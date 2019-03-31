@@ -1,0 +1,22 @@
+language: csharp
+solution: Easly-Compiler.sln
+
+install:
+- nuget restore Easly-Compiler.sln
+- nuget install NUnit -Version 3.11.0 -OutputDirectory testrunner
+- nuget install NUnit.ConsoleRunner -Version 3.9.0 -OutputDirectory testrunner
+
+script:
+- msbuild Easly-Compiler.sln /p:Configuration=Travis
+- cp ./testrunner/NUnit.3.11.0/lib/net45/nunit.framework.dll ./Easly-Compiler/bin/x64/Travis/
+- mono ./testrunner/NUnit.ConsoleRunner.3.9.0/tools/nunit3-console.exe --trace=Debug --labels=All "--where=cat!=Coverage" ./Easly-Compiler/bin/x64/Travis/Test-Easly-Compiler.dll
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  local_dir: ./Easly-Compiler/bin/x64/Travis
+  target_branch: gh-pages
+  email: "github-pages-deploy@travis-ci.org"
+  on:
+    branch: master
