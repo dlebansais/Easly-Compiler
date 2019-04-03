@@ -21,7 +21,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\x64\Debug\Easly-Controller.xml</DocumentationFile>
+    <DocumentationFile>bin\x64\Debug\Easly-Compiler.xml</DocumentationFile>
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
@@ -32,7 +32,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\x64\Release\Easly-Controller.xml</DocumentationFile>
+    <DocumentationFile>bin\x64\Release\Easly-Compiler.xml</DocumentationFile>
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Travis|x64'">
@@ -41,7 +41,7 @@
     <Optimize>true</Optimize>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-    <DocumentationFile>bin\x64\Travis\Easly-Controller.xml</DocumentationFile>
+    <DocumentationFile>bin\x64\Travis\Easly-Compiler.xml</DocumentationFile>
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
@@ -222,7 +222,7 @@
     <PreBuildEvent>call "$(SolutionDir)updateversion.bat" "$(SolutionDir)" "$(SolutionPath)"</PreBuildEvent>
     <PostBuildEvent>call "$(SolutionDir)updatecommit.bat" "$(SolutionDir)" "$(TargetPath)"
 if exist "$(SolutionDir)signfile.bat" call "$(SolutionDir)signfile.bat" "$(SolutionDir)" "$(Configuration)-$(Platform)" "$(TargetPath)"</PostBuildEvent>
-    <DocumentationFile>bin\x64\Release\Easly-Controller.xml</DocumentationFile>
+    <DocumentationFile>bin\x64\Release\Easly-Compiler.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Travis|x64'">
     <PostBuildEvent>cp -a $(SolutionDir)Test/. $(TargetDir)</PostBuildEvent>
