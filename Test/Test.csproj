@@ -62,7 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="sample.easly" />
+    <None Include="test.easly" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Easly-Compiler\Easly-Compiler.csproj">

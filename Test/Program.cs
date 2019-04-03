@@ -1,4 +1,5 @@
-﻿using EaslyCompiler;
+﻿using System.Diagnostics;
+using EaslyCompiler;
 
 namespace Test
 {
@@ -7,7 +8,9 @@ namespace Test
         static void Main(string[] args)
         {
             Compiler c = new Compiler();
-            c.Compile("../../../sample.easly");
+            c.Compile("../../../test.easly");
+
+            Debug.WriteLine($"{c.ErrorList.Count} error(s).");
         }
     }
 }
