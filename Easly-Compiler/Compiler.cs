@@ -475,88 +475,100 @@
 
         private bool ReplicateBlock(BaseNode.IBlock block, List<BaseNode.INode> replicatedNodeList, IWalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
         {
-            ErrorStringValidity StringError;
-
             BaseNode.ReplicationStatus Status = block.Replication;
-            IList NodeList = block.NodeList as IList;
 
             if (Status == BaseNode.ReplicationStatus.Replicated)
-            {
-                IPattern ReplicationPattern = (IPattern)block.ReplicationPattern;
-                IIdentifier SourceIdentifier = (IIdentifier)block.SourceIdentifier;
-                string ReplicationPatternText = ReplicationPattern.Text;
+                return ProcessReplicatedBlock(block, replicatedNodeList, callbacks, context);
+            else
+                return ProcessNormalBlock(block, replicatedNodeList, callbacks, context);
+        }
 
-                string ValidReplicationPattern;
-                if (!StringValidation.IsValidIdentifier(ReplicationPattern, ReplicationPatternText, out ValidReplicationPattern, out StringError))
+        private bool ProcessReplicatedBlock(BaseNode.IBlock block, List<BaseNode.INode> replicatedNodeList, IWalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
+        {
+            ErrorStringValidity StringError;
+            IPattern ReplicationPattern = (IPattern)block.ReplicationPattern;
+            IIdentifier SourceIdentifier = (IIdentifier)block.SourceIdentifier;
+            string ReplicationPatternText = ReplicationPattern.Text;
+
+            string ValidReplicationPattern;
+            if (!StringValidation.IsValidIdentifier(ReplicationPattern, ReplicationPatternText, out ValidReplicationPattern, out StringError))
+            {
+                ErrorList.Add(StringError);
+                return false;
+            }
+            else
+            {
+                string SourceIdentifierText = SourceIdentifier.Text;
+
+                string ValidSourceIdentifier;
+                if (!StringValidation.IsValidIdentifier(SourceIdentifier, SourceIdentifierText, out ValidSourceIdentifier, out StringError))
                 {
                     ErrorList.Add(StringError);
                     return false;
                 }
-                else
+                else if (!context.ReplicateTable.ContainsKey(ValidSourceIdentifier))
                 {
-                    string SourceIdentifierText = SourceIdentifier.Text;
-
-                    string ValidSourceIdentifier;
-                    if (!StringValidation.IsValidIdentifier(SourceIdentifier, SourceIdentifierText, out ValidSourceIdentifier, out StringError))
-                    {
-                        ErrorList.Add(StringError);
-                        return false;
-                    }
-                    else if (!context.ReplicateTable.ContainsKey(ValidSourceIdentifier))
-                    {
-                        ErrorList.Add(new ErrorUnknownIdentifier(SourceIdentifier, ValidSourceIdentifier));
-                        return false;
-                    }
-                    else if (context.PatternTable.ContainsKey(ValidReplicationPattern))
-                    {
-                        ErrorList.Add(new ErrorPatternAlreadyUsed(ReplicationPattern, ValidReplicationPattern));
-                        return false;
-                    }
-                    else
-                    {
-                        List<string> PatternList = context.ReplicateTable[ValidSourceIdentifier];
-
-                        foreach (string PatternText in PatternList)
-                        {
-                            bool Continue = true;
-
-                            context.PatternTable.Add(ValidReplicationPattern, PatternText);
-                            foreach (BaseNode.INode Node in NodeList)
-                            {
-                                BaseNode.INode ClonedNode = NodeHelper.DeepCloneNode(Node, cloneCommentGuid: true);
-
-                                if (!NodeTreeWalk<ReplicationContext>.Walk(ClonedNode, callbacks, context))
-                                {
-                                    Continue = false;
-                                    break;
-                                }
-
-                                if (ClonedNode is IClass AsClass)
-                                    AsClass.SetFullClassPath(ValidReplicationPattern, PatternText);
-
-                                replicatedNodeList.Add(ClonedNode);
-                            }
-
-                            context.PatternTable.Remove(ValidReplicationPattern);
-
-                            if (!Continue)
-                                return false;
-                        }
-                    }
+                    ErrorList.Add(new ErrorUnknownIdentifier(SourceIdentifier, ValidSourceIdentifier));
+                    return false;
                 }
+                else if (context.PatternTable.ContainsKey(ValidReplicationPattern))
+                {
+                    ErrorList.Add(new ErrorPatternAlreadyUsed(ReplicationPattern, ValidReplicationPattern));
+                    return false;
+                }
+                else
+                    return ProcessReplicationPatterns(block, replicatedNodeList, ValidReplicationPattern, ValidSourceIdentifier, callbacks, context);
             }
-            else
+        }
+
+        private bool ProcessReplicationPatterns(BaseNode.IBlock block, List<BaseNode.INode> replicatedNodeList, string replicationPattern, string sourceIdentifier, IWalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
+        {
+            IList NodeList = block.NodeList as IList;
+            List<string> PatternList = context.ReplicateTable[sourceIdentifier];
+
+            foreach (string PatternText in PatternList)
             {
+                bool Continue = true;
+
+                context.PatternTable.Add(replicationPattern, PatternText);
                 foreach (BaseNode.INode Node in NodeList)
                 {
-                    if (!NodeTreeWalk<ReplicationContext>.Walk(Node, callbacks, context))
-                        return false;
+                    BaseNode.INode ClonedNode = NodeHelper.DeepCloneNode(Node, cloneCommentGuid: true);
 
-                    if (Node is IClass AsClass)
-                        AsClass.SetFullClassPath();
+                    if (!NodeTreeWalk<ReplicationContext>.Walk(ClonedNode, callbacks, context))
+                    {
+                        Continue = false;
+                        break;
+                    }
 
-                    replicatedNodeList.Add(Node);
+                    if (ClonedNode is IClass AsClass)
+                        AsClass.SetFullClassPath(replicationPattern, PatternText);
+
+                    replicatedNodeList.Add(ClonedNode);
                 }
+
+                context.PatternTable.Remove(replicationPattern);
+
+                if (!Continue)
+                    return false;
+            }
+
+            return true;
+        }
+
+        private bool ProcessNormalBlock(BaseNode.IBlock block, List<BaseNode.INode> replicatedNodeList, IWalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
+        {
+            IList NodeList = block.NodeList as IList;
+
+            foreach (BaseNode.INode Node in NodeList)
+            {
+                if (!NodeTreeWalk<ReplicationContext>.Walk(Node, callbacks, context))
+                    return false;
+
+                if (Node is IClass AsClass)
+                    AsClass.SetFullClassPath();
+
+                replicatedNodeList.Add(Node);
             }
 
             return true;
