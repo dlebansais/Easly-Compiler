@@ -38,4 +38,11 @@ Since blocks can be nested, the following order is used:
 + Then, each block is replicated, starting from the top level ones, and reprocessing each replicated version to handle nested blocks.
 
 Since maintaining blocks after this step no longer makes sense, all nodes in block lists are grouped into one list (per property).
+
+## Replacing macroes (phase 2)
+
+The following macroes are replaced by their compile time values, instances of IInitializedObjectExpression:
++ Class Path, this includes replication information.
++ Class Counter, each replicated class has its own counter.
++ Random Number, each instance is unique.
  

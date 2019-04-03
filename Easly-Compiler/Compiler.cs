@@ -441,10 +441,8 @@
                 {
                     if (context.ReplicateTable.ContainsKey(ValidReplicateName))
                         ErrorList.Add(new ErrorDuplicateName(ReplicateName, ValidReplicateName));
-
                     else if (Replicate.PatternList.Count == 0)
                         ErrorList.Add(new ErrorEmptyList((ISource)Replicate, ValidReplicateName));
-
                     else
                     {
                         List<string> ValidPatternList = new List<string>();
@@ -504,13 +502,11 @@
                         ErrorList.Add(StringError);
                         return false;
                     }
-
                     else if (!context.ReplicateTable.ContainsKey(ValidSourceIdentifier))
                     {
                         ErrorList.Add(new ErrorUnknownIdentifier(SourceIdentifier, ValidSourceIdentifier));
                         return false;
                     }
-
                     else if (context.PatternTable.ContainsKey(ValidReplicationPattern))
                     {
                         ErrorList.Add(new ErrorPatternAlreadyUsed(ReplicationPattern, ValidReplicationPattern));
