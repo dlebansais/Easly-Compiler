@@ -7,7 +7,7 @@ namespace Test
         static void Main(string[] args)
         {
             Compiler c = new Compiler();
-            c.Compile("../../../root.easly");
+            c.Compile("../../../sample.easly");
         }
     }
 }

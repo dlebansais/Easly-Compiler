@@ -22,6 +22,11 @@
         /// The file name.
         /// </summary>
         public string FileName { get; }
+
+        /// <summary>
+        /// The error message.
+        /// </summary>
+        public override string Message { get { return $"File not found: '{FileName}'."; } }
         #endregion
     }
 }

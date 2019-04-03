@@ -29,3 +29,13 @@ The following macroes are replaced by their compile time values, instances of II
 + Debugging
 
 Other macroes are expanded after the block replication step.
+
+## Block Replication
+
+All blocks with a replication status equal to `Replicated` are processed.
+Since blocks can be nested, the following order is used:
++ Class replicate blocks are replicated first in each class.
++ Then, each block is replicated, starting from the top level ones, and reprocessing each replicated version to handle nested blocks.
+
+Since maintaining blocks after this step no longer makes sense, all nodes in block lists are grouped into one list (per property).
+ 

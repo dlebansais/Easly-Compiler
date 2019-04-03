@@ -24,6 +24,11 @@
         /// The exception that occured reading the file or stream.
         /// </summary>
         public Exception Exception { get; }
+
+        /// <summary>
+        /// The error message.
+        /// </summary>
+        public override string Message { get { return Exception.Message; } }
         #endregion
     }
 }

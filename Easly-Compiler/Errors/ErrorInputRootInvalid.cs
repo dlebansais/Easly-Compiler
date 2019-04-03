@@ -1,6 +1,6 @@
 ﻿namespace EaslyCompiler
 {
-    using BaseNode;
+    using CompilerNode;
 
     /// <summary>
     /// Invalid Input Root.
@@ -13,9 +13,16 @@
         /// </summary>
         /// <param name="root">The error location.</param>
         public ErrorInputRootInvalid(IRoot root)
-            : base(new ErrorLocation(root))
+            : base(root)
         {
         }
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// The error message.
+        /// </summary>
+        public override string Message { get { return $"Invalid root object."; } }
         #endregion
     }
 }

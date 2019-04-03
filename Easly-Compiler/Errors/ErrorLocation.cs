@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
-    using BaseNode;
+    using System.Diagnostics;
+    using CompilerNode;
 
     /// <summary>
     /// Location of an error.
@@ -26,7 +27,21 @@
         /// <param name="node">The node location.</param>
         public ErrorLocation(INode node)
         {
+            Debug.Assert(node != null);
+
             Node = node;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ErrorLocation"/> class.
+        /// </summary>
+        /// <param name="source">The node location.</param>
+        public ErrorLocation(ISource source)
+        {
+            Debug.Assert(source != null);
+
+            Node = source as INode;
+            Debug.Assert(Node != null);
         }
         #endregion
 
