@@ -14,8 +14,8 @@ if exist ..\Misc-Beta-Test\Test-Easly-Compiler\obj\x64\Release\Coverage-Easly-Co
 "..\Misc-Beta-Test\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe" -register:user -target:"..\Misc-Beta-Test\packages\NUnit.ConsoleRunner.3.9.0\tools\nunit3-console.exe" -targetargs:"..\Misc-Beta-Test\Test-Easly-Compiler\bin\x64\Release\Test-Easly-Compiler.dll --trace=Debug --labels=All --where=cat==Coverage" -filter:"+[Easly-Compiler*]* -[Test-Easly-Compiler*]*" -output:"..\Misc-Beta-Test\Test-Easly-Compiler\obj\x64\Release\Coverage-Easly-Compiler-Release_coverage.xml"
 
 :upload
-if exist ..\Misc-Beta-Test\Test-Easly-Compiler\obj\x64\Debug\Coverage-Easly-Compiler-Debug_coverage.xml ..\Misc-Beta-Test\packages\Codecov.1.1.1\tools\codecov -f "..\Misc-Beta-Test\Test-Easly-Compiler\obj\x64\Debug\Coverage-Easly-Compiler-Debug_coverage.xml" -t "fc0bc186-943a-4a37-9edf-75c2f365deee"
-if exist ..\Misc-Beta-Test\Test-Easly-Compiler\obj\x64\Release\Coverage-Easly-Compiler-Release_coverage.xml ..\Misc-Beta-Test\packages\Codecov.1.1.1\tools\codecov -f "..\Misc-Beta-Test\Test-Easly-Compiler\obj\x64\Release\Coverage-Easly-Compiler-Release_coverage.xml" -t "fc0bc186-943a-4a37-9edf-75c2f365deee"
+if exist ..\Misc-Beta-Test\Test-Easly-Compiler\obj\x64\Debug\Coverage-Easly-Compiler-Debug_coverage.xml ..\Misc-Beta-Test\packages\Codecov.1.1.1\tools\codecov -f "..\Misc-Beta-Test\Test-Easly-Compiler\obj\x64\Debug\Coverage-Easly-Compiler-Debug_coverage.xml" -t "e37c5eff-2e09-45d3-94bf-ace6e34fca12"
+if exist ..\Misc-Beta-Test\Test-Easly-Compiler\obj\x64\Release\Coverage-Easly-Compiler-Release_coverage.xml ..\Misc-Beta-Test\packages\Codecov.1.1.1\tools\codecov -f "..\Misc-Beta-Test\Test-Easly-Compiler\obj\x64\Release\Coverage-Easly-Compiler-Release_coverage.xml" -t "e37c5eff-2e09-45d3-94bf-ace6e34fca12"
 goto end
 
 :error_console1
