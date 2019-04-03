@@ -83,6 +83,7 @@
         public virtual void Compile(BaseNode.IRoot root)
         {
             Root = root ?? throw new ArgumentNullException(nameof(root));
+            ErrorList.Clear();
 
             using (MemoryStream ms = new MemoryStream())
             {
@@ -101,6 +102,7 @@
         public virtual void Compile(Stream stream)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
+            ErrorList.Clear();
 
             try
             {
@@ -140,7 +142,7 @@
 
             MergeLanguageRoot(root, LanguageRoot);
 
-            if (!NodeTreeDiagnostic.IsValid(root))
+            if (!NodeTreeDiagnostic.IsValid(root, assertValid: false))
             {
                 ErrorList.Add(new ErrorInputRootInvalid(root));
                 return;
