@@ -622,6 +622,10 @@
                 Debug.Assert(NodeWithReplicatedBlocks != null);
 
                 NodeWithReplicatedBlocks.FillReplicatedList(propertyName, ReplicatedNodeList);
+
+                /*foreach (BaseNode.INode Node in ReplicatedNodeList)
+                    Debug.WriteLine($"Adding {Node} to list {propertyName} of {node}");*/
+
                 return true;
             }
         }
