@@ -47,6 +47,12 @@
     <Reference Include="Easly-Language">
       <HintPath>..\Easly-Language\$(Platform)\$(Configuration)\Easly-Language.dll</HintPath>
     </Reference>
+    <Reference Include="Easly-Language-Helper">
+      <HintPath>..\Easly-Language\$(Platform)\$(Configuration)\Easly-Language-Helper.dll</HintPath>
+    </Reference>
+    <Reference Include="PolySerializer">
+      <HintPath>..\PolySerializer\$(Platform)\$(Configuration)\PolySerializer.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

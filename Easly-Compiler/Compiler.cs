@@ -180,19 +180,35 @@
         /// <summary></summary>
         protected virtual void MergeLanguageRoot(IRoot root, IRoot languageRoot)
         {
-            foreach (IBlock<BaseNode.ILibrary, BaseNode.Library> Block in languageRoot.LibraryBlocks.NodeBlockList)
-                root.LibraryBlocks.NodeBlockList.Add(Block);
+            Debug.Assert(languageRoot.LibraryBlocks.NodeBlockList.Count == 1);
+            BaseNode.IBlock<BaseNode.ILibrary, BaseNode.Library> BlockLibrary = languageRoot.LibraryBlocks.NodeBlockList[0];
 
-            foreach (IBlock<BaseNode.IClass, BaseNode.Class> Block in languageRoot.ClassBlocks.NodeBlockList)
+            Debug.Assert(BlockLibrary.NodeList.Count == 1);
+            root.LibraryBlocks.NodeBlockList.Add(BlockLibrary);
+
+            BaseNode.ILibrary LanguageLibrary = BlockLibrary.NodeList[0];
+            Debug.Assert(LanguageLibrary.ClassIdentifierBlocks.NodeBlockList.Count == 1);
+            BaseNode.IBlock<BaseNode.IIdentifier, BaseNode.Identifier> BlockIdentifier = LanguageLibrary.ClassIdentifierBlocks.NodeBlockList[0];
+
+            Debug.Assert(BlockIdentifier.NodeList.Count == LanguageClasses.NameToGuid.Count);
+            List<string> IdentifierList = new List<string>();
+            foreach (IIdentifier Item in BlockIdentifier.NodeList)
             {
-                foreach (IClass Item in Block.NodeList)
-                {
-                    Debug.Assert(LanguageClasses.NameToGuid.ContainsKey(Item.EntityName.Text));
-                    Debug.Assert(LanguageClasses.NameToGuid[Item.EntityName.Text] == Item.ClassGuid);
-                }
-
-                root.ClassBlocks.NodeBlockList.Add(Block);
+                Debug.Assert(!IdentifierList.Contains(Item.Text));
+                IdentifierList.Add(Item.Text);
             }
+
+            Debug.Assert(languageRoot.ClassBlocks.NodeBlockList.Count == 1);
+            BaseNode.IBlock<BaseNode.IClass, BaseNode.Class> BlockClass = languageRoot.ClassBlocks.NodeBlockList[0];
+
+            Debug.Assert(BlockClass.NodeList.Count == LanguageClasses.NameToGuid.Count);
+            foreach (IClass Item in BlockClass.NodeList)
+            {
+                Debug.Assert(LanguageClasses.NameToGuid.ContainsKey(Item.EntityName.Text));
+                Debug.Assert(LanguageClasses.NameToGuid[Item.EntityName.Text] == Item.ClassGuid);
+                Debug.Assert(IdentifierList.Contains(Item.EntityName.Text));
+            }
+            root.ClassBlocks.NodeBlockList.Add(BlockClass);
 
             Debug.Assert(languageRoot.Replicates.Count == 0);
         }
@@ -228,7 +244,7 @@
             GenerateConformanceToStandard();
             GenerateDebugging();
 
-            return NodeTreeWalk<ReplacePhase1MacroContext>.Walk(root, new WalkCallbacks<ReplacePhase1MacroContext>() { HandlerNode = ReplacePhase1Macro }, new ReplacePhase1MacroContext());
+            return NodeTreeWalk<ReplacePhase1MacroContext>.Walk(root, new WalkCallbacks<ReplacePhase1MacroContext>() { HandlerNode = ReplacePhase1Macro, IsRecursive = true }, new ReplacePhase1MacroContext());
         }
 
         private IInitializedObjectExpression CompilationDateTime;
@@ -240,32 +256,32 @@
         /// <summary></summary>
         protected virtual void GenerateCompilationDateTime()
         {
-            CompilationDateTime = InitializedExpression("Date And Time", "0");
+            CompilationDateTime = InitializedExpression(LanguageClasses.DateAndTime.Name, "0");
         }
 
         /// <summary></summary>
         protected virtual void GenerateCompilationUID()
         {
             string NewGuidDigits = Guid.NewGuid().ToString("N");
-            CompilationUID = InitializedExpression("Globally Discrete Identifier", "0x" + NewGuidDigits);
+            CompilationUID = InitializedExpression(LanguageClasses.UniversallyUniqueIdentifier.Name, "0x" + NewGuidDigits);
         }
 
         /// <summary></summary>
         protected virtual void GenerateCompilerVersion()
         {
-            CompilerVersion = InitializedExpression("String", "Easly 1");
+            CompilerVersion = InitializedExpression(LanguageClasses.String.Name, "Easly 1");
         }
 
         /// <summary></summary>
         protected virtual void GenerateConformanceToStandard()
         {
-            ConformanceToStandard = InitializedExpression("Boolean", "1");
+            ConformanceToStandard = InitializedExpression(LanguageClasses.Boolean.Name, "True");
         }
 
         /// <summary></summary>
         protected virtual void GenerateDebugging()
         {
-            Debugging = InitializedExpression("Boolean", "0");
+            Debugging = InitializedExpression(LanguageClasses.Boolean.Name, "False");
         }
 
         /// <summary></summary>
@@ -320,7 +336,7 @@
                     case BaseNode.PreprocessorMacro.DiscreteClassIdentifier:
                         if (context.CurrentClass != null)
                         {
-                            IInitializedObjectExpression ReplacementNode = InitializedExpression("Guid", context.CurrentClass.ClassGuid.ToString("N"));
+                            IInitializedObjectExpression ReplacementNode = InitializedExpression(LanguageClasses.UniversallyUniqueIdentifier.Name, context.CurrentClass.ClassGuid.ToString("N"));
                             NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ReplacementNode);
                         }
                         else
@@ -638,7 +654,7 @@
                     case BaseNode.PreprocessorMacro.ClassPath:
                         if (context.CurrentClass != null)
                         {
-                            ReplacementNode = InitializedExpression("String", context.CurrentClass.FullClassPath);
+                            ReplacementNode = InitializedExpression(LanguageClasses.String.Name, context.CurrentClass.FullClassPath);
                             NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ReplacementNode);
                         }
                         else
@@ -653,7 +669,7 @@
                     case BaseNode.PreprocessorMacro.Counter:
                         if (context.CurrentClass != null)
                         {
-                            ReplacementNode = InitializedExpression("Number", context.CurrentClass.ClassCounter.ToString());
+                            ReplacementNode = InitializedExpression(LanguageClasses.Number.Name, context.CurrentClass.ClassCounter.ToString());
                             NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ReplacementNode);
 
                             context.CurrentClass.IncrementClassCounter();
@@ -677,7 +693,7 @@
                         foreach (byte b in Data)
                             Value += b.ToString("X2");
 
-                        ReplacementNode = InitializedExpression("Number", Value);
+                        ReplacementNode = InitializedExpression(LanguageClasses.Number.Name, Value);
                         NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ReplacementNode);
                         IsHandled = true;
                         break;
