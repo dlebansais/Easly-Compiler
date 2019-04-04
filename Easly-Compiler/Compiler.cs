@@ -143,15 +143,15 @@
 
             MergeLanguageRoot(root, LanguageRoot);
 
-            if (!IsRootValid(root))
-                return;
+            if (IsRootValid(root))
+            {
+                ReplacePhase1Macroes(root);
 
-            ReplacePhase1Macroes(root);
-
-            if (!ReplicateAllBlocks(root))
-                return;
-
-            ReplacePhase2Macroes(root);
+                if (ReplicateAllBlocks(root))
+                {
+                    ReplacePhase2Macroes(root);
+                }
+            }
         }
 
         /// <summary></summary>
@@ -487,11 +487,12 @@
 
         private bool ReplicateBlockList(BaseNode.IBlockList blockList, List<BaseNode.INode> replicatedNodeList, IWalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
         {
-            foreach (BaseNode.IBlock BlockObject in blockList.NodeBlockList)
-                if (!ReplicateBlock(BlockObject, replicatedNodeList, callbacks, context))
-                    return false;
+            bool Result = true;
 
-            return true;
+            foreach (BaseNode.IBlock BlockObject in blockList.NodeBlockList)
+                Result &= ReplicateBlock(BlockObject, replicatedNodeList, callbacks, context);
+
+            return Result;
         }
 
         private bool ReplicateBlock(BaseNode.IBlock block, List<BaseNode.INode> replicatedNodeList, IWalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
@@ -547,52 +548,53 @@
             IList NodeList = block.NodeList as IList;
             List<string> PatternList = context.ReplicateTable[sourceIdentifier];
 
-            foreach (string PatternText in PatternList)
+            bool Continue = true;
+            for (int i = 0; i < PatternList.Count && Continue; i++)
             {
-                bool Continue = true;
+                string PatternText = PatternList[i];
 
                 context.PatternTable.Add(replicationPattern, PatternText);
                 foreach (BaseNode.INode Node in NodeList)
                 {
                     BaseNode.INode ClonedNode = NodeHelper.DeepCloneNode(Node, cloneCommentGuid: true);
 
-                    if (!NodeTreeWalk<ReplicationContext>.Walk(ClonedNode, callbacks, context))
+                    Continue &= NodeTreeWalk<ReplicationContext>.Walk(ClonedNode, callbacks, context);
+                    if (Continue)
                     {
-                        Continue = false;
-                        break;
+                        if (ClonedNode is IClass AsClass)
+                            AsClass.SetFullClassPath(replicationPattern, PatternText);
+
+                        replicatedNodeList.Add(ClonedNode);
                     }
-
-                    if (ClonedNode is IClass AsClass)
-                        AsClass.SetFullClassPath(replicationPattern, PatternText);
-
-                    replicatedNodeList.Add(ClonedNode);
                 }
 
                 context.PatternTable.Remove(replicationPattern);
-
-                if (!Continue)
-                    return false;
             }
 
-            return true;
+            return Continue;
         }
 
         private bool ProcessNormalBlock(BaseNode.IBlock block, List<BaseNode.INode> replicatedNodeList, IWalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
         {
             IList NodeList = block.NodeList as IList;
 
-            foreach (BaseNode.INode Node in NodeList)
+            bool Continue = true;
+            for (int i = 0; i < NodeList.Count && Continue; i++)
             {
-                if (!NodeTreeWalk<ReplicationContext>.Walk(Node, callbacks, context))
-                    return false;
+                BaseNode.INode Node = NodeList[i] as BaseNode.INode;
+                Debug.Assert(Node != null);
 
-                if (Node is IClass AsClass)
-                    AsClass.SetFullClassPath();
+                Continue &= NodeTreeWalk<ReplicationContext>.Walk(Node, callbacks, context);
+                if (Continue)
+                {
+                    if (Node is IClass AsClass)
+                        AsClass.SetFullClassPath();
 
-                replicatedNodeList.Add(Node);
+                    replicatedNodeList.Add(Node);
+                }
             }
 
-            return true;
+            return Continue;
         }
 
         private bool OnStringReplicateText(BaseNode.INode node, string propertyName, ReplicationContext context)
@@ -619,14 +621,16 @@
             else
             {
                 List<BaseNode.INode> ReplicatedNodeList = new List<BaseNode.INode>();
-                if (!ReplicateBlockList(blockList, ReplicatedNodeList, callbacks, context))
-                    return false;
+                bool Continue = ReplicateBlockList(blockList, ReplicatedNodeList, callbacks, context);
+                if (Continue)
+                {
+                    INodeWithReplicatedBlocks NodeWithReplicatedBlocks = node as INodeWithReplicatedBlocks;
+                    Debug.Assert(NodeWithReplicatedBlocks != null);
 
-                INodeWithReplicatedBlocks NodeWithReplicatedBlocks = node as INodeWithReplicatedBlocks;
-                Debug.Assert(NodeWithReplicatedBlocks != null);
+                    NodeWithReplicatedBlocks.FillReplicatedList(propertyName, ReplicatedNodeList);
+                }
 
-                NodeWithReplicatedBlocks.FillReplicatedList(propertyName, ReplicatedNodeList);
-                return true;
+                return Continue;
             }
         }
         #endregion
