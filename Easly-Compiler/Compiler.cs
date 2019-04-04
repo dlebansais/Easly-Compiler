@@ -146,14 +146,12 @@
             if (!IsRootValid(root))
                 return;
 
-            if (!ReplacePhase1Macroes(root))
-                return;
+            ReplacePhase1Macroes(root);
 
             if (!ReplicateAllBlocks(root))
                 return;
 
-            if (!ReplacePhase2Macroes(root))
-                return;
+            ReplacePhase2Macroes(root);
         }
 
         /// <summary></summary>
@@ -225,15 +223,18 @@
 
         #region Replication, phase 1
         /// <summary></summary>
-        protected virtual bool ReplacePhase1Macroes(IRoot root)
+        protected virtual void ReplacePhase1Macroes(IRoot root)
         {
+            Debug.Assert(ErrorList.Count == 0);
+
             GenerateCompilationDateTime();
             GenerateCompilationUID();
             GenerateCompilerVersion();
             GenerateConformanceToStandard();
             GenerateDebugging();
 
-            return NodeTreeWalk<ReplacePhase1MacroContext>.Walk(root, new WalkCallbacks<ReplacePhase1MacroContext>() { HandlerNode = ReplacePhase1Macro, IsRecursive = true }, new ReplacePhase1MacroContext());
+            bool Success = NodeTreeWalk<ReplacePhase1MacroContext>.Walk(root, new WalkCallbacks<ReplacePhase1MacroContext>() { HandlerNode = ReplacePhase1Macro, IsRecursive = true }, new ReplacePhase1MacroContext());
+            Debug.Assert(Success);
         }
 
         private IInitializedObjectExpression CompilationDateTime;
@@ -374,6 +375,8 @@
         #region Block Replication
         private bool ReplicateAllBlocks(IRoot root)
         {
+            Debug.Assert(ErrorList.Count == 0);
+
             foreach (IBlock<BaseNode.IClass, BaseNode.Class> Block in root.ClassBlocks.NodeBlockList)
                 foreach (IClass Item in Block.NodeList)
                     if (string.IsNullOrEmpty(Item.ClassPath))
@@ -631,11 +634,14 @@
         }
         #endregion
 
-        #region Replication, phase 1
+        #region Replication, phase 2
         /// <summary></summary>
-        protected virtual bool ReplacePhase2Macroes(IRoot root)
+        protected virtual void ReplacePhase2Macroes(IRoot root)
         {
-            return NodeTreeWalk<ReplacePhase2MacroContext>.Walk(root, new WalkCallbacks<ReplacePhase2MacroContext>() { HandlerNode = ReplacePhase2Macro, BlockSubstitution = new KeyValuePair<string, string>("Blocks", "List") }, new ReplacePhase2MacroContext());
+            Debug.Assert(ErrorList.Count == 0);
+
+            bool Success = NodeTreeWalk<ReplacePhase2MacroContext>.Walk(root, new WalkCallbacks<ReplacePhase2MacroContext>() { HandlerNode = ReplacePhase2Macro, IsRecursive = true, BlockSubstitution = new KeyValuePair<string, string>("Blocks", "List") }, new ReplacePhase2MacroContext());
+            Debug.Assert(Success);
         }
 
         /// <summary></summary>
