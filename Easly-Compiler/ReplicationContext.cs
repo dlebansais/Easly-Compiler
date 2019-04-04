@@ -8,17 +8,14 @@
     public class ReplicationContext
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReplicationContext"/> class.
+        /// A table of subsitutions.
         /// </summary>
-        public ReplicationContext()
-        {
-            ReplicateTable = new Dictionary<string, List<string>>();
-        }
+        public Dictionary<string, List<string>> GlobalReplicateTable { get; } = new Dictionary<string, List<string>>();
 
         /// <summary>
         /// A table of subsitutions.
         /// </summary>
-        public Dictionary<string, List<string>> ReplicateTable { get; }
+        public Dictionary<string, List<string>> ReplicateTable { get; } = new Dictionary<string, List<string>>();
 
         /// <summary>
         /// A table of pattern association. The key is the text to replace, the value the replacement.

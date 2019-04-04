@@ -415,6 +415,10 @@
             }
 
             CheckReplicates(ReplicateList, context);
+
+            Debug.Assert(context.GlobalReplicateTable.Count == 0);
+            foreach (KeyValuePair<string, List<string>> Entry in context.ReplicateTable)
+                context.GlobalReplicateTable.Add(Entry.Key, Entry.Value);
         }
 
         private void ProcessClassReplicates(IClass parentClass, IWalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
@@ -436,7 +440,7 @@
                 }
 
                 context.ReplicateTable.Clear();
-                foreach (KeyValuePair<string, List<string>> Entry in context.ReplicateTable)
+                foreach (KeyValuePair<string, List<string>> Entry in context.GlobalReplicateTable)
                     context.ReplicateTable.Add(Entry.Key, Entry.Value);
 
                 CheckReplicates(ReplicateList, context);
@@ -622,10 +626,6 @@
                 Debug.Assert(NodeWithReplicatedBlocks != null);
 
                 NodeWithReplicatedBlocks.FillReplicatedList(propertyName, ReplicatedNodeList);
-
-                /*foreach (BaseNode.INode Node in ReplicatedNodeList)
-                    Debug.WriteLine($"Adding {Node} to list {propertyName} of {node}");*/
-
                 return true;
             }
         }
