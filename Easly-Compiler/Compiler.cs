@@ -122,6 +122,7 @@
         /// <summary></summary>
         protected virtual ISerializer CreateCompilerSerializer()
         {
+            // Convert namespace, assembly and version to use the compiler classes.
             ISerializer Serializer = new Serializer();
             Dictionary<NamespaceDescriptor, NamespaceDescriptor> NamespaceOverrideTable = new Dictionary<NamespaceDescriptor, NamespaceDescriptor>();
             NamespaceOverrideTable.Add(new NamespaceDescriptor("BaseNode", "*", "*", "*", "*"), NamespaceDescriptor.DescriptorFromType(typeof(IRoot)));
@@ -142,11 +143,8 @@
 
             MergeLanguageRoot(root, LanguageRoot);
 
-            if (!NodeTreeDiagnostic.IsValid(root, assertValid: false))
-            {
-                ErrorList.Add(new ErrorInputRootInvalid(root));
+            if (!IsRootValid(root))
                 return;
-            }
 
             if (!ReplacePhase1Macroes(root))
                 return;
@@ -164,7 +162,6 @@
             try
             {
                 Assembly CurrentAssembly = Assembly.GetExecutingAssembly();
-                object o = CurrentAssembly.GetManifestResourceNames();
                 using (Stream fs = CurrentAssembly.GetManifestResourceStream("EaslyCompiler.Resources.language.easly"))
                 {
                     ISerializer Serializer = CreateCompilerSerializer();
@@ -214,23 +211,15 @@
         }
 
         /// <summary></summary>
-        /// <typeparam name="TBase">BaseNode type.</typeparam>
-        /// <typeparam name="TCompiler">Compiler type.</typeparam>
-        /// <param name="node">The BaseNode object to convert.</param>
-        protected virtual TCompiler ToCompilerNode<TBase, TCompiler>(TBase node)
-            where TBase : BaseNode.INode
-            where TCompiler : class, INode
+        protected virtual bool IsRootValid(IRoot root)
         {
-            using (MemoryStream ms = new MemoryStream())
+            if (!NodeTreeDiagnostic.IsValid(root, assertValid: false))
             {
-                ISerializer s = new Serializer();
-                s.Serialize(ms, node);
-
-                ms.Seek(0, SeekOrigin.Begin);
-
-                s = CreateCompilerSerializer();
-                return s.Deserialize(ms) as TCompiler;
+                ErrorList.Add(new ErrorInputRootInvalid(root));
+                return false;
             }
+
+            return true;
         }
         #endregion
 
@@ -256,7 +245,9 @@
         /// <summary></summary>
         protected virtual void GenerateCompilationDateTime()
         {
-            CompilationDateTime = InitializedExpression(LanguageClasses.DateAndTime.Name, "0");
+            DateTime Now = DateTime.UtcNow;
+            string IsoString = Now.ToString("u");
+            CompilationDateTime = InitializedExpression(LanguageClasses.DateAndTime.Name, IsoString);
         }
 
         /// <summary></summary>
@@ -275,13 +266,13 @@
         /// <summary></summary>
         protected virtual void GenerateConformanceToStandard()
         {
-            ConformanceToStandard = InitializedExpression(LanguageClasses.Boolean.Name, "True");
+            ConformanceToStandard = InitializedExpression(LanguageClasses.Boolean.Name, LanguageClasses.BooleanTrueString);
         }
 
         /// <summary></summary>
         protected virtual void GenerateDebugging()
         {
-            Debugging = InitializedExpression(LanguageClasses.Boolean.Name, "False");
+            Debugging = InitializedExpression(LanguageClasses.Boolean.Name, LanguageClasses.BooleanFalseString);
         }
 
         /// <summary></summary>
@@ -296,6 +287,26 @@
 
             IInitializedObjectExpression Result = ToCompilerNode<BaseNode.IInitializedObjectExpression, IInitializedObjectExpression>(Expression);
             return Result;
+        }
+
+        /// <summary></summary>
+        /// <typeparam name="TBase">BaseNode type.</typeparam>
+        /// <typeparam name="TCompiler">Compiler type.</typeparam>
+        /// <param name="node">The BaseNode object to convert.</param>
+        protected virtual TCompiler ToCompilerNode<TBase, TCompiler>(TBase node)
+            where TBase : BaseNode.INode
+            where TCompiler : class, INode
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                ISerializer s = new Serializer();
+                s.Serialize(ms, node);
+
+                ms.Seek(0, SeekOrigin.Begin);
+
+                s = CreateCompilerSerializer();
+                return s.Deserialize(ms) as TCompiler;
+            }
         }
 
         /// <summary></summary>
@@ -334,17 +345,9 @@
                         break;
 
                     case BaseNode.PreprocessorMacro.DiscreteClassIdentifier:
-                        if (context.CurrentClass != null)
-                        {
-                            IInitializedObjectExpression ReplacementNode = InitializedExpression(LanguageClasses.UniversallyUniqueIdentifier.Name, context.CurrentClass.ClassGuid.ToString("N"));
-                            NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ReplacementNode);
-                        }
-                        else
-                        {
-                            ErrorList.Add(new ErrorMacroOutOfContext(AsPreprocessorExpression));
-                            Result = false;
-                        }
-
+                        Debug.Assert(context.CurrentClass != null);
+                        IInitializedObjectExpression ReplacementNode = InitializedExpression(LanguageClasses.UniversallyUniqueIdentifier.Name, context.CurrentClass.ClassGuid.ToString("N"));
+                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ReplacementNode);
                         IsHandled = true;
                         break;
 
@@ -652,48 +655,23 @@
                 switch (AsPreprocessorExpression.Value)
                 {
                     case BaseNode.PreprocessorMacro.ClassPath:
-                        if (context.CurrentClass != null)
-                        {
-                            ReplacementNode = InitializedExpression(LanguageClasses.String.Name, context.CurrentClass.FullClassPath);
-                            NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ReplacementNode);
-                        }
-                        else
-                        {
-                            ErrorList.Add(new ErrorMacroOutOfContext(AsPreprocessorExpression));
-                            Result = false;
-                        }
-
+                        Debug.Assert(context.CurrentClass != null);
+                        ReplacementNode = InitializedExpression(LanguageClasses.String.Name, context.CurrentClass.FullClassPath);
+                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ReplacementNode);
                         IsHandled = true;
                         break;
 
                     case BaseNode.PreprocessorMacro.Counter:
-                        if (context.CurrentClass != null)
-                        {
-                            ReplacementNode = InitializedExpression(LanguageClasses.Number.Name, context.CurrentClass.ClassCounter.ToString());
-                            NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ReplacementNode);
+                        Debug.Assert(context.CurrentClass != null);
+                        ReplacementNode = InitializedExpression(LanguageClasses.Number.Name, context.CurrentClass.ClassCounter.ToString());
+                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ReplacementNode);
 
-                            context.CurrentClass.IncrementClassCounter();
-                        }
-                        else
-                        {
-                            ErrorList.Add(new ErrorMacroOutOfContext(AsPreprocessorExpression));
-                            Result = false;
-                        }
-
+                        context.CurrentClass.IncrementClassCounter();
                         IsHandled = true;
                         break;
 
                     case BaseNode.PreprocessorMacro.RandomInteger:
-                        RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
-
-                        byte[] Data = new byte[8];
-                        rng.GetBytes(Data);
-
-                        string Value = "0x";
-                        foreach (byte b in Data)
-                            Value += b.ToString("X2");
-
-                        ReplacementNode = InitializedExpression(LanguageClasses.Number.Name, Value);
+                        ReplacementNode = CreateRandomInteger();
                         NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ReplacementNode);
                         IsHandled = true;
                         break;
@@ -704,6 +682,22 @@
 
             return Result;
         }
+
+        /// <summary></summary>
+        protected virtual IInitializedObjectExpression CreateRandomInteger()
+        {
+            RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
+
+            byte[] Data = new byte[8];
+            rng.GetBytes(Data);
+
+            string Value = "0x";
+            foreach (byte b in Data)
+                Value += b.ToString("X2");
+
+            return InitializedExpression(LanguageClasses.Number.Name, Value);
+        }
+
         #endregion
     }
 }

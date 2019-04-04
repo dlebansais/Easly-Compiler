@@ -82,5 +82,8 @@
             { FunctionEntity.Name, FunctionEntity.Guid },
             { UniversallyUniqueIdentifier.Name, UniversallyUniqueIdentifier.Guid },
         };
+
+        public static readonly string BooleanTrueString = "True";
+        public static readonly string BooleanFalseString = "False";
     }
 }
