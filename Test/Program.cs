@@ -10,7 +10,17 @@ namespace Test
     {
         static void Main(string[] args)
         {
-            /*
+            Compiler c = new Compiler();
+            c.Compile("../../../coverage.easly");
+            //c.Compile("../../../test.easly");
+
+            Debug.WriteLine($"{c.ErrorList.Count} error(s).");
+            foreach (Error Error in c.ErrorList)
+                Debug.WriteLine($"  {Error.Message} ({Error}).");
+        }
+
+        static void DebugOutputLanguage()
+        {
             IRoot Root;
 
             using (FileStream fs = new FileStream("../../../../Easly-Compiler/Resources/language.easly", FileMode.Open, FileAccess.Read))
@@ -34,15 +44,6 @@ namespace Test
                         ISerializer s = new Serializer();
                         s.Serialize(fs, Item);
                     }
-                    */
-
-            Compiler c = new Compiler();
-            c.Compile("../../../coverage.easly");
-            //c.Compile("../../../test.easly");
-
-            Debug.WriteLine($"{c.ErrorList.Count} error(s).");
-            foreach (Error Error in c.ErrorList)
-                Debug.WriteLine($"  {Error.Message} ({Error}).");
         }
     }
 }
