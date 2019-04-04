@@ -157,18 +157,11 @@
         /// <summary></summary>
         protected virtual IRoot LoadLanguageRoot()
         {
-            try
+            Assembly CurrentAssembly = Assembly.GetExecutingAssembly();
+            using (Stream fs = CurrentAssembly.GetManifestResourceStream("EaslyCompiler.Resources.language.easly"))
             {
-                Assembly CurrentAssembly = Assembly.GetExecutingAssembly();
-                using (Stream fs = CurrentAssembly.GetManifestResourceStream("EaslyCompiler.Resources.language.easly"))
-                {
-                    ISerializer Serializer = CreateCompilerSerializer();
-                    return (IRoot)Serializer.Deserialize(fs);
-                }
-            }
-            catch
-            {
-                return null;
+                ISerializer Serializer = CreateCompilerSerializer();
+                return (IRoot)Serializer.Deserialize(fs);
             }
         }
 
