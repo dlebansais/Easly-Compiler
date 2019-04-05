@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Text;
@@ -26,22 +27,32 @@
         {
             validText = string.Empty;
             error = null;
+            bool IsNormalized;
 
             try
             {
-                text.IsNormalized(NormalizationForm.FormD);
+                IsNormalized = text.IsNormalized(NormalizationForm.FormD);
             }
             catch
+            {
+                IsNormalized = false;
+            }
+
+            if (!IsNormalized)
             {
                 error = new ErrorIllFormedString(source);
                 return false;
             }
 
             bool WhiteSpaceFound = false;
+            byte[] Bytes = Encoding.UTF32.GetBytes(text);
+            int[] Codes = new int[Bytes.Length / 4];
+            for (int i = 0; i < Codes.Length; i++)
+                Codes[i] = BitConverter.ToInt32(Bytes, i * 4);
 
-            for (int i = 0; i < text.Length; i++)
+            for (int i = 0; i < Codes.Length; i++)
             {
-                char c = text[i];
+                int c = Codes[i];
 
                 if (!AllowedCharactersTypes.ContainsKey(c))
                 {
@@ -66,7 +77,7 @@
                 }
                 else
                 {
-                    validText += c;
+                    validText += text[i];
                     WhiteSpaceFound = false;
                 }
             }
@@ -93,12 +104,18 @@
         {
             validText = string.Empty;
             error = null;
+            bool IsNormalized;
 
             try
             {
-                text.IsNormalized(NormalizationForm.FormD);
+                IsNormalized = text.IsNormalized(NormalizationForm.FormD);
             }
             catch
+            {
+                IsNormalized = false;
+            }
+
+            if (!IsNormalized)
             {
                 error = new ErrorIllFormedString(source);
                 return false;
@@ -115,10 +132,14 @@
 
             bool InUnicodeSyntax = false;
             string UnicodeCharacter = string.Empty;
+            byte[] Bytes = Encoding.UTF32.GetBytes(text);
+            int[] Codes = new int[Bytes.Length / 4];
+            for (int i = 0; i < Codes.Length; i++)
+                Codes[i] = BitConverter.ToInt32(Bytes, i * 4);
 
-            for (int i = 0; i < text.Length; i++)
+            for (int i = 0; i < Codes.Length; i++)
             {
-                char c = text[i];
+                int c = Codes[i];
 
                 if (c == '\\')
                 {
@@ -188,11 +209,11 @@
                             return false;
                         }
                     }
-                    else if (CSharpEscapeTable.ContainsKey(c))
-                        validText += CSharpEscapeTable[c];
+                    else if (CSharpEscapeTable.ContainsKey(text[i]))
+                        validText += CSharpEscapeTable[text[i]];
 
                     else
-                        validText += c;
+                        validText += text[i];
                 }
             }
 
@@ -202,7 +223,7 @@
 
         private static void InitAllowedCharactersTable()
         {
-            AllowedCharactersTypes = new Dictionary<char, CharacterType>();
+            AllowedCharactersTypes = new Dictionary<int, CharacterType>();
 
             // From http://www.unicode.org/Public/UCD/latest/ucd/PropList.txt
             // # ================================================
@@ -220,46 +241,46 @@
             // 3000          ; White_Space # Zs       IDEOGRAPHIC SPACE
             //
             // # Total code points: 25
-            AllowedCharactersTypes.Add((char)0x0009, CharacterType.WhiteSpace);
-            AllowedCharactersTypes.Add((char)0x0020, CharacterType.WhiteSpace);
-            AllowedCharactersTypes.Add((char)0x00A0, CharacterType.WhiteSpace);
-            AllowedCharactersTypes.Add((char)0x1680, CharacterType.WhiteSpace);
-            AllowedCharactersTypes.Add((char)0x2000, CharacterType.WhiteSpace);
-            AllowedCharactersTypes.Add((char)0x2001, CharacterType.WhiteSpace);
-            AllowedCharactersTypes.Add((char)0x2002, CharacterType.WhiteSpace);
-            AllowedCharactersTypes.Add((char)0x2003, CharacterType.WhiteSpace);
-            AllowedCharactersTypes.Add((char)0x2004, CharacterType.WhiteSpace);
-            AllowedCharactersTypes.Add((char)0x2005, CharacterType.WhiteSpace);
-            AllowedCharactersTypes.Add((char)0x2006, CharacterType.WhiteSpace);
-            AllowedCharactersTypes.Add((char)0x2007, CharacterType.WhiteSpace);
-            AllowedCharactersTypes.Add((char)0x2008, CharacterType.WhiteSpace);
-            AllowedCharactersTypes.Add((char)0x2009, CharacterType.WhiteSpace);
-            AllowedCharactersTypes.Add((char)0x200A, CharacterType.WhiteSpace);
-            AllowedCharactersTypes.Add((char)0x202F, CharacterType.WhiteSpace);
-            AllowedCharactersTypes.Add((char)0x205F, CharacterType.WhiteSpace);
-            AllowedCharactersTypes.Add((char)0x3000, CharacterType.WhiteSpace);
+            AllowedCharactersTypes.Add(0x0009, CharacterType.WhiteSpace);
+            AllowedCharactersTypes.Add(0x0020, CharacterType.WhiteSpace);
+            AllowedCharactersTypes.Add(0x00A0, CharacterType.WhiteSpace);
+            AllowedCharactersTypes.Add(0x1680, CharacterType.WhiteSpace);
+            AllowedCharactersTypes.Add(0x2000, CharacterType.WhiteSpace);
+            AllowedCharactersTypes.Add(0x2001, CharacterType.WhiteSpace);
+            AllowedCharactersTypes.Add(0x2002, CharacterType.WhiteSpace);
+            AllowedCharactersTypes.Add(0x2003, CharacterType.WhiteSpace);
+            AllowedCharactersTypes.Add(0x2004, CharacterType.WhiteSpace);
+            AllowedCharactersTypes.Add(0x2005, CharacterType.WhiteSpace);
+            AllowedCharactersTypes.Add(0x2006, CharacterType.WhiteSpace);
+            AllowedCharactersTypes.Add(0x2007, CharacterType.WhiteSpace);
+            AllowedCharactersTypes.Add(0x2008, CharacterType.WhiteSpace);
+            AllowedCharactersTypes.Add(0x2009, CharacterType.WhiteSpace);
+            AllowedCharactersTypes.Add(0x200A, CharacterType.WhiteSpace);
+            AllowedCharactersTypes.Add(0x202F, CharacterType.WhiteSpace);
+            AllowedCharactersTypes.Add(0x205F, CharacterType.WhiteSpace);
+            AllowedCharactersTypes.Add(0x3000, CharacterType.WhiteSpace);
 
             for (int i = 0x21; i < 0x7F; i++)
-                AllowedCharactersTypes.Add((char)i, CharacterType.Printable);
+                AllowedCharactersTypes.Add(i, CharacterType.Printable);
 
             for (int i = 0xA1; i < 0xAD; i++)
-                AllowedCharactersTypes.Add((char)i, CharacterType.Printable);
+                AllowedCharactersTypes.Add(i, CharacterType.Printable);
 
             for (int i = 0xAE; i < 0x34F; i++)
-                AllowedCharactersTypes.Add((char)i, CharacterType.Printable);
+                AllowedCharactersTypes.Add(i, CharacterType.Printable);
 
             for (int i = 0x350; i < 0x378; i++)
-                AllowedCharactersTypes.Add((char)i, CharacterType.Printable);
+                AllowedCharactersTypes.Add(i, CharacterType.Printable);
 
             for (int i = 0x37A; i < 0x37F; i++)
-                AllowedCharactersTypes.Add((char)i, CharacterType.Printable);
+                AllowedCharactersTypes.Add(i, CharacterType.Printable);
 
             for (int i = 0x384; i < 0xE01EF; i++)
-                if (!AllowedCharactersTypes.ContainsKey((char)i))
-                    AllowedCharactersTypes.Add((char)i, CharacterType.Printable);
+                if (!AllowedCharactersTypes.ContainsKey(i))
+                    AllowedCharactersTypes.Add(i, CharacterType.Printable);
         }
 
         private enum CharacterType { Printable, WhiteSpace }
-        private static Dictionary<char, CharacterType> AllowedCharactersTypes;
+        private static Dictionary<int, CharacterType> AllowedCharactersTypes;
     }
 }

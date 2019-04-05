@@ -13,6 +13,7 @@ namespace Test
             Compiler c = new Compiler();
             c.Compile("../../../coverage invalid 7.easly");
             //c.Compile("../../../test.easly");
+            //c.Compile("../../../root.easly");
             //c.Compile("../../../coverage_replication.easly");
 
             Debug.WriteLine($"{c.ErrorList.Count} error(s).");

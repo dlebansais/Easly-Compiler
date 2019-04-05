@@ -179,7 +179,6 @@
     <Compile Include="Errors\ErrorEmptyClassPath.cs" />
     <Compile Include="Errors\ErrorPatternAlreadyUsed.cs" />
     <Compile Include="Errors\ErrorUnknownIdentifier.cs" />
-    <Compile Include="Errors\ErrorEmptyList.cs" />
     <Compile Include="Errors\ErrorDuplicateName.cs" />
     <Compile Include="Errors\StringValidity\ErrorWhiteSpaceNotAllowed.cs" />
     <Compile Include="Errors\StringValidity\ErrorEmptyString.cs" />

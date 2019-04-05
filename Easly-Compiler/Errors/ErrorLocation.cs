@@ -24,17 +24,6 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="ErrorLocation"/> class.
         /// </summary>
-        /// <param name="node">The node location.</param>
-        public ErrorLocation(INode node)
-        {
-            Debug.Assert(node != null);
-
-            Node = node;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ErrorLocation"/> class.
-        /// </summary>
         /// <param name="source">The node location.</param>
         public ErrorLocation(ISource source)
         {

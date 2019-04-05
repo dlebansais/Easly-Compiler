@@ -1,9 +1,5 @@
 ﻿namespace EaslyCompiler
 {
-    using System;
-    using System.Diagnostics;
-    using System.Text;
-
     /// <summary>
     /// Invalid character in a string.
     /// </summary>
@@ -15,7 +11,7 @@
         /// </summary>
         /// <param name="source">The error location.</param>
         /// <param name="character">The invalid character.</param>
-        public ErrorInvalidCharacter(ISource source, char character)
+        public ErrorInvalidCharacter(ISource source, int character)
             : base(source)
         {
             Character = character;
@@ -26,7 +22,7 @@
         /// <summary>
         /// The invalid character.
         /// </summary>
-        public char Character { get; }
+        public int Character { get; }
 
         /// <summary>
         /// The error message.
@@ -35,12 +31,7 @@
         {
             get
             {
-                byte[] Bytes = Encoding.UTF32.GetBytes(new char[] { Character });
-                Debug.Assert(Bytes.Length == sizeof(int));
-                int Code = BitConverter.ToInt32(Bytes, 0);
-                Debug.Assert(Code >= 0);
-
-                return $"Invalid character with code U+{Code.ToString("X4")} found.";
+                return $"Invalid character with code U+{Character.ToString("X8")} found.";
             }
         }
         #endregion
