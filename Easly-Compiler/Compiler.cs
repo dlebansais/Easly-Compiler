@@ -150,6 +150,7 @@
                 if (ReplicateAllBlocks(root))
                 {
                     ReplacePhase2Macroes(root);
+                    InitializeSources(root);
                 }
             }
         }
@@ -634,6 +635,11 @@
                 return Continue;
             }
         }
+
+        private KeyValuePair<string, string> CreateBlockSubstitution()
+        {
+            return new KeyValuePair<string, string>("Blocks", "List");
+        }
         #endregion
 
         #region Replication, phase 2
@@ -642,7 +648,7 @@
         {
             Debug.Assert(ErrorList.Count == 0);
 
-            bool Success = NodeTreeWalk<ReplacePhase2MacroContext>.Walk(root, new WalkCallbacks<ReplacePhase2MacroContext>() { HandlerNode = ReplacePhase2Macro, IsRecursive = true, BlockSubstitution = new KeyValuePair<string, string>("Blocks", "List") }, new ReplacePhase2MacroContext());
+            bool Success = NodeTreeWalk<ReplacePhase2MacroContext>.Walk(root, new WalkCallbacks<ReplacePhase2MacroContext>() { HandlerNode = ReplacePhase2Macro, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() }, new ReplacePhase2MacroContext());
             Debug.Assert(Success);
         }
 
@@ -705,7 +711,31 @@
 
             return InitializedExpression(LanguageClasses.Number.Name, Value);
         }
+        #endregion
 
+        #region Source Initialization
+        /// <summary></summary>
+        protected virtual void InitializeSources(IRoot root)
+        {
+            Debug.Assert(ErrorList.Count == 0);
+
+            bool Success = NodeTreeWalk<InitializeSourceContext>.Walk(root, new WalkCallbacks<InitializeSourceContext>() { HandlerNode = InitializeSource, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() }, new InitializeSourceContext());
+            Debug.Assert(Success);
+        }
+
+        /// <summary></summary>
+        public bool InitializeSource(BaseNode.INode node, BaseNode.INode parentNode, string propertyName, IWalkCallbacks<InitializeSourceContext> callbacks, InitializeSourceContext context)
+        {
+            bool Result = true;
+
+            if (node is ISource AsSource)
+            {
+                ISource ParentSource = parentNode as ISource;
+                AsSource.InitializeSource(ParentSource);
+            }
+
+            return Result;
+        }
         #endregion
     }
 }
