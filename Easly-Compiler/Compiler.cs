@@ -462,10 +462,11 @@
                 {
                     if (context.ReplicateTable.ContainsKey(ValidReplicateName))
                         ErrorList.Add(new ErrorDuplicateName(ReplicateName, ValidReplicateName));
-                    else if (Replicate.PatternList.Count == 0)
-                        ErrorList.Add(new ErrorEmptyList((ISource)Replicate, ValidReplicateName));
                     else
                     {
+                        // If 0, the whole root would not have passed validity check.
+                        Debug.Assert(Replicate.PatternList.Count > 0);
+
                         List<string> ValidPatternList = new List<string>();
 
                         foreach (IPattern Pattern in Replicate.PatternList)
