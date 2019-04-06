@@ -719,12 +719,12 @@
         {
             Debug.Assert(ErrorList.Count == 0);
 
-            bool Success = NodeTreeWalk<InitializeSourceContext>.Walk(root, new WalkCallbacks<InitializeSourceContext>() { HandlerNode = InitializeSource, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() }, new InitializeSourceContext());
+            bool Success = NodeTreeWalk<object>.Walk(root, new WalkCallbacks<object>() { HandlerNode = InitializeSource, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() }, null);
             Debug.Assert(Success);
         }
 
         /// <summary></summary>
-        public bool InitializeSource(BaseNode.INode node, BaseNode.INode parentNode, string propertyName, IWalkCallbacks<InitializeSourceContext> callbacks, InitializeSourceContext context)
+        public bool InitializeSource(BaseNode.INode node, BaseNode.INode parentNode, string propertyName, IWalkCallbacks<object> callbacks, object context)
         {
             bool Result = true;
 
@@ -734,6 +734,14 @@
                 AsSource.InitializeSource(ParentSource);
             }
 
+#if DEBUG
+            if (node is ICompiledFeature AsFeature)
+            {
+                bool IsDeferredFeature = AsFeature.IsDeferredFeature;
+                bool HasExternBody = AsFeature.HasExternBody;
+                bool HasPrecursorBody = AsFeature.HasPrecursorBody;
+            }
+#endif
             return Result;
         }
         #endregion

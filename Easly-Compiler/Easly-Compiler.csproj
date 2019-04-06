@@ -191,7 +191,6 @@
     <Compile Include="CompiledFeature.cs" />
     <Compile Include="CompiledType.cs" />
     <Compile Include="Errors\StringValidity\ErrorStringValidity.cs" />
-    <Compile Include="InitializeSourceContext.cs" />
     <Compile Include="NameGuidPair.cs" />
     <Compile Include="NodeWithReplicatedBlocks.cs" />
     <Compile Include="ReplacePhase2MacroContext.cs" />

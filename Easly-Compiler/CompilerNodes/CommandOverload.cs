@@ -3,7 +3,6 @@ namespace CompilerNode
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using Easly;
     using EaslyCompiler;
 
     /// <summary>
