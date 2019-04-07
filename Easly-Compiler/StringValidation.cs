@@ -32,6 +32,8 @@
             try
             {
                 IsNormalized = text.IsNormalized(NormalizationForm.FormD);
+                if (!IsNormalized)
+                    throw new ArgumentException();
             }
             catch
             {

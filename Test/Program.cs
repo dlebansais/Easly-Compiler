@@ -11,11 +11,11 @@ namespace Test
         static void Main(string[] args)
         {
             Compiler c = new Compiler();
-            c.Compile("../../../coverage.easly");
+            //c.Compile("../../../coverage.easly");
             //c.Compile("../../../coverage invalid 7.easly");
             //c.Compile("../../../test.easly");
             //c.Compile("../../../root.easly");
-            //c.Compile("../../../coverage_replication.easly");
+            c.Compile("../../../coverage replication.easly");
 
             Debug.WriteLine($"{c.ErrorList.Count} error(s).");
             foreach (Error Error in c.ErrorList)
