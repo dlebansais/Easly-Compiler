@@ -281,7 +281,7 @@ namespace CompilerNode
                     continue;
                 }
 
-                if (ValidClassIdentifier.ToLower() == LanguageClasses.Any.Name)
+                if (ValidClassIdentifier.ToLower() == LanguageClasses.Any.Name.ToLower())
                 {
                     // 'Any' is implicit and just ignored.
                 }
