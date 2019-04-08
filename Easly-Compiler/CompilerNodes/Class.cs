@@ -499,62 +499,66 @@ namespace CompilerNode
         /// <summary>
         /// Merges a class import with previous imports.
         /// </summary>
-        /// <param name="importedClassTable">The already reoved imports.</param>
-        /// <param name="locallyImportedClassTable">The current import.</param>
+        /// <param name="importedClassTable">The already resolved imports.</param>
+        /// <param name="mergedClassTable">The new classes to import.</param>
         /// <param name="importLocation">The import location.</param>
-        /// <param name="localImportType">The import specification.</param>
+        /// <param name="mergedImportType">The import specification for all <paramref name="mergedClassTable"/>.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if the merge is successful.</returns>
-        public static bool MergeClassTables(IHashtableEx<string, IImportedClass> importedClassTable, IHashtableEx<string, IImportedClass> locallyImportedClassTable, IImport importLocation, BaseNode.ImportType localImportType, IList<IError> errorList)
+        public static bool MergeClassTables(IHashtableEx<string, IImportedClass> importedClassTable, IHashtableEx<string, IImportedClass> mergedClassTable, IImport importLocation, BaseNode.ImportType mergedImportType, IList<IError> errorList)
         {
-            bool AllClassesAdded = true;
+            bool Success = true;
 
-            foreach (KeyValuePair<string, IImportedClass> Entry in locallyImportedClassTable)
+            foreach (KeyValuePair<string, IImportedClass> Entry in mergedClassTable)
             {
                 string ClassName = Entry.Key;
-                IImportedClass LocalClassItem = Entry.Value;
+                IImportedClass MergedClassItem = Entry.Value;
 
+                // The merged class may have an import specification already, but if so it must match the one used here.
+                // We can assume we use mergedImportType after this.
+                if (MergedClassItem.IsTypeAssigned && MergedClassItem.ImportType != mergedImportType)
+                {
+                    errorList.Add(new ErrorImportTypeConflict(importLocation, ClassName));
+                    Success = false;
+                }
+
+                // If a class is already imported with this name somehow.
                 if (importedClassTable.ContainsKey(ClassName))
                 {
+                    // It must be the same class.
                     IImportedClass ClassItem = importedClassTable[ClassName];
-                    if (ClassItem.Item != LocalClassItem.Item)
+                    if (ClassItem.Item != MergedClassItem.Item)
                     {
                         errorList.Add(new ErrorNameAlreadyUsed(importLocation, ClassName));
-                        AllClassesAdded = false;
+                        Success = false;
                         continue;
                     }
 
-                    Debug.Assert(ClassItem.IsTypeAssigned);
-
-                    if (LocalClassItem.IsTypeAssigned)
+                    // If the already existing imported class has a specification, it must match the one use for merge.
+                    if (ClassItem.IsTypeAssigned)
                     {
-                        if (ClassItem.ImportType != LocalClassItem.ImportType)
+                        if (ClassItem.ImportType != mergedImportType)
                         {
                             errorList.Add(new ErrorImportTypeConflict(importLocation, ClassName));
-                            AllClassesAdded = false;
+                            Success = false;
                             continue;
                         }
                     }
                     else
-                    {
-                        if (ClassItem.ImportType != localImportType)
-                        {
-                            errorList.Add(new ErrorImportTypeConflict(importLocation, ClassName));
-                            AllClassesAdded = false;
-                            continue;
-                        }
+                        ClassItem.SetImportType(mergedImportType);
 
-                        if (!ClassItem.IsLocationAssigned)
-                            ClassItem.SetImportLocation(importLocation);
-                    }
+                    // If the import location isn't specified yet, use the imported library.
+                    if (!ClassItem.IsLocationAssigned)
+                        ClassItem.SetImportLocation(importLocation);
                 }
                 else
                 {
+                    // New class, at least by name. Make sure it's not an already imported class using a different name.
                     bool AlreadyImported = false;
                     foreach (KeyValuePair<string, IImportedClass> ImportedEntry in importedClassTable)
                     {
                         IImportedClass ClassItem = ImportedEntry.Value;
-                        if (ClassItem.Item == LocalClassItem.Item)
+                        if (ClassItem.Item == MergedClassItem.Item)
                         {
                             string OldName = ImportedEntry.Key;
                             errorList.Add(new ErrorClassAlreadyImported(importLocation, OldName, ClassName));
@@ -565,30 +569,20 @@ namespace CompilerNode
 
                     if (AlreadyImported)
                     {
-                        AllClassesAdded = false;
+                        Success = false;
                         continue;
                     }
 
-                    if (LocalClassItem.IsTypeAssigned)
-                    {
-                        if (LocalClassItem.ImportType != localImportType)
-                        {
-                            errorList.Add(new ErrorImportTypeConflict(importLocation, ClassName));
-                            AllClassesAdded = false;
-                        }
-                    }
-                    else
-                    {
-                        LocalClassItem.SetImportType(localImportType);
-                        LocalClassItem.SetImportLocation(importLocation);
-                    }
+                    // First time this class is imported, use the merge import type specification and location since they are known.
+                    MergedClassItem.SetImportType(mergedImportType);
+                    MergedClassItem.SetImportLocation(importLocation);
 
-                    importedClassTable.Add(ClassName, LocalClassItem);
+                    importedClassTable.Add(ClassName, MergedClassItem);
                 }
             }
 
-            Debug.Assert(AllClassesAdded || errorList.Count > 0);
-            return AllClassesAdded;
+            Debug.Assert(Success || errorList.Count > 0);
+            return Success;
         }
         #endregion
 

@@ -377,27 +377,27 @@ namespace CompilerNode
         }
 
         /// <summary>
-        /// Merges an import clause with other imports.
+        /// Merges an import clause with already imported classes.
         /// </summary>
         /// <param name="importedClassTable">Already imported classes.</param>
         /// <param name="importItem">The merged import.</param>
-        /// <param name="matchingLibrary">The library with the import.</param>
+        /// <param name="matchingLibrary">The library referenced by <paramref name="importItem"/>.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if the merge succeeded.</returns>
         public static bool MergeImports(IHashtableEx<string, IImportedClass> importedClassTable, IImport importItem, ILibrary matchingLibrary, IList<IError> errorList)
         {
             // Clone imported class objects from the imported library.
-            IHashtableEx<string, IImportedClass> LocallyImportedClassTable = new HashtableEx<string, IImportedClass>();
+            IHashtableEx<string, IImportedClass> MergedClassTable = new HashtableEx<string, IImportedClass>();
             foreach (KeyValuePair<string, IImportedClass> Entry in matchingLibrary.ImportedClassTable)
             {
                 IImportedClass Clone = new ImportedClass(Entry.Value);
-                LocallyImportedClassTable.Add(Entry.Key, Clone);
+                MergedClassTable.Add(Entry.Key, Clone);
             }
 
-            if (!importItem.CheckRenames(LocallyImportedClassTable, errorList))
+            if (!importItem.CheckRenames(MergedClassTable, errorList))
                 return false;
 
-            if (!Class.MergeClassTables(importedClassTable, LocallyImportedClassTable, importItem, importItem.Type, errorList))
+            if (!Class.MergeClassTables(importedClassTable, MergedClassTable, importItem, importItem.Type, errorList))
                 return false;
 
             return true;
