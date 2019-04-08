@@ -126,12 +126,14 @@ namespace CompilerNode
         /// <returns>True if library names are valid.</returns>
         public virtual bool CheckImportConsistency(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, out ILibrary matchingLibrary, IList<IError> errorList)
         {
+            IErrorStringValidity StringError;
+            string ValidFromIdentifier;
             IIdentifier ImportLibraryIdentifier = (IIdentifier)LibraryIdentifier;
             IHashtableEx<string, ILibrary> SourceNameTable;
-            matchingLibrary = null;
-            string ValidFromIdentifier;
 
-            if (!StringValidation.IsValidIdentifier(ImportLibraryIdentifier, LibraryIdentifier.Text, out string ValidLibraryIdentifier, out IErrorStringValidity StringError))
+            matchingLibrary = null;
+
+            if (!StringValidation.IsValidIdentifier(ImportLibraryIdentifier, LibraryIdentifier.Text, out string ValidLibraryIdentifier, out StringError))
             {
                 errorList.Add(StringError);
                 return false;
@@ -181,9 +183,10 @@ namespace CompilerNode
             IHashtableEx<string, string> DestinationIdentifierTable = new HashtableEx<string, string>(); // string (destination) -> string (source)
 
             bool Success = true;
-            foreach (Rename RenameItem in RenameList)
+            foreach (IRename RenameItem in RenameList)
                 Success &= RenameItem.CheckGenericRename(new IHashtableIndex<string>[] { importedClassTable }, SourceIdentifierTable, DestinationIdentifierTable, (string key) => key, (string s) => s, errorList);
 
+            Debug.Assert(Success || errorList.Count > 0);
             return Success;
         }
         #endregion

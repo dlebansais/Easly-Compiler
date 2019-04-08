@@ -114,7 +114,7 @@ namespace CompilerNode
         /// <param name="validatedClassList">List of classes with valid names, updated upon return.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if class names are valid.</returns>
-        bool CheckClassNames(IHashtableEx<string, IHashtableEx<string, IClass>> classTable, List<IClass> validatedClassList, IList<IError> errorList);
+        bool CheckClassNames(IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IList<IClass> validatedClassList, IList<IError> errorList);
 
         /// <summary>
         /// Validate a class import clauses.
@@ -355,7 +355,7 @@ namespace CompilerNode
         /// <param name="validatedClassList">List of classes with valid names, updated upon return.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if class names are valid.</returns>
-        public virtual bool CheckClassNames(IHashtableEx<string, IHashtableEx<string, IClass>> classTable, List<IClass> validatedClassList, IList<IError> errorList)
+        public virtual bool CheckClassNames(IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IList<IClass> validatedClassList, IList<IError> errorList)
         {
             IName ClassEntityName = (IName)EntityName;
 
@@ -373,8 +373,7 @@ namespace CompilerNode
                 // Verify the class source name is a valid string.
                 IIdentifier ClassFromIdentifier = (IIdentifier)FromIdentifier.Item;
 
-                string ValidFromIdentifier;
-                if (!StringValidation.IsValidIdentifier(ClassFromIdentifier, FromIdentifier.Item.Text, out ValidFromIdentifier, out StringError))
+                if (!StringValidation.IsValidIdentifier(ClassFromIdentifier, FromIdentifier.Item.Text, out string ValidFromIdentifier, out StringError))
                 {
                     errorList.Add(StringError);
                     return false;
@@ -407,8 +406,11 @@ namespace CompilerNode
             }
             else
             {
-                IHashtableEx<string, IClass> SourceNameTable = new HashtableEx<string, IClass>();
-                SourceNameTable.Add(ValidSourceName, this);
+                IHashtableEx<string, IClass> SourceNameTable = new HashtableEx<string, IClass>
+                {
+                    { ValidSourceName, this }
+                };
+
                 classTable.Add(ValidClassName, SourceNameTable);
             }
 
@@ -416,7 +418,7 @@ namespace CompilerNode
         }
 
         /// <summary>
-        /// Validate a class import clauses.
+        /// Validates a class import clauses.
         /// </summary>
         /// <param name="libraryTable">Imported libraries.</param>
         /// <param name="classTable">Imported classes.</param>
@@ -426,10 +428,14 @@ namespace CompilerNode
         {
             bool Success = true;
 
+            // Process all import clauses separately.
             foreach (IImport ImportItem in ImportList)
             {
                 if (!ImportItem.CheckImportConsistency(libraryTable, out ILibrary MatchingLibrary, errorList))
+                {
+                    Success = false;
                     continue;
+                }
 
                 if (ImportedLibraryList.Contains(MatchingLibrary))
                 {
@@ -439,11 +445,15 @@ namespace CompilerNode
                 }
 
                 if (!Library.MergeImports(ImportedClassTable, ImportItem, MatchingLibrary, errorList))
+                {
+                    Success = false;
                     continue;
+                }
 
                 ImportedLibraryList.Add(MatchingLibrary);
             }
 
+            // Check import specifications.
             foreach (KeyValuePair<string, IImportedClass> Entry in ImportedClassTable)
             {
                 IImportedClass Imported = Entry.Value;
@@ -481,6 +491,7 @@ namespace CompilerNode
 
             ImportedClassTable.Seal();
 
+            Debug.Assert(Success || errorList.Count > 0);
             return Success;
         }
 
@@ -496,6 +507,7 @@ namespace CompilerNode
         public static bool MergeClassTables(IHashtableEx<string, IImportedClass> importedClassTable, IHashtableEx<string, IImportedClass> locallyImportedClassTable, IImport importLocation, BaseNode.ImportType localImportType, IList<IError> errorList)
         {
             bool AllClassesAdded = true;
+
             foreach (KeyValuePair<string, IImportedClass> Entry in locallyImportedClassTable)
             {
                 string ClassName = Entry.Key;
@@ -532,7 +544,7 @@ namespace CompilerNode
                         }
 
                         if (!ClassItem.IsLocationAssigned)
-                            ClassItem.ImportLocation = importLocation;
+                            ClassItem.SetImportLocation(importLocation);
                     }
                 }
                 else
@@ -566,15 +578,27 @@ namespace CompilerNode
                     }
                     else
                     {
-                        LocalClassItem.ImportType = localImportType;
-                        LocalClassItem.ImportLocation = importLocation;
+                        LocalClassItem.SetImportType(localImportType);
+                        LocalClassItem.SetImportLocation(importLocation);
                     }
 
                     importedClassTable.Add(ClassName, LocalClassItem);
                 }
             }
 
+            Debug.Assert(AllClassesAdded || errorList.Count > 0);
             return AllClassesAdded;
+        }
+        #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            if (ValidClassName != null)
+                return $"Class '{ValidClassName}'";
+            else
+                return $"Class '{EntityName.Text}'";
         }
         #endregion
     }

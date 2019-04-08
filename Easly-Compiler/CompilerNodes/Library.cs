@@ -53,7 +53,7 @@ namespace CompilerNode
         /// <param name="validatedLibraryList">List of classes with valid names, updated upon return.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if library names are valid.</returns>
-        bool CheckLibraryNames(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, List<ILibrary> validatedLibraryList, IList<IError> errorList);
+        bool CheckLibraryNames(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IList<ILibrary> validatedLibraryList, IList<IError> errorList);
 
         /// <summary>
         /// Initializes the list of classes belonging to the library.
@@ -198,14 +198,13 @@ namespace CompilerNode
         /// <param name="validatedLibraryList">List of classes with valid names, updated upon return.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if library names are valid.</returns>
-        public virtual bool CheckLibraryNames(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, List<ILibrary> validatedLibraryList, IList<IError> errorList)
+        public virtual bool CheckLibraryNames(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IList<ILibrary> validatedLibraryList, IList<IError> errorList)
         {
             IErrorStringValidity StringError;
             IName LibraryEntityName = (IName)EntityName;
 
             // Verify the library name is a valid string.
-            string ValidEntityName;
-            if (!StringValidation.IsValidIdentifier(LibraryEntityName, EntityName.Text, out ValidEntityName, out StringError))
+            if (!StringValidation.IsValidIdentifier(LibraryEntityName, EntityName.Text, out string ValidEntityName, out StringError))
             {
                 errorList.Add(StringError);
                 return false;
@@ -218,8 +217,7 @@ namespace CompilerNode
                 // Verify the library source name is a valid string.
                 IIdentifier LibraryFromIdentifier = (IIdentifier)FromIdentifier.Item;
 
-                string ValidFromIdentifier;
-                if (!StringValidation.IsValidIdentifier(LibraryFromIdentifier, FromIdentifier.Item.Text, out ValidFromIdentifier, out StringError))
+                if (!StringValidation.IsValidIdentifier(LibraryFromIdentifier, FromIdentifier.Item.Text, out string ValidFromIdentifier, out StringError))
                 {
                     errorList.Add(StringError);
                     return false;
@@ -252,8 +250,11 @@ namespace CompilerNode
             }
             else
             {
-                IHashtableEx<string, ILibrary> SourceNameTable = new HashtableEx<string, ILibrary>();
-                SourceNameTable.Add(ValidSourceName, this);
+                IHashtableEx<string, ILibrary> SourceNameTable = new HashtableEx<string, ILibrary>
+                {
+                    { ValidSourceName, this }
+                };
+
                 libraryTable.Add(ValidLibraryName, SourceNameTable);
             }
 
@@ -318,6 +319,7 @@ namespace CompilerNode
                 }
             }
 
+            Debug.Assert(Success || errorList.Count > 0);
             return Success;
         }
 
@@ -354,7 +356,7 @@ namespace CompilerNode
                 // It must be one of the resolved libraries.
                 if (!resolvedLibraryList.Contains(MatchingLibrary))
                 {
-                    Success = false;
+                    // Success = false; TODO verify success
                     continue;
                 }
 
@@ -372,6 +374,7 @@ namespace CompilerNode
             foreach (IImport ImportItem in ToRemove)
                 ImportList.Remove(ImportItem);
 
+            Debug.Assert(Success || errorList.Count > 0);
             return Success;
         }
 
@@ -393,6 +396,17 @@ namespace CompilerNode
                 return false;
 
             return true;
+        }
+        #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            if (ValidLibraryName != null)
+                return $"Library '{ValidLibraryName}'";
+            else
+                return $"Library '{EntityName.Text}'";
         }
         #endregion
     }

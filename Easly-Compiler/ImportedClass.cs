@@ -21,7 +21,7 @@
         /// <summary>
         /// The import type.
         /// </summary>
-        BaseNode.ImportType ImportType { get; set; }
+        BaseNode.ImportType ImportType { get; }
 
         /// <summary>
         /// True if <see cref="ImportType"/> is valid.
@@ -31,7 +31,7 @@
         /// <summary>
         /// The import location.
         /// </summary>
-        IImport ImportLocation { get; set; }
+        IImport ImportLocation { get; }
 
         /// <summary>
         /// True if <see cref="ImportLocation"/> is valid.
@@ -43,6 +43,18 @@
         /// </summary>
         /// <param name="parentSource">The parent source.</param>
         void SetParentSource(IClass parentSource);
+
+        /// <summary>
+        /// Sets the import type.
+        /// </summary>
+        /// <param name="importType">The import type.</param>
+        void SetImportType(BaseNode.ImportType importType);
+
+        /// <summary>
+        /// Sets the import location.
+        /// </summary>
+        /// <param name="importLocation">The import location.</param>
+        void SetImportLocation(IImport importLocation);
     }
 
     /// <summary>
@@ -58,7 +70,6 @@
         public ImportedClass(IClass item)
         {
             Item = item;
-            _ImportType = null;
         }
 
         /// <summary>
@@ -70,6 +81,7 @@
         {
             Item = item;
             _ImportType = importType;
+            IsTypeAssigned = true;
         }
         #endregion
 
@@ -91,20 +103,16 @@
         {
             get
             {
-                Debug.Assert(_ImportType.HasValue);
-                return _ImportType.Value;
-            }
-            set
-            {
-                _ImportType = value;
+                Debug.Assert(IsTypeAssigned);
+                return _ImportType;
             }
         }
-        private BaseNode.ImportType? _ImportType;
+        private BaseNode.ImportType _ImportType;
 
         /// <summary>
         /// True if <see cref="ImportType"/> is valid.
         /// </summary>
-        public bool IsTypeAssigned { get { return _ImportType != null; } }
+        public bool IsTypeAssigned { get; private set; }
 
         /// <summary>
         /// The import location.
@@ -113,13 +121,8 @@
         {
             get
             {
-                Debug.Assert(_ImportLocation != null);
+                Debug.Assert(IsLocationAssigned);
                 return _ImportLocation;
-            }
-            set
-            {
-                Debug.Assert(value != null);
-                _ImportLocation = value;
             }
         }
         private IImport _ImportLocation;
@@ -127,7 +130,7 @@
         /// <summary>
         /// True if <see cref="ImportLocation"/> is valid.
         /// </summary>
-        public bool IsLocationAssigned { get { return _ImportLocation != null; } }
+        public bool IsLocationAssigned { get; private set; }
         #endregion
 
         #region Client Interface
@@ -138,9 +141,34 @@
         public virtual void SetParentSource(IClass parentSource)
         {
             Debug.Assert(parentSource != null);
-            Debug.Assert(ParentSource == null);
+            Debug.Assert(ParentSource == null || ParentSource == parentSource);
 
             ParentSource = parentSource;
+        }
+
+        /// <summary>
+        /// Sets the import type.
+        /// </summary>
+        /// <param name="importType">The import type.</param>
+        public virtual void SetImportType(BaseNode.ImportType importType)
+        {
+            Debug.Assert(!IsTypeAssigned || ImportType == importType);
+
+            _ImportType = importType;
+            IsTypeAssigned = true;
+        }
+
+        /// <summary>
+        /// Sets the import location.
+        /// </summary>
+        /// <param name="importLocation">The import location.</param>
+        public virtual void SetImportLocation(IImport importLocation)
+        {
+            Debug.Assert(importLocation != null);
+            Debug.Assert(!IsLocationAssigned || ImportLocation == importLocation);
+
+            _ImportLocation = importLocation;
+            IsLocationAssigned = true;
         }
         #endregion
     }

@@ -153,10 +153,9 @@
                     ReplacePhase2Macroes(root);
                     InitializeSources(root);
 
-                    /*if (CheckClassAndLibraryNames(root))
+                    if (CheckClassAndLibraryNames(root))
                     {
-
-                    }*/
+                    }
                 }
             }
         }
@@ -751,8 +750,8 @@
         /// <summary></summary>
         protected virtual bool CheckClassAndLibraryNames(IRoot root)
         {
-            ClassTable.Clear();
-            LibraryTable.Clear();
+            Debug.Assert(ClassTable.Count == 0);
+            Debug.Assert(LibraryTable.Count == 0);
 
             bool IsClassNamesValid = CheckClassNames(root);
             bool IsLibraryNamesValid = CheckLibraryNames(root);
@@ -768,15 +767,17 @@
             if (!CheckClassesConsistency(root))
                 return false;
 
+            Debug.Assert(ErrorList.Count == 0);
             return true;
         }
 
         /// <summary></summary>
         protected virtual bool CheckClassNames(IRoot root)
         {
-            List<IClass> ValidatedClassList = new List<IClass>();
+            IList<IClass> ValidatedClassList = new List<IClass>();
             bool IsClassNamesValid = true;
 
+            // Basic name checks.
             foreach (IClass Class in root.ClassList)
                 IsClassNamesValid &= Class.CheckClassNames(ClassTable, ValidatedClassList, ErrorList);
 
@@ -800,15 +801,17 @@
                 }
             }
 
+            Debug.Assert(IsClassNamesValid || ErrorList.Count > 0);
             return IsClassNamesValid;
         }
 
         /// <summary></summary>
         protected virtual bool CheckLibraryNames(IRoot root)
         {
-            List<ILibrary> ValidatedLibraryList = new List<ILibrary>();
+            IList<ILibrary> ValidatedLibraryList = new List<ILibrary>();
             bool IsLibraryNamesValid = true;
 
+            // Basic name checks.
             foreach (ILibrary Library in root.LibraryList)
                 IsLibraryNamesValid &= Library.CheckLibraryNames(LibraryTable, ValidatedLibraryList, ErrorList);
 
@@ -832,6 +835,7 @@
                 }
             }
 
+            Debug.Assert(IsLibraryNamesValid || ErrorList.Count > 0);
             return IsLibraryNamesValid;
         }
 
@@ -843,6 +847,7 @@
             foreach (ILibrary Library in root.LibraryList)
                 Success &= Library.InitLibraryTables(ClassTable, ErrorList);
 
+            Debug.Assert(Success || ErrorList.Count > 0);
             return Success;
         }
 
@@ -854,8 +859,9 @@
 
             bool Success = true;
             bool Continue = true;
-            while (UnresolvedLibraryList.Count > 0 && ErrorList.Count == 0 && Continue)
+            while (UnresolvedLibraryList.Count > 0 && Success && Continue)
             {
+                // Continue while there is a library to process.
                 Continue = false;
 
                 foreach (ILibrary Library in UnresolvedLibraryList)
@@ -864,12 +870,14 @@
                 MoveResolvedLibraries(UnresolvedLibraryList, ResolvedLibraryList, ref Continue);
             }
 
+            // If we're stuck at processing remaining libraries, it's because they are referencing each other in a cycle.
             if (UnresolvedLibraryList.Count > 0 && Success)
             {
                 Success = false;
                 ErrorList.Add(new ErrorCyclicDependency(UnresolvedLibraryList[0], UnresolvedLibraryList[0].ValidLibraryName));
             }
 
+            Debug.Assert(Success || ErrorList.Count > 0);
             return Success;
         }
 
@@ -902,11 +910,12 @@
             foreach (IClass Class in root.ClassList)
                 Success &= Class.CheckClassConsistency(LibraryTable, ClassTable, ErrorList);
 
+            Debug.Assert(Success || ErrorList.Count > 0);
             return Success;
         }
 
-        private IHashtableEx<string, IHashtableEx<string, IClass>> ClassTable { get; set; }
-        private IHashtableEx<string, IHashtableEx<string, ILibrary>> LibraryTable { get; set; }
+        private IHashtableEx<string, IHashtableEx<string, IClass>> ClassTable = new HashtableEx<string, IHashtableEx<string, IClass>>();
+        private IHashtableEx<string, IHashtableEx<string, ILibrary>> LibraryTable = new HashtableEx<string, IHashtableEx<string, ILibrary>>();
         #endregion
     }
 }
