@@ -735,6 +735,8 @@
             }
 
 #if DEBUG
+            string DebugString = node.ToString();
+
             if (node is ICompiledFeature AsFeature)
             {
                 bool IsDeferredFeature = AsFeature.IsDeferredFeature;
@@ -830,7 +832,7 @@
                 {
                     IsLibraryNamesValid = false;
 
-                    foreach (IClass Item in DuplicateLibraryList)
+                    foreach (ILibrary Item in DuplicateLibraryList)
                         ErrorList.Add(new ErrorSourceRequired((IName)Item.EntityName));
                 }
             }
@@ -874,7 +876,7 @@
             if (UnresolvedLibraryList.Count > 0 && Success)
             {
                 Success = false;
-                ErrorList.Add(new ErrorCyclicDependency(UnresolvedLibraryList[0], UnresolvedLibraryList[0].ValidLibraryName));
+                ErrorList.Add(new ErrorCyclicDependency(UnresolvedLibraryList[0], UnresolvedLibraryList));
             }
 
             Debug.Assert(Success || ErrorList.Count > 0);

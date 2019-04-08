@@ -184,10 +184,10 @@
     <Compile Include="Errors\ImportConsistency\ErrorImportTypeConflict.cs" />
     <Compile Include="Errors\ImportConsistency\ErrorNameAlreadyUsed.cs" />
     <Compile Include="Errors\ImportConsistency\ErrorNameUnchanged.cs" />
-    <Compile Include="Errors\Replication\ErrorSourceRequired.cs" />
+    <Compile Include="Errors\ImportConsistency\ErrorSourceRequired.cs" />
     <Compile Include="Errors\Replication\ErrorEmptyClassPath.cs" />
     <Compile Include="Errors\Replication\ErrorPatternAlreadyUsed.cs" />
-    <Compile Include="Errors\Miscellaneous\ErrorIdentifierAlreadyListed.cs" />
+    <Compile Include="Errors\ImportConsistency\ErrorIdentifierAlreadyListed.cs" />
     <Compile Include="Errors\Miscellaneous\ErrorUnknownIdentifier.cs" />
     <Compile Include="Errors\Miscellaneous\ErrorDuplicateName.cs" />
     <Compile Include="Errors\StringValidity\ErrorWhiteSpaceNotAllowed.cs" />

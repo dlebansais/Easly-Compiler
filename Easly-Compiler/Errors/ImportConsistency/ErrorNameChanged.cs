@@ -50,7 +50,7 @@
         /// <summary>
         /// The error message.
         /// </summary>
-        public override string Message { get { return $"Class '{ClassName}' cannot import itself under name '{NewName}'"; } }
+        public override string Message { get { return $"Class '{ClassName}' cannot import itself under name '{NewName}'."; } }
         #endregion
     }
 }

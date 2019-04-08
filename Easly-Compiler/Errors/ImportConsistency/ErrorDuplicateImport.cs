@@ -55,9 +55,9 @@
             get
             {
                 if (SourceName.Length > 0)
-                    return $"Library '{LibraryName}' from '{SourceName}' already imported";
+                    return $"Library '{LibraryName}' from '{SourceName}' already imported.";
                 else
-                    return $"Library '{LibraryName}' already imported";
+                    return $"Library '{LibraryName}' already imported.";
             }
         }
         #endregion
