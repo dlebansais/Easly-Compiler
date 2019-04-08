@@ -3,7 +3,14 @@
     /// <summary>
     /// Invalid empty string.
     /// </summary>
-    public class ErrorEmptyString : ErrorStringValidity
+    public interface IErrorEmptyString : IErrorStringValidity
+    {
+    }
+
+    /// <summary>
+    /// Invalid empty string.
+    /// </summary>
+    internal class ErrorEmptyString : ErrorStringValidity, IErrorEmptyString
     {
         #region Init
         /// <summary>

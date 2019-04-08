@@ -10,6 +10,15 @@ namespace CompilerNode
     /// </summary>
     public interface IRoot : BaseNode.IRoot, INode, INodeWithReplicatedBlocks, ISource
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Root.ClassBlocks"/>.
+        /// </summary>
+        IList<IClass> ClassList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Root.LibraryBlocks"/>.
+        /// </summary>
+        IList<ILibrary> LibraryList { get; }
     }
 
     /// <summary>

@@ -5,7 +5,14 @@
     /// <summary>
     /// Empty class path.
     /// </summary>
-    public class ErrorEmptyClassPath : Error
+    public interface IErrorEmptyClassPath : IError
+    {
+    }
+
+    /// <summary>
+    /// Empty class path.
+    /// </summary>
+    internal class ErrorEmptyClassPath : Error, IErrorEmptyClassPath
     {
         #region Init
         /// <summary>

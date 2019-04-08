@@ -23,7 +23,7 @@
         /// <param name="validText">If valid, the normalized string to use instead of <paramref name="text"/>.</param>
         /// <param name="error">If not valid, the error to report.</param>
         /// <returns>True if the identifier or name is valid.</returns>
-        public static bool IsValidIdentifier(ISource source, string text, out string validText, out ErrorStringValidity error)
+        public static bool IsValidIdentifier(ISource source, string text, out string validText, out IErrorStringValidity error)
         {
             validText = string.Empty;
             error = null;
@@ -102,7 +102,7 @@
         /// <param name="validText">If valid, the normalized string to use instead of <paramref name="text"/>.</param>
         /// <param name="error">If not valid, the error to report.</param>
         /// <returns>True if the manifest string is valid.</returns>
-        public static bool IsValidManifestConstant(ISource source, string text, out string validText, out ErrorStringValidity error)
+        public static bool IsValidManifestConstant(ISource source, string text, out string validText, out IErrorStringValidity error)
         {
             validText = string.Empty;
             error = null;

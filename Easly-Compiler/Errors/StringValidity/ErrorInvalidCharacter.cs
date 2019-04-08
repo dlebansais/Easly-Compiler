@@ -3,7 +3,18 @@
     /// <summary>
     /// Invalid character in a string.
     /// </summary>
-    public class ErrorInvalidCharacter : ErrorStringValidity
+    public interface IErrorInvalidCharacter : IErrorStringValidity
+    {
+        /// <summary>
+        /// The invalid character.
+        /// </summary>
+        int Character { get; }
+    }
+
+    /// <summary>
+    /// Invalid character in a string.
+    /// </summary>
+    internal class ErrorInvalidCharacter : ErrorStringValidity, IErrorInvalidCharacter
     {
         #region Init
         /// <summary>

@@ -5,7 +5,14 @@
     /// <summary>
     /// Invalid Input Root.
     /// </summary>
-    public class ErrorInputRootInvalid : Error
+    public interface IErrorInputRootInvalid : IError
+    {
+    }
+
+    /// <summary>
+    /// Invalid Input Root.
+    /// </summary>
+    internal class ErrorInputRootInvalid : Error, IErrorInputRootInvalid
     {
         #region Init
         /// <summary>

@@ -3,7 +3,18 @@
     /// <summary>
     /// Pattern already used.
     /// </summary>
-    public class ErrorPatternAlreadyUsed : Error
+    public interface IErrorPatternAlreadyUsed : IError
+    {
+        /// <summary>
+        /// The pattern.
+        /// </summary>
+        string Pattern { get; }
+    }
+
+    /// <summary>
+    /// Pattern already used.
+    /// </summary>
+    internal class ErrorPatternAlreadyUsed : Error, IErrorPatternAlreadyUsed
     {
         #region Init
         /// <summary>

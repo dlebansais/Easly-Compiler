@@ -3,7 +3,14 @@
     /// <summary>
     /// Invalid string.
     /// </summary>
-    public abstract class ErrorStringValidity : Error
+    public interface IErrorStringValidity : IError
+    {
+    }
+
+    /// <summary>
+    /// Invalid string.
+    /// </summary>
+    internal abstract class ErrorStringValidity : Error, IErrorStringValidity
     {
         #region Init
         /// <summary>

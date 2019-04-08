@@ -3,7 +3,18 @@
     /// <summary>
     /// Input File Not Found.
     /// </summary>
-    public class ErrorInputFileNotFound : Error
+    public interface IErrorInputFileNotFound : IError
+    {
+        /// <summary>
+        /// The file name.
+        /// </summary>
+        string FileName { get; }
+    }
+
+    /// <summary>
+    /// Input File Not Found.
+    /// </summary>
+    internal class ErrorInputFileNotFound : Error, IErrorInputFileNotFound
     {
         #region Init
         /// <summary>

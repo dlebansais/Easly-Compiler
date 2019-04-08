@@ -11,7 +11,6 @@ namespace CompilerNode
     /// </summary>
     public interface IClass : BaseNode.IClass, INode, INodeWithReplicatedBlocks, ISource, IScopeHolder
     {
-        #region Compiler
         /// <summary>
         /// The class path with replication info.
         /// </summary>
@@ -38,7 +37,93 @@ namespace CompilerNode
         /// Increments <see cref="ClassCounter"/>.
         /// </summary>
         void IncrementClassCounter();
-        #endregion
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Class.InvariantBlocks"/>.
+        /// </summary>
+        IList<IAssertion> InvariantList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Class.ConversionBlocks"/>.
+        /// </summary>
+        IList<IIdentifier> ConversionList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Class.FeatureBlocks"/>.
+        /// </summary>
+        IList<IFeature> FeatureList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Class.ClassReplicateBlocks"/>.
+        /// </summary>
+        IList<IClassReplicate> ClassReplicateList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Class.DiscreteBlocks"/>.
+        /// </summary>
+        IList<IDiscrete> DiscreteList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Class.InheritanceBlocks"/>.
+        /// </summary>
+        IList<IInheritance> InheritanceList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Class.TypedefBlocks"/>.
+        /// </summary>
+        IList<ITypedef> TypedefList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Class.ExportBlocks"/>.
+        /// </summary>
+        IList<IExport> ExportList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Class.ImportBlocks"/>.
+        /// </summary>
+        IList<IImport> ImportList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Class.GenericBlocks"/>.
+        /// </summary>
+        IList<IGeneric> GenericList { get; }
+        /// <summary>
+        /// The class name, verified as valid.
+        /// </summary>
+        string ValidClassName { get; }
+
+        /// <summary>
+        /// The class source name, verified as valid.
+        /// </summary>
+        string ValidSourceName { get; }
+
+        /// <summary>
+        /// The list of imported libraries.
+        /// </summary>
+        IList<ILibrary> ImportedLibraryList { get; }
+
+        /// <summary>
+        /// The table of imported classes.
+        /// </summary>
+        IHashtableEx<string, IImportedClass> ImportedClassTable { get; }
+
+        /// <summary>
+        /// Validates the class name and class source name, and update <see cref="ValidClassName"/> and <see cref="ValidSourceName"/>.
+        /// </summary>
+        /// <param name="classTable">Table of valid class names and their sources, updated upon return.</param>
+        /// <param name="validatedClassList">List of classes with valid names, updated upon return.</param>
+        /// <param name="errorList">List of errors found.</param>
+        /// <returns>True if class names are valid.</returns>
+        bool CheckClassNames(IHashtableEx<string, IHashtableEx<string, IClass>> classTable, List<IClass> validatedClassList, IList<IError> errorList);
+
+        /// <summary>
+        /// Validate a class import clauses.
+        /// </summary>
+        /// <param name="libraryTable">Imported libraries.</param>
+        /// <param name="classTable">Imported classes.</param>
+        /// <param name="errorList">List of errors found.</param>
+        /// <returns>True if imports are valid.</returns>
+        bool CheckClassConsistency(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IList<IError> errorList);
     }
 
     /// <summary>
@@ -239,6 +324,257 @@ namespace CompilerNode
             EmbeddingOverload = parentSource is IQueryOverload AsOverload ? AsOverload : parentSource?.EmbeddingOverload;
             EmbeddingBody = parentSource is IBody AsBody ? AsBody : parentSource?.EmbeddingBody;
             EmbeddingAssertion = parentSource is IAssertion AsAssertion ? AsAssertion : parentSource?.EmbeddingAssertion;
+        }
+        #endregion
+
+        #region Classes and Libraries name collision check
+        /// <summary>
+        /// The class name, verified as valid.
+        /// </summary>
+        public string ValidClassName { get; private set; }
+
+        /// <summary>
+        /// The class source name, verified as valid.
+        /// </summary>
+        public string ValidSourceName { get; private set; }
+
+        /// <summary>
+        /// The list of imported libraries.
+        /// </summary>
+        public IList<ILibrary> ImportedLibraryList { get; } = new List<ILibrary>();
+
+        /// <summary>
+        /// The table of imported classes.
+        /// </summary>
+        public IHashtableEx<string, IImportedClass> ImportedClassTable { get; } = new HashtableEx<string, IImportedClass>();
+
+        /// <summary>
+        /// Validates the class name and class source name, and update <see cref="ValidClassName"/> and <see cref="ValidSourceName"/>.
+        /// </summary>
+        /// <param name="classTable">Table of valid class names and their sources, updated upon return.</param>
+        /// <param name="validatedClassList">List of classes with valid names, updated upon return.</param>
+        /// <param name="errorList">List of errors found.</param>
+        /// <returns>True if class names are valid.</returns>
+        public virtual bool CheckClassNames(IHashtableEx<string, IHashtableEx<string, IClass>> classTable, List<IClass> validatedClassList, IList<IError> errorList)
+        {
+            IName ClassEntityName = (IName)EntityName;
+
+            // Verify the class name is a valid string.
+            if (!StringValidation.IsValidIdentifier(ClassEntityName, EntityName.Text, out string ValidEntityName, out IErrorStringValidity StringError))
+            {
+                errorList.Add(StringError);
+                return false;
+            }
+
+            ValidClassName = ValidEntityName;
+
+            if (FromIdentifier.IsAssigned)
+            {
+                // Verify the class source name is a valid string.
+                IIdentifier ClassFromIdentifier = (IIdentifier)FromIdentifier.Item;
+
+                string ValidFromIdentifier;
+                if (!StringValidation.IsValidIdentifier(ClassFromIdentifier, FromIdentifier.Item.Text, out ValidFromIdentifier, out StringError))
+                {
+                    errorList.Add(StringError);
+                    return false;
+                }
+
+                ValidSourceName = ValidFromIdentifier;
+            }
+            else
+                ValidSourceName = string.Empty;
+
+            // Add this class with valid names to the list.
+            validatedClassList.Add(this);
+
+            if (classTable.ContainsKey(ValidClassName))
+            {
+                IHashtableEx<string, IClass> SourceNameTable = classTable[ValidClassName];
+
+                if (SourceNameTable.ContainsKey(ValidSourceName))
+                {
+                    // Report a source name collision if the class has one.
+                    if (FromIdentifier.IsAssigned)
+                    {
+                        errorList.Add(new ErrorDuplicateName(ClassEntityName, ValidClassName));
+                        return false;
+                    }
+                }
+
+                else
+                    SourceNameTable.Add(ValidSourceName, this);
+            }
+            else
+            {
+                IHashtableEx<string, IClass> SourceNameTable = new HashtableEx<string, IClass>();
+                SourceNameTable.Add(ValidSourceName, this);
+                classTable.Add(ValidClassName, SourceNameTable);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Validate a class import clauses.
+        /// </summary>
+        /// <param name="libraryTable">Imported libraries.</param>
+        /// <param name="classTable">Imported classes.</param>
+        /// <param name="errorList">List of errors found.</param>
+        /// <returns>True if imports are valid.</returns>
+        public virtual bool CheckClassConsistency(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IList<IError> errorList)
+        {
+            bool Success = true;
+
+            foreach (IImport ImportItem in ImportList)
+            {
+                if (!ImportItem.CheckImportConsistency(libraryTable, out ILibrary MatchingLibrary, errorList))
+                    continue;
+
+                if (ImportedLibraryList.Contains(MatchingLibrary))
+                {
+                    Success = false;
+                    errorList.Add(new ErrorDuplicateImport((IIdentifier)ImportItem.LibraryIdentifier, MatchingLibrary.ValidLibraryName, MatchingLibrary.ValidSourceName));
+                    continue;
+                }
+
+                if (!Library.MergeImports(ImportedClassTable, ImportItem, MatchingLibrary, errorList))
+                    continue;
+
+                ImportedLibraryList.Add(MatchingLibrary);
+            }
+
+            foreach (KeyValuePair<string, IImportedClass> Entry in ImportedClassTable)
+            {
+                IImportedClass Imported = Entry.Value;
+                if (Imported.Item == this)
+                {
+                    string NewName = Entry.Key;
+
+                    if (NewName != ValidClassName)
+                    {
+                        Success = false;
+                        errorList.Add(new ErrorNameChanged(Imported.ImportLocation, ValidClassName, NewName));
+                    }
+
+                    if (Imported.IsTypeAssigned && Imported.ImportType != BaseNode.ImportType.Latest)
+                    {
+                        Success = false;
+                        errorList.Add(new ErrorImportTypeConflict(Imported.ImportLocation, ValidClassName));
+                    }
+
+                    break;
+                }
+            }
+
+            if (!ImportedClassTable.ContainsKey(ValidClassName))
+            {
+                IImportedClass SelfImport = new ImportedClass(this, BaseNode.ImportType.Latest);
+                ImportedClassTable.Add(ValidClassName, SelfImport);
+            }
+
+            foreach (KeyValuePair<string, IImportedClass> Entry in ImportedClassTable)
+            {
+                IImportedClass Imported = Entry.Value;
+                Imported.SetParentSource(this);
+            }
+
+            ImportedClassTable.Seal();
+
+            return Success;
+        }
+
+        /// <summary>
+        /// Merges a class import with previous imports.
+        /// </summary>
+        /// <param name="importedClassTable">The already reoved imports.</param>
+        /// <param name="locallyImportedClassTable">The current import.</param>
+        /// <param name="importLocation">The import location.</param>
+        /// <param name="localImportType">The import specification.</param>
+        /// <param name="errorList">List of errors found.</param>
+        /// <returns>True if the merge is successful.</returns>
+        public static bool MergeClassTables(IHashtableEx<string, IImportedClass> importedClassTable, IHashtableEx<string, IImportedClass> locallyImportedClassTable, IImport importLocation, BaseNode.ImportType localImportType, IList<IError> errorList)
+        {
+            bool AllClassesAdded = true;
+            foreach (KeyValuePair<string, IImportedClass> Entry in locallyImportedClassTable)
+            {
+                string ClassName = Entry.Key;
+                IImportedClass LocalClassItem = Entry.Value;
+
+                if (importedClassTable.ContainsKey(ClassName))
+                {
+                    IImportedClass ClassItem = importedClassTable[ClassName];
+                    if (ClassItem.Item != LocalClassItem.Item)
+                    {
+                        errorList.Add(new ErrorNameAlreadyUsed(importLocation, ClassName));
+                        AllClassesAdded = false;
+                        continue;
+                    }
+
+                    Debug.Assert(ClassItem.IsTypeAssigned);
+
+                    if (LocalClassItem.IsTypeAssigned)
+                    {
+                        if (ClassItem.ImportType != LocalClassItem.ImportType)
+                        {
+                            errorList.Add(new ErrorImportTypeConflict(importLocation, ClassName));
+                            AllClassesAdded = false;
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        if (ClassItem.ImportType != localImportType)
+                        {
+                            errorList.Add(new ErrorImportTypeConflict(importLocation, ClassName));
+                            AllClassesAdded = false;
+                            continue;
+                        }
+
+                        if (!ClassItem.IsLocationAssigned)
+                            ClassItem.ImportLocation = importLocation;
+                    }
+                }
+                else
+                {
+                    bool AlreadyImported = false;
+                    foreach (KeyValuePair<string, IImportedClass> ImportedEntry in importedClassTable)
+                    {
+                        IImportedClass ClassItem = ImportedEntry.Value;
+                        if (ClassItem.Item == LocalClassItem.Item)
+                        {
+                            string OldName = ImportedEntry.Key;
+                            errorList.Add(new ErrorClassAlreadyImported(importLocation, OldName, ClassName));
+                            AlreadyImported = true;
+                            break;
+                        }
+                    }
+
+                    if (AlreadyImported)
+                    {
+                        AllClassesAdded = false;
+                        continue;
+                    }
+
+                    if (LocalClassItem.IsTypeAssigned)
+                    {
+                        if (LocalClassItem.ImportType != localImportType)
+                        {
+                            errorList.Add(new ErrorImportTypeConflict(importLocation, ClassName));
+                            AllClassesAdded = false;
+                        }
+                    }
+                    else
+                    {
+                        LocalClassItem.ImportType = localImportType;
+                        LocalClassItem.ImportLocation = importLocation;
+                    }
+
+                    importedClassTable.Add(ClassName, LocalClassItem);
+                }
+            }
+
+            return AllClassesAdded;
         }
         #endregion
     }

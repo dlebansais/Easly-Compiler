@@ -5,7 +5,18 @@
     /// <summary>
     /// Invalid Input File or stream.
     /// </summary>
-    public class ErrorInputFileInvalid : Error
+    public interface IErrorInputFileInvalid : IError
+    {
+        /// <summary>
+        /// The exception that occured reading the file or stream.
+        /// </summary>
+        Exception Exception { get; }
+    }
+
+    /// <summary>
+    /// Invalid Input File or stream.
+    /// </summary>
+    internal class ErrorInputFileInvalid : Error, IErrorInputFileInvalid
     {
         #region Init
         /// <summary>

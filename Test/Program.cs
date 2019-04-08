@@ -18,7 +18,7 @@ namespace Test
             c.Compile("../../../coverage replication.easly");
 
             Debug.WriteLine($"{c.ErrorList.Count} error(s).");
-            foreach (Error Error in c.ErrorList)
+            foreach (IError Error in c.ErrorList)
                 Debug.WriteLine($"  {Error.Message} ({Error}).");
         }
 

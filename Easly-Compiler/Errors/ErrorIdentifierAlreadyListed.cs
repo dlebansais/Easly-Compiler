@@ -1,28 +1,28 @@
 ﻿namespace EaslyCompiler
 {
     /// <summary>
-    /// Unknown identifier.
+    /// Identifier already listed.
     /// </summary>
-    public interface IErrorUnknownIdentifier : IError
+    public interface IErrorIdentifierAlreadyListed : IError
     {
         /// <summary>
-        /// The unknown identifier.
+        /// The identifier.
         /// </summary>
         string Identifier { get; }
     }
 
     /// <summary>
-    /// Unknown identifier.
+    /// Identifier already listed.
     /// </summary>
-    internal class ErrorUnknownIdentifier : Error, IErrorUnknownIdentifier
+    internal class ErrorIdentifierAlreadyListed : Error, IErrorIdentifierAlreadyListed
     {
         #region Init
         /// <summary>
-        /// Initializes a new instance of the <see cref="ErrorUnknownIdentifier"/> class.
+        /// Initializes a new instance of the <see cref="ErrorIdentifierAlreadyListed"/> class.
         /// </summary>
         /// <param name="source">The error location.</param>
-        /// <param name="identifier">The unknown identifier.</param>
-        public ErrorUnknownIdentifier(ISource source, string identifier)
+        /// <param name="identifier">The identifier.</param>
+        public ErrorIdentifierAlreadyListed(ISource source, string identifier)
             : base(source)
         {
             Identifier = identifier;
@@ -31,14 +31,14 @@
 
         #region Properties
         /// <summary>
-        /// The unknown identifier.
+        /// The identifier.
         /// </summary>
         public string Identifier { get; }
 
         /// <summary>
         /// The error message.
         /// </summary>
-        public override string Message { get { return $"Unknown identifier: '{Identifier}'."; } }
+        public override string Message { get { return $"Identifier '{Identifier}' already listed."; } }
         #endregion
     }
 }

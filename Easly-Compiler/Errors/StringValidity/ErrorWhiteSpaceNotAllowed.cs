@@ -3,7 +3,14 @@
     /// <summary>
     /// Whitespace not allowed in string.
     /// </summary>
-    public class ErrorWhiteSpaceNotAllowed : ErrorStringValidity
+    public interface IErrorWhiteSpaceNotAllowed : IErrorStringValidity
+    {
+    }
+
+    /// <summary>
+    /// Whitespace not allowed in string.
+    /// </summary>
+    internal class ErrorWhiteSpaceNotAllowed : ErrorStringValidity, IErrorWhiteSpaceNotAllowed
     {
         #region Init
         /// <summary>

@@ -19,7 +19,7 @@
     /// <summary>
     /// Base class for errors.
     /// </summary>
-    public abstract class Error : IError
+    internal abstract class Error : IError
     {
         #region Init
         /// <summary>

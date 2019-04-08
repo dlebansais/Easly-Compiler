@@ -3,6 +3,7 @@ namespace CompilerNode
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -10,6 +11,27 @@ namespace CompilerNode
     /// </summary>
     public interface IImport : BaseNode.IImport, INode, INodeWithReplicatedBlocks, ISource
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Import.RenameBlocks"/>.
+        /// </summary>
+        IList<IRename> RenameList { get; }
+
+        /// <summary>
+        /// Validates an import and return the matching library.
+        /// </summary>
+        /// <param name="libraryTable">Table of valid library names and their sources, updated upon return.</param>
+        /// <param name="matchingLibrary">The matching library upon return.</param>
+        /// <param name="errorList">List of errors found.</param>
+        /// <returns>True if library names are valid.</returns>
+        bool CheckImportConsistency(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, out ILibrary matchingLibrary, IList<IError> errorList);
+
+        /// <summary>
+        /// Check all rename clauses separately.
+        /// </summary>
+        /// <param name="importedClassTable">Table of imported classes.</param>
+        /// <param name="errorList">List of errors found.</param>
+        /// <returns>True if all rename clauses are valid.</returns>
+        bool CheckRenames(IHashtableEx<string, IImportedClass> importedClassTable, IList<IError> errorList);
     }
 
     /// <summary>
@@ -91,6 +113,78 @@ namespace CompilerNode
             EmbeddingOverload = parentSource is IQueryOverload AsOverload ? AsOverload : parentSource?.EmbeddingOverload;
             EmbeddingBody = parentSource is IBody AsBody ? AsBody : parentSource?.EmbeddingBody;
             EmbeddingAssertion = parentSource is IAssertion AsAssertion ? AsAssertion : parentSource?.EmbeddingAssertion;
+        }
+        #endregion
+
+        #region Classes and Libraries name collision check
+        /// <summary>
+        /// Validates an import and return the matching library.
+        /// </summary>
+        /// <param name="libraryTable">Table of valid library names and their sources, updated upon return.</param>
+        /// <param name="matchingLibrary">The matching library upon return.</param>
+        /// <param name="errorList">List of errors found.</param>
+        /// <returns>True if library names are valid.</returns>
+        public virtual bool CheckImportConsistency(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, out ILibrary matchingLibrary, IList<IError> errorList)
+        {
+            IIdentifier ImportLibraryIdentifier = (IIdentifier)LibraryIdentifier;
+            IHashtableEx<string, ILibrary> SourceNameTable;
+            matchingLibrary = null;
+            string ValidFromIdentifier;
+
+            if (!StringValidation.IsValidIdentifier(ImportLibraryIdentifier, LibraryIdentifier.Text, out string ValidLibraryIdentifier, out IErrorStringValidity StringError))
+            {
+                errorList.Add(StringError);
+                return false;
+            }
+
+            // Match the library name and source name.
+            if (!libraryTable.ContainsKey(ValidLibraryIdentifier))
+            {
+                errorList.Add(new ErrorUnknownIdentifier(ImportLibraryIdentifier, ValidLibraryIdentifier));
+                return false;
+            }
+
+            SourceNameTable = libraryTable[ValidLibraryIdentifier];
+
+            if (FromIdentifier.IsAssigned)
+            {
+                IIdentifier ImportFromIdentifier = (IIdentifier)FromIdentifier.Item;
+
+                if (!StringValidation.IsValidIdentifier(ImportFromIdentifier, FromIdentifier.Item.Text, out ValidFromIdentifier, out StringError))
+                {
+                    errorList.Add(StringError);
+                    return false;
+                }
+            }
+            else
+                ValidFromIdentifier = string.Empty;
+
+            if (!SourceNameTable.ContainsKey(ValidFromIdentifier))
+            {
+                errorList.Add(new ErrorUnknownIdentifier(ImportLibraryIdentifier, ValidLibraryIdentifier));
+                return false;
+            }
+
+            matchingLibrary = SourceNameTable[ValidFromIdentifier];
+            return true;
+        }
+
+        /// <summary>
+        /// Check all rename clauses separately.
+        /// </summary>
+        /// <param name="importedClassTable">Table of imported classes.</param>
+        /// <param name="errorList">List of errors found.</param>
+        /// <returns>True if all rename clauses are valid.</returns>
+        public virtual bool CheckRenames(IHashtableEx<string, IImportedClass> importedClassTable, IList<IError> errorList)
+        {
+            IHashtableEx<string, string> SourceIdentifierTable = new HashtableEx<string, string>(); // string (source) -> string (destination)
+            IHashtableEx<string, string> DestinationIdentifierTable = new HashtableEx<string, string>(); // string (destination) -> string (source)
+
+            bool Success = true;
+            foreach (Rename RenameItem in RenameList)
+                Success &= RenameItem.CheckGenericRename(new IHashtableIndex<string>[] { importedClassTable }, SourceIdentifierTable, DestinationIdentifierTable, (string key) => key, (string s) => s, errorList);
+
+            return Success;
         }
         #endregion
     }

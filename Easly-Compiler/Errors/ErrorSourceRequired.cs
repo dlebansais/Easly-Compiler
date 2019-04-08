@@ -1,23 +1,23 @@
 ﻿namespace EaslyCompiler
 {
     /// <summary>
-    /// Invalid unicode string.
+    /// Class source missing.
     /// </summary>
-    public interface IErrorIllFormedString : IErrorStringValidity
+    public interface IErrorSourceRequired : IError
     {
     }
 
     /// <summary>
-    /// Invalid unicode string.
+    /// Class source missing.
     /// </summary>
-    internal class ErrorIllFormedString : ErrorStringValidity, IErrorIllFormedString
+    internal class ErrorSourceRequired : Error, IErrorSourceRequired
     {
         #region Init
         /// <summary>
-        /// Initializes a new instance of the <see cref="ErrorIllFormedString"/> class.
+        /// Initializes a new instance of the <see cref="ErrorSourceRequired"/> class.
         /// </summary>
         /// <param name="source">The error location.</param>
-        public ErrorIllFormedString(ISource source)
+        public ErrorSourceRequired(ISource source)
             : base(source)
         {
         }
@@ -27,7 +27,7 @@
         /// <summary>
         /// The error message.
         /// </summary>
-        public override string Message { get { return "Ill-formed string."; } }
+        public override string Message { get { return "All items with the same name must have a source."; } }
         #endregion
     }
 }

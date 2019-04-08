@@ -176,8 +176,18 @@
     <Compile Include="CompilerNodes\Typedef.cs" />
     <Compile Include="CompilerNodes\With.cs" />
     <Compile Include="Errors\Error.cs" />
+    <Compile Include="Errors\ErrorClassAlreadyImported.cs" />
+    <Compile Include="Errors\ErrorNameChanged.cs" />
+    <Compile Include="Errors\ErrorDoubleRename.cs" />
+    <Compile Include="Errors\ErrorDuplicateImport.cs" />
+    <Compile Include="Errors\ErrorCyclicDependency.cs" />
+    <Compile Include="Errors\ErrorImportTypeConflict.cs" />
+    <Compile Include="Errors\ErrorNameAlreadyUsed.cs" />
+    <Compile Include="Errors\ErrorNameUnchanged.cs" />
+    <Compile Include="Errors\ErrorSourceRequired.cs" />
     <Compile Include="Errors\ErrorEmptyClassPath.cs" />
     <Compile Include="Errors\ErrorPatternAlreadyUsed.cs" />
+    <Compile Include="Errors\ErrorIdentifierAlreadyListed.cs" />
     <Compile Include="Errors\ErrorUnknownIdentifier.cs" />
     <Compile Include="Errors\ErrorDuplicateName.cs" />
     <Compile Include="Errors\StringValidity\ErrorWhiteSpaceNotAllowed.cs" />
@@ -191,6 +201,7 @@
     <Compile Include="CompiledFeature.cs" />
     <Compile Include="CompiledType.cs" />
     <Compile Include="Errors\StringValidity\ErrorStringValidity.cs" />
+    <Compile Include="ImportedClass.cs" />
     <Compile Include="NameGuidPair.cs" />
     <Compile Include="NodeWithReplicatedBlocks.cs" />
     <Compile Include="ReplacePhase2MacroContext.cs" />

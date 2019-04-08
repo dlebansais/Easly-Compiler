@@ -9,6 +9,7 @@
     using System.Security.Cryptography;
     using BaseNodeHelper;
     using CompilerNode;
+    using Easly;
     using PolySerializer;
 
     /// <summary>
@@ -45,7 +46,7 @@
         /// <summary>
         /// Errors in last compilation.
         /// </summary>
-        public IList<Error> ErrorList { get; } = new List<Error>();
+        public IList<IError> ErrorList { get; } = new List<IError>();
         #endregion
 
         #region Client Interface
@@ -151,6 +152,11 @@
                 {
                     ReplacePhase2Macroes(root);
                     InitializeSources(root);
+
+                    /*if (CheckClassAndLibraryNames(root))
+                    {
+
+                    }*/
                 }
             }
         }
@@ -455,9 +461,7 @@
                 IName ReplicateName = (IName)Replicate.ReplicateName;
                 string ReplicateNameText = ReplicateName.Text;
 
-                string ValidReplicateName;
-                ErrorStringValidity StringError;
-                if (!StringValidation.IsValidIdentifier(ReplicateName, ReplicateNameText, out ValidReplicateName, out StringError))
+                if (!StringValidation.IsValidIdentifier(ReplicateName, ReplicateNameText, out string ValidReplicateName, out IErrorStringValidity StringError))
                     ErrorList.Add(StringError);
                 else
                 {
@@ -474,8 +478,7 @@
                         {
                             string PatternText = Pattern.Text;
 
-                            string ValidPatternText;
-                            if (!StringValidation.IsValidIdentifier(Pattern, PatternText, out ValidPatternText, out StringError))
+                            if (!StringValidation.IsValidIdentifier(Pattern, PatternText, out string ValidPatternText, out StringError))
                                 ErrorList.Add(StringError);
                             else
                                 ValidPatternList.Add(ValidPatternText);
@@ -509,13 +512,12 @@
 
         private bool ProcessReplicatedBlock(BaseNode.IBlock block, List<BaseNode.INode> replicatedNodeList, IWalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
         {
-            ErrorStringValidity StringError;
+            IErrorStringValidity StringError;
             IPattern ReplicationPattern = (IPattern)block.ReplicationPattern;
             IIdentifier SourceIdentifier = (IIdentifier)block.SourceIdentifier;
             string ReplicationPatternText = ReplicationPattern.Text;
 
-            string ValidReplicationPattern;
-            if (!StringValidation.IsValidIdentifier(ReplicationPattern, ReplicationPatternText, out ValidReplicationPattern, out StringError))
+            if (!StringValidation.IsValidIdentifier(ReplicationPattern, ReplicationPatternText, out string ValidReplicationPattern, out StringError))
             {
                 ErrorList.Add(StringError);
                 return false;
@@ -524,8 +526,7 @@
             {
                 string SourceIdentifierText = SourceIdentifier.Text;
 
-                string ValidSourceIdentifier;
-                if (!StringValidation.IsValidIdentifier(SourceIdentifier, SourceIdentifierText, out ValidSourceIdentifier, out StringError))
+                if (!StringValidation.IsValidIdentifier(SourceIdentifier, SourceIdentifierText, out string ValidSourceIdentifier, out StringError))
                 {
                     ErrorList.Add(StringError);
                     return false;
@@ -744,6 +745,168 @@
 #endif
             return Result;
         }
+        #endregion
+
+        #region Classes and Libraries name collision check
+        /// <summary></summary>
+        protected virtual bool CheckClassAndLibraryNames(IRoot root)
+        {
+            ClassTable.Clear();
+            LibraryTable.Clear();
+
+            bool IsClassNamesValid = CheckClassNames(root);
+            bool IsLibraryNamesValid = CheckLibraryNames(root);
+            if (!IsClassNamesValid || !IsLibraryNamesValid)
+                return false;
+
+            if (!InitializeLibraries(root))
+                return false;
+
+            if (!CheckLibrariesConsistency(root))
+                return false;
+
+            if (!CheckClassesConsistency(root))
+                return false;
+
+            return true;
+        }
+
+        /// <summary></summary>
+        protected virtual bool CheckClassNames(IRoot root)
+        {
+            List<IClass> ValidatedClassList = new List<IClass>();
+            bool IsClassNamesValid = true;
+
+            foreach (IClass Class in root.ClassList)
+                IsClassNamesValid &= Class.CheckClassNames(ClassTable, ValidatedClassList, ErrorList);
+
+            foreach (KeyValuePair<string, IHashtableEx<string, IClass>> Entry in ClassTable)
+            {
+                string ValidClassName = Entry.Key;
+
+                // List all classes with the same name and no source.
+                List<IClass> DuplicateClassList = new List<IClass>();
+                foreach (IClass Item in ValidatedClassList)
+                    if (Item.ValidClassName == ValidClassName && !Item.FromIdentifier.IsAssigned)
+                        DuplicateClassList.Add(Item);
+
+                // If more than one, report an error for each of them.
+                if (DuplicateClassList.Count > 1)
+                {
+                    IsClassNamesValid = false;
+
+                    foreach (IClass Item in DuplicateClassList)
+                        ErrorList.Add(new ErrorSourceRequired((IName)Item.EntityName));
+                }
+            }
+
+            return IsClassNamesValid;
+        }
+
+        /// <summary></summary>
+        protected virtual bool CheckLibraryNames(IRoot root)
+        {
+            List<ILibrary> ValidatedLibraryList = new List<ILibrary>();
+            bool IsLibraryNamesValid = true;
+
+            foreach (ILibrary Library in root.LibraryList)
+                IsLibraryNamesValid &= Library.CheckLibraryNames(LibraryTable, ValidatedLibraryList, ErrorList);
+
+            foreach (KeyValuePair<string, IHashtableEx<string, ILibrary>> Entry in LibraryTable)
+            {
+                string ValidLibraryName = Entry.Key;
+
+                // List all libraries with the same name and no source.
+                List<ILibrary> DuplicateLibraryList = new List<ILibrary>();
+                foreach (ILibrary Item in ValidatedLibraryList)
+                    if (Item.ValidLibraryName == ValidLibraryName && !Item.FromIdentifier.IsAssigned)
+                        DuplicateLibraryList.Add(Item);
+
+                // If more than one, report an error for each of them.
+                if (DuplicateLibraryList.Count > 1)
+                {
+                    IsLibraryNamesValid = false;
+
+                    foreach (IClass Item in DuplicateLibraryList)
+                        ErrorList.Add(new ErrorSourceRequired((IName)Item.EntityName));
+                }
+            }
+
+            return IsLibraryNamesValid;
+        }
+
+        /// <summary></summary>
+        protected virtual bool InitializeLibraries(IRoot root)
+        {
+            bool Success = true;
+
+            foreach (ILibrary Library in root.LibraryList)
+                Success &= Library.InitLibraryTables(ClassTable, ErrorList);
+
+            return Success;
+        }
+
+        /// <summary></summary>
+        protected virtual bool CheckLibrariesConsistency(IRoot root)
+        {
+            List<ILibrary> ResolvedLibraryList = new List<ILibrary>();
+            List<ILibrary> UnresolvedLibraryList = new List<ILibrary>(root.LibraryList);
+
+            bool Success = true;
+            bool Continue = true;
+            while (UnresolvedLibraryList.Count > 0 && ErrorList.Count == 0 && Continue)
+            {
+                Continue = false;
+
+                foreach (ILibrary Library in UnresolvedLibraryList)
+                    Success &= Library.Resolve(LibraryTable, ResolvedLibraryList, ref Continue, ErrorList);
+
+                MoveResolvedLibraries(UnresolvedLibraryList, ResolvedLibraryList, ref Continue);
+            }
+
+            if (UnresolvedLibraryList.Count > 0 && Success)
+            {
+                Success = false;
+                ErrorList.Add(new ErrorCyclicDependency(UnresolvedLibraryList[0], UnresolvedLibraryList[0].ValidLibraryName));
+            }
+
+            return Success;
+        }
+
+        /// <summary></summary>
+        protected virtual void MoveResolvedLibraries(List<ILibrary> unresolvedLibraryList, List<ILibrary> resolvedLibraryList, ref bool continueMove)
+        {
+            List<ILibrary> ToMove = new List<ILibrary>();
+
+            foreach (ILibrary Library in unresolvedLibraryList)
+                if (Library.IsResolved)
+                    ToMove.Add(Library);
+
+            if (ToMove.Count > 0)
+            {
+                foreach (ILibrary LibraryItem in ToMove)
+                {
+                    unresolvedLibraryList.Remove(LibraryItem);
+                    resolvedLibraryList.Add(LibraryItem);
+                }
+
+                continueMove = true;
+            }
+        }
+
+        /// <summary></summary>
+        protected virtual bool CheckClassesConsistency(IRoot root)
+        {
+            bool Success = true;
+
+            foreach (IClass Class in root.ClassList)
+                Success &= Class.CheckClassConsistency(LibraryTable, ClassTable, ErrorList);
+
+            return Success;
+        }
+
+        private IHashtableEx<string, IHashtableEx<string, IClass>> ClassTable { get; set; }
+        private IHashtableEx<string, IHashtableEx<string, ILibrary>> LibraryTable { get; set; }
         #endregion
     }
 }

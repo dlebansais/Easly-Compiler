@@ -1,28 +1,28 @@
 ﻿namespace EaslyCompiler
 {
     /// <summary>
-    /// Duplicate name.
+    /// Cyclic dependency.
     /// </summary>
-    public interface IErrorDuplicateName : IError
+    public interface IErrorCyclicDependency : IError
     {
         /// <summary>
-        /// The duplicate name.
+        /// The name with cyclic dependency.
         /// </summary>
         string Name { get; }
     }
 
     /// <summary>
-    /// Duplicate name.
+    /// Cyclic dependency.
     /// </summary>
-    internal class ErrorDuplicateName : Error, IErrorDuplicateName
+    internal class ErrorCyclicDependency : Error, IErrorCyclicDependency
     {
         #region Init
         /// <summary>
-        /// Initializes a new instance of the <see cref="ErrorDuplicateName"/> class.
+        /// Initializes a new instance of the <see cref="ErrorCyclicDependency"/> class.
         /// </summary>
         /// <param name="source">The error location.</param>
-        /// <param name="name">The duplicate name.</param>
-        public ErrorDuplicateName(ISource source, string name)
+        /// <param name="name">The name with cyclic dependency.</param>
+        public ErrorCyclicDependency(ISource source, string name)
             : base(source)
         {
             Name = name;
@@ -31,14 +31,14 @@
 
         #region Properties
         /// <summary>
-        /// The duplicate name.
+        /// The name with cyclic dependency.
         /// </summary>
         public string Name { get; }
 
         /// <summary>
         /// The error message.
         /// </summary>
-        public override string Message { get { return $"Duplicate Name '{Name}'."; } }
+        public override string Message { get { return $"Cyclic dependency detected in '{Name}'"; } }
         #endregion
     }
 }
