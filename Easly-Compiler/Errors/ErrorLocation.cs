@@ -40,5 +40,26 @@
         /// </summary>
         public INode Node { get; }
         #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            string Result = string.Empty;
+
+            ISource Source = Node as ISource;
+            while (Source != null)
+            {
+                if (Result.Length > 0)
+                    Result = $"{Source} / {Result}";
+                else
+                    Result = Source.ToString();
+
+                Source = Source.ParentSource;
+            }
+
+            return Result;
+        }
+        #endregion
     }
 }

@@ -13,13 +13,13 @@ namespace Test
             Compiler c = new Compiler();
             //c.Compile("../../../coverage.easly");
             //c.Compile("../../../coverage invalid 7.easly");
-            //c.Compile("../../../test.easly");
+            c.Compile("../../../test.easly");
             //c.Compile("../../../root.easly");
-            c.Compile("../../../coverage replication.easly");
+            //c.Compile("../../../coverage replication.easly");
 
             Debug.WriteLine($"{c.ErrorList.Count} error(s).");
             foreach (IError Error in c.ErrorList)
-                Debug.WriteLine($"  {Error.Message} ({Error}).");
+                Debug.WriteLine($"  {Error.Message} ({Error}) [{Error.Location}].");
         }
 
         static void DebugOutputLanguage()

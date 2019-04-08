@@ -60,5 +60,13 @@
             EmbeddingAssertion = parentSource is IAssertion AsAssertion ? AsAssertion : parentSource?.EmbeddingAssertion;
         }
         #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Identifier '{Text}'";
+        }
+        #endregion
     }
 }

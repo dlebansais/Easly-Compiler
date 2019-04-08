@@ -83,6 +83,23 @@
             _ImportType = importType;
             IsTypeAssigned = true;
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImportedClass"/> class.
+        /// </summary>
+        /// <param name="other">The other imported class.</param>
+        public ImportedClass(IImportedClass other)
+        {
+            Item = other.Item;
+
+            IsTypeAssigned = other.IsTypeAssigned;
+            if (IsTypeAssigned)
+                _ImportType = other.ImportType;
+
+            IsLocationAssigned = other.IsLocationAssigned;
+            if (IsLocationAssigned)
+                _ImportLocation = other.ImportLocation;
+        }
         #endregion
 
         #region Properties
@@ -169,6 +186,17 @@
 
             _ImportLocation = importLocation;
             IsLocationAssigned = true;
+        }
+        #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            if (IsTypeAssigned)
+                return $"ImportedClass: {Item}, {ImportType}";
+            else
+                return $"ImportedClass: {Item}";
         }
         #endregion
     }

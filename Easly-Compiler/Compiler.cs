@@ -750,8 +750,8 @@
         /// <summary></summary>
         protected virtual bool CheckClassAndLibraryNames(IRoot root)
         {
-            Debug.Assert(ClassTable.Count == 0);
-            Debug.Assert(LibraryTable.Count == 0);
+            ClassTable.Clear();
+            LibraryTable.Clear();
 
             bool IsClassNamesValid = CheckClassNames(root);
             bool IsLibraryNamesValid = CheckLibraryNames(root);

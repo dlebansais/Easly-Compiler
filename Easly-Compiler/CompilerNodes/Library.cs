@@ -353,13 +353,11 @@ namespace CompilerNode
                     continue;
                 }
 
-                // It must be one of the resolved libraries.
+                // If the imported library hasn't been resolved yet, ignore it for now.
                 if (!resolvedLibraryList.Contains(MatchingLibrary))
-                {
-                    // Success = false; TODO verify success
                     continue;
-                }
 
+                // The imported library was resolved, merge this import with it.
                 if (!MergeImports(ImportedClassTable, ImportItem, MatchingLibrary, errorList))
                 {
                     Success = false;
@@ -388,7 +386,14 @@ namespace CompilerNode
         /// <returns>True if the merge succeeded.</returns>
         public static bool MergeImports(IHashtableEx<string, IImportedClass> importedClassTable, IImport importItem, ILibrary matchingLibrary, IList<IError> errorList)
         {
-            IHashtableEx<string, IImportedClass> LocallyImportedClassTable = matchingLibrary.ImportedClassTable.CloneUnsealed();
+            // Clone imported class objects from the imported library.
+            IHashtableEx<string, IImportedClass> LocallyImportedClassTable = new HashtableEx<string, IImportedClass>();
+            foreach (KeyValuePair<string, IImportedClass> Entry in matchingLibrary.ImportedClassTable)
+            {
+                IImportedClass Clone = new ImportedClass(Entry.Value);
+                LocallyImportedClassTable.Add(Entry.Key, Clone);
+            }
+
             if (!importItem.CheckRenames(LocallyImportedClassTable, errorList))
                 return false;
 

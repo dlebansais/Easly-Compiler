@@ -190,5 +190,13 @@ namespace CompilerNode
             return Success;
         }
         #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Import '{LibraryIdentifier.Text}', {Type}, {RenameList.Count} rename(s)";
+        }
+        #endregion
     }
 }

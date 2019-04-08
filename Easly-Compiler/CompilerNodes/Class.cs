@@ -477,6 +477,7 @@ namespace CompilerNode
                 }
             }
 
+            // If not referenced by an imported library, a class should be able to reference itself.
             if (!ImportedClassTable.ContainsKey(ValidClassName))
             {
                 IImportedClass SelfImport = new ImportedClass(this, BaseNode.ImportType.Latest);
