@@ -316,6 +316,11 @@ namespace CompilerNode
                     // Add it, leaving the import mode open for now.
                     IImportedClass Imported = new ImportedClass(SourceNameTable[ValidSourceName]);
                     ImportedClassTable.Add(ValidClassIdentifier, Imported);
+
+#if DEBUG
+                    // For code coverage purpose
+                    string ImportString = Imported.ToString();
+#endif
                 }
             }
 

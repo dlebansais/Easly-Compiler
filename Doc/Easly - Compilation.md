@@ -46,3 +46,47 @@ The following macroes are replaced by their compile time values, instances of II
 + Class Counter, each replicated class has its own counter.
 + Random Number, each instance is unique.
  
+## Organizing class and library imports
+
+Libraries list classes that other libraries and classes can import. This step ensures that all classes end up with a list of imported classes, after nested library imports and renames.
+
+The following checks are performed.
+
+### String validity
+
+Identifiers must be valid, i.e contain valid characters, be well-formed unicode strings and no start or end with a whitespace. Identifiers included are:
++ Class name and source.
++ Library name and source.
++ Name of classes listed in libraries
++ Name and source of libraries in import clauses
++ Source and destination in rename clauses
+
+### Import Errors
+
+    Class '{NewName}' already imported under name '{OldName}'.
+A class must not be imported using two different names after all rename clauses have been processed.
+
+    Cyclic dependencies detected in ...list of classes...
+    Class '{ClassName}' cannot import itself under name '{NewName}'.
+A class cannot import itself, neither directly or through libraries in a cycle.
+
+    '{SourceName}' has already been renamed as '{DestinationName}'.
+A class cannot be imported with its name and with another name through libraries rename clauses.
+
+    Library '{LibraryName}' already imported.
+A library should be imported only once. Note that multiple imports with nested libraries are valid, but explicitely importing the same one twice is not.
+
+    Identifier '{Identifier}' already listed.
+This error occurs for example when the same class is renamed twice in the same import clause.
+
+    Conflicting import type for class '{ClassName}'.
+A class must not be imported using different specification, for example as `stable` in a library and `latest` in another.
+
+    More than one class is imported using the name '{Name}'.
+Rename clauses should not be used to rename different classes to the same name.
+
+    Item renamed to the same name '{Name}'.
+In a rename clause, the source and destination must be different.
+
+    All items with the same name must have a source.
+Different classes can use the same name, but when they are used together they must have a different source name.

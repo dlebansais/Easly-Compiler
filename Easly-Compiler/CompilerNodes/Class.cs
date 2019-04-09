@@ -482,6 +482,11 @@ namespace CompilerNode
             {
                 IImportedClass SelfImport = new ImportedClass(this, BaseNode.ImportType.Latest);
                 ImportedClassTable.Add(ValidClassName, SelfImport);
+
+#if DEBUG
+                // For code coverage purpose
+                string ImportString = SelfImport.ToString();
+#endif
             }
 
             foreach (KeyValuePair<string, IImportedClass> Entry in ImportedClassTable)
