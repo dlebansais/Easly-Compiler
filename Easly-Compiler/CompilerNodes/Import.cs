@@ -186,6 +186,12 @@ namespace CompilerNode
             foreach (IRename RenameItem in RenameList)
                 Success &= RenameItem.CheckGenericRename(new IHashtableIndex<string>[] { importedClassTable }, SourceIdentifierTable, DestinationIdentifierTable, (string key) => key, (string s) => s, errorList);
 
+            if (Success)
+            {
+                foreach (KeyValuePair<string, string> Entry in SourceIdentifierTable)
+                    importedClassTable.ChangeKey(Entry.Key, Entry.Value);
+            }
+
             Debug.Assert(Success || errorList.Count > 0);
             return Success;
         }

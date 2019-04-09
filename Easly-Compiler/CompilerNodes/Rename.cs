@@ -2,6 +2,7 @@ namespace CompilerNode
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using Easly;
     using EaslyCompiler;
 
@@ -153,21 +154,16 @@ namespace CompilerNode
             }
 
             // Check that no other rename uses this destination.
-            foreach (IHashtableIndex<TKey> Table in renamedItemTables)
-                foreach (TKey Entry in Table.Indexes)
-                {
-                    string ValidName = key2String(Entry);
-                    if (ValidName == ValidDestinationIdentifier)
-                    {
-                        errorList.Add(new ErrorIdentifierAlreadyListed(RenameDestinationIdentifier, ValidDestinationIdentifier));
-                        return false;
-                    }
-                }
+            if (destinationIdentifierTable.ContainsKey(ValidDestinationIdentifier))
+            {
+                errorList.Add(new ErrorIdentifierAlreadyListed(RenameDestinationIdentifier, ValidDestinationIdentifier));
+                return false;
+            }
 
+            Debug.Assert(!sourceIdentifierTable.ContainsKey(ValidSourceIdentifier));
+            Debug.Assert(!destinationIdentifierTable.ContainsKey(ValidDestinationIdentifier));
             sourceIdentifierTable.Add(ValidSourceIdentifier, ValidDestinationIdentifier);
             destinationIdentifierTable.Add(ValidDestinationIdentifier, ValidSourceIdentifier);
-
-            SourceTable.Item.ChangeKey(SourceKey, string2Key(ValidDestinationIdentifier));
             return true;
         }
         #endregion

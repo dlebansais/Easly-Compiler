@@ -12,7 +12,7 @@ namespace Test
         {
             Compiler c = new Compiler();
             //c.Compile("../../../coverage/coverage.easly");
-            c.Compile("../../../coverage/coverage invalid 31.easly");
+            c.Compile("../../../coverage/coverage invalid 38.easly");
             //c.Compile("../../../test.easly");
             //c.Compile("../../../root.easly");
             //c.Compile("../../../coverage/coverage replication.easly");
