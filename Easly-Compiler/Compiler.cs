@@ -876,7 +876,12 @@
             if (UnresolvedLibraryList.Count > 0 && Success)
             {
                 Success = false;
-                ErrorList.Add(new ErrorCyclicDependency(UnresolvedLibraryList[0], UnresolvedLibraryList));
+
+                IList<string> NameList = new List<string>();
+                foreach (ILibrary Library in UnresolvedLibraryList)
+                    NameList.Add(Library.ValidLibraryName);
+
+                ErrorList.Add(new ErrorCyclicDependency(UnresolvedLibraryList[0], NameList));
             }
 
             Debug.Assert(Success || ErrorList.Count > 0);

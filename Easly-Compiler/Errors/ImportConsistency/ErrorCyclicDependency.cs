@@ -2,7 +2,6 @@
 {
     using System.Collections.Generic;
     using System.Diagnostics;
-    using CompilerNode;
 
     /// <summary>
     /// Cyclic dependency.
@@ -10,9 +9,9 @@
     public interface IErrorCyclicDependency : IError
     {
         /// <summary>
-        /// List of libraries with cyclic dependencies.
+        /// List of nodes with cyclic dependencies by names.
         /// </summary>
-        IList<ILibrary> LibraryList { get; }
+        IList<string> NameList { get; }
     }
 
     /// <summary>
@@ -25,21 +24,21 @@
         /// Initializes a new instance of the <see cref="ErrorCyclicDependency"/> class.
         /// </summary>
         /// <param name="source">The error location.</param>
-        /// <param name="libraryList">List of libraries with cyclic dependencies.</param>
-        public ErrorCyclicDependency(ISource source, IList<ILibrary> libraryList)
+        /// <param name="nameList">List of nodes with cyclic dependencies by names</param>
+        public ErrorCyclicDependency(ISource source, IList<string> nameList)
             : base(source)
         {
-            Debug.Assert(libraryList.Count >= 2);
+            Debug.Assert(nameList.Count >= 2);
 
-            LibraryList = libraryList;
+            NameList = nameList;
         }
         #endregion
 
         #region Properties
         /// <summary>
-        /// List of libraries with cyclic dependencies.
+        /// List of nodes with cyclic dependencies by names.
         /// </summary>
-        public IList<ILibrary> LibraryList { get; }
+        public IList<string> NameList { get; }
 
         /// <summary>
         /// The error message.
@@ -48,16 +47,16 @@
         {
             get
             {
-                Debug.Assert(LibraryList.Count >= 2);
+                Debug.Assert(NameList.Count >= 2);
 
-                string NameList = $"'{LibraryList[0].ValidLibraryName}'";
+                string Result = $"'{NameList[0]}'";
 
-                for (int i = 1; i + 1 < LibraryList.Count; i++)
-                    NameList += $", '{LibraryList[i].ValidLibraryName}'";
+                for (int i = 1; i + 1 < NameList.Count; i++)
+                    Result += $", '{NameList[i]}'";
 
-                NameList += $" and '{LibraryList[LibraryList.Count - 1].ValidLibraryName}'";
+                Result += $" and '{NameList[NameList.Count - 1]}'";
 
-                return $"Cyclic dependencies detected in {NameList}.";
+                return $"Cyclic dependencies detected in {Result}.";
             }
         }
         #endregion

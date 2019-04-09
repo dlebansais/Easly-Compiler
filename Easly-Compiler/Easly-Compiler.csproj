@@ -202,6 +202,12 @@
     <Compile Include="CompiledType.cs" />
     <Compile Include="Errors\StringValidity\ErrorStringValidity.cs" />
     <Compile Include="ImportedClass.cs" />
+    <Compile Include="InferenceEngine\DestinationTemplate.cs" />
+    <Compile Include="InferenceEngine\SourceTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplate.cs" />
+    <Compile Include="InferenceEngine\InferenceEngine.cs" />
+    <Compile Include="InferenceEngine\TemplateNodeStart.cs" />
+    <Compile Include="InferenceEngine\TemplatePathStart.cs" />
     <Compile Include="NameGuidPair.cs" />
     <Compile Include="NodeWithReplicatedBlocks.cs" />
     <Compile Include="ReplacePhase2MacroContext.cs" />

@@ -1,7 +1,5 @@
 ﻿namespace CompilerNode
 {
-    using System.Collections.Generic;
-
     /// <summary>
     /// Compiler INode.
     /// </summary>
