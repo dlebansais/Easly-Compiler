@@ -30,7 +30,7 @@
         }
         #endregion
 
-        #region Properties
+        #region Client Interface
         /// <summary>
         /// Checks for errors before applying a rule.
         /// </summary>
@@ -53,9 +53,6 @@
             return Success;
         }
 
-        #endregion
-
-        #region Application
         /// <summary>
         /// Applies the rule.
         /// </summary>

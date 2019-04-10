@@ -103,18 +103,28 @@
         public virtual void Compile(Stream stream)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
+
             ErrorList.Clear();
+            IRoot LoadedRoot;
 
             try
             {
                 ISerializer Serializer = CreateCompilerSerializer();
-                IRoot LoadedRoot = (IRoot)Serializer.Deserialize(stream);
-
-                CompileRoot(LoadedRoot);
+                LoadedRoot = (IRoot)Serializer.Deserialize(stream);
             }
             catch (Exception e)
             {
                 ErrorList.Add(new ErrorInputFileInvalid(e));
+                return;
+            }
+
+            try
+            {
+                CompileRoot(LoadedRoot);
+            }
+            catch (Exception e)
+            {
+                ErrorList.Add(new ErrorInternal(e));
             }
         }
         #endregion
@@ -241,7 +251,7 @@
 
         private IInitializedObjectExpression CompilationDateTime;
         private IInitializedObjectExpression CompilationUID;
-        private IInitializedObjectExpression CompilerVersion;
+        private IManifestStringExpression CompilerVersion;
         private IInitializedObjectExpression ConformanceToStandard;
         private IInitializedObjectExpression Debugging;
 
@@ -250,42 +260,55 @@
         {
             DateTime Now = DateTime.UtcNow;
             string IsoString = Now.ToString("u");
-            CompilationDateTime = InitializedExpression(LanguageClasses.DateAndTime.Name, IsoString);
+            CompilationDateTime = InitializedStringExpression(LanguageClasses.DateAndTime.Name, nameof(DateAndTime.ToUtcDateTime), IsoString);
         }
 
         /// <summary></summary>
         protected virtual void GenerateCompilationUID()
         {
             string NewGuidDigits = Guid.NewGuid().ToString("N");
-            CompilationUID = InitializedExpression(LanguageClasses.UniversallyUniqueIdentifier.Name, "0x" + NewGuidDigits);
+            CompilationUID = InitializedNumberExpression(LanguageClasses.UniversallyUniqueIdentifier.Name, "Value", NewGuidDigits + IntegerBase.Hexadecimal.Suffix);
         }
 
         /// <summary></summary>
         protected virtual void GenerateCompilerVersion()
         {
-            CompilerVersion = InitializedExpression(LanguageClasses.String.Name, "Easly 1");
+            CompilerVersion = new ManifestStringExpression("Easly 1");
         }
 
         /// <summary></summary>
         protected virtual void GenerateConformanceToStandard()
         {
-            ConformanceToStandard = InitializedExpression(LanguageClasses.Boolean.Name, LanguageClasses.BooleanTrueString);
+            ConformanceToStandard = InitializedStringExpression(LanguageClasses.Boolean.Name, "Value", LanguageClasses.BooleanTrueString);
         }
 
         /// <summary></summary>
         protected virtual void GenerateDebugging()
         {
-            Debugging = InitializedExpression(LanguageClasses.Boolean.Name, LanguageClasses.BooleanFalseString);
+            Debugging = InitializedStringExpression(LanguageClasses.Boolean.Name, "Value", LanguageClasses.BooleanFalseString);
         }
 
         /// <summary></summary>
-        protected virtual IInitializedObjectExpression InitializedExpression(string className, string initialValue)
+        protected virtual IInitializedObjectExpression InitializedNumberExpression(string className, string identifierName, string initialValue)
+        {
+            BaseNode.IManifestNumberExpression ManifestValue = NodeHelper.CreateSimpleManifestNumberExpression(initialValue);
+            return InitializedExpression(className, identifierName, ManifestValue);
+        }
+
+        /// <summary></summary>
+        protected virtual IInitializedObjectExpression InitializedStringExpression(string className, string identifierName, string initialValue)
+        {
+            BaseNode.IManifestStringExpression ManifestValue = NodeHelper.CreateManifestStringExpression(initialValue);
+            return InitializedExpression(className, identifierName, ManifestValue);
+        }
+
+        /// <summary></summary>
+        protected virtual IInitializedObjectExpression InitializedExpression(string className, string identifierName, BaseNode.IExpression manifestValue)
         {
             BaseNode.IIdentifier ClassIdentifier = NodeHelper.CreateSimpleIdentifier(className);
-            BaseNode.IManifestNumberExpression CurrentTime = NodeHelper.CreateSimpleManifestNumberExpression(initialValue);
+            BaseNode.IIdentifier FirstIdentifier = NodeHelper.CreateSimpleIdentifier(identifierName);
 
-            BaseNode.IIdentifier FirstIdentifier = NodeHelper.CreateSimpleIdentifier(string.Empty);
-            BaseNode.IAssignmentArgument FirstArgument = NodeHelper.CreateAssignmentArgument(new List<BaseNode.IIdentifier>() { FirstIdentifier }, CurrentTime);
+            BaseNode.IAssignmentArgument FirstArgument = NodeHelper.CreateAssignmentArgument(new List<BaseNode.IIdentifier>() { FirstIdentifier }, manifestValue);
             BaseNode.IInitializedObjectExpression Expression = NodeHelper.CreateInitializedObjectExpression(ClassIdentifier, new List<BaseNode.IAssignmentArgument>() { FirstArgument });
 
             IInitializedObjectExpression Result = ToCompilerNode<BaseNode.IInitializedObjectExpression, IInitializedObjectExpression>(Expression);
@@ -349,7 +372,7 @@
 
                     case BaseNode.PreprocessorMacro.DiscreteClassIdentifier:
                         Debug.Assert(context.CurrentClass != null);
-                        IInitializedObjectExpression ReplacementNode = InitializedExpression(LanguageClasses.UniversallyUniqueIdentifier.Name, context.CurrentClass.ClassGuid.ToString("N"));
+                        IExpression ReplacementNode = InitializedNumberExpression(LanguageClasses.UniversallyUniqueIdentifier.Name, "Value", context.CurrentClass.ClassGuid.ToString("N") + IntegerBase.Hexadecimal.Suffix);
                         NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ReplacementNode);
                         IsHandled = true;
                         break;
@@ -667,20 +690,20 @@
             else if (node is IPreprocessorExpression AsPreprocessorExpression)
             {
                 bool IsHandled = false;
-                IInitializedObjectExpression ReplacementNode;
+                IExpression ReplacementNode;
 
                 switch (AsPreprocessorExpression.Value)
                 {
                     case BaseNode.PreprocessorMacro.ClassPath:
                         Debug.Assert(context.CurrentClass != null);
-                        ReplacementNode = InitializedExpression(LanguageClasses.String.Name, context.CurrentClass.FullClassPath);
+                        ReplacementNode = new ManifestStringExpression(context.CurrentClass.FullClassPath);
                         NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ReplacementNode);
                         IsHandled = true;
                         break;
 
                     case BaseNode.PreprocessorMacro.Counter:
                         Debug.Assert(context.CurrentClass != null);
-                        ReplacementNode = InitializedExpression(LanguageClasses.Number.Name, context.CurrentClass.ClassCounter.ToString());
+                        ReplacementNode = new ManifestNumberExpression(context.CurrentClass.ClassCounter);
                         NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ReplacementNode);
 
                         context.CurrentClass.IncrementClassCounter();
@@ -701,18 +724,18 @@
         }
 
         /// <summary></summary>
-        protected virtual IInitializedObjectExpression CreateRandomInteger()
+        protected virtual IExpression CreateRandomInteger()
         {
             RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
 
             byte[] Data = new byte[8];
             rng.GetBytes(Data);
 
-            string Value = "0x";
+            string Value = string.Empty;
             foreach (byte b in Data)
                 Value += b.ToString("X2");
 
-            return InitializedExpression(LanguageClasses.Number.Name, Value);
+            return new ManifestNumberExpression(Value + IntegerBase.Hexadecimal.Suffix);
         }
         #endregion
 
@@ -952,9 +975,35 @@
                 new QualifiedNameRuleTemplate(),
             };
 
-            List<INode> NodeList = new List<INode>();
+            BuildInferenceSourceList Context = new BuildInferenceSourceList(RuleTemplateList);
+            IWalkCallbacks<BuildInferenceSourceList> Callbacks = new WalkCallbacks<BuildInferenceSourceList>() { HandlerNode = ListAllSources, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() };
+            IList<IClass> ClassList = root.ClassList;
 
-            InferenceEngine Engine = new InferenceEngine(RuleTemplateList, NodeList, root.ClassList, CheckIdentifiersResolved, true);
+            foreach (IClass Class in ClassList)
+                NodeTreeWalk<BuildInferenceSourceList>.Walk(Class, Callbacks, Context);
+
+            List<ISource> SourceList = Context.SourceList;
+
+            InferenceEngine Engine = new InferenceEngine(RuleTemplateList, SourceList, ClassList, CheckIdentifiersResolved, true);
+            bool Success = Engine.Solve(ErrorList);
+
+            Debug.Assert(Success || ErrorList.Count > 0);
+            return true;
+        }
+
+        /// <summary></summary>
+        protected virtual bool ListAllSources(BaseNode.INode node, BaseNode.INode parentNode, string propertyName, IWalkCallbacks<BuildInferenceSourceList> callbacks, BuildInferenceSourceList context)
+        {
+            foreach (IRuleTemplate RuleTemplate in context.RuleTemplateList)
+                if (RuleTemplate.NodeType.IsAssignableFrom(node.GetType()))
+                {
+                    ISource Source = node as ISource;
+                    Debug.Assert(Source != null);
+
+                    context.SourceList.Add(Source);
+                    break;
+                }
+
             return true;
         }
 

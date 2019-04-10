@@ -1,45 +1,49 @@
 ﻿namespace EaslyCompiler
 {
-    using CompilerNode;
+    using Easly;
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
     /// </summary>
-    public interface IStringSourceTemplate : ISourceTemplate
+    public interface IOnceReferenceSourceTemplate : ISourceTemplate
     {
         /// <summary>
-        /// The string value if ready.
+        /// The reference value if ready.
         /// </summary>
-        string ReadyString { get; }
+        IOnceReference ReadyReference { get; }
     }
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
-    public interface IStringSourceTemplate<TSource> : ISourceTemplate<TSource, string>
+    /// <typeparam name="TRef">Type of the reference.</typeparam>
+    public interface IOnceReferenceSourceTemplate<TSource, TRef> : ISourceTemplate<TSource, OnceReference<TRef>>
         where TSource : ISource
+        where TRef : class
     {
         /// <summary>
-        /// The string value if ready.
+        /// The reference value if ready.
         /// </summary>
-        string ReadyString { get; }
+        OnceReference<TRef> ReadyReference { get; }
     }
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
-    public class StringSourceTemplate<TSource> : SourceTemplate<TSource, string>, IStringSourceTemplate<TSource>, IStringSourceTemplate
+    /// <typeparam name="TRef">Type of the reference.</typeparam>
+    public class OnceReferenceSourceTemplate<TSource, TRef> : SourceTemplate<TSource, OnceReference<TRef>>, IOnceReferenceSourceTemplate<TSource, TRef>, IOnceReferenceSourceTemplate
         where TSource : ISource
+        where TRef : class
     {
         #region Init
         /// <summary>
-        /// Initializes a new instance of the <see cref="StringSourceTemplate{TSource}"/> class.
+        /// Initializes a new instance of the <see cref="OnceReferenceSourceTemplate{TSource, TRef}"/> class.
         /// </summary>
         /// <param name="path">Path to the source object.</param>
         /// <param name="startingPoint">The starting point for the path.</param>
-        public StringSourceTemplate(string path, ITemplatePathStart<TSource> startingPoint = null)
+        public OnceReferenceSourceTemplate(string path, ITemplatePathStart<TSource> startingPoint = null)
             : base(path, startingPoint)
         {
         }
@@ -47,9 +51,10 @@
 
         #region Properties
         /// <summary>
-        /// The string value if ready.
+        /// The reference value if ready.
         /// </summary>
-        public string ReadyString { get; private set; }
+        public OnceReference<TRef> ReadyReference { get; private set; }
+        IOnceReference IOnceReferenceSourceTemplate.ReadyReference { get { return ReadyReference; } }
         #endregion
 
         #region Client Interface
@@ -61,10 +66,10 @@
         {
             bool Result = false;
 
-            string Value = GetSourceObject(node);
-            if (Value != null)
+            OnceReference<TRef> Value = GetSourceObject(node);
+            if (Value.IsAssigned)
             {
-                ReadyString = Value;
+                ReadyReference = Value;
                 Result = true;
             }
 

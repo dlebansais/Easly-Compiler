@@ -1,25 +1,28 @@
 ﻿namespace EaslyCompiler
 {
     using System;
-    using BaseNode;
 
     /// <summary>
     /// The identity starting point.
     /// </summary>
-    public interface ITemplateNodeStart : ITemplatePathStart
+    /// <typeparam name="TSource">The node type for the starting point.</typeparam>
+    public interface ITemplateNodeStart<TSource> : ITemplatePathStart<TSource>
+        where TSource : ISource
     {
     }
 
     /// <summary>
     /// The identity starting point.
     /// </summary>
-    public class TemplateNodeStart : ITemplateNodeStart
+    /// <typeparam name="TSource">The node type for the starting point.</typeparam>
+    public class TemplateNodeStart<TSource> : ITemplateNodeStart<TSource>
+        where TSource : ISource
     {
         #region Init
         /// <summary>
         /// An instance that can be used in any source template.
         /// </summary>
-        public static TemplateNodeStart Default { get; } = new TemplateNodeStart();
+        public static TemplateNodeStart<TSource> Default { get; } = new TemplateNodeStart<TSource>();
 
         private TemplateNodeStart()
         {
@@ -30,7 +33,7 @@
         /// <summary>
         /// The type of the starting point.
         /// </summary>
-        public Type PropertyType { get { return typeof(INode); } }
+        public Type PropertyType { get { return typeof(TSource); } }
         #endregion
 
         #region Client Interface
@@ -38,7 +41,7 @@
         /// Gets the starting point.
         /// </summary>
         /// <param name="node">The node for which a value is requested.</param>
-        public virtual object GetStart(INode node)
+        public virtual ISource GetStart(TSource node)
         {
             return node;
         }

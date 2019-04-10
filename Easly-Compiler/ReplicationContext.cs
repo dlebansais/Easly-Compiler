@@ -3,7 +3,7 @@
     using System.Collections.Generic;
 
     /// <summary>
-    /// Context use when walking the node tree to replicate blocks.
+    /// Context used when walking the node tree to replicate blocks.
     /// </summary>
     public class ReplicationContext
     {

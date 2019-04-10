@@ -19,6 +19,36 @@
     /// </summary>
     public class ManifestNumberExpression : BaseNode.ManifestNumberExpression, IManifestNumberExpression
     {
+        #region Init
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ManifestNumberExpression"/> class.
+        /// This constructor is needed to allow deserialization of objects.
+        /// </summary>
+        public ManifestNumberExpression()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ManifestNumberExpression"/> class.
+        /// </summary>
+        /// <param name="value">Initial value.</param>
+        public ManifestNumberExpression(int value)
+        {
+            Documentation = BaseNodeHelper.NodeHelper.CreateEmptyDocumentation();
+            Text = value.ToString();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ManifestNumberExpression"/> class.
+        /// </summary>
+        /// <param name="text">Initial value.</param>
+        public ManifestNumberExpression(string text)
+        {
+            Documentation = BaseNodeHelper.NodeHelper.CreateEmptyDocumentation();
+            Text = text;
+        }
+        #endregion
+
         #region Implementation of ISource
         /// <summary>
         /// The parent node, null if root.

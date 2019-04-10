@@ -18,7 +18,7 @@
         /// <summary>
         /// The list of nodes on which rules are checked and applied.
         /// </summary>
-        IList<INode> NodeList { get; }
+        IList<ISource> SourceList { get; }
 
         /// <summary>
         /// The list of classes to resolve.
@@ -53,14 +53,14 @@
         /// Initializes a new instance of the <see cref="InferenceEngine"/> class.
         /// </summary>
         /// <param name="ruleTemplateList">The set of rules to execute.</param>
-        /// <param name="nodeList">The list of nodes on which rules are checked and applied.</param>
+        /// <param name="sourceList">The list of nodes on which rules are checked and applied.</param>
         /// <param name="classList">The list of classes to resolve.</param>
-        /// <param name="isResolvedHandler">Checks if a node is fully resolved.</param>
+        /// <param name="isResolvedHandler">Checks if a class is fully resolved.</param>
         /// <param name="isCycleErrorChecked">True if the engine should check for cyclic dependencies errors.</param>
-        public InferenceEngine(IList<IRuleTemplate> ruleTemplateList, IList<INode> nodeList, IList<IClass> classList, Func<IClass, bool> isResolvedHandler, bool isCycleErrorChecked)
+        public InferenceEngine(IList<IRuleTemplate> ruleTemplateList, IList<ISource> sourceList, IList<IClass> classList, Func<IClass, bool> isResolvedHandler, bool isCycleErrorChecked)
         {
             RuleTemplateList = ruleTemplateList;
-            NodeList = nodeList;
+            SourceList = sourceList;
             ClassList = classList;
             IsResolvedHandler = isResolvedHandler;
             IsCycleErrorChecked = isCycleErrorChecked;
@@ -76,7 +76,7 @@
         /// <summary>
         /// The list of nodes on which rules are checked and applied.
         /// </summary>
-        public IList<INode> NodeList { get; }
+        public IList<ISource> SourceList { get; }
 
         /// <summary>
         /// The list of classes to resolve.
@@ -84,7 +84,7 @@
         public IList<IClass> ClassList { get; }
 
         /// <summary>
-        /// Checks if a node is fully resolved.
+        /// Checks if a class is fully resolved.
         /// </summary>
         public Func<IClass, bool> IsResolvedHandler { get; }
 
@@ -104,15 +104,16 @@
         {
             IList<IClass> ResolvedClassList = new List<IClass>();
             IList<IClass> UnresolvedClassList = new List<IClass>(ClassList);
+            IList<ISource> UnresolvedSourceList = new List<ISource>(SourceList);
             bool Result = true;
 
             bool Exit = false;
             while (UnresolvedClassList.Count > 0 && errorList.Count == 0 && !Exit)
             {
                 Exit = true;
-                InferTemplates(ref Exit, errorList);
+                InferTemplates(ref Exit, UnresolvedSourceList, errorList);
 
-                MoveResolvedClasses(ref Exit, UnresolvedClassList, ResolvedClassList);
+                MoveResolvedClasses(ref Exit, UnresolvedClassList, ResolvedClassList, UnresolvedSourceList);
             }
 
             if (IsCycleErrorChecked && UnresolvedClassList.Count > 0 && errorList.Count == 0)
@@ -129,13 +130,13 @@
         }
 
         /// <summary></summary>
-        protected virtual void InferTemplates(ref bool exit, IList<IError> errorList)
+        protected virtual void InferTemplates(ref bool exit, IList<ISource> unresolvedSourceList, IList<IError> errorList)
         {
             foreach (IRuleTemplate Rule in RuleTemplateList)
             {
-                foreach (INode Node in NodeList)
+                foreach (ISource Node in unresolvedSourceList)
                 {
-                    if (Node.GetType() != Rule.NodeType)
+                    if (!Rule.NodeType.IsAssignableFrom(Node.GetType()))
                         continue;
 
                     if (Rule.IsNoDestinationSet(Node))
@@ -159,7 +160,7 @@
         }
 
         /// <summary></summary>
-        protected virtual void MoveResolvedClasses(ref bool exit, IList<IClass> unresolvedClassList, IList<IClass> resolvedClassList)
+        protected virtual void MoveResolvedClasses(ref bool exit, IList<IClass> unresolvedClassList, IList<IClass> resolvedClassList, IList<ISource> unresolvedSourceList)
         {
             IList<IClass> ToMove = new List<IClass>();
 
@@ -169,10 +170,20 @@
 
             if (ToMove.Count > 0)
             {
-                foreach (IClass ClassItem in ToMove)
+                foreach (IClass Class in ToMove)
                 {
-                    unresolvedClassList.Remove(ClassItem);
-                    resolvedClassList.Add(ClassItem);
+                    unresolvedClassList.Remove(Class);
+                    resolvedClassList.Add(Class);
+
+                    /*
+                    List<ISource> ToRemove = new List<ISource>();
+                    foreach (ISource source in unresolvedSourceList)
+                        if (source.EmbeddingClass == Class)
+                            ToRemove.Add(source);
+
+                    foreach (ISource source in ToRemove)
+                        unresolvedSourceList.Remove(source);
+                        */
                 }
 
                 exit = false;

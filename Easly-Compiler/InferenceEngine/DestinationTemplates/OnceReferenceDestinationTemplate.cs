@@ -13,10 +13,10 @@
     /// <summary>
     /// Specifies a destination for a <see cref="IRuleTemplate"/>.
     /// </summary>
-    /// <typeparam name="TNode">The node type on which the rule applies.</typeparam>
+    /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TRef">Type of the reference.</typeparam>
-    public interface IOnceReferenceDestinationTemplate<TNode, TRef> : IDestinationTemplate<TNode, OnceReference<TRef>>
-        where TNode : INode
+    public interface IOnceReferenceDestinationTemplate<TSource, TRef> : IDestinationTemplate<TSource, OnceReference<TRef>>
+        where TSource : ISource
         where TRef : class
     {
     }
@@ -24,19 +24,19 @@
     /// <summary>
     /// Specifies a destination for a <see cref="IRuleTemplate"/>.
     /// </summary>
-    /// <typeparam name="TNode">The node type on which the rule applies.</typeparam>
+    /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TRef">Type of the reference.</typeparam>
-    public class OnceReferenceDestinationTemplate<TNode, TRef> : DestinationTemplate<TNode, OnceReference<TRef>>, IOnceReferenceDestinationTemplate<TNode, TRef>, IOnceReferenceDestinationTemplate
-        where TNode : INode
+    public class OnceReferenceDestinationTemplate<TSource, TRef> : DestinationTemplate<TSource, OnceReference<TRef>>, IOnceReferenceDestinationTemplate<TSource, TRef>, IOnceReferenceDestinationTemplate
+        where TSource : ISource
         where TRef : class
     {
         #region Init
         /// <summary>
-        /// Initializes a new instance of the <see cref="OnceReferenceDestinationTemplate{TNode, TRef}"/> class.
+        /// Initializes a new instance of the <see cref="OnceReferenceDestinationTemplate{TSource, TRef}"/> class.
         /// </summary>
         /// <param name="path">Path to the destination object.</param>
         /// <param name="startingPoint">The starting point for the path.</param>
-        public OnceReferenceDestinationTemplate(string path, ITemplatePathStart startingPoint = null)
+        public OnceReferenceDestinationTemplate(string path, ITemplatePathStart<TSource> startingPoint = null)
             : base(path, startingPoint)
         {
         }
@@ -47,7 +47,7 @@
         /// True if the destination value has been set;
         /// </summary>
         /// <param name="node">The node for which the value is to be checked.</param>
-        public override bool IsSet(TNode node)
+        public override bool IsSet(TSource node)
         {
             OnceReference<TRef> Value = GetDestinationObject(node);
             return Value.IsAssigned;

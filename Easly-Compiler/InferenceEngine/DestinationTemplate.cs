@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Reflection;
+    using BaseNodeHelper;
     using CompilerNode;
 
     /// <summary>
@@ -15,48 +16,48 @@
         /// True if the destination value has been set;
         /// </summary>
         /// <param name="node">The node for which the value is to be checked.</param>
-        bool IsSet(object node);
+        bool IsSet(ISource node);
     }
 
     /// <summary>
     /// Specifies a destination for a <see cref="IRuleTemplate"/>.
     /// </summary>
-    /// <typeparam name="TNode">The node type on which the rule applies.</typeparam>
+    /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TValue">Type of the destination.</typeparam>
-    public interface IDestinationTemplate<TNode, TValue>
-        where TNode : INode
+    public interface IDestinationTemplate<TSource, TValue>
+        where TSource : ISource
     {
         /// <summary>
         /// True if the destination value has been set;
         /// </summary>
         /// <param name="node">The node for which the value is to be checked.</param>
-        bool IsSet(TNode node);
+        bool IsSet(TSource node);
 
         /// <summary>
         /// Sets the destination new value.
         /// </summary>
         /// <param name="node">The node for which the value is to be set.</param>
         /// <param name="value">The value.</param>
-        void SetDestinationObject(TNode node, TValue value);
+        void SetDestinationObject(TSource node, TValue value);
     }
 
     /// <summary>
     /// Specifies a destination for a <see cref="IRuleTemplate"/>.
     /// </summary>
-    /// <typeparam name="TNode">The node type on which the rule applies.</typeparam>
+    /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TValue">Type of the destination.</typeparam>
-    public abstract class DestinationTemplate<TNode, TValue> : IDestinationTemplate<TNode, TValue>, IDestinationTemplate
-        where TNode : INode
+    public abstract class DestinationTemplate<TSource, TValue> : IDestinationTemplate<TSource, TValue>, IDestinationTemplate
+        where TSource : ISource
     {
         #region Init
         /// <summary>
-        /// Initializes a new instance of the <see cref="DestinationTemplate{TNode, TValue}"/> class.
+        /// Initializes a new instance of the <see cref="DestinationTemplate{TSource, TValue}"/> class.
         /// </summary>
         /// <param name="path">Path to the destination object.</param>
         /// <param name="startingPoint">The starting point for the path.</param>
-        public DestinationTemplate(string path, ITemplatePathStart startingPoint = null)
+        public DestinationTemplate(string path, ITemplatePathStart<TSource> startingPoint = null)
         {
-            StartingPoint = startingPoint ?? TemplateNodeStart.Default;
+            StartingPoint = startingPoint ?? TemplateNodeStart<TSource>.Default;
 
             List<PropertyInfo> PropertyPath = new List<PropertyInfo>();
             BuildPropertyPath(StartingPoint.PropertyType, path, PropertyPath);
@@ -70,7 +71,7 @@
         /// <summary>
         /// The starting point for the path.
         /// </summary>
-        public ITemplatePathStart StartingPoint { get; }
+        public ITemplatePathStart<TSource> StartingPoint { get; }
         #endregion
 
         #region Client Interface
@@ -78,16 +79,16 @@
         /// True if the destination value has been set;
         /// </summary>
         /// <param name="node">The node for which the value is to be checked.</param>
-        public abstract bool IsSet(TNode node);
+        public abstract bool IsSet(TSource node);
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public bool IsSet(object node) { return IsSet((TNode)node); }
+        public bool IsSet(ISource node) { return IsSet((TSource)node); }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
         /// Gets the destination current value.
         /// </summary>
         /// <param name="node">The node for which the value is requested.</param>
-        public virtual TValue GetDestinationObject(TNode node)
+        public virtual TValue GetDestinationObject(TSource node)
         {
             object Result = StartingPoint.GetStart(node);
 
@@ -102,7 +103,7 @@
         /// </summary>
         /// <param name="node">The node for which the value is to be set.</param>
         /// <param name="value">The value.</param>
-        public virtual void SetDestinationObject(TNode node, TValue value)
+        public virtual void SetDestinationObject(TSource node, TValue value)
         {
             object Reference = StartingPoint.GetStart(node);
 
@@ -126,19 +127,23 @@
             if (path.Length == 0)
                 return;
 
+            string NestedPath;
             int Index = path.IndexOf('.');
             if (Index < 0)
+            {
                 Index = path.Length;
+                NestedPath = string.Empty;
+            }
+            else
+                NestedPath = path.Substring(Index + 1);
 
             string PropertyName = path.Substring(0, Index);
-            PropertyInfo Property = type.GetProperty(PropertyName);
+            PropertyInfo Property = NodeTreeHelper.GetPropertyOf(type, PropertyName);
             Debug.Assert(Property != null);
 
             propertyPath.Add(Property);
 
-            string NestedPath = path.Substring(Index + 1);
             Type NestedType = Property.PropertyType;
-
             BuildPropertyPath(NestedType, NestedPath, propertyPath);
         }
 

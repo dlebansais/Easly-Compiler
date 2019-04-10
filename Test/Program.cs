@@ -11,8 +11,8 @@ namespace Test
         static void Main(string[] args)
         {
             Compiler c = new Compiler();
-            //c.Compile("../../../coverage/coverage.easly");
-            c.Compile("../../../coverage/coverage invalid 39.easly");
+            c.Compile("../../../coverage/coverage.easly");
+            //c.Compile("../../../coverage/coverage invalid 39.easly");
             //c.Compile("../../../test.easly");
             //c.Compile("../../../root.easly");
             //c.Compile("../../../coverage/coverage replication.easly");

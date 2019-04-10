@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Reflection;
+    using BaseNodeHelper;
     using CompilerNode;
 
     /// <summary>
@@ -15,47 +16,47 @@
         /// Checks if a node source is ready.
         /// </summary>
         /// <param name="node">The node for which the value is checked.</param>
-        bool IsReady(object node);
+        bool IsReady(ISource node);
     }
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
     /// </summary>
-    /// <typeparam name="TNode">The node type on which the rule applies.</typeparam>
+    /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TValue">Type of the source.</typeparam>
-    public interface ISourceTemplate<TNode, TValue>
-        where TNode : INode
+    public interface ISourceTemplate<TSource, TValue>
+        where TSource : ISource
     {
         /// <summary>
         /// Checks if a node source is ready.
         /// </summary>
         /// <param name="node">The node for which the value is checked.</param>
-        bool IsReady(TNode node);
+        bool IsReady(TSource node);
 
         /// <summary>
         /// Gets the source's current value.
         /// </summary>
         /// <param name="node">The node for which the value is requested.</param>
-        TValue GetSourceObject(TNode node);
+        TValue GetSourceObject(TSource node);
     }
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
     /// </summary>
-    /// <typeparam name="TNode">The node type on which the rule applies.</typeparam>
+    /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TValue">Type of the source.</typeparam>
-    public abstract class SourceTemplate<TNode, TValue> : ISourceTemplate<TNode, TValue>, ISourceTemplate
-        where TNode : INode
+    public abstract class SourceTemplate<TSource, TValue> : ISourceTemplate<TSource, TValue>, ISourceTemplate
+        where TSource : ISource
     {
         #region Init
         /// <summary>
-        /// Initializes a new instance of the <see cref="SourceTemplate{TNode, TValue}"/> class.
+        /// Initializes a new instance of the <see cref="SourceTemplate{TSource, TValue}"/> class.
         /// </summary>
         /// <param name="path">Path to the source object.</param>
         /// <param name="startingPoint">The starting point for the path.</param>
-        public SourceTemplate(string path, ITemplatePathStart startingPoint = null)
+        public SourceTemplate(string path, ITemplatePathStart<TSource> startingPoint = null)
         {
-            StartingPoint = startingPoint ?? TemplateNodeStart.Default;
+            StartingPoint = startingPoint ?? TemplateNodeStart<TSource>.Default;
 
             List<PropertyInfo> PropertyPath = new List<PropertyInfo>();
             BuildPropertyPath(StartingPoint.PropertyType, path, PropertyPath);
@@ -69,7 +70,7 @@
         /// <summary>
         /// The starting point for the path.
         /// </summary>
-        public ITemplatePathStart StartingPoint { get; }
+        public ITemplatePathStart<TSource> StartingPoint { get; }
         #endregion
 
         #region Client Interface
@@ -77,16 +78,16 @@
         /// Checks if a node source is ready.
         /// </summary>
         /// <param name="node">The node for which the value is checked.</param>
-        public abstract bool IsReady(TNode node);
+        public abstract bool IsReady(TSource node);
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public bool IsReady(object node) { return IsReady((TNode)node); }
+        public bool IsReady(ISource node) { return IsReady((TSource)node); }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
         /// Gets the source's current value.
         /// </summary>
         /// <param name="node">The node for which the value is requested.</param>
-        public virtual TValue GetSourceObject(TNode node)
+        public virtual TValue GetSourceObject(TSource node)
         {
             object Result = StartingPoint.GetStart(node);
 
@@ -109,19 +110,23 @@
             if (path.Length == 0)
                 return;
 
+            string NestedPath;
             int Index = path.IndexOf('.');
             if (Index < 0)
+            {
                 Index = path.Length;
+                NestedPath = string.Empty;
+            }
+            else
+                NestedPath = path.Substring(Index + 1);
 
             string PropertyName = path.Substring(0, Index);
-            PropertyInfo Property = type.GetProperty(PropertyName);
+            PropertyInfo Property = NodeTreeHelper.GetPropertyOf(type, PropertyName);
             Debug.Assert(Property != null);
 
             propertyPath.Add(Property);
 
-            string NestedPath = path.Substring(Index + 1);
             Type NestedType = Property.PropertyType;
-
             BuildPropertyPath(NestedType, NestedPath, propertyPath);
         }
 

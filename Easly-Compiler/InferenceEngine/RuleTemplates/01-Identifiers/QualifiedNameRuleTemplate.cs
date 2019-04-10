@@ -21,6 +21,7 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
+                new OnceReferenceCollectionSourceTemplate<IQualifiedName, IIdentifier>(nameof(IQualifiedName.Path), nameof(IIdentifier.ValidText)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
@@ -30,7 +31,7 @@
         }
         #endregion
 
-        #region Properties
+        #region Client Interface
         /// <summary>
         /// Checks for errors before applying a rule.
         /// </summary>
@@ -61,9 +62,6 @@
             return Success;
         }
 
-        #endregion
-
-        #region Application
         /// <summary>
         /// Applies the rule.
         /// </summary>
@@ -72,22 +70,36 @@
         public override void Apply(IQualifiedName node, object data)
         {
             List<string> StringPath = data as List<string>;
-            Debug.Assert(StringPath.TrueForAll((string validText) => StringValidation.IsValidIdentifier(validText)));
-            Debug.Assert(StringPath.Count == node.Path.Count);
+            Debug.Assert(IsPathAssigned(StringPath, node.Path));
 
-            List<IIdentifier> ValidPath = new List<IIdentifier>();
-            for (int i = 0; i < node.Path.Count; i++)
-            {
-                string ValidText = StringPath[i];
-                IIdentifier Identifier = (IIdentifier)node.Path[i];
-
-                Identifier.ValidText.Item = ValidText;
+            IList<IIdentifier> ValidPath = new List<IIdentifier>();
+            foreach (IIdentifier Identifier in node.Path)
                 ValidPath.Add(Identifier);
-            }
-
-            Debug.Assert(ValidPath.Count == node.Path.Count);
 
             node.ValidPath.Item = ValidPath;
+        }
+
+        private bool IsPathAssigned(IList<string> stringPath, IList<BaseNode.IIdentifier> identifierPath)
+        {
+            if (stringPath.Count != identifierPath.Count)
+                return false;
+
+            for (int i = 0; i < stringPath.Count; i++)
+            {
+                string StringText = stringPath[i];
+                Debug.Assert(StringValidation.IsValidIdentifier(StringText));
+
+                IIdentifier Identifier = (IIdentifier)identifierPath[i];
+
+                Debug.Assert(Identifier.ValidText.IsAssigned);
+                string IdentifierText = Identifier.ValidText.Item;
+                Debug.Assert(StringValidation.IsValidIdentifier(IdentifierText));
+
+                if (StringText != IdentifierText)
+                    return false;
+            }
+
+            return true;
         }
         #endregion
     }

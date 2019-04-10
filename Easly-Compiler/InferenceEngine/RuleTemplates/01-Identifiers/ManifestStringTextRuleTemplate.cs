@@ -30,7 +30,7 @@
         }
         #endregion
 
-        #region Properties
+        #region Client Interface
         /// <summary>
         /// Checks for errors before applying a rule.
         /// </summary>
@@ -53,9 +53,6 @@
             return Success;
         }
 
-        #endregion
-
-        #region Application
         /// <summary>
         /// Applies the rule.
         /// </summary>
@@ -64,7 +61,7 @@
         public override void Apply(IManifestStringExpression node, object data)
         {
             string ValidText = data as string;
-            Debug.Assert(StringValidation.IsValidIdentifier(ValidText));
+            Debug.Assert(StringValidation.IsValidManifestString(ValidText));
 
             node.ValidText.Item = ValidText;
         }

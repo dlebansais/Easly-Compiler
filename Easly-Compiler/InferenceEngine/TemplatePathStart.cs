@@ -1,12 +1,13 @@
 ﻿namespace EaslyCompiler
 {
     using System;
-    using BaseNode;
 
     /// <summary>
     /// An interface to find the starting point of a source template path.
     /// </summary>
-    public interface ITemplatePathStart
+    /// <typeparam name="TSource">The node type for the starting point.</typeparam>
+    public interface ITemplatePathStart<TSource>
+        where TSource : ISource
     {
         /// <summary>
         /// The type of the starting point.
@@ -17,6 +18,6 @@
         /// Gets the starting point.
         /// </summary>
         /// <param name="node">The node for which a value is requested.</param>
-        object GetStart(INode node);
+        ISource GetStart(TSource node);
     }
 }
