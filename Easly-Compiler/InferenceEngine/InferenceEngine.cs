@@ -28,7 +28,7 @@
         /// <summary>
         /// Checks if a class is fully resolved.
         /// </summary>
-        Func<IClass, bool> IsResolvedHandler { get; }
+        Func<IList<ISource>, IClass, bool> IsResolvedHandler { get; }
 
         /// <summary>
         /// True if the engine should check for cyclic dependencies errors.
@@ -57,7 +57,7 @@
         /// <param name="classList">The list of classes to resolve.</param>
         /// <param name="isResolvedHandler">Checks if a class is fully resolved.</param>
         /// <param name="isCycleErrorChecked">True if the engine should check for cyclic dependencies errors.</param>
-        public InferenceEngine(IList<IRuleTemplate> ruleTemplateList, IList<ISource> sourceList, IList<IClass> classList, Func<IClass, bool> isResolvedHandler, bool isCycleErrorChecked)
+        public InferenceEngine(IList<IRuleTemplate> ruleTemplateList, IList<ISource> sourceList, IList<IClass> classList, Func<IList<ISource>, IClass, bool> isResolvedHandler, bool isCycleErrorChecked)
         {
             RuleTemplateList = ruleTemplateList;
             SourceList = sourceList;
@@ -86,7 +86,7 @@
         /// <summary>
         /// Checks if a class is fully resolved.
         /// </summary>
-        public Func<IClass, bool> IsResolvedHandler { get; }
+        public Func<IList<ISource>, IClass, bool> IsResolvedHandler { get; }
 
         /// <summary>
         /// True if the engine should check for cyclic dependencies errors.
@@ -165,7 +165,7 @@
             IList<IClass> ToMove = new List<IClass>();
 
             foreach (IClass Class in unresolvedClassList)
-                if (IsResolvedHandler(Class))
+                if (IsResolvedHandler(SourceList, Class))
                     ToMove.Add(Class);
 
             if (ToMove.Count > 0)
@@ -174,16 +174,6 @@
                 {
                     unresolvedClassList.Remove(Class);
                     resolvedClassList.Add(Class);
-
-                    /*
-                    List<ISource> ToRemove = new List<ISource>();
-                    foreach (ISource source in unresolvedSourceList)
-                        if (source.EmbeddingClass == Class)
-                            ToRemove.Add(source);
-
-                    foreach (ISource source in ToRemove)
-                        unresolvedSourceList.Remove(source);
-                        */
                 }
 
                 exit = false;

@@ -951,13 +951,14 @@
         private IHashtableEx<string, IHashtableEx<string, ILibrary>> LibraryTable = new HashtableEx<string, IHashtableEx<string, ILibrary>>();
         #endregion
 
-        #region Class Identifiers
+        #region Identifiers
         /// <summary></summary>
         protected virtual bool BuildClassIdentifiers(IRoot root)
         {
             IList<IRuleTemplate> RuleTemplateList = new List<IRuleTemplate>()
             {
                 // Create many derivations of IdentifierRuleTemplate to have separate static constructors, to ensure separate namespaces.
+                new QualifiedNameRuleTemplate(),
                 new IdentifierRuleTemplate<IIdentifier>(),
                 new IdentifierRuleTemplate<IClassIdentifier>(),
                 new IdentifierRuleTemplate<IClassOrExportIdentifier>(),
@@ -972,7 +973,6 @@
                 new ManifestNumberTextRuleTemplate(),
                 new ManifestStringTextRuleTemplate(),
                 new NameRuleTemplate(),
-                new QualifiedNameRuleTemplate(),
             };
 
             BuildInferenceSourceList Context = new BuildInferenceSourceList(RuleTemplateList);
@@ -982,7 +982,7 @@
             foreach (IClass Class in ClassList)
                 NodeTreeWalk<BuildInferenceSourceList>.Walk(Class, Callbacks, Context);
 
-            List<ISource> SourceList = Context.SourceList;
+            IList<ISource> SourceList = Context.SourceList;
 
             InferenceEngine Engine = new InferenceEngine(RuleTemplateList, SourceList, ClassList, CheckIdentifiersResolved, true);
             bool Success = Engine.Solve(ErrorList);
@@ -1008,14 +1008,58 @@
         }
 
         /// <summary></summary>
-        protected virtual bool CheckIdentifiersResolved(IClass item)
+        protected virtual bool CheckIdentifiersResolved(IList<ISource> sourceList, IClass item)
         {
-            foreach (IInheritance Inheritance in item.InheritanceList)
-                foreach (IExportChange ExportChangeItem in Inheritance.ExportChangeList)
-                    if (!ExportChangeItem.IdentifierTable.IsSealed)
-                        return false;
+            bool IsResolved = true;
 
-            return true;
+            foreach (ISource Source in sourceList)
+                if (Source.EmbeddingClass == item)
+                {
+                    bool IsHandled = false;
+
+                    if (Source is IIdentifier AsIdentifier)
+                    {
+                        IsHandled = true;
+                        IsResolved = AsIdentifier.ValidText.IsAssigned;
+                    }
+
+                    else if (Source is IManifestCharacterExpression AsManifestCharacterExpression)
+                    {
+                        IsHandled = true;
+                        IsResolved = AsManifestCharacterExpression.ValidText.IsAssigned;
+                    }
+
+                    else if (Source is IManifestNumberExpression AsManifestNumberExpression)
+                    {
+                        IsHandled = true;
+                        IsResolved = AsManifestNumberExpression.ValidText.IsAssigned;
+                    }
+
+                    else if (Source is IManifestStringExpression AsManifestStringExpression)
+                    {
+                        IsHandled = true;
+                        IsResolved = AsManifestStringExpression.ValidText.IsAssigned;
+                    }
+
+                    else if (Source is IName AsName)
+                    {
+                        IsHandled = true;
+                        IsResolved = AsName.ValidText.IsAssigned;
+                    }
+
+                    else if (Source is IQualifiedName AsQualifiedName)
+                    {
+                        IsHandled = true;
+                        IsResolved = AsQualifiedName.ValidPath.IsAssigned;
+                    }
+
+                    Debug.Assert(IsHandled);
+
+                    if (!IsResolved)
+                        break;
+                }
+
+            return IsResolved;
         }
         #endregion
     }
