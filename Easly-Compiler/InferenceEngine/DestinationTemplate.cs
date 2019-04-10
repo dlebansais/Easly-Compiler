@@ -84,6 +84,20 @@
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
+        /// Gets the destination current value.
+        /// </summary>
+        /// <param name="node">The node for which the value is requested.</param>
+        public virtual TValue GetDestinationObject(TNode node)
+        {
+            object Result = StartingPoint.GetStart(node);
+
+            for (int i = 0; i < PropertyPath.Count; i++)
+                Result = PropertyPath[i].GetValue(Result);
+
+            return (TValue)Result;
+        }
+
+        /// <summary>
         /// Sets the destination new value.
         /// </summary>
         /// <param name="node">The node for which the value is to be set.</param>

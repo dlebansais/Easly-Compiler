@@ -16,14 +16,19 @@
         IList<IRuleTemplate> RuleTemplateList { get; }
 
         /// <summary>
-        /// The list of classes on which rules are checked and applied.
+        /// The list of nodes on which rules are checked and applied.
         /// </summary>
-        IList<IClass> SourceList { get; }
+        IList<INode> NodeList { get; }
 
         /// <summary>
-        /// Checks if a node is fully resolved.
+        /// The list of classes to resolve.
         /// </summary>
-        Func<INode, bool> IsResolvedHandler { get; }
+        IList<IClass> ClassList { get; }
+
+        /// <summary>
+        /// Checks if a class is fully resolved.
+        /// </summary>
+        Func<IClass, bool> IsResolvedHandler { get; }
 
         /// <summary>
         /// True if the engine should check for cyclic dependencies errors.
@@ -48,13 +53,16 @@
         /// Initializes a new instance of the <see cref="InferenceEngine"/> class.
         /// </summary>
         /// <param name="ruleTemplateList">The set of rules to execute.</param>
-        /// <param name="sourceList">The list of classes on which rules are checked and applied.</param>
+        /// <param name="nodeList">The list of nodes on which rules are checked and applied.</param>
+        /// <param name="classList">The list of classes to resolve.</param>
         /// <param name="isResolvedHandler">Checks if a node is fully resolved.</param>
         /// <param name="isCycleErrorChecked">True if the engine should check for cyclic dependencies errors.</param>
-        public InferenceEngine(IList<IRuleTemplate> ruleTemplateList, IList<IClass> sourceList, Func<INode, bool> isResolvedHandler, bool isCycleErrorChecked)
+        public InferenceEngine(IList<IRuleTemplate> ruleTemplateList, IList<INode> nodeList, IList<IClass> classList, Func<IClass, bool> isResolvedHandler, bool isCycleErrorChecked)
         {
             RuleTemplateList = ruleTemplateList;
-            SourceList = sourceList;
+            NodeList = nodeList;
+            ClassList = classList;
+            IsResolvedHandler = isResolvedHandler;
             IsCycleErrorChecked = isCycleErrorChecked;
         }
         #endregion
@@ -66,14 +74,19 @@
         public IList<IRuleTemplate> RuleTemplateList { get; }
 
         /// <summary>
-        /// The list of classes on which rules are checked and applied.
+        /// The list of nodes on which rules are checked and applied.
         /// </summary>
-        public IList<IClass> SourceList { get; }
+        public IList<INode> NodeList { get; }
+
+        /// <summary>
+        /// The list of classes to resolve.
+        /// </summary>
+        public IList<IClass> ClassList { get; }
 
         /// <summary>
         /// Checks if a node is fully resolved.
         /// </summary>
-        public Func<INode, bool> IsResolvedHandler { get; }
+        public Func<IClass, bool> IsResolvedHandler { get; }
 
         /// <summary>
         /// True if the engine should check for cyclic dependencies errors.
@@ -90,7 +103,7 @@
         public virtual bool Solve(IList<IError> errorList)
         {
             IList<IClass> ResolvedClassList = new List<IClass>();
-            IList<IClass> UnresolvedClassList = new List<IClass>(SourceList);
+            IList<IClass> UnresolvedClassList = new List<IClass>(ClassList);
             bool Result = true;
 
             bool Exit = false;
@@ -120,7 +133,7 @@
         {
             foreach (IRuleTemplate Rule in RuleTemplateList)
             {
-                foreach (INode Node in SourceList)
+                foreach (INode Node in NodeList)
                 {
                     if (Node.GetType() != Rule.NodeType)
                         continue;
@@ -128,10 +141,10 @@
                     if (Rule.IsNoDestinationSet(Node))
                         if (Rule.AreAllSourcesReady(Node) && Rule.ErrorList.Count == 0)
                         {
-                            if (Rule.CheckConsistency(Node))
+                            if (Rule.CheckConsistency(Node, out object data))
                             {
                                 Debug.Assert(Rule.ErrorList.Count == 0);
-                                Rule.Apply(Node);
+                                Rule.Apply(Node, data);
                                 exit = false;
                             }
                             else

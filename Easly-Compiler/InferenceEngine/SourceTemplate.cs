@@ -86,7 +86,7 @@
         /// Gets the source's current value.
         /// </summary>
         /// <param name="node">The node for which the value is requested.</param>
-        public TValue GetSourceObject(TNode node)
+        public virtual TValue GetSourceObject(TNode node)
         {
             object Result = StartingPoint.GetStart(node);
 

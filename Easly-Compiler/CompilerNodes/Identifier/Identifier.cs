@@ -1,5 +1,6 @@
 ﻿namespace CompilerNode
 {
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -7,6 +8,10 @@
     /// </summary>
     public interface IIdentifier : BaseNode.IIdentifier, INode, ISource
     {
+        /// <summary>
+        /// The valid value of <see cref="BaseNode.IIdentifier.Text"/>.
+        /// </summary>
+        OnceReference<string> ValidText { get; }
     }
 
     /// <summary>
@@ -59,6 +64,13 @@
             EmbeddingBody = parentSource is IBody AsBody ? AsBody : parentSource?.EmbeddingBody;
             EmbeddingAssertion = parentSource is IAssertion AsAssertion ? AsAssertion : parentSource?.EmbeddingAssertion;
         }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// The valid value of <see cref="BaseNode.IIdentifier.Text"/>.
+        /// </summary>
+        public OnceReference<string> ValidText { get; } = new OnceReference<string>();
         #endregion
 
         #region Debugging

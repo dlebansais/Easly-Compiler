@@ -3,6 +3,7 @@ namespace CompilerNode
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -10,6 +11,20 @@ namespace CompilerNode
     /// </summary>
     public interface IExportChange : BaseNode.IExportChange, INode, INodeWithReplicatedBlocks, ISource
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.ExportChange.IdentifierBlocks"/>.
+        /// </summary>
+        IList<IIdentifier> IdentifierList { get; }
+
+        /// <summary>
+        /// Table of valid identifiers.
+        /// </summary>
+        IHashtableEx<string, IIdentifier> IdentifierTable { get; }
+
+        /// <summary>
+        /// Valid export identifier.
+        /// </summary>
+        OnceReference<string> ValidExportIdentifier { get; }
     }
 
     /// <summary>
@@ -92,6 +107,18 @@ namespace CompilerNode
             EmbeddingBody = parentSource is IBody AsBody ? AsBody : parentSource?.EmbeddingBody;
             EmbeddingAssertion = parentSource is IAssertion AsAssertion ? AsAssertion : parentSource?.EmbeddingAssertion;
         }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Table of valid identifiers.
+        /// </summary>
+        public IHashtableEx<string, IIdentifier> IdentifierTable { get; } = new HashtableEx<string, IIdentifier>();
+
+        /// <summary>
+        /// Valid export identifier.
+        /// </summary>
+        public OnceReference<string> ValidExportIdentifier { get; } = new OnceReference<string>();
         #endregion
     }
 }

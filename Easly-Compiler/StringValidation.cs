@@ -13,6 +13,20 @@
         static StringValidation()
         {
             InitAllowedCharactersTable();
+            FakeIdentifier = new CompilerNode.Identifier();
+        }
+
+        // Used to avoid an assert that hides the real error.
+        private static CompilerNode.IIdentifier FakeIdentifier;
+
+        /// <summary>
+        /// Checks if an identifier or name is valid.
+        /// </summary>
+        /// <param name="text">The text to check.</param>
+        /// <returns>True if the identifier or name is valid.</returns>
+        public static bool IsValidIdentifier(string text)
+        {
+            return IsValidIdentifier(FakeIdentifier, text, out string validText, out IErrorStringValidity error);
         }
 
         /// <summary>
@@ -97,12 +111,22 @@
         /// <summary>
         /// Checks if a manifest string is valid.
         /// </summary>
+        /// <param name="text">The text to check.</param>
+        /// <returns>True if the manifest string is valid.</returns>
+        public static bool IsValidManifestString(string text)
+        {
+            return IsValidManifestString(FakeIdentifier, text, out string validText, out IErrorStringValidity error);
+        }
+
+        /// <summary>
+        /// Checks if a manifest string is valid.
+        /// </summary>
         /// <param name="source">Location to use when reporting errors.</param>
         /// <param name="text">The text to check.</param>
         /// <param name="validText">If valid, the normalized string to use instead of <paramref name="text"/>.</param>
         /// <param name="error">If not valid, the error to report.</param>
         /// <returns>True if the manifest string is valid.</returns>
-        public static bool IsValidManifestConstant(ISource source, string text, out string validText, out IErrorStringValidity error)
+        public static bool IsValidManifestString(ISource source, string text, out string validText, out IErrorStringValidity error)
         {
             validText = string.Empty;
             error = null;
@@ -111,6 +135,8 @@
             try
             {
                 IsNormalized = text.IsNormalized(NormalizationForm.FormD);
+                if (!IsNormalized)
+                    throw new ArgumentException();
             }
             catch
             {

@@ -1,5 +1,6 @@
 ﻿namespace CompilerNode
 {
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -7,6 +8,10 @@
     /// </summary>
     public interface IManifestNumberExpression : BaseNode.IManifestNumberExpression, IExpression
     {
+        /// <summary>
+        /// The valid value of <see cref="BaseNode.IManifestNumberExpression.Text"/>.
+        /// </summary>
+        OnceReference<string> ValidText { get; }
     }
 
     /// <summary>
@@ -58,6 +63,21 @@
             EmbeddingOverload = parentSource is IQueryOverload AsOverload ? AsOverload : parentSource?.EmbeddingOverload;
             EmbeddingBody = parentSource is IBody AsBody ? AsBody : parentSource?.EmbeddingBody;
             EmbeddingAssertion = parentSource is IAssertion AsAssertion ? AsAssertion : parentSource?.EmbeddingAssertion;
+        }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// The valid value of <see cref="BaseNode.IManifestNumberExpression.Text"/>.
+        /// </summary>
+        public OnceReference<string> ValidText { get; } = new OnceReference<string>();
+        #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Manifest Number '{Text}'";
         }
         #endregion
     }

@@ -1,5 +1,7 @@
 ﻿namespace CompilerNode
 {
+    using System.Collections.Generic;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -7,6 +9,10 @@
     /// </summary>
     public interface IQualifiedName : BaseNode.IQualifiedName, INode, ISource
     {
+        /// <summary>
+        /// The valid value of <see cref="BaseNode.IQualifiedName.Path"/>.
+        /// </summary>
+        OnceReference<IList<IIdentifier>> ValidPath { get; }
     }
 
     /// <summary>
@@ -58,6 +64,25 @@
             EmbeddingOverload = parentSource is IQueryOverload AsOverload ? AsOverload : parentSource?.EmbeddingOverload;
             EmbeddingBody = parentSource is IBody AsBody ? AsBody : parentSource?.EmbeddingBody;
             EmbeddingAssertion = parentSource is IAssertion AsAssertion ? AsAssertion : parentSource?.EmbeddingAssertion;
+        }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// The valid value of <see cref="BaseNode.IQualifiedName.Path"/>.
+        /// </summary>
+        public OnceReference<IList<IIdentifier>> ValidPath { get; } = new OnceReference<IList<IIdentifier>>();
+        #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            string Result = Path[0].Text;
+            for (int i = 1; i < Path.Count; i++)
+                Result += $".{Path[i].Text}";
+
+            return $"Qualified Name '{Result}'";
         }
         #endregion
     }

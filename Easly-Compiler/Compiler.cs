@@ -155,6 +155,9 @@
 
                     if (CheckClassAndLibraryNames(root))
                     {
+                        if (BuildClassIdentifiers(root))
+                        {
+                        }
                     }
                 }
             }
@@ -923,6 +926,48 @@
 
         private IHashtableEx<string, IHashtableEx<string, IClass>> ClassTable = new HashtableEx<string, IHashtableEx<string, IClass>>();
         private IHashtableEx<string, IHashtableEx<string, ILibrary>> LibraryTable = new HashtableEx<string, IHashtableEx<string, ILibrary>>();
+        #endregion
+
+        #region Class Identifiers
+        /// <summary></summary>
+        protected virtual bool BuildClassIdentifiers(IRoot root)
+        {
+            IList<IRuleTemplate> RuleTemplateList = new List<IRuleTemplate>()
+            {
+                // Create many derivations of IdentifierRuleTemplate to have separate static constructors, to ensure separate namespaces.
+                new IdentifierRuleTemplate<IIdentifier>(),
+                new IdentifierRuleTemplate<IClassIdentifier>(),
+                new IdentifierRuleTemplate<IClassOrExportIdentifier>(),
+                new IdentifierRuleTemplate<IClassOrFeatureIdentifier>(),
+                new IdentifierRuleTemplate<IExportIdentifier>(),
+                new IdentifierRuleTemplate<IFeatureIdentifier>(),
+                new IdentifierRuleTemplate<ILibraryIdentifier>(),
+                new IdentifierRuleTemplate<IReplicateIdentifier>(),
+                new IdentifierRuleTemplate<ISourceIdentifier>(),
+                new IdentifierRuleTemplate<ITypeIdentifier>(),
+                new ManifestCharacterTextRuleTemplate(),
+                new ManifestNumberTextRuleTemplate(),
+                new ManifestStringTextRuleTemplate(),
+                new NameRuleTemplate(),
+                new QualifiedNameRuleTemplate(),
+            };
+
+            List<INode> NodeList = new List<INode>();
+
+            InferenceEngine Engine = new InferenceEngine(RuleTemplateList, NodeList, root.ClassList, CheckIdentifiersResolved, true);
+            return true;
+        }
+
+        /// <summary></summary>
+        protected virtual bool CheckIdentifiersResolved(IClass item)
+        {
+            foreach (IInheritance Inheritance in item.InheritanceList)
+                foreach (IExportChange ExportChangeItem in Inheritance.ExportChangeList)
+                    if (!ExportChangeItem.IdentifierTable.IsSealed)
+                        return false;
+
+            return true;
+        }
         #endregion
     }
 }

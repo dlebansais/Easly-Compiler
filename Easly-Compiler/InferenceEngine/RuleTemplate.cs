@@ -35,14 +35,16 @@
         /// Checks for errors before applying a rule.
         /// </summary>
         /// <param name="node">The node instance to check.</param>
+        /// <param name="data">Private data to give to Apply() upon return.</param>
         /// <returns>True if an error occured.</returns>
-        bool CheckConsistency(object node);
+        bool CheckConsistency(object node, out object data);
 
         /// <summary>
         /// Applies the rule.
         /// </summary>
         /// <param name="node">The node instance to modify.</param>
-        void Apply(object node);
+        /// <param name="data">Private data from CheckConsistency().</param>
+        void Apply(object node, object data);
     }
 
     /// <summary>
@@ -80,14 +82,16 @@
         /// Checks for errors before applying a rule.
         /// </summary>
         /// <param name="node">The node instance to check.</param>
+        /// <param name="data">Private data to give to Apply() upon return.</param>
         /// <returns>True if an error occured.</returns>
-        bool CheckConsistency(TNode node);
+        bool CheckConsistency(TNode node, out object data);
 
         /// <summary>
         /// Applies the rule.
         /// </summary>
         /// <param name="node">The node instance to modify.</param>
-        void Apply(TNode node);
+        /// <param name="data">Private data from CheckConsistency().</param>
+        void Apply(TNode node, object data);
     }
 
     /// <summary>
@@ -99,6 +103,7 @@
         where TNode : INode
         where TRule : IRuleTemplate
     {
+        #region Init
         static RuleTemplate()
         {
         }
@@ -112,7 +117,9 @@
         /// Destinations this rule applies to.
         /// </summary>
         public static List<IDestinationTemplate> DestinationTemplateList { get; protected set; }
+        #endregion
 
+        #region Properties
         /// <summary>
         /// Type on which a rule operates.
         /// </summary>
@@ -122,7 +129,9 @@
         /// List of errors found when applying this rule.
         /// </summary>
         public IList<IError> ErrorList { get; } = new List<IError>();
+        #endregion
 
+        #region Client Interface
         /// <summary>
         /// Checks that no destination value has been set.
         /// </summary>
@@ -151,19 +160,33 @@
         /// Checks for errors before applying a rule.
         /// </summary>
         /// <param name="node">The node instance to check.</param>
+        /// <param name="data">Private data to give to Apply() upon return.</param>
         /// <returns>True if an error occured.</returns>
-        public abstract bool CheckConsistency(TNode node);
+        public abstract bool CheckConsistency(TNode node, out object data);
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public bool CheckConsistency(object node) { return CheckConsistency((TNode)node); }
+        public bool CheckConsistency(object node, out object data) { return CheckConsistency((TNode)node, out data); }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
         /// Applies the rule.
         /// </summary>
         /// <param name="node">The node instance to modify.</param>
-        public abstract void Apply(TNode node);
+        /// <param name="data">Private data from CheckConsistency().</param>
+        public abstract void Apply(TNode node, object data);
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public void Apply(object node) { Apply((TNode)node); }
+        public void Apply(object node, object data) { Apply((TNode)node, data); }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+        #endregion
+
+        #region Implementation
+        /// <summary>
+        /// Adds an error.
+        /// </summary>
+        /// <param name="error">The error to add.</param>
+        protected virtual void AddSourceError(IError error)
+        {
+            ErrorList.Add(error);
+        }
+        #endregion
     }
 }

@@ -10,6 +10,30 @@ namespace CompilerNode
     /// </summary>
     public interface IInheritance : BaseNode.IInheritance, INode, INodeWithReplicatedBlocks, ISource
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Inheritance.RenameBlocks"/>.
+        /// </summary>
+        IList<IRename> RenameList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Inheritance.ForgetBlocks"/>.
+        /// </summary>
+        IList<IIdentifier> ForgetList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Inheritance.KeepBlocks"/>.
+        /// </summary>
+        IList<IIdentifier> KeepList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Inheritance.DiscontinueBlocks"/>.
+        /// </summary>
+        IList<IIdentifier> DiscontinueList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Inheritance.ExportChangeBlocks"/>.
+        /// </summary>
+        IList<IExportChange> ExportChangeList { get; }
     }
 
     /// <summary>
