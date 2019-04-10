@@ -36,6 +36,11 @@
         bool IsCycleErrorChecked { get; }
 
         /// <summary>
+        /// Number of retries (debug only).
+        /// </summary>
+        int Retries { get; }
+
+        /// <summary>
         /// Execute all rules until the source list is exhausted.
         /// </summary>
         /// <param name="errorList">List of errors found.</param>
@@ -57,13 +62,17 @@
         /// <param name="classList">The list of classes to resolve.</param>
         /// <param name="isResolvedHandler">Checks if a class is fully resolved.</param>
         /// <param name="isCycleErrorChecked">True if the engine should check for cyclic dependencies errors.</param>
-        public InferenceEngine(IList<IRuleTemplate> ruleTemplateList, IList<ISource> sourceList, IList<IClass> classList, Func<IList<ISource>, IClass, bool> isResolvedHandler, bool isCycleErrorChecked)
+        /// <param name="retries">Number of retries (debug only).</param>
+        public InferenceEngine(IList<IRuleTemplate> ruleTemplateList, IList<ISource> sourceList, IList<IClass> classList, Func<IList<ISource>, IClass, bool> isResolvedHandler, bool isCycleErrorChecked, int retries)
         {
             RuleTemplateList = ruleTemplateList;
             SourceList = sourceList;
             ClassList = classList;
             IsResolvedHandler = isResolvedHandler;
             IsCycleErrorChecked = isCycleErrorChecked;
+
+            Debug.Assert(retries >= 0);
+            Retries = retries;
         }
         #endregion
 
@@ -92,6 +101,11 @@
         /// True if the engine should check for cyclic dependencies errors.
         /// </summary>
         public bool IsCycleErrorChecked { get; }
+
+        /// <summary>
+        /// Number of retries (debug only).
+        /// </summary>
+        public int Retries { get; private set; }
         #endregion
 
         #region Client Interface
@@ -102,10 +116,49 @@
         /// <returns>True if there is no source left to process.</returns>
         public virtual bool Solve(IList<IError> errorList)
         {
+            bool Result;
+            bool? LastTryResult = null;
+
+            for (;;)
+            {
+                List<IError> TryErrorList = new List<IError>();
+                bool TryResult = SolveWithRetry(TryErrorList);
+                if (Retries == 0)
+                {
+                    foreach (IError Error in TryErrorList)
+                        errorList.Add(Error);
+                    Result = TryResult;
+                    break;
+                }
+
+                // Errors can differ, but success or failure must not.
+                if (!LastTryResult.HasValue)
+                    LastTryResult = TryResult;
+
+                Debug.Assert(TryResult == LastTryResult.Value);
+
+                // Reset sources so we restart inference from a fresh state.
+                ResetSources();
+                ShuffleRules(RuleTemplateList);
+                Retries--;
+            }
+
+            return Result;
+        }
+
+        /// <summary>
+        /// Execute all rules until the source list is exhausted.
+        /// </summary>
+        /// <param name="errorList">List of errors found.</param>
+        /// <returns>True if there is no source left to process.</returns>
+        protected virtual bool SolveWithRetry(IList<IError> errorList)
+        {
             IList<IClass> ResolvedClassList = new List<IClass>();
             IList<IClass> UnresolvedClassList = new List<IClass>(ClassList);
             IList<ISource> UnresolvedSourceList = new List<ISource>(SourceList);
             bool Result = true;
+
+            Debug.Assert(IsNoDestinationSet());
 
             bool Exit = false;
             while (UnresolvedClassList.Count > 0 && errorList.Count == 0 && !Exit)
@@ -130,22 +183,41 @@
         }
 
         /// <summary></summary>
+        protected virtual bool IsNoDestinationSet()
+        {
+            bool Result = true;
+
+            foreach (IRuleTemplate Rule in RuleTemplateList)
+            {
+                foreach (ISource Source in SourceList)
+                {
+                    if (!Rule.NodeType.IsAssignableFrom(Source.GetType()))
+                        continue;
+
+                    Result &= Rule.IsNoDestinationSet(Source);
+                }
+            }
+
+            return Result;
+        }
+
+        /// <summary></summary>
         protected virtual void InferTemplates(ref bool exit, IList<ISource> unresolvedSourceList, IList<IError> errorList)
         {
             foreach (IRuleTemplate Rule in RuleTemplateList)
             {
-                foreach (ISource Node in unresolvedSourceList)
+                foreach (ISource Source in unresolvedSourceList)
                 {
-                    if (!Rule.NodeType.IsAssignableFrom(Node.GetType()))
+                    if (!Rule.NodeType.IsAssignableFrom(Source.GetType()))
                         continue;
 
-                    if (Rule.IsNoDestinationSet(Node))
-                        if (Rule.AreAllSourcesReady(Node) && Rule.ErrorList.Count == 0)
+                    if (Rule.IsNoDestinationSet(Source))
+                        if (Rule.AreAllSourcesReady(Source) && Rule.ErrorList.Count == 0)
                         {
-                            if (Rule.CheckConsistency(Node, out object data))
+                            if (Rule.CheckConsistency(Source, out object data))
                             {
                                 Debug.Assert(Rule.ErrorList.Count == 0);
-                                Rule.Apply(Node, data);
+                                Rule.Apply(Source, data);
                                 exit = false;
                             }
                             else
@@ -177,6 +249,30 @@
                 }
 
                 exit = false;
+            }
+        }
+
+        /// <summary></summary>
+        protected virtual void ResetSources()
+        {
+            foreach (ISource Source in SourceList)
+                Source.Reset(this);
+        }
+
+        private static void ShuffleRules(IList<IRuleTemplate> ruleTemplateList)
+        {
+            Random Rng = new Random();
+            int ShuffleCount = ruleTemplateList.Count * 4;
+            int Count = ruleTemplateList.Count;
+
+            for (int i = 0; i < ShuffleCount; i++)
+            {
+                int Index = Rng.Next(Count);
+                IRuleTemplate RuleTemplate = ruleTemplateList[Index];
+                ruleTemplateList.RemoveAt(Index);
+
+                Index = Rng.Next(Count);
+                ruleTemplateList.Insert(Index, RuleTemplate);
             }
         }
         #endregion

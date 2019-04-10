@@ -216,6 +216,7 @@
     <Compile Include="ImportedClass.cs" />
     <Compile Include="InferenceEngine\DestinationTemplate.cs" />
     <Compile Include="InferenceEngine\DestinationTemplates\OnceReferenceDestinationTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplateSet.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\QualifiedNameRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\NameRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\ManifestStringTextRuleTemplate.cs" />

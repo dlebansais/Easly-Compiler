@@ -1,6 +1,7 @@
 ﻿namespace CompilerNode
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using EaslyCompiler;
 
     /// <summary>
@@ -59,6 +60,22 @@
             EmbeddingOverload = parentSource is IQueryOverload AsOverload ? AsOverload : parentSource?.EmbeddingOverload;
             EmbeddingBody = parentSource is IBody AsBody ? AsBody : parentSource?.EmbeddingBody;
             EmbeddingAssertion = parentSource is IAssertion AsAssertion ? AsAssertion : parentSource?.EmbeddingAssertion;
+        }
+
+        /// <summary>
+        /// Reset some intermediate results.
+        /// </summary>
+        /// <param name="engine">The engine requesting reset.</param>
+        public void Reset(InferenceEngine engine)
+        {
+            bool IsHandled = false;
+
+            if (engine.RuleTemplateList == RuleTemplateSet.Identifiers)
+            {
+                IsHandled = true;
+            }
+
+            Debug.Assert(IsHandled);
         }
         #endregion
 

@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using CompilerNode;
 
     /// <summary>
     /// A rule to process an Easly node.
@@ -22,29 +21,29 @@
         /// <summary>
         /// Checks that no destination value has been set.
         /// </summary>
-        /// <param name="node">The node instance to check.</param>
-        bool IsNoDestinationSet(ISource node);
+        /// <param name="source">The node instance to check.</param>
+        bool IsNoDestinationSet(ISource source);
 
         /// <summary>
         /// Checks that no destination value has been set.
         /// </summary>
-        /// <param name="node">The node instance to check.</param>
-        bool AreAllSourcesReady(ISource node);
+        /// <param name="source">The node instance to check.</param>
+        bool AreAllSourcesReady(ISource source);
 
         /// <summary>
         /// Checks for errors before applying a rule.
         /// </summary>
-        /// <param name="node">The node instance to check.</param>
+        /// <param name="source">The node instance to check.</param>
         /// <param name="data">Private data to give to Apply() upon return.</param>
         /// <returns>True if an error occured.</returns>
-        bool CheckConsistency(ISource node, out object data);
+        bool CheckConsistency(ISource source, out object data);
 
         /// <summary>
         /// Applies the rule.
         /// </summary>
-        /// <param name="node">The node instance to modify.</param>
+        /// <param name="source">The node instance to modify.</param>
         /// <param name="data">Private data from CheckConsistency().</param>
-        void Apply(ISource node, object data);
+        void Apply(ISource source, object data);
     }
 
     /// <summary>
@@ -69,29 +68,29 @@
         /// <summary>
         /// Checks that no destination value has been set.
         /// </summary>
-        /// <param name="node">The node instance to check.</param>
-        bool IsNoDestinationSet(TSource node);
+        /// <param name="source">The node instance to check.</param>
+        bool IsNoDestinationSet(TSource source);
 
         /// <summary>
         /// Checks that no destination value has been set.
         /// </summary>
-        /// <param name="node">The node instance to check.</param>
-        bool AreAllSourcesReady(TSource node);
+        /// <param name="source">The node instance to check.</param>
+        bool AreAllSourcesReady(TSource source);
 
         /// <summary>
         /// Checks for errors before applying a rule.
         /// </summary>
-        /// <param name="node">The node instance to check.</param>
+        /// <param name="source">The node instance to check.</param>
         /// <param name="data">Private data to give to Apply() upon return.</param>
         /// <returns>True if an error occured.</returns>
-        bool CheckConsistency(TSource node, out object data);
+        bool CheckConsistency(TSource source, out object data);
 
         /// <summary>
         /// Applies the rule.
         /// </summary>
-        /// <param name="node">The node instance to modify.</param>
+        /// <param name="source">The node instance to modify.</param>
         /// <param name="data">Private data from CheckConsistency().</param>
-        void Apply(TSource node, object data);
+        void Apply(TSource source, object data);
     }
 
     /// <summary>
@@ -131,46 +130,46 @@
         /// <summary>
         /// Checks that no destination value has been set.
         /// </summary>
-        /// <param name="node">The node instance to check.</param>
-        public virtual bool IsNoDestinationSet(TSource node)
+        /// <param name="source">The node instance to check.</param>
+        public virtual bool IsNoDestinationSet(TSource source)
         {
-            return !DestinationTemplateList.Exists((IDestinationTemplate destinationTemplate) => { return destinationTemplate.IsSet(node); });
+            return !DestinationTemplateList.Exists((IDestinationTemplate destinationTemplate) => { return destinationTemplate.IsSet(source); });
         }
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public bool IsNoDestinationSet(ISource node) { return IsNoDestinationSet((TSource)node); }
+        public bool IsNoDestinationSet(ISource source) { return IsNoDestinationSet((TSource)source); }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
         /// Checks that no destination value has been set.
         /// </summary>
-        /// <param name="node">The node instance to check.</param>
-        public virtual bool AreAllSourcesReady(TSource node)
+        /// <param name="source">The node instance to check.</param>
+        public virtual bool AreAllSourcesReady(TSource source)
         {
-            return SourceTemplateList.TrueForAll((ISourceTemplate sourceTemplate) => { return sourceTemplate.IsReady(node); });
+            return SourceTemplateList.TrueForAll((ISourceTemplate sourceTemplate) => { return sourceTemplate.IsReady(source); });
         }
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public bool AreAllSourcesReady(ISource node) { return AreAllSourcesReady((TSource)node); }
+        public bool AreAllSourcesReady(ISource source) { return AreAllSourcesReady((TSource)source); }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
         /// Checks for errors before applying a rule.
         /// </summary>
-        /// <param name="node">The node instance to check.</param>
+        /// <param name="source">The node instance to check.</param>
         /// <param name="data">Private data to give to Apply() upon return.</param>
         /// <returns>True if an error occured.</returns>
-        public abstract bool CheckConsistency(TSource node, out object data);
+        public abstract bool CheckConsistency(TSource source, out object data);
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public bool CheckConsistency(ISource node, out object data) { return CheckConsistency((TSource)node, out data); }
+        public bool CheckConsistency(ISource source, out object data) { return CheckConsistency((TSource)source, out data); }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
         /// Applies the rule.
         /// </summary>
-        /// <param name="node">The node instance to modify.</param>
+        /// <param name="source">The node instance to modify.</param>
         /// <param name="data">Private data from CheckConsistency().</param>
-        public abstract void Apply(TSource node, object data);
+        public abstract void Apply(TSource source, object data);
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public void Apply(ISource node, object data) { Apply((TSource)node, data); }
+        public void Apply(ISource source, object data) { Apply((TSource)source, data); }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         #endregion
 

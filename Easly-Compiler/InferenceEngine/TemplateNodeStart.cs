@@ -40,10 +40,10 @@
         /// <summary>
         /// Gets the starting point.
         /// </summary>
-        /// <param name="node">The node for which a value is requested.</param>
-        public virtual ISource GetStart(TSource node)
+        /// <param name="source">The node for which a value is requested.</param>
+        public virtual ISource GetStart(TSource source)
         {
-            return node;
+            return source;
         }
         #endregion
     }

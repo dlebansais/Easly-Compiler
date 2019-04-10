@@ -5,7 +5,6 @@
     using System.Diagnostics;
     using System.Reflection;
     using BaseNodeHelper;
-    using CompilerNode;
 
     /// <summary>
     /// Specifies a destination for a <see cref="IRuleTemplate"/>.
@@ -15,8 +14,8 @@
         /// <summary>
         /// True if the destination value has been set;
         /// </summary>
-        /// <param name="node">The node for which the value is to be checked.</param>
-        bool IsSet(ISource node);
+        /// <param name="source">The node for which the value is to be checked.</param>
+        bool IsSet(ISource source);
     }
 
     /// <summary>
@@ -30,15 +29,15 @@
         /// <summary>
         /// True if the destination value has been set;
         /// </summary>
-        /// <param name="node">The node for which the value is to be checked.</param>
-        bool IsSet(TSource node);
+        /// <param name="source">The node for which the value is to be checked.</param>
+        bool IsSet(TSource source);
 
         /// <summary>
         /// Sets the destination new value.
         /// </summary>
-        /// <param name="node">The node for which the value is to be set.</param>
+        /// <param name="source">The node for which the value is to be set.</param>
         /// <param name="value">The value.</param>
-        void SetDestinationObject(TSource node, TValue value);
+        void SetDestinationObject(TSource source, TValue value);
     }
 
     /// <summary>
@@ -78,19 +77,19 @@
         /// <summary>
         /// True if the destination value has been set;
         /// </summary>
-        /// <param name="node">The node for which the value is to be checked.</param>
-        public abstract bool IsSet(TSource node);
+        /// <param name="source">The node for which the value is to be checked.</param>
+        public abstract bool IsSet(TSource source);
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public bool IsSet(ISource node) { return IsSet((TSource)node); }
+        public bool IsSet(ISource source) { return IsSet((TSource)source); }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
         /// Gets the destination current value.
         /// </summary>
-        /// <param name="node">The node for which the value is requested.</param>
-        public virtual TValue GetDestinationObject(TSource node)
+        /// <param name="source">The node for which the value is requested.</param>
+        public virtual TValue GetDestinationObject(TSource source)
         {
-            object Result = StartingPoint.GetStart(node);
+            object Result = StartingPoint.GetStart(source);
 
             for (int i = 0; i < PropertyPath.Count; i++)
                 Result = PropertyPath[i].GetValue(Result);
@@ -101,11 +100,11 @@
         /// <summary>
         /// Sets the destination new value.
         /// </summary>
-        /// <param name="node">The node for which the value is to be set.</param>
+        /// <param name="source">The node for which the value is to be set.</param>
         /// <param name="value">The value.</param>
-        public virtual void SetDestinationObject(TSource node, TValue value)
+        public virtual void SetDestinationObject(TSource source, TValue value)
         {
-            object Reference = StartingPoint.GetStart(node);
+            object Reference = StartingPoint.GetStart(source);
 
             for (int i = 0; i + 1 < PropertyPath.Count; i++)
                 Reference = PropertyPath[i].GetValue(Reference);

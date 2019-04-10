@@ -42,5 +42,11 @@
         /// </summary>
         /// <param name="parentSource">The parent node.</param>
         void InitializeSource(ISource parentSource);
+
+        /// <summary>
+        /// Reset some intermediate results.
+        /// </summary>
+        /// <param name="engine">The engine requesting reset.</param>
+        void Reset(InferenceEngine engine);
     }
 }

@@ -102,6 +102,22 @@ namespace CompilerNode
             EmbeddingBody = parentSource is IBody AsBody ? AsBody : parentSource?.EmbeddingBody;
             EmbeddingAssertion = parentSource is IAssertion AsAssertion ? AsAssertion : parentSource?.EmbeddingAssertion;
         }
+
+        /// <summary>
+        /// Reset some intermediate results.
+        /// </summary>
+        /// <param name="engine">The engine requesting reset.</param>
+        public void Reset(InferenceEngine engine)
+        {
+            bool IsHandled = false;
+
+            if (engine.RuleTemplateList == RuleTemplateSet.Identifiers)
+            {
+                IsHandled = true;
+            }
+
+            Debug.Assert(IsHandled);
+        }
         #endregion
 
         #region Implementation of ICompiledFeature

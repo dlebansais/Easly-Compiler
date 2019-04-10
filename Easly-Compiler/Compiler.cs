@@ -47,6 +47,11 @@
         /// Errors in last compilation.
         /// </summary>
         public IList<IError> ErrorList { get; } = new List<IError>();
+
+        /// <summary>
+        /// Number of retries by the inference engine (debug only).
+        /// </summary>
+        public int InferenceRetries { get; set; } = 0;
         #endregion
 
         #region Client Interface
@@ -735,6 +740,10 @@
             foreach (byte b in Data)
                 Value += b.ToString("X2");
 
+            // Eliminate leading zeroes that not valid.
+            while (Value.Length > 1 && Value[0] == '0')
+                Value = Value.Substring(1);
+
             return new ManifestNumberExpression(Value + IntegerBase.Hexadecimal.Suffix);
         }
         #endregion
@@ -951,30 +960,11 @@
         private IHashtableEx<string, IHashtableEx<string, ILibrary>> LibraryTable = new HashtableEx<string, IHashtableEx<string, ILibrary>>();
         #endregion
 
-        #region Identifiers
+        #region Inference Pass: Identifiers
         /// <summary></summary>
         protected virtual bool BuildClassIdentifiers(IRoot root)
         {
-            IList<IRuleTemplate> RuleTemplateList = new List<IRuleTemplate>()
-            {
-                // Create many derivations of IdentifierRuleTemplate to have separate static constructors, to ensure separate namespaces.
-                new QualifiedNameRuleTemplate(),
-                new IdentifierRuleTemplate<IIdentifier>(),
-                new IdentifierRuleTemplate<IClassIdentifier>(),
-                new IdentifierRuleTemplate<IClassOrExportIdentifier>(),
-                new IdentifierRuleTemplate<IClassOrFeatureIdentifier>(),
-                new IdentifierRuleTemplate<IExportIdentifier>(),
-                new IdentifierRuleTemplate<IFeatureIdentifier>(),
-                new IdentifierRuleTemplate<ILibraryIdentifier>(),
-                new IdentifierRuleTemplate<IReplicateIdentifier>(),
-                new IdentifierRuleTemplate<ISourceIdentifier>(),
-                new IdentifierRuleTemplate<ITypeIdentifier>(),
-                new ManifestCharacterTextRuleTemplate(),
-                new ManifestNumberTextRuleTemplate(),
-                new ManifestStringTextRuleTemplate(),
-                new NameRuleTemplate(),
-            };
-
+            IList<IRuleTemplate> RuleTemplateList = RuleTemplateSet.Identifiers;
             BuildInferenceSourceList Context = new BuildInferenceSourceList(RuleTemplateList);
             IWalkCallbacks<BuildInferenceSourceList> Callbacks = new WalkCallbacks<BuildInferenceSourceList>() { HandlerNode = ListAllSources, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() };
             IList<IClass> ClassList = root.ClassList;
@@ -984,7 +974,14 @@
 
             IList<ISource> SourceList = Context.SourceList;
 
-            InferenceEngine Engine = new InferenceEngine(RuleTemplateList, SourceList, ClassList, CheckIdentifiersResolved, true);
+            InferenceEngine Engine = new InferenceEngine(RuleTemplateList, SourceList, ClassList, CheckIdentifiersResolved, true, InferenceRetries);
+
+#if DEBUG
+            // For code coverage purpose only.
+            foreach (ISource Source in SourceList)
+                Source.Reset(Engine);
+#endif
+
             bool Success = Engine.Solve(ErrorList);
 
             Debug.Assert(Success || ErrorList.Count > 0);

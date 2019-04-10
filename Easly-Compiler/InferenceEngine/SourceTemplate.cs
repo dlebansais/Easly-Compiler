@@ -15,8 +15,8 @@
         /// <summary>
         /// Checks if a node source is ready.
         /// </summary>
-        /// <param name="node">The node for which the value is checked.</param>
-        bool IsReady(ISource node);
+        /// <param name="source">The node for which the value is checked.</param>
+        bool IsReady(ISource source);
     }
 
     /// <summary>
@@ -30,14 +30,14 @@
         /// <summary>
         /// Checks if a node source is ready.
         /// </summary>
-        /// <param name="node">The node for which the value is checked.</param>
-        bool IsReady(TSource node);
+        /// <param name="source">The node for which the value is checked.</param>
+        bool IsReady(TSource source);
 
         /// <summary>
         /// Gets the source's current value.
         /// </summary>
-        /// <param name="node">The node for which the value is requested.</param>
-        TValue GetSourceObject(TSource node);
+        /// <param name="source">The node for which the value is requested.</param>
+        TValue GetSourceObject(TSource source);
     }
 
     /// <summary>
@@ -77,19 +77,19 @@
         /// <summary>
         /// Checks if a node source is ready.
         /// </summary>
-        /// <param name="node">The node for which the value is checked.</param>
-        public abstract bool IsReady(TSource node);
+        /// <param name="source">The node for which the value is checked.</param>
+        public abstract bool IsReady(TSource source);
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public bool IsReady(ISource node) { return IsReady((TSource)node); }
+        public bool IsReady(ISource source) { return IsReady((TSource)source); }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
         /// Gets the source's current value.
         /// </summary>
-        /// <param name="node">The node for which the value is requested.</param>
-        public virtual TValue GetSourceObject(TSource node)
+        /// <param name="source">The node for which the value is requested.</param>
+        public virtual TValue GetSourceObject(TSource source)
         {
-            object Result = StartingPoint.GetStart(node);
+            object Result = StartingPoint.GetStart(source);
 
             for (int i = 0; i < PropertyPath.Count; i++)
                 Result = PropertyPath[i].GetValue(Result);

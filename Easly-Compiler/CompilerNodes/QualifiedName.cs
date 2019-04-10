@@ -1,6 +1,7 @@
 ﻿namespace CompilerNode
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using Easly;
     using EaslyCompiler;
 
@@ -65,13 +66,30 @@
             EmbeddingBody = parentSource is IBody AsBody ? AsBody : parentSource?.EmbeddingBody;
             EmbeddingAssertion = parentSource is IAssertion AsAssertion ? AsAssertion : parentSource?.EmbeddingAssertion;
         }
+
+        /// <summary>
+        /// Reset some intermediate results.
+        /// </summary>
+        /// <param name="engine">The engine requesting reset.</param>
+        public void Reset(InferenceEngine engine)
+        {
+            bool IsHandled = false;
+
+            if (engine.RuleTemplateList == RuleTemplateSet.Identifiers)
+            {
+                ValidPath = new OnceReference<IList<IIdentifier>>();
+                IsHandled = true;
+            }
+
+            Debug.Assert(IsHandled);
+        }
         #endregion
 
         #region Compiler
         /// <summary>
         /// The valid value of <see cref="BaseNode.IQualifiedName.Path"/>.
         /// </summary>
-        public OnceReference<IList<IIdentifier>> ValidPath { get; } = new OnceReference<IList<IIdentifier>>();
+        public OnceReference<IList<IIdentifier>> ValidPath { get; private set; } = new OnceReference<IList<IIdentifier>>();
         #endregion
 
         #region Debugging

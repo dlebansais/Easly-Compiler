@@ -1,5 +1,6 @@
 namespace CompilerNode
 {
+    using System.Diagnostics;
     using Easly;
     using EaslyCompiler;
 
@@ -84,13 +85,30 @@ namespace CompilerNode
             EmbeddingBody = parentSource is IBody AsBody ? AsBody : parentSource?.EmbeddingBody;
             EmbeddingAssertion = parentSource is IAssertion AsAssertion ? AsAssertion : parentSource?.EmbeddingAssertion;
         }
+
+        /// <summary>
+        /// Reset some intermediate results.
+        /// </summary>
+        /// <param name="engine">The engine requesting reset.</param>
+        public void Reset(InferenceEngine engine)
+        {
+            bool IsHandled = false;
+
+            if (engine.RuleTemplateList == RuleTemplateSet.Identifiers)
+            {
+                ValidText = new OnceReference<string>();
+                IsHandled = true;
+            }
+
+            Debug.Assert(IsHandled);
+        }
         #endregion
 
         #region Compiler
         /// <summary>
         /// The valid value of <see cref="BaseNode.IManifestStringExpression.Text"/>.
         /// </summary>
-        public OnceReference<string> ValidText { get; } = new OnceReference<string>();
+        public OnceReference<string> ValidText { get; private set; } = new OnceReference<string>();
         #endregion
 
         #region Debugging
