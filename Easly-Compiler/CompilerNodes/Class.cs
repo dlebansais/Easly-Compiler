@@ -611,10 +611,7 @@ namespace CompilerNode
         /// <summary></summary>
         public override string ToString()
         {
-            if (ValidClassName != null)
-                return $"Class '{ValidClassName}'";
-            else
-                return $"Class '{EntityName.Text}'";
+            return $"Class '{EntityName.Text}'";
         }
         #endregion
     }

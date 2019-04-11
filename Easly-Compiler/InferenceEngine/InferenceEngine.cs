@@ -120,40 +120,32 @@
             foreach (IRuleTemplate Rule in RuleTemplateList)
                 Rule.ErrorList.Clear();
 
-            try
+            for (;;)
             {
-                for (;;)
+                List<IError> TryErrorList = new List<IError>();
+                bool TryResult = SolveWithRetry(TryErrorList);
+                if (Retries == 0)
                 {
-                    List<IError> TryErrorList = new List<IError>();
-                    bool TryResult = SolveWithRetry(TryErrorList);
-                    if (Retries == 0)
-                    {
-                        foreach (IError Error in TryErrorList)
-                            errorList.Add(Error);
-                        Result = TryResult;
-                        break;
-                    }
-
-                    // Errors can differ, but success or failure must not.
-                    if (!LastTryResult.HasValue)
-                        LastTryResult = TryResult;
-
-                    Debug.Assert(TryResult == LastTryResult.Value);
-
-                    // Reset sources so we restart inference from a fresh state.
-                    ResetSources();
-                    ShuffleRules(RuleTemplateList);
-
-                    if (Retries <= 0)
-                        throw new InvalidOperationException("Invalid inference retries count.");
-
-                    Retries--;
+                    foreach (IError Error in TryErrorList)
+                        errorList.Add(Error);
+                    Result = TryResult;
+                    break;
                 }
-            }
-            catch (Exception e)
-            {
-                errorList.Add(new ErrorInternal(e));
-                Result = false;
+
+                // Errors can differ, but success or failure must not.
+                if (!LastTryResult.HasValue)
+                    LastTryResult = TryResult;
+
+                Debug.Assert(TryResult == LastTryResult.Value);
+
+                // Reset sources so we restart inference from a fresh state.
+                ResetSources();
+                ShuffleRules(RuleTemplateList);
+
+                if (Retries <= 0)
+                    throw new InvalidOperationException("Invalid inference retries count.");
+
+                Retries--;
             }
 
             return Result;

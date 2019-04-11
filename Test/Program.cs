@@ -12,8 +12,7 @@ namespace Test
         {
             Compiler c = new Compiler();
             //c.Compile("../../../coverage/coverage.easly");
-            c.InferenceRetries = -1;
-            c.Compile("../../../coverage/coverage invalid 45.easly");
+            c.Compile("../../../coverage/coverage invalid 2-50.easly");
             //c.Compile("../../../test.easly");
             //c.Compile("../../../root.easly");
             //c.Compile("../../../coverage/coverage replication.easly");

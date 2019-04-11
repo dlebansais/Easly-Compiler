@@ -110,24 +110,19 @@
             if (path.Length == 0)
                 return;
 
-            string NestedPath;
             int Index = path.IndexOf('.');
-            if (Index < 0)
-            {
-                Index = path.Length;
-                NestedPath = string.Empty;
-            }
-            else
-                NestedPath = path.Substring(Index + 1);
+            int ThisPathIndex = (Index >= 0) ? Index : path.Length;
+            string PropertyName = path.Substring(0, ThisPathIndex);
+            int NextPathIndex = (Index >= 0) ? Index + 1 : path.Length;
+            string NextPath = path.Substring(NextPathIndex);
 
-            string PropertyName = path.Substring(0, Index);
             PropertyInfo Property = NodeTreeHelper.GetPropertyOf(type, PropertyName);
             Debug.Assert(Property != null);
 
             propertyPath.Add(Property);
 
             Type NestedType = Property.PropertyType;
-            BuildPropertyPath(NestedType, NestedPath, propertyPath);
+            BuildPropertyPath(NestedType, NextPath, propertyPath);
         }
 
         /// <summary></summary>

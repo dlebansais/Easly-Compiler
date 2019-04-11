@@ -44,21 +44,18 @@
             data = null;
 
             if (!StringValidation.IsValidIdentifier(node, node.Text, out string ValidText, out IErrorStringValidity StringError))
-            {
                 Success = false;
-                AddSourceError(StringError);
-            }
             else
             {
                 IFormattedNumber fn = FormattedNumber.Parse(ValidText);
                 if (!string.IsNullOrEmpty(fn.InvalidText))
-                {
                     Success = false;
-                    AddSourceError(new ErrorInvalidManifestNumber(node, ValidText));
-                }
-                else
-                    data = ValidText;
             }
+
+            if (!Success)
+                AddSourceError(new ErrorInvalidManifestNumber(node, node.Text));
+            else
+                data = ValidText;
 
             return Success;
         }

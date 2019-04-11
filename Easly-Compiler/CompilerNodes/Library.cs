@@ -366,10 +366,7 @@ namespace CompilerNode
         /// <summary></summary>
         public override string ToString()
         {
-            if (ValidLibraryName != null)
-                return $"Library '{ValidLibraryName}'";
-            else
-                return $"Library '{EntityName.Text}'";
+            return $"Library '{EntityName.Text}'";
         }
         #endregion
     }

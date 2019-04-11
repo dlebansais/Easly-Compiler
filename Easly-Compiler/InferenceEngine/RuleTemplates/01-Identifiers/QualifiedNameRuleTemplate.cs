@@ -48,16 +48,15 @@
             List<string> ValidPath = new List<string>();
 
             foreach (IIdentifier Identifier in node.Path)
-                if (!StringValidation.IsValidIdentifier(node, Identifier.Text, out string ValidText, out IErrorStringValidity StringError))
-                {
-                    Success = false;
-                    AddSourceError(StringError);
-                }
-                else
-                    ValidPath.Add(ValidText);
+            {
+                Debug.Assert(StringValidation.IsValidIdentifier(node, Identifier.Text, out string ValidText, out IErrorStringValidity StringError));
+                Debug.Assert(Identifier.ValidText.IsAssigned);
+                Debug.Assert(Identifier.ValidText.Item == ValidText);
 
-            if (Success)
-                data = ValidPath;
+                ValidPath.Add(Identifier.ValidText.Item);
+            }
+
+            data = ValidPath;
 
             return Success;
         }
@@ -81,10 +80,11 @@
 
         private bool IsPathAssigned(IList<string> stringPath, IList<BaseNode.IIdentifier> identifierPath)
         {
-            if (stringPath.Count != identifierPath.Count)
-                return false;
+            bool Result = true;
 
-            for (int i = 0; i < stringPath.Count; i++)
+            Result &= stringPath.Count == identifierPath.Count;
+
+            for (int i = 0; i < stringPath.Count && i < identifierPath.Count; i++)
             {
                 string StringText = stringPath[i];
                 Debug.Assert(StringValidation.IsValidIdentifier(StringText));
@@ -95,11 +95,10 @@
                 string IdentifierText = Identifier.ValidText.Item;
                 Debug.Assert(StringValidation.IsValidIdentifier(IdentifierText));
 
-                if (StringText != IdentifierText)
-                    return false;
+                Result &= StringText == IdentifierText;
             }
 
-            return true;
+            return Result;
         }
         #endregion
     }

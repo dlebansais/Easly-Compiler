@@ -1,6 +1,6 @@
 ﻿namespace EaslyCompiler
 {
-    using CompilerNode;
+    using System.Diagnostics;
     using Easly;
 
     /// <summary>
@@ -50,6 +50,8 @@
         public override bool IsSet(TSource node)
         {
             OnceReference<TRef> Value = GetDestinationObject(node);
+            Debug.Assert(Value == GetDestinationObject((ISource)node));
+
             return Value.IsAssigned;
         }
         #endregion

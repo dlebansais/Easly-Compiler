@@ -16,6 +16,12 @@
         /// </summary>
         /// <param name="source">The node for which the value is to be checked.</param>
         bool IsSet(ISource source);
+
+        /// <summary>
+        /// Gets the destination current value.
+        /// </summary>
+        /// <param name="source">The node for which the value is requested.</param>
+        object GetDestinationObject(ISource source);
     }
 
     /// <summary>
@@ -33,11 +39,10 @@
         bool IsSet(TSource source);
 
         /// <summary>
-        /// Sets the destination new value.
+        /// Gets the destination current value.
         /// </summary>
-        /// <param name="source">The node for which the value is to be set.</param>
-        /// <param name="value">The value.</param>
-        void SetDestinationObject(TSource source, TValue value);
+        /// <param name="source">The node for which the value is requested.</param>
+        TValue GetDestinationObject(TSource source);
     }
 
     /// <summary>
@@ -96,22 +101,9 @@
 
             return (TValue)Result;
         }
-
-        /// <summary>
-        /// Sets the destination new value.
-        /// </summary>
-        /// <param name="source">The node for which the value is to be set.</param>
-        /// <param name="value">The value.</param>
-        public virtual void SetDestinationObject(TSource source, TValue value)
-        {
-            object Reference = StartingPoint.GetStart(source);
-
-            for (int i = 0; i + 1 < PropertyPath.Count; i++)
-                Reference = PropertyPath[i].GetValue(Reference);
-
-            PropertyInfo LastProperty = PropertyPath[PropertyPath.Count - 1];
-            LastProperty.SetValue(Reference, value);
-        }
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        public object GetDestinationObject(ISource source) { return GetDestinationObject((TSource)source); }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         #endregion
 
         #region Implementation
@@ -126,24 +118,19 @@
             if (path.Length == 0)
                 return;
 
-            string NestedPath;
             int Index = path.IndexOf('.');
-            if (Index < 0)
-            {
-                Index = path.Length;
-                NestedPath = string.Empty;
-            }
-            else
-                NestedPath = path.Substring(Index + 1);
+            int ThisPathIndex = (Index >= 0) ? Index : path.Length;
+            string PropertyName = path.Substring(0, ThisPathIndex);
+            int NextPathIndex = (Index >= 0) ? Index + 1 : path.Length;
+            string NextPath = path.Substring(NextPathIndex);
 
-            string PropertyName = path.Substring(0, Index);
             PropertyInfo Property = NodeTreeHelper.GetPropertyOf(type, PropertyName);
             Debug.Assert(Property != null);
 
             propertyPath.Add(Property);
 
             Type NestedType = Property.PropertyType;
-            BuildPropertyPath(NestedType, NestedPath, propertyPath);
+            BuildPropertyPath(NestedType, NextPath, propertyPath);
         }
 
         /// <summary></summary>
