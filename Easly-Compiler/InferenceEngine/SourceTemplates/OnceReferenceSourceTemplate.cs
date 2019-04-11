@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+#if LATER
     using Easly;
 
     /// <summary>
@@ -77,4 +78,5 @@
         }
         #endregion
     }
+#endif
 }
