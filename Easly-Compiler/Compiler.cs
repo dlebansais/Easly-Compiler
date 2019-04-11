@@ -993,10 +993,8 @@
             ISource Source = node as ISource;
             Debug.Assert(Source != null);
 
-#if DEBUG
-            // For code coverage purpose only.
+            // TODO: remove this code, for code coverage purpose only.
             Source.Reset(context.RuleTemplateList);
-#endif
 
             foreach (IRuleTemplate RuleTemplate in context.RuleTemplateList)
                 if (RuleTemplate.NodeType.IsAssignableFrom(node.GetType()))
