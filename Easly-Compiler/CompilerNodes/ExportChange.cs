@@ -111,12 +111,12 @@ namespace CompilerNode
         /// <summary>
         /// Reset some intermediate results.
         /// </summary>
-        /// <param name="engine">The engine requesting reset.</param>
-        public void Reset(InferenceEngine engine)
+        /// <param name="ruleTemplateList">The list of rule templates that would read the properties to reset.</param>
+        public void Reset(IList<IRuleTemplate> ruleTemplateList)
         {
             bool IsHandled = false;
 
-            if (engine.RuleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers)
             {
                 IsHandled = true;
             }

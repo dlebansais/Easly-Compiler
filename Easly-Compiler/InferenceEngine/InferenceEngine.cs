@@ -256,7 +256,7 @@
         protected virtual void ResetSources()
         {
             foreach (ISource Source in SourceList)
-                Source.Reset(this);
+                Source.Reset(RuleTemplateList);
         }
 
         private static void ShuffleRules(IList<IRuleTemplate> ruleTemplateList)

@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Collections.Generic;
     using CompilerNode;
 
     /// <summary>
@@ -46,7 +47,7 @@
         /// <summary>
         /// Reset some intermediate results.
         /// </summary>
-        /// <param name="engine">The engine requesting reset.</param>
-        void Reset(InferenceEngine engine);
+        /// <param name="ruleTemplateList">The list of rule templates that would read the properties to reset.</param>
+        void Reset(IList<IRuleTemplate> ruleTemplateList);
     }
 }

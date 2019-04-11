@@ -272,6 +272,11 @@
         protected virtual void GenerateCompilationUID()
         {
             string NewGuidDigits = Guid.NewGuid().ToString("N");
+
+            // Eliminate leading zeroes that are not valid.
+            while (NewGuidDigits.Length > 1 && NewGuidDigits[0] == '0')
+                NewGuidDigits = NewGuidDigits.Substring(1);
+
             CompilationUID = InitializedNumberExpression(LanguageClasses.UniversallyUniqueIdentifier.Name, "Value", NewGuidDigits + IntegerBase.Hexadecimal.Suffix);
         }
 
@@ -740,7 +745,7 @@
             foreach (byte b in Data)
                 Value += b.ToString("X2");
 
-            // Eliminate leading zeroes that not valid.
+            // Eliminate leading zeroes that are not valid.
             while (Value.Length > 1 && Value[0] == '0')
                 Value = Value.Substring(1);
 
@@ -976,12 +981,6 @@
 
             InferenceEngine Engine = new InferenceEngine(RuleTemplateList, SourceList, ClassList, CheckIdentifiersResolved, true, InferenceRetries);
 
-#if DEBUG
-            // For code coverage purpose only.
-            foreach (ISource Source in SourceList)
-                Source.Reset(Engine);
-#endif
-
             bool Success = Engine.Solve(ErrorList);
 
             Debug.Assert(Success || ErrorList.Count > 0);
@@ -991,12 +990,17 @@
         /// <summary></summary>
         protected virtual bool ListAllSources(BaseNode.INode node, BaseNode.INode parentNode, string propertyName, IWalkCallbacks<BuildInferenceSourceList> callbacks, BuildInferenceSourceList context)
         {
+            ISource Source = node as ISource;
+            Debug.Assert(Source != null);
+
+#if DEBUG
+            // For code coverage purpose only.
+            Source.Reset(context.RuleTemplateList);
+#endif
+
             foreach (IRuleTemplate RuleTemplate in context.RuleTemplateList)
                 if (RuleTemplate.NodeType.IsAssignableFrom(node.GetType()))
                 {
-                    ISource Source = node as ISource;
-                    Debug.Assert(Source != null);
-
                     context.SourceList.Add(Source);
                     break;
                 }
