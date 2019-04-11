@@ -119,6 +119,9 @@
             bool Result;
             bool? LastTryResult = null;
 
+            foreach (IRuleTemplate Rule in RuleTemplateList)
+                Rule.ErrorList.Clear();
+
             for (;;)
             {
                 List<IError> TryErrorList = new List<IError>();
@@ -175,7 +178,7 @@
                 foreach (IClass Class in UnresolvedClassList)
                     NameList.Add(Class.ValidClassName);
 
-                errorList.Add(new ErrorCyclicDependency(UnresolvedClassList[0], NameList));
+                errorList.Add(new ErrorCyclicDependency(NameList));
                 Result = false;
             }
 
@@ -211,8 +214,14 @@
                     if (!Rule.NodeType.IsAssignableFrom(Source.GetType()))
                         continue;
 
-                    if (Rule.IsNoDestinationSet(Source))
-                        if (Rule.AreAllSourcesReady(Source) && Rule.ErrorList.Count == 0)
+                    bool IsNoDestinationSet = Rule.IsNoDestinationSet(Source);
+
+                    if (IsNoDestinationSet)
+                    {
+                        bool AreAllSourcesReady = Rule.AreAllSourcesReady(Source);
+                        bool NoError = Rule.ErrorList.Count == 0;
+
+                        if (AreAllSourcesReady && NoError)
                         {
                             if (Rule.CheckConsistency(Source, out object data))
                             {
@@ -227,6 +236,7 @@
                                     errorList.Add(Error);
                             }
                         }
+                    }
                 }
             }
         }

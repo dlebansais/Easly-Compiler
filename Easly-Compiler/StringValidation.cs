@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Globalization;
     using System.Text;
 
@@ -149,17 +150,10 @@
                 return false;
             }
 
-            Dictionary<char, string> CSharpEscapeTable = new Dictionary<char, string>();
-            CSharpEscapeTable.Add('\"', "\\\"");
-            CSharpEscapeTable.Add('\a', "\\a");
-            CSharpEscapeTable.Add('\b', "\\b");
-            CSharpEscapeTable.Add('\f', "\\f");
-            CSharpEscapeTable.Add('\n', "\\n");
-            CSharpEscapeTable.Add('\r', "\\r");
-            CSharpEscapeTable.Add('\t', "\\t");
-
+            bool InEscapeSequence = false;
             bool InUnicodeSyntax = false;
             string UnicodeCharacter = string.Empty;
+
             byte[] Bytes = Encoding.UTF32.GetBytes(text);
             int[] Codes = new int[Bytes.Length / 4];
             for (int i = 0; i < Codes.Length; i++)
@@ -169,85 +163,86 @@
             {
                 int c = Codes[i];
 
-                if (c == '\\')
+                if (InEscapeSequence)
                 {
-                    if (InUnicodeSyntax)
+                    if (c == 'u' || c == 'U')
                     {
-                        InUnicodeSyntax = false;
-
-                        if (UnicodeCharacter.Length == 0)
-                            validText += "\\\\";
-                        else
-                        {
-                            bool ParsedAsEscape = false;
-                            int CodePoint;
-                            if (int.TryParse(UnicodeCharacter, NumberStyles.HexNumber, null, out CodePoint))
-                            {
-                                if (CodePoint < 32)
-                                {
-                                    char Character = (char)CodePoint;
-                                    if (CSharpEscapeTable.ContainsKey(Character))
-                                    {
-                                        validText += CSharpEscapeTable[Character];
-                                        ParsedAsEscape = true;
-                                    }
-                                }
-                            }
-
-                            if (!ParsedAsEscape)
-                            {
-                                if (UnicodeCharacter.Length <= 4)
-                                {
-                                    while (UnicodeCharacter.Length < 4)
-                                        UnicodeCharacter = "0" + UnicodeCharacter;
-
-                                    validText += "\\u" + UnicodeCharacter;
-                                }
-                                else
-                                {
-                                    if (UnicodeCharacter.Length > 8)
-                                    {
-                                        error = new ErrorIllFormedString(source);
-                                        return false;
-                                    }
-
-                                    while (UnicodeCharacter.Length < 8)
-                                        UnicodeCharacter = "0" + UnicodeCharacter;
-
-                                    validText += "\\U" + UnicodeCharacter;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
+                        InEscapeSequence = false;
                         InUnicodeSyntax = true;
                         UnicodeCharacter = string.Empty;
                     }
-                }
-                else
-                {
-                    if (InUnicodeSyntax)
+                    else
                     {
-                        if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
-                            UnicodeCharacter += c;
-                        else
+                        InEscapeSequence = false;
+
+                        bool IsTranslated = false;
+                        foreach (KeyValuePair<char, string> Entry in CSharpEscapeTable)
+                            if (c == Entry.Value[1])
+                            {
+                                IsTranslated = true;
+                                validText += Entry.Key;
+                                break;
+                            }
+                        if (!IsTranslated)
                         {
                             error = new ErrorIllFormedString(source);
                             return false;
                         }
                     }
-                    else if (CSharpEscapeTable.ContainsKey(text[i]))
-                        validText += CSharpEscapeTable[text[i]];
-
-                    else
-                        validText += text[i];
                 }
+                else if (InUnicodeSyntax)
+                {
+                    if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
+                    {
+                        UnicodeCharacter += (char)c;
+
+                        if (UnicodeCharacter.Length == 4)
+                        {
+                            bool IsTranslated = int.TryParse(UnicodeCharacter, NumberStyles.HexNumber, null, out int CodePoint);
+                            Debug.Assert(IsTranslated);
+
+                            byte[] CodeBytes = BitConverter.GetBytes(CodePoint);
+                            validText += Encoding.UTF32.GetString(CodeBytes);
+
+                            InUnicodeSyntax = false;
+                            UnicodeCharacter = string.Empty;
+                        }
+                    }
+                    else
+                    {
+                        error = new ErrorIllFormedString(source);
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (c == '\\')
+                        InEscapeSequence = true;
+                    else
+                        validText += Encoding.UTF32.GetString(Bytes, i * 4, 4);
+                }
+            }
+
+            if (InUnicodeSyntax || InEscapeSequence)
+            {
+                error = new ErrorIllFormedString(source);
+                return false;
             }
 
             validText = validText.Normalize(NormalizationForm.FormD);
             return true;
         }
+
+        private static readonly Dictionary<char, string> CSharpEscapeTable = new Dictionary<char, string>()
+        {
+            { '\\', "\\\\" },
+            { '\a', "\\a" },
+            { '\b', "\\b" },
+            { '\f', "\\f" },
+            { '\n', "\\n" },
+            { '\r', "\\r" },
+            { '\t', "\\t" }
+        };
 
         private static void InitAllowedCharactersTable()
         {

@@ -23,12 +23,11 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="ErrorCyclicDependency"/> class.
         /// </summary>
-        /// <param name="source">The error location.</param>
         /// <param name="nameList">List of nodes with cyclic dependencies by names</param>
-        public ErrorCyclicDependency(ISource source, IList<string> nameList)
-            : base(source)
+        public ErrorCyclicDependency(IList<string> nameList)
+            : base(ErrorLocation.NoLocation)
         {
-            Debug.Assert(nameList.Count >= 2);
+            Debug.Assert(nameList.Count >= 1);
 
             NameList = nameList;
         }
@@ -47,7 +46,7 @@
         {
             get
             {
-                Debug.Assert(NameList.Count >= 2);
+                Debug.Assert(NameList.Count >= 1);
 
                 string Result = $"'{NameList[0]}'";
 

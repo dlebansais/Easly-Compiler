@@ -18,9 +18,8 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="ErrorInputRootInvalid"/> class.
         /// </summary>
-        /// <param name="root">The error location.</param>
-        public ErrorInputRootInvalid(IRoot root)
-            : base(root)
+        public ErrorInputRootInvalid()
+            : base(ErrorLocation.NoLocation)
         {
         }
         #endregion

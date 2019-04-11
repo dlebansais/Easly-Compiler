@@ -230,7 +230,7 @@
         {
             if (!NodeTreeDiagnostic.IsValid(root, assertValid: false))
             {
-                ErrorList.Add(new ErrorInputRootInvalid(root));
+                ErrorList.Add(new ErrorInputRootInvalid());
                 return false;
             }
 
@@ -921,7 +921,7 @@
                 foreach (ILibrary Library in UnresolvedLibraryList)
                     NameList.Add(Library.ValidLibraryName);
 
-                ErrorList.Add(new ErrorCyclicDependency(UnresolvedLibraryList[0], NameList));
+                ErrorList.Add(new ErrorCyclicDependency(NameList));
             }
 
             Debug.Assert(Success || ErrorList.Count > 0);
@@ -997,7 +997,7 @@
             Source.Reset(context.RuleTemplateList);
 
             foreach (IRuleTemplate RuleTemplate in context.RuleTemplateList)
-                if (RuleTemplate.NodeType.IsAssignableFrom(node.GetType()))
+                if (RuleTemplate.NodeType.IsAssignableFrom(Source.GetType()))
                 {
                     context.SourceList.Add(Source);
                     break;

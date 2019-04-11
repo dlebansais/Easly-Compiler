@@ -14,7 +14,6 @@
         public static IList<IRuleTemplate> Identifiers { get; } = new List<IRuleTemplate>()
         {
             // Create many derivations of IdentifierRuleTemplate to have separate static constructors, to ensure separate namespaces.
-            new QualifiedNameRuleTemplate(),
             new IdentifierRuleTemplate<IIdentifier>(),
             new IdentifierRuleTemplate<IClassIdentifier>(),
             new IdentifierRuleTemplate<IClassOrExportIdentifier>(),
@@ -29,6 +28,7 @@
             new ManifestNumberTextRuleTemplate(),
             new ManifestStringTextRuleTemplate(),
             new NameRuleTemplate(),
+            new QualifiedNameRuleTemplate(),
         };
     }
 }
