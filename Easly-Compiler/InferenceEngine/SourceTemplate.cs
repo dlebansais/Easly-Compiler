@@ -5,7 +5,6 @@
     using System.Diagnostics;
     using System.Reflection;
     using BaseNodeHelper;
-    using CompilerNode;
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
@@ -16,7 +15,8 @@
         /// Checks if a node source is ready.
         /// </summary>
         /// <param name="source">The node for which the value is checked.</param>
-        bool IsReady(ISource source);
+        /// <param name="data">Optional data returned to the caller.</param>
+        bool IsReady(ISource source, out object data);
     }
 
     /// <summary>
@@ -31,7 +31,8 @@
         /// Checks if a node source is ready.
         /// </summary>
         /// <param name="source">The node for which the value is checked.</param>
-        bool IsReady(TSource source);
+        /// <param name="data">Optional data returned to the caller.</param>
+        bool IsReady(TSource source, out object data);
 
         /// <summary>
         /// Gets the source's current value.
@@ -78,9 +79,10 @@
         /// Checks if a node source is ready.
         /// </summary>
         /// <param name="source">The node for which the value is checked.</param>
-        public abstract bool IsReady(TSource source);
+        /// <param name="data">Optional data returned to the caller.</param>
+        public abstract bool IsReady(TSource source, out object data);
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public bool IsReady(ISource source) { return IsReady((TSource)source); }
+        public bool IsReady(ISource source, out object data) { return IsReady((TSource)source, out data); }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
@@ -110,7 +112,7 @@
             if (path.Length == 0)
                 return;
 
-            int Index = path.IndexOf('.');
+            int Index = path.IndexOf(InferenceEngine.Dot);
             int ThisPathIndex = (Index >= 0) ? Index : path.Length;
             string PropertyName = path.Substring(0, ThisPathIndex);
             int NextPathIndex = (Index >= 0) ? Index + 1 : path.Length;

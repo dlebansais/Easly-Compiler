@@ -80,6 +80,10 @@
                 ValidPath = new OnceReference<IList<IIdentifier>>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Types)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }

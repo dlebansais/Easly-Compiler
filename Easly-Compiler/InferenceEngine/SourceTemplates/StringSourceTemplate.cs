@@ -57,8 +57,10 @@
         /// Checks if a node source is ready.
         /// </summary>
         /// <param name="node">The node for which the value is checked.</param>
-        public override bool IsReady(TSource node)
+        /// <param name="data">Optional data returned to the caller.</param>
+        public override bool IsReady(TSource node, out object data)
         {
+            data = null;
             bool Result = false;
 
             string Value = GetSourceObject(node);

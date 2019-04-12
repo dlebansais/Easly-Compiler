@@ -35,9 +35,10 @@
         /// Checks for errors before applying a rule.
         /// </summary>
         /// <param name="node">The node instance to check.</param>
+        /// <param name="dataList">Optional data collected during inspection of sources.</param>
         /// <param name="data">Private data to give to Apply() upon return.</param>
         /// <returns>True if an error occured.</returns>
-        public override bool CheckConsistency(IManifestCharacterExpression node, out object data)
+        public override bool CheckConsistency(IManifestCharacterExpression node, IDictionary<ISourceTemplate, object> dataList, out object data)
         {
             bool Success = true;
             data = null;

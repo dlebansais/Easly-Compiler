@@ -151,6 +151,10 @@ namespace CompilerNode
             {
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Types)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }

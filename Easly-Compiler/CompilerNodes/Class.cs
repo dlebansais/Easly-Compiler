@@ -124,6 +124,46 @@ namespace CompilerNode
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if imports are valid.</returns>
         bool CheckClassConsistency(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IList<IError> errorList);
+
+        /// <summary>
+        /// The table of resolved generic arguments for this class.
+        /// </summary>
+        IHashtableEx<string, ICompiledType> LocalGenericTable { get; }
+
+        /// <summary>
+        /// Table of resolved discretes defined in this class.
+        /// </summary>
+        IHashtableEx<IFeatureName, IDiscrete> LocalDiscreteTable { get; }
+
+        /// <summary>
+        /// Table of all resolved discretes in this class, direct or inherited.
+        /// </summary>
+        IHashtableEx<IFeatureName, IDiscrete> DiscreteTable { get; }
+
+        /// <summary>
+        /// Table of resolved features defined in this class.
+        /// </summary>
+        IHashtableEx<IFeatureName, IFeatureInstance> LocalFeatureTable { get; }
+
+        /// <summary>
+        /// Table of all resolved features in this class, direct or inherited.
+        /// </summary>
+        IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable { get; }
+
+        /// <summary>
+        /// The type name for this class.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedClassTypeName { get; }
+
+        /// <summary>
+        /// The type from this class.
+        /// </summary>
+        OnceReference<IClassType> ResolvedClassType { get; }
+
+        /// <summary>
+        /// List of types corresponding to each generic argument.
+        /// </summary>
+        IList<ICompiledType> GenericInstanceList { get; }
     }
 
     /// <summary>
@@ -336,6 +376,18 @@ namespace CompilerNode
 
             if (ruleTemplateList == RuleTemplateSet.Identifiers)
             {
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Types)
+            {
+                LocalGenericTable = new HashtableEx<string, ICompiledType>();
+                LocalDiscreteTable = new HashtableEx<IFeatureName, IDiscrete>();
+                DiscreteTable = new HashtableEx<IFeatureName, IDiscrete>();
+                LocalFeatureTable = new HashtableEx<IFeatureName, IFeatureInstance>();
+                FeatureTable = new HashtableEx<IFeatureName, IFeatureInstance>();
+                ResolvedClassTypeName = new OnceReference<ITypeName>();
+                ResolvedClassType = new OnceReference<IClassType>();
+                GenericInstanceList = new List<ICompiledType>();
                 IsHandled = true;
             }
 
@@ -605,6 +657,48 @@ namespace CompilerNode
             Debug.Assert(Success || errorList.Count > 0);
             return Success;
         }
+        #endregion
+
+        #region Types
+        /// <summary>
+        /// The table of resolved generic arguments for this class.
+        /// </summary>
+        public IHashtableEx<string, ICompiledType> LocalGenericTable { get; private set; } = new HashtableEx<string, ICompiledType>();
+
+        /// <summary>
+        /// Table of resolved discretes defined in this class.
+        /// </summary>
+        public IHashtableEx<IFeatureName, IDiscrete> LocalDiscreteTable { get; private set; } = new HashtableEx<IFeatureName, IDiscrete>();
+
+        /// <summary>
+        /// Table of all resolved discretes in this class, direct or inherited.
+        /// </summary>
+        public IHashtableEx<IFeatureName, IDiscrete> DiscreteTable { get; private set; } = new HashtableEx<IFeatureName, IDiscrete>();
+
+        /// <summary>
+        /// Table of resolved features defined in this class.
+        /// </summary>
+        public IHashtableEx<IFeatureName, IFeatureInstance> LocalFeatureTable { get; private set; } = new HashtableEx<IFeatureName, IFeatureInstance>();
+
+        /// <summary>
+        /// Table of all resolved features in this class, direct or inherited.
+        /// </summary>
+        public IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable { get; private set; } = new HashtableEx<IFeatureName, IFeatureInstance>();
+
+        /// <summary>
+        /// The type name for this class.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedClassTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The type from this class.
+        /// </summary>
+        public OnceReference<IClassType> ResolvedClassType { get; private set; } = new OnceReference<IClassType>();
+
+        /// <summary>
+        /// List of types corresponding to each generic argument.
+        /// </summary>
+        public IList<ICompiledType> GenericInstanceList { get; private set; } = new List<ICompiledType>();
         #endregion
 
         #region Debugging

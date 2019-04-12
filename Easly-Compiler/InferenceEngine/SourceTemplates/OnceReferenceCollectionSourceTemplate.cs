@@ -8,6 +8,7 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
+    /// The source is a collection of nodes, each with a property that must be an assigned <see cref="OnceReference{Tref}"/>.
     /// </summary>
     public interface IOnceReferenceCollectionSourceTemplate : ISourceTemplate
     {
@@ -19,6 +20,7 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
+    /// The source is a collection of nodes, each with a property that must be an assigned <see cref="OnceReference{Tref}"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TRef">Type of the reference in each item.</typeparam>
@@ -34,6 +36,7 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
+    /// The source is a collection of nodes, each with a property that must be an assigned <see cref="OnceReference{Tref}"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TRef">Type of the reference in each item.</typeparam>
@@ -46,7 +49,7 @@
         /// Initializes a new instance of the <see cref="OnceReferenceCollectionSourceTemplate{TSource, TRef}"/> class.
         /// </summary>
         /// <param name="path">Path to the source object.</param>
-        /// <param name="propertyName">The name of the property to check in each item of the list.</param>
+        /// <param name="propertyName">The name of the <see cref="OnceReference{TRef}"/> property to check in each item of the list.</param>
         /// <param name="startingPoint">The starting point for the path.</param>
         public OnceReferenceCollectionSourceTemplate(string path, string propertyName, ITemplatePathStart<TSource> startingPoint = null)
             : base(path, startingPoint)
@@ -70,8 +73,10 @@
         /// Checks if a node source is ready.
         /// </summary>
         /// <param name="node">The node for which the value is checked.</param>
-        public override bool IsReady(TSource node)
+        /// <param name="data">Optional data returned to the caller.</param>
+        public override bool IsReady(TSource node, out object data)
         {
+            data = null;
             bool Result = true;
             ReadyReferenceList.Clear();
 

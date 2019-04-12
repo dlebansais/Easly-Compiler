@@ -3,6 +3,7 @@ namespace CompilerNode
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -105,9 +106,27 @@ namespace CompilerNode
             {
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Types)
+            {
+                DiscreteTable = new HashtableEx<IFeatureName, IDiscrete>();
+                FeatureTable = new HashtableEx<IFeatureName, IFeatureInstance>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Discretes available in this type.
+        /// </summary>
+        public IHashtableEx<IFeatureName, IDiscrete> DiscreteTable { get; private set; } = new HashtableEx<IFeatureName, IDiscrete>();
+
+        /// <summary>
+        /// Features available in this type.
+        /// </summary>
+        public IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable { get; private set; } = new HashtableEx<IFeatureName, IFeatureInstance>();
         #endregion
     }
 }

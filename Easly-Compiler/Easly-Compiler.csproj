@@ -159,6 +159,8 @@
     <Compile Include="CompilerNodes\Name.cs" />
     <Compile Include="CompilerNodes\Node.cs" />
     <Compile Include="CompilerNodes\ObjectType\AnchoredType.cs" />
+    <Compile Include="CompilerNodes\ObjectType\ClassType.cs" />
+    <Compile Include="CompilerNodes\ObjectType\FormalGenericType.cs" />
     <Compile Include="CompilerNodes\ObjectType\FunctionType.cs" />
     <Compile Include="CompilerNodes\ObjectType\GenericType.cs" />
     <Compile Include="CompilerNodes\ObjectType\IndexerType.cs" />
@@ -195,8 +197,12 @@
     <Compile Include="Errors\ImportConsistency\ErrorNameAlreadyUsed.cs" />
     <Compile Include="Errors\ImportConsistency\ErrorNameUnchanged.cs" />
     <Compile Include="Errors\ImportConsistency\ErrorSourceRequired.cs" />
-    <Compile Include="Errors\Inference-01\ErrorInvalidManifestNumber.cs" />
-    <Compile Include="Errors\Inference-01\ErrorInvalidManifestChraracter.cs" />
+    <Compile Include="Errors\Inference\01-Identifiers\ErrorInvalidManifestNumber.cs" />
+    <Compile Include="Errors\Inference\01-Identifiers\ErrorInvalidManifestChraracter.cs" />
+    <Compile Include="Errors\Inference\02-Types\ErrorInvalidAnchoredType.cs" />
+    <Compile Include="Errors\Inference\02-Types\ErrorDiscreteNameConflict.cs" />
+    <Compile Include="Errors\Inference\02-Types\ErrorNotAnchor.cs" />
+    <Compile Include="Errors\Inference\02-Types\ErrorReservedName.cs" />
     <Compile Include="Errors\Replication\ErrorEmptyClassPath.cs" />
     <Compile Include="Errors\Replication\ErrorPatternAlreadyUsed.cs" />
     <Compile Include="Errors\ImportConsistency\ErrorIdentifierAlreadyListed.cs" />
@@ -213,8 +219,10 @@
     <Compile Include="CompiledFeature.cs" />
     <Compile Include="CompiledType.cs" />
     <Compile Include="Errors\StringValidity\ErrorStringValidity.cs" />
+    <Compile Include="FeatureInstance.cs" />
     <Compile Include="ImportedClass.cs" />
     <Compile Include="InferenceEngine\DestinationTemplate.cs" />
+    <Compile Include="InferenceEngine\DestinationTemplates\UnsealedTableDestinationTemplate.cs" />
     <Compile Include="InferenceEngine\DestinationTemplates\OnceReferenceDestinationTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplateSet.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\QualifiedNameRuleTemplate.cs" />
@@ -223,14 +231,21 @@
     <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\ManifestNumberTextRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\ManifestCharacterTextRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\IdentifierRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\AnchroredTypeRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllDiscretesRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\GenericRuleTemplate.cs" />
     <Compile Include="InferenceEngine\SourceTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplate.cs" />
     <Compile Include="InferenceEngine\InferenceEngine.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\OnceReferenceCollectionSourceTemplate.cs" />
+    <Compile Include="InferenceEngine\SourceTemplates\OnceReferenceSourceListTemplate.cs" />
+    <Compile Include="InferenceEngine\SourceTemplates\ResolvedPathSourceTemplate.cs" />
+    <Compile Include="InferenceEngine\SourceTemplates\SealedTableSourceTemplate.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\OnceReferenceSourceTemplate.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\StringSourceTemplate.cs" />
-    <Compile Include="InferenceEngine\TemplateNodeStart.cs" />
-    <Compile Include="InferenceEngine\TemplatePathStart.cs" />
+    <Compile Include="InferenceEngine\StartingPoints\TemplateClassStart.cs" />
+    <Compile Include="InferenceEngine\StartingPoints\TemplateNodeStart.cs" />
+    <Compile Include="InferenceEngine\StartingPoints\TemplatePathStart.cs" />
     <Compile Include="NameGuidPair.cs" />
     <Compile Include="NodeWithReplicatedBlocks.cs" />
     <Compile Include="ReplacePhase2MacroContext.cs" />
@@ -243,6 +258,8 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringValidation.cs" />
+    <Compile Include="FeatureName.cs" />
+    <Compile Include="TypeName.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

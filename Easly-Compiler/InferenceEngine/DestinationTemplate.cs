@@ -118,7 +118,7 @@
             if (path.Length == 0)
                 return;
 
-            int Index = path.IndexOf('.');
+            int Index = path.IndexOf(InferenceEngine.Dot);
             int ThisPathIndex = (Index >= 0) ? Index : path.Length;
             string PropertyName = path.Substring(0, ThisPathIndex);
             int NextPathIndex = (Index >= 0) ? Index + 1 : path.Length;

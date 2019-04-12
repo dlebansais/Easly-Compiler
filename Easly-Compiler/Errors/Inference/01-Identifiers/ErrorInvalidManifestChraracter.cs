@@ -6,7 +6,7 @@
     public interface IErrorInvalidManifestChraracter : IError
     {
         /// <summary>
-        /// The Invalid character.
+        /// The invalid character.
         /// </summary>
         string Character { get; }
     }
@@ -21,7 +21,7 @@
         /// Initializes a new instance of the <see cref="ErrorInvalidManifestChraracter"/> class.
         /// </summary>
         /// <param name="source">The error location.</param>
-        /// <param name="character">The Invalid character.</param>
+        /// <param name="character">The invalid character.</param>
         public ErrorInvalidManifestChraracter(ISource source, string character)
             : base(source)
         {
@@ -31,7 +31,7 @@
 
         #region Properties
         /// <summary>
-        /// The Invalid character.
+        /// The invalid character.
         /// </summary>
         public string Character { get; }
 

@@ -29,7 +29,7 @@
         /// <summary>
         /// The error message.
         /// </summary>
-        public override string Message { get { return $"Class has an empty class path."; } }
+        public override string Message { get { return "Class has an empty class path."; } }
         #endregion
     }
 }

@@ -1,7 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     /// <summary>
-    /// Duplicate import.
+    /// Double rename.
     /// </summary>
     public interface IErrorDoubleRename : IError
     {
@@ -17,7 +17,7 @@
     }
 
     /// <summary>
-    /// Duplicate import.
+    /// Double rename.
     /// </summary>
     internal class ErrorDoubleRename : Error, IErrorDoubleRename
     {

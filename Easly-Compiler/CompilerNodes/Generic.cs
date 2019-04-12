@@ -3,6 +3,7 @@ namespace CompilerNode
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -10,6 +11,22 @@ namespace CompilerNode
     /// </summary>
     public interface IGeneric : BaseNode.IGeneric, INode, INodeWithReplicatedBlocks, ISource
     {
+        #region Compiler
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Generic.ConstraintBlocks"/>.
+        /// </summary>
+        IList<IConstraint> ConstraintList { get; }
+
+        /// <summary>
+        /// The resolved, unique type name for this generic.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedGenericTypeName { get; }
+
+        /// <summary>
+        /// The corresponding resolved type.
+        /// </summary>
+        OnceReference<IFormalGenericType> ResolvedGenericType { get; }
+        #endregion
     }
 
     /// <summary>
@@ -105,9 +122,27 @@ namespace CompilerNode
             {
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Types)
+            {
+                ResolvedGenericTypeName = new OnceReference<ITypeName>();
+                ResolvedGenericType = new OnceReference<IFormalGenericType>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// The resolved, unique type name for this generic.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedGenericTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The corresponding resolved type.
+        /// </summary>
+        public OnceReference<IFormalGenericType> ResolvedGenericType { get; private set; } = new OnceReference<IFormalGenericType>();
         #endregion
     }
 }

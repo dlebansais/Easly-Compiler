@@ -2,6 +2,7 @@ namespace CompilerNode
 {
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -9,6 +10,15 @@ namespace CompilerNode
     /// </summary>
     public interface IAnchoredType : BaseNode.IAnchoredType, IObjectType
     {
+        /// <summary>
+        /// The name of the resolved type.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedTypeName { get; }
+
+        /// <summary>
+        /// The resolved type.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedType { get; }
     }
 
     /// <summary>
@@ -74,9 +84,27 @@ namespace CompilerNode
             {
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Types)
+            {
+                ResolvedTypeName = new OnceReference<ITypeName>();
+                ResolvedType = new OnceReference<ICompiledType>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// The name of the resolved type.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The resolved type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
     }
 }

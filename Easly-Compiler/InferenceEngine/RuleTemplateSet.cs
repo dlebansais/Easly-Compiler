@@ -30,5 +30,13 @@
             new NameRuleTemplate(),
             new QualifiedNameRuleTemplate(),
         };
+
+        /// <summary>
+        /// Rules for the types inference pass.
+        /// </summary>
+        public static IList<IRuleTemplate> Types { get; } = new List<IRuleTemplate>()
+        {
+            new GenericRuleTemplate(),
+        };
     }
 }

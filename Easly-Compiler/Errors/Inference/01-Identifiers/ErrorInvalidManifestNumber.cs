@@ -6,7 +6,7 @@
     public interface IErrorInvalidManifestNumber : IError
     {
         /// <summary>
-        /// The Invalid number.
+        /// The invalid number.
         /// </summary>
         string Number { get; }
     }
@@ -21,7 +21,7 @@
         /// Initializes a new instance of the <see cref="ErrorInvalidManifestNumber"/> class.
         /// </summary>
         /// <param name="source">The error location.</param>
-        /// <param name="number">The Invalid number.</param>
+        /// <param name="number">The invalid number.</param>
         public ErrorInvalidManifestNumber(ISource source, string number)
             : base(source)
         {
@@ -31,7 +31,7 @@
 
         #region Properties
         /// <summary>
-        /// The Invalid number.
+        /// The invalid number.
         /// </summary>
         public string Number { get; }
 

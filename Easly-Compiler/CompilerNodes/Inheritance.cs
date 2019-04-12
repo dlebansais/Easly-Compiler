@@ -3,6 +3,7 @@ namespace CompilerNode
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -34,6 +35,21 @@ namespace CompilerNode
         /// Replicated list from <see cref="BaseNode.Inheritance.ExportChangeBlocks"/>.
         /// </summary>
         IList<IExportChange> ExportChangeList { get; }
+
+        /// <summary>
+        /// Type name of the resolved inherited type.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedTypeName { get; }
+
+        /// <summary>
+        /// Resolved inherited type.
+        /// </summary>
+        OnceReference<IClassType> ResolvedType { get; }
+
+        /// <summary>
+        /// Table of association of discrete names to their instance.
+        /// </summary>
+        OnceReference<IHashtableEx<FeatureName, Discrete>> DiscreteTable { get; }
     }
 
     /// <summary>
@@ -165,9 +181,33 @@ namespace CompilerNode
             {
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Types)
+            {
+                ResolvedTypeName = new OnceReference<ITypeName>();
+                ResolvedType = new OnceReference<IClassType>();
+                DiscreteTable = new OnceReference<IHashtableEx<FeatureName, Discrete>>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Type name of the resolved inherited type.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// Resolved inherited type.
+        /// </summary>
+        public OnceReference<IClassType> ResolvedType { get; private set; } = new OnceReference<IClassType>();
+
+        /// <summary>
+        /// Table of association of discrete names to their instance.
+        /// </summary>
+        public OnceReference<IHashtableEx<FeatureName, Discrete>> DiscreteTable { get; private set; } = new OnceReference<IHashtableEx<FeatureName, Discrete>>();
         #endregion
     }
 }

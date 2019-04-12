@@ -11,6 +11,15 @@ namespace CompilerNode
     /// </summary>
     public interface IPropertyFeature : BaseNode.IPropertyFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IScopeHolder
     {
+        /// <summary>
+        /// The name of the resolved property type.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedEntityTypeName { get; }
+
+        /// <summary>
+        /// The resolved property type.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedEntityType { get; }
     }
 
     /// <summary>
@@ -106,6 +115,12 @@ namespace CompilerNode
             {
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Types)
+            {
+                ResolvedEntityTypeName = new OnceReference<ITypeName>();
+                ResolvedEntityType = new OnceReference<ICompiledType>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -126,6 +141,18 @@ namespace CompilerNode
         /// True if the feature contains precursor bodies in its overloads.
         /// </summary>
         public bool HasPrecursorBody { get { return (GetterBody.IsAssigned && GetterBody.Item is IPrecursorBody) || (SetterBody.IsAssigned && SetterBody.Item is IPrecursorBody); } }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// The name of the resolved property type.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedEntityTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The resolved property type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedEntityType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
     }
 }

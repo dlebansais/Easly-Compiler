@@ -2,6 +2,7 @@ namespace CompilerNode
 {
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -9,6 +10,15 @@ namespace CompilerNode
     /// </summary>
     public interface IConstantFeature : BaseNode.IConstantFeature, IFeatureWithName, ICompiledFeature
     {
+        /// <summary>
+        /// The name of the resolved constant type.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedEntityTypeName { get; }
+
+        /// <summary>
+        /// The resolved constant type.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedEntityType { get; }
     }
 
     /// <summary>
@@ -74,6 +84,12 @@ namespace CompilerNode
             {
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Types)
+            {
+                ResolvedEntityTypeName = new OnceReference<ITypeName>();
+                ResolvedEntityType = new OnceReference<ICompiledType>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -94,6 +110,18 @@ namespace CompilerNode
         /// True if the feature contains precursor bodies in its overloads.
         /// </summary>
         public bool HasPrecursorBody { get { return false; } }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// The name of the resolved constant type.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedEntityTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The resolved constant type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedEntityType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
     }
 }

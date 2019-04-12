@@ -1,10 +1,10 @@
 ﻿namespace EaslyCompiler
 {
-#if LATER
     using Easly;
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
+    /// The source is an assigned <see cref="OnceReference{Tref}"/>.
     /// </summary>
     public interface IOnceReferenceSourceTemplate : ISourceTemplate
     {
@@ -16,6 +16,7 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
+    /// The source is an assigned <see cref="OnceReference{Tref}"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TRef">Type of the reference.</typeparam>
@@ -31,6 +32,7 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
+    /// The source is an assigned <see cref="OnceReference{Tref}"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TRef">Type of the reference.</typeparam>
@@ -63,8 +65,10 @@
         /// Checks if a node source is ready.
         /// </summary>
         /// <param name="node">The node for which the value is checked.</param>
-        public override bool IsReady(TSource node)
+        /// <param name="data">Optional data returned to the caller.</param>
+        public override bool IsReady(TSource node, out object data)
         {
+            data = null;
             bool Result = false;
 
             OnceReference<TRef> Value = GetSourceObject(node);
@@ -78,5 +82,4 @@
         }
         #endregion
     }
-#endif
 }

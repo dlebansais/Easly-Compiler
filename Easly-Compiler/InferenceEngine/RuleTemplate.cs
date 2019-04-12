@@ -28,15 +28,17 @@
         /// Checks that no destination value has been set.
         /// </summary>
         /// <param name="source">The node instance to check.</param>
-        bool AreAllSourcesReady(ISource source);
+        /// <param name="dataList">Optional data returned by each source.</param>
+        bool AreAllSourcesReady(ISource source, out IDictionary<ISourceTemplate, object> dataList);
 
         /// <summary>
         /// Checks for errors before applying a rule.
         /// </summary>
         /// <param name="source">The node instance to check.</param>
+        /// <param name="dataList">Optional data collected during inspection of sources.</param>
         /// <param name="data">Private data to give to Apply() upon return.</param>
         /// <returns>True if an error occured.</returns>
-        bool CheckConsistency(ISource source, out object data);
+        bool CheckConsistency(ISource source, IDictionary<ISourceTemplate, object> dataList, out object data);
 
         /// <summary>
         /// Applies the rule.
@@ -75,15 +77,17 @@
         /// Checks that no destination value has been set.
         /// </summary>
         /// <param name="source">The node instance to check.</param>
-        bool AreAllSourcesReady(TSource source);
+        /// <param name="dataList">Optional data returned by each source.</param>
+        bool AreAllSourcesReady(TSource source, out IDictionary<ISourceTemplate, object> dataList);
 
         /// <summary>
         /// Checks for errors before applying a rule.
         /// </summary>
         /// <param name="source">The node instance to check.</param>
+        /// <param name="dataList">Optional data collected during inspection of sources.</param>
         /// <param name="data">Private data to give to Apply() upon return.</param>
         /// <returns>True if an error occured.</returns>
-        bool CheckConsistency(TSource source, out object data);
+        bool CheckConsistency(TSource source, IDictionary<ISourceTemplate, object> dataList, out object data);
 
         /// <summary>
         /// Applies the rule.
@@ -102,6 +106,13 @@
         where TSource : ISource
         where TRule : IRuleTemplate
     {
+        #region Constant
+        /// <summary>
+        /// The dot separator for property path.
+        /// </summary>
+        public static readonly string Dot = InferenceEngine.Dot;
+        #endregion
+
         #region Init
         /// <summary>
         /// Sources this rule is watching.
@@ -143,23 +154,34 @@
         /// Checks that no destination value has been set.
         /// </summary>
         /// <param name="source">The node instance to check.</param>
-        public virtual bool AreAllSourcesReady(TSource source)
+        /// <param name="dataList">Optional data returned by each source.</param>
+        public virtual bool AreAllSourcesReady(TSource source, out IDictionary<ISourceTemplate, object> dataList)
         {
-            return SourceTemplateList.TrueForAll((ISourceTemplate sourceTemplate) => { return sourceTemplate.IsReady(source); });
+            dataList = new Dictionary<ISourceTemplate, object>();
+            bool IsReady = true;
+
+            foreach (ISourceTemplate SourceTemplate in SourceTemplateList)
+            {
+                IsReady &= SourceTemplate.IsReady(source, out object data);
+                dataList.Add(SourceTemplate, data);
+            }
+
+            return IsReady;
         }
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public bool AreAllSourcesReady(ISource source) { return AreAllSourcesReady((TSource)source); }
+        public bool AreAllSourcesReady(ISource source, out IDictionary<ISourceTemplate, object> dataList) { return AreAllSourcesReady((TSource)source, out dataList); }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
         /// Checks for errors before applying a rule.
         /// </summary>
         /// <param name="source">The node instance to check.</param>
+        /// <param name="dataList">Optional data collected during inspection of sources.</param>
         /// <param name="data">Private data to give to Apply() upon return.</param>
         /// <returns>True if an error occured.</returns>
-        public abstract bool CheckConsistency(TSource source, out object data);
+        public abstract bool CheckConsistency(TSource source, IDictionary<ISourceTemplate, object> dataList, out object data);
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public bool CheckConsistency(ISource source, out object data) { return CheckConsistency((TSource)source, out data); }
+        public bool CheckConsistency(ISource source, IDictionary<ISourceTemplate, object> dataList, out object data) { return CheckConsistency((TSource)source, dataList, out data); }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
@@ -181,6 +203,16 @@
         protected virtual void AddSourceError(IError error)
         {
             ErrorList.Add(error);
+        }
+
+        /// <summary>
+        /// Adds several errors.
+        /// </summary>
+        /// <param name="errorList">The list of errors to add.</param>
+        protected virtual void AddSourceErrorList(IList<IError> errorList)
+        {
+            foreach (IError Error in ErrorList)
+                ErrorList.Add(Error);
         }
         #endregion
     }

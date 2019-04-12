@@ -3,6 +3,7 @@ namespace CompilerNode
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -10,6 +11,15 @@ namespace CompilerNode
     /// </summary>
     public interface IFunctionFeature : BaseNode.IFunctionFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature
     {
+        /// <summary>
+        /// The name of the resolved function type processing all overloads.
+        /// </summary>
+        OnceReference<ITypeName> MostCommonTypeName { get; }
+
+        /// <summary>
+        /// The resolved function type processing all overloads.
+        /// </summary>
+        OnceReference<ICompiledType> MostCommonType { get; }
     }
 
     /// <summary>
@@ -105,6 +115,12 @@ namespace CompilerNode
             {
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Types)
+            {
+                MostCommonTypeName = new OnceReference<ITypeName>();
+                MostCommonType = new OnceReference<ICompiledType>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -125,6 +141,18 @@ namespace CompilerNode
         /// True if the feature contains precursor bodies in its overloads.
         /// </summary>
         public bool HasPrecursorBody { get { return ((List<IQueryOverload>)OverloadList).Exists((IQueryOverload overload) => overload.HasPrecursorBody); } }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// The name of the resolved function type after processing all overloads.
+        /// </summary>
+        public OnceReference<ITypeName> MostCommonTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The resolved function type processing all overloads.
+        /// </summary>
+        public OnceReference<ICompiledType> MostCommonType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
     }
 }

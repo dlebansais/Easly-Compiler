@@ -53,6 +53,13 @@
     /// </summary>
     public class InferenceEngine : IInferenceEngine
     {
+        #region Constant
+        /// <summary>
+        /// The dot separator for property path.
+        /// </summary>
+        public static readonly string Dot = ".";
+        #endregion
+
         #region Init
         /// <summary>
         /// Initializes a new instance of the <see cref="InferenceEngine"/> class.
@@ -114,7 +121,7 @@
         /// <returns>True if there is no source left to process.</returns>
         public virtual bool Solve(IList<IError> errorList)
         {
-            bool Result;
+            bool Success;
             bool? LastTryResult = null;
 
             foreach (IRuleTemplate Rule in RuleTemplateList)
@@ -128,7 +135,7 @@
                 {
                     foreach (IError Error in TryErrorList)
                         errorList.Add(Error);
-                    Result = TryResult;
+                    Success = TryResult;
                     break;
                 }
 
@@ -148,7 +155,8 @@
                 Retries--;
             }
 
-            return Result;
+            Debug.Assert(Success || errorList.Count > 0);
+            return Success;
         }
 
         /// <summary>
@@ -161,30 +169,31 @@
             IList<IClass> ResolvedClassList = new List<IClass>();
             IList<IClass> UnresolvedClassList = new List<IClass>(ClassList);
             IList<ISource> UnresolvedSourceList = new List<ISource>(SourceList);
-            bool Result = true;
+            bool Success = true;
 
             Debug.Assert(IsNoDestinationSet());
 
             bool Exit = false;
-            while (UnresolvedClassList.Count > 0 && errorList.Count == 0 && !Exit)
+            while (UnresolvedClassList.Count > 0 && Success && !Exit)
             {
                 Exit = true;
-                InferTemplates(ref Exit, UnresolvedSourceList, errorList);
-
-                MoveResolvedClasses(ref Exit, UnresolvedClassList, ResolvedClassList, UnresolvedSourceList);
+                Success = InferTemplates(ref Exit, UnresolvedSourceList, errorList);
+                if (Success)
+                    MoveResolvedClasses(ref Exit, UnresolvedClassList, ResolvedClassList, UnresolvedSourceList);
             }
 
-            if (IsCycleErrorChecked && UnresolvedClassList.Count > 0 && errorList.Count == 0)
+            if (Success && IsCycleErrorChecked && UnresolvedClassList.Count > 0)
             {
                 IList<string> NameList = new List<string>();
                 foreach (IClass Class in UnresolvedClassList)
                     NameList.Add(Class.ValidClassName);
 
                 errorList.Add(new ErrorCyclicDependency(NameList));
-                Result = false;
+                Success = false;
             }
 
-            return Result;
+            Debug.Assert(Success || errorList.Count > 0);
+            return Success;
         }
 
         /// <summary></summary>
@@ -207,8 +216,10 @@
         }
 
         /// <summary></summary>
-        protected virtual void InferTemplates(ref bool exit, IList<ISource> unresolvedSourceList, IList<IError> errorList)
+        protected virtual bool InferTemplates(ref bool exit, IList<ISource> unresolvedSourceList, IList<IError> errorList)
         {
+            bool Success = true;
+
             foreach (IRuleTemplate Rule in RuleTemplateList)
             {
                 foreach (ISource Source in unresolvedSourceList)
@@ -220,12 +231,12 @@
 
                     if (IsNoDestinationSet)
                     {
-                        bool AreAllSourcesReady = Rule.AreAllSourcesReady(Source);
+                        bool AreAllSourcesReady = Rule.AreAllSourcesReady(Source, out IDictionary<ISourceTemplate, object> DataList);
                         bool NoError = Rule.ErrorList.Count == 0;
 
                         if (AreAllSourcesReady && NoError)
                         {
-                            if (Rule.CheckConsistency(Source, out object data))
+                            if (Rule.CheckConsistency(Source, DataList, out object data))
                             {
                                 Debug.Assert(Rule.ErrorList.Count == 0);
                                 Rule.Apply(Source, data);
@@ -236,11 +247,15 @@
                                 Debug.Assert(Rule.ErrorList.Count > 0);
                                 foreach (IError Error in Rule.ErrorList)
                                     errorList.Add(Error);
+
+                                Success = false;
                             }
                         }
                     }
                 }
             }
+
+            return Success;
         }
 
         /// <summary></summary>
