@@ -201,6 +201,7 @@
     <Compile Include="Errors\ImportConsistency\ErrorSourceRequired.cs" />
     <Compile Include="Errors\Inference\01-Identifiers\ErrorInvalidManifestNumber.cs" />
     <Compile Include="Errors\Inference\01-Identifiers\ErrorInvalidManifestChraracter.cs" />
+    <Compile Include="Errors\Inference\02-Types\ErrorCloneableClass.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorFieldMismatchConformance.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorGetterSetterConformance.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorExceptionConformance.cs" />
@@ -251,6 +252,10 @@
     <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\ManifestNumberTextRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\ManifestCharacterTextRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\IdentifierRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllInheritancesRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllInheritancesInstancedRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllImportedClassRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllGenericsRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllFeaturesRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllExportsRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\AnchroredTypeRuleTemplate.cs" />
@@ -266,6 +271,7 @@
     <Compile Include="InferenceEngine\SourceTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplate.cs" />
     <Compile Include="InferenceEngine\InferenceEngine.cs" />
+    <Compile Include="InferenceEngine\SourceTemplates\OnceReferenceTableSourceTemplate.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\OnceReferenceCollectionSourceTemplate.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\ResolvedPathSourceTemplate.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\SealedTableSourceTemplate.cs" />

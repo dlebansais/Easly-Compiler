@@ -25,7 +25,7 @@
         bool IsNoDestinationSet(ISource source);
 
         /// <summary>
-        /// Checks that no destination value has been set.
+        /// Checks that all sources are ready.
         /// </summary>
         /// <param name="source">The node instance to check.</param>
         /// <param name="dataList">Optional data returned by each source.</param>
@@ -46,6 +46,12 @@
         /// <param name="source">The node instance to modify.</param>
         /// <param name="data">Private data from CheckConsistency().</param>
         void Apply(ISource source, object data);
+
+        /// <summary>
+        /// Checks that all destination values have been set.
+        /// </summary>
+        /// <param name="source">The node instance to check.</param>
+        bool AreAllDestinationsSet(ISource source);
     }
 
     /// <summary>
@@ -74,7 +80,7 @@
         bool IsNoDestinationSet(TSource source);
 
         /// <summary>
-        /// Checks that no destination value has been set.
+        /// Checks that all sources are ready.
         /// </summary>
         /// <param name="source">The node instance to check.</param>
         /// <param name="dataList">Optional data returned by each source.</param>
@@ -95,6 +101,12 @@
         /// <param name="source">The node instance to modify.</param>
         /// <param name="data">Private data from CheckConsistency().</param>
         void Apply(TSource source, object data);
+
+        /// <summary>
+        /// Checks that all destination values have been set.
+        /// </summary>
+        /// <param name="source">The node instance to check.</param>
+        bool AreAllDestinationsSet(TSource source);
     }
 
     /// <summary>
@@ -151,7 +163,7 @@
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
-        /// Checks that no destination value has been set.
+        /// Checks that all sources are ready.
         /// </summary>
         /// <param name="source">The node instance to check.</param>
         /// <param name="dataList">Optional data returned by each source.</param>
@@ -194,6 +206,23 @@
         public void Apply(ISource source, object data) { Apply((TSource)source, data); }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         #endregion
+
+        /// <summary>
+        /// Checks that all destinations values have been set.
+        /// </summary>
+        /// <param name="source">The node instance to check.</param>
+        public virtual bool AreAllDestinationsSet(TSource source)
+        {
+            bool IsSet = true;
+
+            foreach (IDestinationTemplate DestinationTemplate in DestinationTemplateList)
+                IsSet &= DestinationTemplate.IsSet(source);
+
+            return IsSet;
+        }
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        public bool AreAllDestinationsSet(ISource source) { return AreAllDestinationsSet((TSource)source); }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         #region Implementation
         /// <summary>

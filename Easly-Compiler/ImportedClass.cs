@@ -2,6 +2,7 @@
 {
     using System.Diagnostics;
     using CompilerNode;
+    using Easly;
 
     /// <summary>
     /// Specifications of an imported class in a library.
@@ -37,6 +38,16 @@
         /// True if <see cref="ImportLocation"/> is valid.
         /// </summary>
         bool IsLocationAssigned { get; }
+
+        /// <summary>
+        /// The resolved class type name.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedClassTypeName { get; }
+
+        /// <summary>
+        /// The resolved class type.
+        /// </summary>
+        OnceReference<ClassType> ResolvedClassType { get; }
 
         /// <summary>
         /// Sets the parent source.
@@ -148,6 +159,16 @@
         /// True if <see cref="ImportLocation"/> is valid.
         /// </summary>
         public bool IsLocationAssigned { get; private set; }
+
+        /// <summary>
+        /// The resolved class type name.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedClassTypeName { get; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The resolved class type.
+        /// </summary>
+        public OnceReference<ClassType> ResolvedClassType { get; } = new OnceReference<ClassType>();
         #endregion
 
         #region Client Interface

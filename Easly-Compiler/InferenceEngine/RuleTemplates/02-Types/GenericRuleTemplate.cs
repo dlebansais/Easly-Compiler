@@ -29,7 +29,6 @@
             {
                 new OnceReferenceDestinationTemplate<IGeneric, ITypeName>(nameof(IGeneric.ResolvedGenericTypeName)),
                 new OnceReferenceDestinationTemplate<IGeneric, IFormalGenericType>(nameof(IGeneric.ResolvedGenericType)),
-                new UnsealedTableDestinationTemplate<IGeneric, string, ICompiledType>(nameof(IClass.LocalGenericTable), TemplateClassStart<IGeneric>.Default),
             };
         }
         #endregion

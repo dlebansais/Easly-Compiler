@@ -1022,40 +1022,37 @@
                 {
                     bool IsHandled = false;
 
-                    if (Source is IIdentifier AsIdentifier)
+                    switch (Source)
                     {
-                        IsHandled = true;
-                        IsResolved = AsIdentifier.ValidText.IsAssigned;
-                    }
+                        case IIdentifier AsIdentifier:
+                            IsHandled = true;
+                            IsResolved = AsIdentifier.ValidText.IsAssigned;
+                            break;
 
-                    else if (Source is IManifestCharacterExpression AsManifestCharacterExpression)
-                    {
-                        IsHandled = true;
-                        IsResolved = AsManifestCharacterExpression.ValidText.IsAssigned;
-                    }
+                        case IManifestCharacterExpression AsManifestCharacterExpression:
+                            IsHandled = true;
+                            IsResolved = AsManifestCharacterExpression.ValidText.IsAssigned;
+                            break;
 
-                    else if (Source is IManifestNumberExpression AsManifestNumberExpression)
-                    {
-                        IsHandled = true;
-                        IsResolved = AsManifestNumberExpression.ValidText.IsAssigned;
-                    }
+                        case IManifestNumberExpression AsManifestNumberExpression:
+                            IsHandled = true;
+                            IsResolved = AsManifestNumberExpression.ValidText.IsAssigned;
+                            break;
 
-                    else if (Source is IManifestStringExpression AsManifestStringExpression)
-                    {
-                        IsHandled = true;
-                        IsResolved = AsManifestStringExpression.ValidText.IsAssigned;
-                    }
+                        case IManifestStringExpression AsManifestStringExpression:
+                            IsHandled = true;
+                            IsResolved = AsManifestStringExpression.ValidText.IsAssigned;
+                            break;
 
-                    else if (Source is IName AsName)
-                    {
-                        IsHandled = true;
-                        IsResolved = AsName.ValidText.IsAssigned;
-                    }
+                        case IName AsName:
+                            IsHandled = true;
+                            IsResolved = AsName.ValidText.IsAssigned;
+                            break;
 
-                    else if (Source is IQualifiedName AsQualifiedName)
-                    {
-                        IsHandled = true;
-                        IsResolved = AsQualifiedName.ValidPath.IsAssigned;
+                        case IQualifiedName AsQualifiedName:
+                            IsHandled = true;
+                            IsResolved = AsQualifiedName.ValidPath.IsAssigned;
+                            break;
                     }
 
                     Debug.Assert(IsHandled);
@@ -1119,10 +1116,16 @@
                 {
                     bool IsHandled = false;
 
-                    if (Source is IGeneric AsGeneric)
+                    switch (Source)
                     {
-                        IsHandled = true;
-                        IsResolved = AsGeneric.ResolvedGenericTypeName.IsAssigned && AsGeneric.ResolvedGenericType.IsAssigned;
+                        case IGeneric AsGeneric:
+                            IsHandled = true;
+                            IsResolved = AsGeneric.ResolvedGenericTypeName.IsAssigned && AsGeneric.ResolvedGenericType.IsAssigned;
+                            break;
+
+                        case IAnchoredType AsAnchoredType:
+                            IsHandled = true;
+                            break;
                     }
 
                     Debug.Assert(IsHandled);

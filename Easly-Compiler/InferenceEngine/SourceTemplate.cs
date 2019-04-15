@@ -50,6 +50,17 @@
         where TSource : ISource
     {
         #region Init
+        static SourceTemplate()
+        {
+            string BaseTypeName = typeof(BaseNode.INode).FullName;
+            BaseNamespace = BaseTypeName.Substring(0, BaseTypeName.IndexOf('.') + 1);
+            string CompilerTypeName = typeof(CompilerNode.INode).FullName;
+            CompilerNamespace = CompilerTypeName.Substring(0, CompilerTypeName.IndexOf('.') + 1);
+        }
+
+        private static string BaseNamespace;
+        private static string CompilerNamespace;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SourceTemplate{TSource, TValue}"/> class.
         /// </summary>
@@ -124,6 +135,14 @@
             propertyPath.Add(Property);
 
             Type NestedType = Property.PropertyType;
+            string NestedTypeName = NestedType.FullName;
+            string CompilerNestedTypeName = NestedTypeName.Replace(BaseNamespace, CompilerNamespace);
+            if (CompilerNestedTypeName != NestedTypeName && !NestedType.IsGenericType)
+            {
+                NestedType = typeof(CompilerNode.INode).Assembly.GetType(CompilerNestedTypeName);
+                Debug.Assert(NestedType != null);
+            }
+
             BuildPropertyPath(NestedType, NextPath, propertyPath);
         }
 

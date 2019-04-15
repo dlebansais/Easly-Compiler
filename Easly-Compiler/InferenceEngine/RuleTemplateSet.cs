@@ -39,6 +39,12 @@
             new AllDiscretesRuleTemplate(),
             new AllExportsRuleTemplate(),
             new AllFeaturesRuleTemplate(),
+            new AllGenericsRuleTemplate(),
+            new AllImportedClassRuleTemplate(),
+            new AllInheritancesInstancedRuleTemplate(),
+            new AllInheritancesRuleTemplate(),
+
+            new AnchroredTypeRuleTemplate(),
             new GenericRuleTemplate(),
         };
     }

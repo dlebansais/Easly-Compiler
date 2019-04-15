@@ -57,6 +57,16 @@ namespace CompilerNode
         OnceReference<ICompiledType> ResolvedParentType { get; }
 
         /// <summary>
+        /// Name of the resolved parent class type.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedClassParentTypeName { get; }
+
+        /// <summary>
+        /// The resolved parent class type.
+        /// </summary>
+        OnceReference<IClassType> ResolvedClassParentType { get; }
+
+        /// <summary>
         /// Table of association of discrete names to their instance.
         /// </summary>
         OnceReference<IHashtableEx<IFeatureName, IDiscrete>> DiscreteTable { get; }
@@ -207,6 +217,8 @@ namespace CompilerNode
                 ResolvedType = new OnceReference<IClassType>();
                 ResolvedParentTypeName = new OnceReference<TypeName>();
                 ResolvedParentType = new OnceReference<ICompiledType>();
+                ResolvedClassParentTypeName = new OnceReference<ITypeName>();
+                ResolvedClassParentType = new OnceReference<IClassType>();
                 DiscreteTable = new OnceReference<IHashtableEx<IFeatureName, IDiscrete>>();
                 FeatureTable = new OnceReference<IHashtableEx<IFeatureName, IFeatureInstance>>();
                 ExportTable = new OnceReference<IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>>();
@@ -237,6 +249,16 @@ namespace CompilerNode
         /// The resolved parent type.
         /// </summary>
         public OnceReference<ICompiledType> ResolvedParentType { get; private set; } = new OnceReference<ICompiledType>();
+
+        /// <summary>
+        /// Name of the resolved parent class type.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedClassParentTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The resolved parent class type.
+        /// </summary>
+        public OnceReference<IClassType> ResolvedClassParentType { get; private set; } = new OnceReference<IClassType>();
 
         /// <summary>
         /// Table of association of discrete names to their instance.

@@ -240,6 +240,8 @@
                             {
                                 Debug.Assert(Rule.ErrorList.Count == 0);
                                 Rule.Apply(Source, data);
+                                Debug.Assert(Rule.AreAllDestinationsSet(Source));
+
                                 exit = false;
                             }
                             else

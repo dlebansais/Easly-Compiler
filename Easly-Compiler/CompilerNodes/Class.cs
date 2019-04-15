@@ -131,9 +131,14 @@ namespace CompilerNode
         bool CheckClassConsistency(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IList<IError> errorList);
 
         /// <summary>
-        /// The table of resolved generic arguments for this class.
+        /// The table of resolved generics arguments for this class.
         /// </summary>
         IHashtableEx<string, ICompiledType> LocalGenericTable { get; }
+
+        /// <summary>
+        /// Table of all resolved generics in this class, direct or inherited.
+        /// </summary>
+        IHashtableEx<string, ICompiledType> GenericTable { get; }
 
         /// <summary>
         /// Table of resolved discretes defined in this class.
@@ -164,6 +169,16 @@ namespace CompilerNode
         /// Table of all resolved features in this class, direct or inherited.
         /// </summary>
         IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable { get; }
+
+        /// <summary>
+        /// Table of inherited types by their class type.
+        /// </summary>
+        IHashtableEx<IClassType, IObjectType> InheritedClassTypeTable { get; }
+
+        /// <summary>
+        /// Table of resolved namespaces defined in this class.
+        /// </summary>
+        IHashtableEx<string, IHashtableEx> LocalNamespaceTable { get; }
 
         /// <summary>
         /// Table of resolved exports defined in this class.
@@ -204,6 +219,11 @@ namespace CompilerNode
         /// Table of inherited types.
         /// </summary>
         IHashtableEx<ITypeName, ICompiledType> InheritanceTable { get; }
+
+        /// <summary>
+        /// The resolved table of imported classes.
+        /// </summary>
+        IHashtableEx<ITypeName, IClassType> ResolvedImportedClassTable { get; }
     }
 
     /// <summary>
@@ -459,12 +479,15 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 LocalGenericTable = new HashtableEx<string, ICompiledType>();
+                GenericTable = new HashtableEx<string, ICompiledType>();
                 LocalDiscreteTable = new HashtableEx<IFeatureName, IDiscrete>();
                 DiscreteTable = new HashtableEx<IFeatureName, IDiscrete>();
                 LocalTypedefTable = new HashtableEx<IFeatureName, ITypedefType>();
                 TypedefTable = new HashtableEx<IFeatureName, ITypedefType>();
                 LocalFeatureTable = new HashtableEx<IFeatureName, IFeatureInstance>();
                 FeatureTable = new HashtableEx<IFeatureName, IFeatureInstance>();
+                InheritedClassTypeTable = new HashtableEx<IClassType, IObjectType>();
+                LocalNamespaceTable = new HashtableEx<string, IHashtableEx>();
                 LocalExportTable = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
                 ExportTable = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
                 ResolvedClassTypeName = new OnceReference<ITypeName>();
@@ -473,6 +496,7 @@ namespace CompilerNode
                 TypeTable = new HashtableEx<ITypeName, ICompiledType>();
                 ClassGroup = new StableReference<SingleClassGroup>();
                 InheritanceTable = new HashtableEx<ITypeName, ICompiledType>();
+                ResolvedImportedClassTable = new HashtableEx<ITypeName, IClassType>();
                 IsHandled = true;
             }
 
@@ -746,9 +770,14 @@ namespace CompilerNode
 
         #region Types
         /// <summary>
-        /// The table of resolved generic arguments for this class.
+        /// The table of resolved generics arguments for this class.
         /// </summary>
         public IHashtableEx<string, ICompiledType> LocalGenericTable { get; private set; } = new HashtableEx<string, ICompiledType>();
+
+        /// <summary>
+        /// Table of all resolved generics in this class, direct or inherited.
+        /// </summary>
+        public IHashtableEx<string, ICompiledType> GenericTable { get; private set; } = new HashtableEx<string, ICompiledType>();
 
         /// <summary>
         /// Table of resolved discretes defined in this class.
@@ -779,6 +808,16 @@ namespace CompilerNode
         /// Table of all resolved features in this class, direct or inherited.
         /// </summary>
         public IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable { get; private set; } = new HashtableEx<IFeatureName, IFeatureInstance>();
+
+        /// <summary>
+        /// Table of inherited types by their class type.
+        /// </summary>
+        public IHashtableEx<IClassType, IObjectType> InheritedClassTypeTable { get; private set; } = new HashtableEx<IClassType, IObjectType>();
+
+        /// <summary>
+        /// Table of resolved namespaces defined in this class.
+        /// </summary>
+        public IHashtableEx<string, IHashtableEx> LocalNamespaceTable { get; private set; } = new HashtableEx<string, IHashtableEx>();
 
         /// <summary>
         /// Table of resolved exports defined in this class.
@@ -819,6 +858,11 @@ namespace CompilerNode
         /// Table of inherited types.
         /// </summary>
         public IHashtableEx<ITypeName, ICompiledType> InheritanceTable { get; private set; } = new HashtableEx<ITypeName, ICompiledType>();
+
+        /// <summary>
+        /// The resolved table of imported classes.
+        /// </summary>
+        public IHashtableEx<ITypeName, IClassType> ResolvedImportedClassTable { get; private set; } = new HashtableEx<ITypeName, IClassType>();
         #endregion
 
         #region Debugging
