@@ -24,8 +24,8 @@
             {
                 new OnceReferenceSourceTemplate<IClass, IClassType>(nameof(IClass.ResolvedClassType)),
                 new SealedTableSourceTemplate<IClass, IFeatureName, IDiscrete>(nameof(IClass.LocalDiscreteTable)),
-                new OnceReferenceCollectionSourceTemplate<IClass, IClassType>(nameof(IClass.InheritanceList), nameof(IInheritance.ResolvedType)),
-                new OnceReferenceCollectionSourceTemplate<IClass, IHashtableEx<IFeatureName, IDiscrete>>(nameof(IClass.InheritanceList), nameof(IInheritance.DiscreteTable)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance>(nameof(IClass.InheritanceList), nameof(IInheritance.ResolvedType)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance>(nameof(IClass.InheritanceList), nameof(IInheritance.DiscreteTable)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()

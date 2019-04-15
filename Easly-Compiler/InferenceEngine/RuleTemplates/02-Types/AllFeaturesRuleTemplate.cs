@@ -24,9 +24,9 @@
             {
                 new OnceReferenceSourceTemplate<IClass, IClassType>(nameof(IClass.ResolvedClassType)),
                 new SealedTableSourceTemplate<IClass, IFeatureName, IFeatureInstance>(nameof(IClass.LocalFeatureTable)),
-                new OnceReferenceCollectionSourceTemplate<IClass, ICompiledFeature>(nameof(IClass.FeatureList), nameof(IFeature.ResolvedFeature)),
-                new OnceReferenceCollectionSourceTemplate<IClass, IClassType>(nameof(IClass.InheritanceList), nameof(IInheritance.ResolvedType)),
-                new OnceReferenceCollectionSourceTemplate<IClass, IHashtableEx<IFeatureName, IFeatureInstance>>(nameof(IClass.InheritanceList), nameof(IInheritance.FeatureTable)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IFeature>(nameof(IClass.FeatureList), nameof(IFeature.ResolvedFeature)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance>(nameof(IClass.InheritanceList), nameof(IInheritance.ResolvedType)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance>(nameof(IClass.InheritanceList), nameof(IInheritance.FeatureTable)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()

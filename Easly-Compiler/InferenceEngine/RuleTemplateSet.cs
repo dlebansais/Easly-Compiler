@@ -36,6 +36,9 @@
         /// </summary>
         public static IList<IRuleTemplate> Types { get; } = new List<IRuleTemplate>()
         {
+            new AllDiscretesRuleTemplate(),
+            new AllExportsRuleTemplate(),
+            new AllFeaturesRuleTemplate(),
             new GenericRuleTemplate(),
         };
     }
