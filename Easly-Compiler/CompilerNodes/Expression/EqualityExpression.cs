@@ -82,5 +82,24 @@
             Debug.Assert(IsHandled);
         }
         #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="expression1">The first expression.</param>
+        /// <param name="expression2">The second expression.</param>
+        public static bool IsExpressionEqual(IEqualityExpression expression1, IEqualityExpression expression2)
+        {
+            bool Result = true;
+
+            Result &= Expression.IsExpressionEqual((IExpression)expression1.LeftExpression, (IExpression)expression2.LeftExpression);
+            Result &= expression1.Comparison == expression2.Comparison;
+            Result &= expression1.Equality != expression2.Equality;
+            Result &= Expression.IsExpressionEqual((IExpression)expression1.RightExpression, (IExpression)expression2.RightExpression);
+
+            return Result;
+        }
+        #endregion
     }
 }

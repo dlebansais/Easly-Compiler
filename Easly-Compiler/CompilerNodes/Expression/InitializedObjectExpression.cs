@@ -10,6 +10,10 @@
     /// </summary>
     public interface IInitializedObjectExpression : BaseNode.IInitializedObjectExpression, IExpression, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.InitializedObjectExpression.AssignmentBlocks"/>.
+        /// </summary>
+        IList<IAssignmentArgument> AssignmentList { get; }
     }
 
     /// <summary>
@@ -111,6 +115,30 @@
             }
 
             Debug.Assert(IsHandled);
+        }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="expression1">The first expression.</param>
+        /// <param name="expression2">The second expression.</param>
+        public static bool IsExpressionEqual(IInitializedObjectExpression expression1, IInitializedObjectExpression expression2)
+        {
+            bool Result = true;
+
+            Result &= expression1.AssignmentList.Count == expression2.AssignmentList.Count;
+
+            for (int i = 0; i < expression1.AssignmentList.Count && i < expression2.AssignmentList.Count; i++)
+            {
+                IAssignmentArgument InitializationAssignment1 = expression1.AssignmentList[i];
+                IAssignmentArgument InitializationAssignment2 = expression2.AssignmentList[i];
+
+                Result &= AssignmentArgument.IsAssignmentArgumentEqual(InitializationAssignment1, InitializationAssignment2);
+            }
+
+            return Result;
         }
         #endregion
     }

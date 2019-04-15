@@ -47,9 +47,29 @@ namespace CompilerNode
         OnceReference<IClassType> ResolvedType { get; }
 
         /// <summary>
+        /// Name of the resolved parent type.
+        /// </summary>
+        OnceReference<TypeName> ResolvedParentTypeName { get; }
+
+        /// <summary>
+        /// The resolved parent type.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedParentType { get; }
+
+        /// <summary>
         /// Table of association of discrete names to their instance.
         /// </summary>
-        OnceReference<IHashtableEx<FeatureName, Discrete>> DiscreteTable { get; }
+        OnceReference<IHashtableEx<IFeatureName, IDiscrete>> DiscreteTable { get; }
+
+        /// <summary>
+        /// Table of association of feature names to their instance.
+        /// </summary>
+        OnceReference<IHashtableEx<IFeatureName, IFeatureInstance>> FeatureTable { get; }
+
+        /// <summary>
+        /// Table of association of export names to their instance.
+        /// </summary>
+        OnceReference<IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>> ExportTable { get; }
     }
 
     /// <summary>
@@ -185,7 +205,11 @@ namespace CompilerNode
             {
                 ResolvedTypeName = new OnceReference<ITypeName>();
                 ResolvedType = new OnceReference<IClassType>();
-                DiscreteTable = new OnceReference<IHashtableEx<FeatureName, Discrete>>();
+                ResolvedParentTypeName = new OnceReference<TypeName>();
+                ResolvedParentType = new OnceReference<ICompiledType>();
+                DiscreteTable = new OnceReference<IHashtableEx<IFeatureName, IDiscrete>>();
+                FeatureTable = new OnceReference<IHashtableEx<IFeatureName, IFeatureInstance>>();
+                ExportTable = new OnceReference<IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>>();
                 IsHandled = true;
             }
 
@@ -205,9 +229,29 @@ namespace CompilerNode
         public OnceReference<IClassType> ResolvedType { get; private set; } = new OnceReference<IClassType>();
 
         /// <summary>
+        /// Name of the resolved parent type.
+        /// </summary>
+        public OnceReference<TypeName> ResolvedParentTypeName { get; private set; } = new OnceReference<TypeName>();
+
+        /// <summary>
+        /// The resolved parent type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedParentType { get; private set; } = new OnceReference<ICompiledType>();
+
+        /// <summary>
         /// Table of association of discrete names to their instance.
         /// </summary>
-        public OnceReference<IHashtableEx<FeatureName, Discrete>> DiscreteTable { get; private set; } = new OnceReference<IHashtableEx<FeatureName, Discrete>>();
+        public OnceReference<IHashtableEx<IFeatureName, IDiscrete>> DiscreteTable { get; private set; } = new OnceReference<IHashtableEx<IFeatureName, IDiscrete>>();
+
+        /// <summary>
+        /// Table of association of feature names to their instance.
+        /// </summary>
+        public OnceReference<IHashtableEx<IFeatureName, IFeatureInstance>> FeatureTable { get; private set; } = new OnceReference<IHashtableEx<IFeatureName, IFeatureInstance>>();
+
+        /// <summary>
+        /// Table of association of export names to their instance.
+        /// </summary>
+        public OnceReference<IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>> ExportTable { get; private set; } = new OnceReference<IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>>();
         #endregion
     }
 }

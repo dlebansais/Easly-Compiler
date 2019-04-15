@@ -10,6 +10,10 @@ namespace CompilerNode
     /// </summary>
     public interface IIndexQueryExpression : BaseNode.IIndexQueryExpression, IExpression, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.IndexQueryExpression.ArgumentBlocks"/>.
+        /// </summary>
+        IList<IArgument> ArgumentList { get; }
     }
 
     /// <summary>
@@ -111,6 +115,23 @@ namespace CompilerNode
             }
 
             Debug.Assert(IsHandled);
+        }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="expression1">The first expression.</param>
+        /// <param name="expression2">The second expression.</param>
+        public static bool IsExpressionEqual(IIndexQueryExpression expression1, IIndexQueryExpression expression2)
+        {
+            bool Result = true;
+
+            Result &= Expression.IsExpressionEqual((IExpression)expression1.IndexedExpression, (IExpression)expression2.IndexedExpression);
+            Result &= Argument.IsArgumentListEqual(expression1.ArgumentList, expression2.ArgumentList);
+
+            return Result;
         }
         #endregion
     }

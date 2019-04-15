@@ -3,6 +3,7 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -10,6 +11,35 @@
     /// </summary>
     public interface ICommandOverloadType : BaseNode.ICommandOverloadType, INode, INodeWithReplicatedBlocks, ISource
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.CommandOverloadType.ParameterBlocks"/>.
+        /// </summary>
+        IList<IEntityDeclaration> ParameterList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.CommandOverloadType.RequireBlocks"/>.
+        /// </summary>
+        IList<IAssertion> RequireList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.CommandOverloadType.EnsureBlocks"/>.
+        /// </summary>
+        IList<IAssertion> EnsureList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.CommandOverloadType.ExceptionIdentifierBlocks"/>.
+        /// </summary>
+        IList<IIdentifier> ExceptionIdentifierList { get; }
+
+        /// <summary>
+        /// Type name associated to this overload.
+        /// </summary>
+        string TypeName { get; }
+
+        /// <summary>
+        /// Table of parameters for this overload.
+        /// </summary>
+        ListTableEx<IParameter> ParameterTable { get; }
     }
 
     /// <summary>
@@ -17,6 +47,33 @@
     /// </summary>
     public class CommandOverloadType : BaseNode.CommandOverloadType, ICommandOverloadType
     {
+        #region Init
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommandOverloadType"/> class.
+        /// This constructor is required for deserialization.
+        /// </summary>
+        public CommandOverloadType()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommandOverloadType"/> class.
+        /// </summary>
+        /// <param name="parameterList">The list of parameters.</param>
+        /// <param name="parameterEnd">The closed or open status.</param>
+        /// <param name="requireList">The list of require assertions.</param>
+        /// <param name="ensureList">The list of ensure assertions.</param>
+        /// <param name="exceptionIdentifierList">The list of exceptions this overload can throw.</param>
+        public CommandOverloadType(IList<IEntityDeclaration> parameterList, BaseNode.ParameterEndStatus parameterEnd, IList<IAssertion> requireList, IList<IAssertion> ensureList, IList<IIdentifier> exceptionIdentifierList)
+        {
+            ParameterList = parameterList;
+            ParameterEnd = parameterEnd;
+            RequireList = requireList;
+            EnsureList = ensureList;
+            ExceptionIdentifierList = exceptionIdentifierList;
+        }
+        #endregion
+
         #region Implementation of INodeWithReplicatedBlocks
         /// <summary>
         /// Replicated list from <see cref="BaseNode.CommandOverloadType.ParameterBlocks"/>.
@@ -134,10 +191,97 @@
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
+                TypeName = null;
+                ParameterTable = new ListTableEx<IParameter>();
                 IsHandled = true;
             }
 
             Debug.Assert(IsHandled);
+        }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Type name associated to this overload.
+        /// </summary>
+        public string TypeName { get; private set; }
+
+        /// <summary>
+        /// Table of parameters for this overload.
+        /// </summary>
+        public ListTableEx<IParameter> ParameterTable { get; private set; } = new ListTableEx<IParameter>();
+
+        /// <summary>
+        /// Finds or creates an overload type with the corresponding parameters.
+        /// </summary>
+        /// <param name="instancingClassType">The type attempting to find the overload type.</param>
+        /// <param name="instancedOverload">The new overload type upon return if not found.</param>
+        /// <param name="errorList">The list of errors.</param>
+        public static void InstanciateCommandOverloadType(IClassType instancingClassType, ref ICommandOverloadType instancedOverload, IList<IError> errorList)
+        {
+            bool IsNewInstance = false;
+
+            IList<IEntityDeclaration> InstancedParameterList = new List<IEntityDeclaration>();
+            foreach (IEntityDeclaration Parameter in instancedOverload.ParameterList)
+            {
+                ITypeName InstancedParameterTypeName = Parameter.ValidEntity.Item.ResolvedFeatureTypeName.Item;
+                ICompiledType InstancedParameterType = Parameter.ValidEntity.Item.ResolvedFeatureType.Item;
+                InstancedParameterType.InstanciateType(instancingClassType, ref InstancedParameterTypeName, ref InstancedParameterType, errorList);
+
+                IEntityDeclaration InstancedParameter = new EntityDeclaration(InstancedParameterTypeName, InstancedParameterType);
+                IName ParameterName = (IName)Parameter.EntityName;
+
+                IScopeAttributeFeature NewEntity;
+                if (Parameter.DefaultValue.IsAssigned)
+                    NewEntity = new ScopeAttributeFeature(Parameter, ParameterName.ValidText.Item, InstancedParameterTypeName, InstancedParameterType, (IExpression)Parameter.DefaultValue.Item, errorList);
+                else
+                    NewEntity = new ScopeAttributeFeature(Parameter, ParameterName.ValidText.Item, InstancedParameterTypeName, InstancedParameterType, errorList);
+                InstancedParameter.ValidEntity.Item = NewEntity;
+
+                InstancedParameterList.Add(InstancedParameter);
+
+                if (InstancedParameterType != Parameter.ValidEntity.Item.ResolvedFeatureType.Item)
+                    IsNewInstance = true;
+            }
+
+            if (IsNewInstance)
+            {
+                ICommandOverloadType NewOverloadInstance = new CommandOverloadType(InstancedParameterList, instancedOverload.ParameterEnd, instancedOverload.RequireList, instancedOverload.EnsureList, instancedOverload.ExceptionIdentifierList);
+
+                foreach (IEntityDeclaration Item in InstancedParameterList)
+                {
+                    string ValidName = Item.ValidEntity.Item.ValidFeatureName.Item.Name;
+                    NewOverloadInstance.ParameterTable.Add(new Parameter(ValidName, Item.ValidEntity.Item));
+                }
+
+                instancedOverload = NewOverloadInstance;
+            }
+        }
+
+        /// <summary>
+        /// Compares two overloads.
+        /// </summary>
+        /// <param name="overload1">The first overload.</param>
+        /// <param name="overload2">The second overload.</param>
+        public static bool CommandOverloadsHaveIdenticalSignature(ICommandOverloadType overload1, ICommandOverloadType overload2)
+        {
+            if (overload1.ParameterList.Count != overload2.ParameterList.Count || overload1.ParameterEnd != overload2.ParameterEnd)
+                return false;
+
+            for (int i = 0; i < overload1.ParameterList.Count && i < overload2.ParameterList.Count; i++)
+                if (!ObjectType.TypesHaveIdenticalSignature(overload1.ParameterList[i].ResolvedEntityType.Item, overload2.ParameterList[i].ResolvedEntityType.Item))
+                    return false;
+
+            if (!Assertion.IsAssertionListEqual(overload1.RequireList, overload2.RequireList))
+                return false;
+
+            if (!Assertion.IsAssertionListEqual(overload1.EnsureList, overload2.EnsureList))
+                return false;
+
+            if (!ExceptionHandler.IdenticalExceptionSignature(overload1.ExceptionIdentifierList, overload2.ExceptionIdentifierList))
+                return false;
+
+            return true;
         }
         #endregion
     }

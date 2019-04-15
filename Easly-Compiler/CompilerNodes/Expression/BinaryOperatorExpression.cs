@@ -82,5 +82,23 @@ namespace CompilerNode
             Debug.Assert(IsHandled);
         }
         #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="expression1">The first expression.</param>
+        /// <param name="expression2">The second expression.</param>
+        public static bool IsExpressionEqual(IBinaryOperatorExpression expression1, IBinaryOperatorExpression expression2)
+        {
+            bool Result = true;
+
+            Result &= Expression.IsExpressionEqual((IExpression)expression1.LeftExpression, (IExpression)expression2.LeftExpression);
+            Result &= expression1.Operator.Text == expression2.Operator.Text;
+            Result &= Expression.IsExpressionEqual((IExpression)expression1.RightExpression, (IExpression)expression2.RightExpression);
+
+            return Result;
+        }
+        #endregion
     }
 }

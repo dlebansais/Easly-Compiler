@@ -10,6 +10,10 @@ namespace CompilerNode
     /// </summary>
     public interface IPrecursorExpression : BaseNode.IPrecursorExpression, IExpression, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.PrecursorExpression.ArgumentBlocks"/>.
+        /// </summary>
+        IList<IArgument> ArgumentList { get; }
     }
 
     /// <summary>
@@ -111,6 +115,34 @@ namespace CompilerNode
             }
 
             Debug.Assert(IsHandled);
+        }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="expression1">The first expression.</param>
+        /// <param name="expression2">The second expression.</param>
+        public static bool IsExpressionEqual(IPrecursorExpression expression1, IPrecursorExpression expression2)
+        {
+            bool Result = true;
+
+            if (expression1.AncestorType.IsAssigned && expression2.AncestorType.IsAssigned)
+            {
+                IObjectType AncestorType1 = (IObjectType)expression1.AncestorType;
+                IObjectType AncestorType2 = (IObjectType)expression2.AncestorType;
+
+                Debug.Assert(AncestorType1.ResolvedType.IsAssigned);
+                Debug.Assert(AncestorType2.ResolvedType.IsAssigned);
+
+                Result &= AncestorType1.ResolvedType.Item == AncestorType2.ResolvedType.Item;
+            }
+
+            Result &= expression1.AncestorType.IsAssigned == expression2.AncestorType.IsAssigned;
+            Result &= Argument.IsArgumentListEqual(expression1.ArgumentList, expression2.ArgumentList);
+
+            return Result;
         }
         #endregion
     }

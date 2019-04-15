@@ -11,6 +11,20 @@ namespace CompilerNode
     /// </summary>
     public interface IFunctionType : BaseNode.IFunctionType, IObjectType, INodeWithReplicatedBlocks, ICompiledType
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.FunctionType.OverloadBlocks"/>.
+        /// </summary>
+        IList<IQueryOverloadType> OverloadList { get; }
+
+        /// <summary>
+        /// Resolved type name for the base type.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedBaseTypeName { get; }
+
+        /// <summary>
+        /// Resolved type for the base type.
+        /// </summary>
+        OnceReference<IClassType> ResolvedBaseType { get; }
     }
 
     /// <summary>
@@ -18,6 +32,29 @@ namespace CompilerNode
     /// </summary>
     public class FunctionType : BaseNode.FunctionType, IFunctionType
     {
+        #region Init
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FunctionType"/> class.
+        /// This constructor is required for deserialization.
+        /// </summary>
+        public FunctionType()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FunctionType"/> class.
+        /// </summary>
+        /// <param name="baseTypeName">Name of the resolved base type.</param>
+        /// <param name="baseType">The resolved base type.</param>
+        /// <param name="overloadList">The list of resolved overloads.</param>
+        public FunctionType(ITypeName baseTypeName, IClassType baseType, IList<IQueryOverloadType> overloadList)
+        {
+            ResolvedBaseTypeName.Item = baseTypeName;
+            ResolvedBaseType.Item = baseType;
+            OverloadList = overloadList;
+        }
+        #endregion
+
         #region Implementation of INodeWithReplicatedBlocks
         /// <summary>
         /// Replicated list from <see cref="BaseNode.FunctionType.OverloadBlocks"/>.
@@ -108,8 +145,15 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
+                ResolvedBaseTypeName = new OnceReference<ITypeName>();
+                ResolvedBaseType = new OnceReference<IClassType>();
+                ResolvedTypeName = new OnceReference<ITypeName>();
+                ResolvedType = new OnceReference<ICompiledType>();
                 DiscreteTable = new HashtableEx<IFeatureName, IDiscrete>();
                 FeatureTable = new HashtableEx<IFeatureName, IFeatureInstance>();
+                ExportTable = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
+                ConformanceTable = new HashtableEx<ITypeName, ICompiledType>();
+                InstancingRecordList = new List<TypeInstancingRecord>();
                 IsHandled = true;
             }
 
@@ -119,6 +163,30 @@ namespace CompilerNode
 
         #region Compiler
         /// <summary>
+        /// Resolved type name for the base type.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedBaseTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// Resolved type for the base type.
+        /// </summary>
+        public OnceReference<IClassType> ResolvedBaseType { get; private set; } = new OnceReference<IClassType>();
+        #endregion
+
+        #region Implementation of IObjectType
+        /// <summary>
+        /// The resolved type name.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The resolved type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedType { get; private set; } = new OnceReference<ICompiledType>();
+        #endregion
+
+        #region Implementation of ICompiledType
+        /// <summary>
         /// Discretes available in this type.
         /// </summary>
         public IHashtableEx<IFeatureName, IDiscrete> DiscreteTable { get; private set; } = new HashtableEx<IFeatureName, IDiscrete>();
@@ -127,6 +195,268 @@ namespace CompilerNode
         /// Features available in this type.
         /// </summary>
         public IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable { get; private set; } = new HashtableEx<IFeatureName, IFeatureInstance>();
+
+        /// <summary>
+        /// Exports available in this type.
+        /// </summary>
+        public IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> ExportTable { get; private set; } = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
+
+        /// <summary>
+        /// Table of conforming types.
+        /// </summary>
+        public IHashtableEx<ITypeName, ICompiledType> ConformanceTable { get; private set; } = new HashtableEx<ITypeName, ICompiledType>();
+
+        /// <summary>
+        /// List of type instancing.
+        /// </summary>
+        public IList<TypeInstancingRecord> InstancingRecordList { get; private set; } = new List<TypeInstancingRecord>();
+
+        /// <summary>
+        /// Type friendly name, unique.
+        /// </summary>
+        public string TypeFriendlyName
+        {
+            get
+            {
+                string Result = BaseType != null ? ((IObjectType)BaseType).ResolvedTypeName.Item.Name : ResolvedBaseType.Item.TypeFriendlyName;
+
+                for (int i = 0; i < OverloadList.Count; i++)
+                {
+                    IQueryOverloadType Item = OverloadList[i];
+                    Result += $".query#{i}{Item.TypeName}";
+                }
+
+                return Result;
+            }
+        }
+
+        /// <summary>
+        /// True if the type is a reference type.
+        /// </summary>
+        public bool IsReference
+        {
+            get { return false; }
+        }
+
+        /// <summary>
+        /// True if the type is a value type.
+        /// </summary>
+        public bool IsValue
+        {
+            get { return true; }
+        }
+
+        /// <summary>
+        /// Creates an instance of a class type, or reuse an existing instance.
+        /// </summary>
+        /// <param name="instancingClassType">The class type to instanciate.</param>
+        /// <param name="resolvedTypeName">The proposed type instance name.</param>
+        /// <param name="resolvedType">The proposed type instance.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        public void InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType, IList<IError> errorList)
+        {
+            bool IsNewInstance = false;
+
+            ITypeName InstancedBaseTypeName = ResolvedBaseTypeName.Item;
+            ICompiledType InstancedBaseType = ResolvedBaseType.Item;
+            InstancedBaseType.InstanciateType(instancingClassType, ref InstancedBaseTypeName, ref InstancedBaseType, errorList);
+
+            if (InstancedBaseType != ResolvedBaseType.Item)
+                IsNewInstance = true;
+
+            IList<IQueryOverloadType> InstancedOverloadList = new List<IQueryOverloadType>();
+            foreach (IQueryOverloadType Overload in OverloadList)
+            {
+                IQueryOverloadType InstancedOverload = Overload;
+                QueryOverloadType.InstanciateQueryOverloadType(instancingClassType, ref InstancedOverload, errorList);
+
+                InstancedOverloadList.Add(InstancedOverload);
+
+                if (InstancedOverload != Overload)
+                    IsNewInstance = true;
+            }
+
+            if (IsNewInstance)
+                ResolveType(instancingClassType.BaseClass.TypeTable, InstancedBaseTypeName, InstancedBaseType, InstancedOverloadList, out resolvedTypeName, out resolvedType);
+        }
+        #endregion
+
+        #region Locate type
+        /// <summary>
+        /// Locates, or creates, a resolved function type.
+        /// </summary>
+        /// <param name="typeTable">The table of existing types.</param>
+        /// <param name="baseTypeName">Name of the resolved base type.</param>
+        /// <param name="baseType">The resolved base type.</param>
+        /// <param name="overloadList">The list of resolved overloads.</param>
+        /// <param name="resolvedTypeName">The type name upon return.</param>
+        /// <param name="resolvedType">The type upon return.</param>
+        public static void ResolveType(IHashtableEx<ITypeName, ICompiledType> typeTable, ITypeName baseTypeName, ICompiledType baseType, IList<IQueryOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        {
+            if (!TypeTableContaining(typeTable, baseType, overloadList, out resolvedTypeName, out resolvedType))
+            {
+                BuildType(baseTypeName, baseType, overloadList, out resolvedTypeName, out resolvedType);
+                typeTable.Add(resolvedTypeName, resolvedType);
+            }
+        }
+
+        /// <summary>
+        /// Checks if a matching function type exists in a type table.
+        /// </summary>
+        /// <param name="typeTable">The table of existing types.</param>
+        /// <param name="baseType">The resolved base type.</param>
+        /// <param name="overloadList">The list of resolved overloads.</param>
+        /// <param name="resolvedTypeName">The type name upon return.</param>
+        /// <param name="resolvedType">The type upon return.</param>
+        public static bool TypeTableContaining(IHashtableEx<ITypeName, ICompiledType> typeTable, ICompiledType baseType, IList<IQueryOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        {
+            resolvedTypeName = null;
+            resolvedType = null;
+            bool Result = false;
+
+            foreach (KeyValuePair<ITypeName, ICompiledType> Entry in typeTable)
+                if (Entry.Value is IFunctionType AsFunctionType)
+                    if (AsFunctionType.ResolvedBaseType.Item == baseType && AsFunctionType.OverloadList.Count == overloadList.Count)
+                    {
+                        bool AllOverloadsEqual = true;
+                        foreach (IQueryOverloadType OverloadItem in overloadList)
+                            if (!IsQueryOverloadMatching(typeTable, OverloadItem, AsFunctionType.OverloadList))
+                            {
+                                AllOverloadsEqual = false;
+                                break;
+                            }
+
+                        if (AllOverloadsEqual)
+                        {
+                            resolvedTypeName = Entry.Key;
+                            resolvedType = AsFunctionType;
+                            Result = true;
+                        }
+                    }
+
+            return Result;
+        }
+
+        /// <summary>
+        /// Checks if a matching function and overload exists in a type table.
+        /// </summary>
+        /// <param name="typeTable">The table of existing types.</param>
+        /// <param name="overload">The overload to check.</param>
+        /// <param name="overloadList">The list of other overloads in the candidate function type.</param>
+        public static bool IsQueryOverloadMatching(IHashtableEx<ITypeName, ICompiledType> typeTable, IQueryOverloadType overload, IList<IQueryOverloadType> overloadList)
+        {
+            foreach (IQueryOverloadType Item in overloadList)
+            {
+                if (overload.ParameterList.Count != Item.ParameterList.Count || overload.ResultList.Count != Item.ResultList.Count)
+                    continue;
+
+                bool AllParametersMatch = true;
+                for (int i = 0; i < overload.ParameterList.Count; i++)
+                {
+                    IScopeAttributeFeature OverloadAttribute = overload.ParameterList[i].ValidEntity.Item;
+                    IScopeAttributeFeature ItemAttribute = Item.ParameterList[i].ValidEntity.Item;
+
+                    if (OverloadAttribute.ResolvedFeatureType.Item != ItemAttribute.ResolvedFeatureType.Item)
+                    {
+                        AllParametersMatch = false;
+                        break;
+                    }
+                }
+                if (!AllParametersMatch)
+                    continue;
+
+                bool AllResultsMatch = true;
+                for (int i = 0; i < overload.ResultList.Count; i++)
+                {
+                    IScopeAttributeFeature OverloadAttribute = overload.ResultList[i].ValidEntity.Item;
+                    IScopeAttributeFeature ItemAttribute = Item.ResultList[i].ValidEntity.Item;
+
+                    if (OverloadAttribute.ResolvedFeatureType.Item != ItemAttribute.ResolvedFeatureType.Item)
+                    {
+                        AllResultsMatch = false;
+                        break;
+                    }
+                }
+                if (!AllResultsMatch)
+                    continue;
+
+                if (overload.ParameterEnd != Item.ParameterEnd)
+                    continue;
+
+                if (!Assertion.IsAssertionListEqual(overload.RequireList, Item.RequireList))
+                    continue;
+
+                if (!Assertion.IsAssertionListEqual(overload.EnsureList, Item.EnsureList))
+                    continue;
+
+                if (!ExceptionHandler.IdenticalExceptionSignature(overload.ExceptionIdentifierList, Item.ExceptionIdentifierList))
+                    continue;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Creates a function type with resolved arguments.
+        /// </summary>
+        /// <param name="baseTypeName">Name of the resolved base type.</param>
+        /// <param name="baseType">The resolved base type.</param>
+        /// <param name="overloadList">The list of resolved overloads.</param>
+        /// <param name="resolvedTypeName">The type name upon return.</param>
+        /// <param name="resolvedType">The type upon return.</param>
+        public static void BuildType(ITypeName baseTypeName, ICompiledType baseType, IList<IQueryOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        {
+            FunctionType ResolvedFunctionType = new FunctionType(baseTypeName, (IClassType)baseType, overloadList);
+
+            foreach (IQueryOverloadType Item in overloadList)
+                foreach (IEntityDeclaration Entity in Item.ResultList)
+                {
+                    ITypeName EntityTypeName = Entity.ValidEntity.Item.ResolvedFeatureTypeName.Item;
+                    ICompiledType EntityType = Entity.ValidEntity.Item.ResolvedFeatureType.Item;
+                    string EntityName = Entity.ValidEntity.Item.ValidFeatureName.Item.Name;
+
+                    IExpressionType ResultExpressionType = new ExpressionType(EntityTypeName, EntityType, EntityName);
+                    Item.Result.Add(ResultExpressionType);
+                }
+
+            resolvedTypeName = new TypeName(ResolvedFunctionType.TypeFriendlyName);
+            resolvedType = ResolvedFunctionType;
+        }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Compares two types.
+        /// </summary>
+        /// <param name="type1">The first type.</param>
+        /// <param name="type2">The second type.</param>
+        public static bool TypesHaveIdenticalSignature(IFunctionType type1, IFunctionType type2)
+        {
+            if (!ObjectType.TypesHaveIdenticalSignature(type1.ResolvedBaseType.Item, type2.ResolvedBaseType.Item))
+                return false;
+
+            if (type1.OverloadList.Count != type2.OverloadList.Count)
+                return false;
+
+            foreach (IQueryOverloadType Overload1 in type1.OverloadList)
+            {
+                bool MatchingOverload = false;
+
+                foreach (IQueryOverloadType Overload2 in type2.OverloadList)
+                    if (QueryOverloadType.QueryOverloadsHaveIdenticalSignature(Overload1, Overload2))
+                    {
+                        MatchingOverload = true;
+                        break;
+                    }
+
+                if (!MatchingOverload)
+                    return false;
+            }
+
+            return true;
+        }
         #endregion
     }
 }

@@ -83,5 +83,21 @@ namespace CompilerNode
             Debug.Assert(IsHandled);
         }
         #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Compares two positional arguments.
+        /// </summary>
+        /// <param name="argument1">The first argument.</param>
+        /// <param name="argument2">The second argument.</param>
+        public static bool IsPositionalArgumentEqual(IPositionalArgument argument1, IPositionalArgument argument2)
+        {
+            bool Result = true;
+
+            Result &= Expression.IsExpressionEqual((IExpression)argument1.Source, (IExpression)argument2.Source);
+
+            return Result;
+        }
+        #endregion
     }
 }

@@ -94,6 +94,27 @@
         /// The valid value of <see cref="BaseNode.IQualifiedName.Path"/>.
         /// </summary>
         public OnceReference<IList<IIdentifier>> ValidPath { get; private set; } = new OnceReference<IList<IIdentifier>>();
+
+        /// <summary>
+        /// Compares two qualified names.
+        /// </summary>
+        /// <param name="qualifiedName1">The first qualified name.</param>
+        /// <param name="qualifiedName2">The second qualified name.</param>
+        public static bool IsQualifiedNameEqual(IQualifiedName qualifiedName1, IQualifiedName qualifiedName2)
+        {
+            bool Result = true;
+
+            Result &= qualifiedName1.Path.Count == qualifiedName2.Path.Count;
+
+            for (int i = 0; i < qualifiedName1.Path.Count && i < qualifiedName2.Path.Count; i++)
+            {
+                IIdentifier Path1 = (IIdentifier)qualifiedName1.Path[i];
+                IIdentifier Path2 = (IIdentifier)qualifiedName2.Path[i];
+                Result &= Path1.ValidText.Item != Path2.ValidText.Item;
+            }
+
+            return Result;
+        }
         #endregion
 
         #region Debugging

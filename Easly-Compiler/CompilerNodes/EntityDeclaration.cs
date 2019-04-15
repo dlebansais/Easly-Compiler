@@ -2,6 +2,7 @@ namespace CompilerNode
 {
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -9,6 +10,30 @@ namespace CompilerNode
     /// </summary>
     public interface IEntityDeclaration : BaseNode.IEntityDeclaration, INode, ISource
     {
+        /// <summary>
+        /// The resolved type name of this declaration.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedEntityTypeName { get; }
+
+        /// <summary>
+        /// The resolved type of this declaration.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedEntityType { get; }
+
+        /// <summary>
+        /// The entity name as an atribute feature name.
+        /// </summary>
+        OnceReference<IFeatureName> ValidEntityName { get; }
+
+        /// <summary>
+        /// The entity instance as an atribute feature instance.
+        /// </summary>
+        OnceReference<IFeatureInstance> ValidEntityInstance { get; }
+
+        /// <summary>
+        /// The entity as an atribute feature.
+        /// </summary>
+        OnceReference<IScopeAttributeFeature> ValidEntity { get; }
     }
 
     /// <summary>
@@ -16,6 +41,27 @@ namespace CompilerNode
     /// </summary>
     public class EntityDeclaration : BaseNode.EntityDeclaration, IEntityDeclaration
     {
+        #region Init
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EntityDeclaration"/> class.
+        /// This constructor is required for deserialization.
+        /// </summary>
+        public EntityDeclaration()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EntityDeclaration"/> class.
+        /// </summary>
+        /// <param name="resolvedTypeName">The resolved entity type name.</param>
+        /// <param name="resolvedType">The resolved entity type.</param>
+        public EntityDeclaration(ITypeName resolvedTypeName, ICompiledType resolvedType)
+        {
+            ResolvedEntityTypeName.Item = resolvedTypeName;
+            ResolvedEntityType.Item = resolvedType;
+        }
+        #endregion
+
         #region Implementation of ISource
         /// <summary>
         /// The parent node, null if root.
@@ -76,11 +122,43 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
+                ResolvedEntityTypeName = new OnceReference<ITypeName>();
+                ResolvedEntityType = new OnceReference<ICompiledType>();
+                ValidEntityName = new OnceReference<IFeatureName>();
+                ValidEntityInstance = new OnceReference<IFeatureInstance>();
+                ValidEntity = new OnceReference<IScopeAttributeFeature>();
                 IsHandled = true;
             }
 
             Debug.Assert(IsHandled);
         }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// The resolved type name of this declaration.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedEntityTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The resolved type of this declaration.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedEntityType { get; private set; } = new OnceReference<ICompiledType>();
+
+        /// <summary>
+        /// The entity name as an atribute feature name.
+        /// </summary>
+        public OnceReference<IFeatureName> ValidEntityName { get; private set; } = new OnceReference<IFeatureName>();
+
+        /// <summary>
+        /// The entity instance as an atribute feature instance.
+        /// </summary>
+        public OnceReference<IFeatureInstance> ValidEntityInstance { get; private set; } = new OnceReference<IFeatureInstance>();
+
+        /// <summary>
+        /// The entity as an atribute feature.
+        /// </summary>
+        public OnceReference<IScopeAttributeFeature> ValidEntity { get; private set; } = new OnceReference<IScopeAttributeFeature>();
         #endregion
     }
 }

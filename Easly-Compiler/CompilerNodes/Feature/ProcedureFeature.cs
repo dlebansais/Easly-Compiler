@@ -3,6 +3,7 @@ namespace CompilerNode
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -107,11 +108,27 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
+                ResolvedFeatureTypeName = new OnceReference<ITypeName>();
+                ResolvedFeatureType = new OnceReference<ICompiledType>();
+                ValidFeatureName = new OnceReference<IFeatureName>();
+                ResolvedFeature = new OnceReference<ICompiledFeature>();
                 IsHandled = true;
             }
 
             Debug.Assert(IsHandled);
         }
+        #endregion
+
+        #region Implementation of IFeature
+        /// <summary>
+        /// The resolved feature name.
+        /// </summary>
+        public OnceReference<IFeatureName> ValidFeatureName { get; private set; } = new OnceReference<IFeatureName>();
+
+        /// <summary>
+        /// The resolved feature.
+        /// </summary>
+        public OnceReference<ICompiledFeature> ResolvedFeature { get; private set; } = new OnceReference<ICompiledFeature>();
         #endregion
 
         #region Implementation of ICompiledFeature
@@ -129,6 +146,16 @@ namespace CompilerNode
         /// True if the feature contains precursor bodies in its overloads.
         /// </summary>
         public bool HasPrecursorBody { get { return ((List<ICommandOverload>)OverloadList).Exists((ICommandOverload overload) => overload.HasPrecursorBody); } }
+
+        /// <summary>
+        /// Name of the associated type.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedFeatureTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// Associated type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedFeatureType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
     }
 }

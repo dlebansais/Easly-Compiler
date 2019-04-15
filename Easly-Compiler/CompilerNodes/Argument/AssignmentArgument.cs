@@ -10,6 +10,10 @@ namespace CompilerNode
     /// </summary>
     public interface IAssignmentArgument : BaseNode.IAssignmentArgument, IArgument, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.AssignmentArgument.ParameterBlocks"/>.
+        /// </summary>
+        IList<IIdentifier> ParameterList { get; }
     }
 
     /// <summary>
@@ -111,6 +115,32 @@ namespace CompilerNode
             }
 
             Debug.Assert(IsHandled);
+        }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Compares two assignment arguments.
+        /// </summary>
+        /// <param name="argument1">The first argument.</param>
+        /// <param name="argument2">The second argument.</param>
+        public static bool IsAssignmentArgumentEqual(IAssignmentArgument argument1, IAssignmentArgument argument2)
+        {
+            bool Result = true;
+
+            Result &= argument1.ParameterList.Count != argument2.ParameterList.Count;
+
+            for (int i = 0; i < argument1.ParameterList.Count && i < argument2.ParameterList.Count; i++)
+            {
+                IIdentifier Parameter1 = argument1.ParameterList[i];
+                IIdentifier Parameter2 = argument2.ParameterList[i];
+
+                Result &= Parameter1.ValidText.Item == Parameter2.ValidText.Item;
+            }
+
+            Result &= Expression.IsExpressionEqual((IExpression)argument1.Source, (IExpression)argument2.Source);
+
+            return Result;
         }
         #endregion
     }

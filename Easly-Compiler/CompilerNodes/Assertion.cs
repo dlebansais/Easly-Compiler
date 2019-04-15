@@ -82,5 +82,44 @@ namespace CompilerNode
             Debug.Assert(IsHandled);
         }
         #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Checks that two lists of assertions are equal.
+        /// </summary>
+        /// <param name="list1">The first list.</param>
+        /// <param name="list2">The second list.</param>
+        public static bool IsAssertionListEqual(IList<IAssertion> list1, IList<IAssertion> list2)
+        {
+            if (list1.Count != list2.Count)
+                return false;
+
+            foreach (IAssertion Assertion1 in list1)
+            {
+                bool Found = false;
+                foreach (IAssertion Assertion2 in list2)
+                    if (IsAssertionEqual(Assertion1, Assertion2))
+                    {
+                        Found = true;
+                        break;
+                    }
+
+                if (!Found)
+                    return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Checks that two assertions are equal.
+        /// </summary>
+        /// <param name="assertion1">The first assertion.</param>
+        /// <param name="assertion2">The second assertion.</param>
+        public static bool IsAssertionEqual(IAssertion assertion1, IAssertion assertion2)
+        {
+            return Expression.IsExpressionEqual((IExpression)assertion1.BooleanExpression, (IExpression)assertion2.BooleanExpression);
+        }
+        #endregion
     }
 }

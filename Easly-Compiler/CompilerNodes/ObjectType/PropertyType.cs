@@ -11,6 +11,45 @@
     /// </summary>
     public interface IPropertyType : BaseNode.IPropertyType, IObjectType, INodeWithReplicatedBlocks, ICompiledType
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.PropertyType.GetEnsureBlocks"/>.
+        /// </summary>
+        IList<IAssertion> GetEnsureList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.PropertyType.GetExceptionIdentifierBlocks"/>.
+        /// </summary>
+        IList<IIdentifier> GetExceptionIdentifierList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.PropertyType.SetRequireBlocks"/>.
+        /// </summary>
+        IList<IAssertion> SetRequireList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.PropertyType.SetExceptionIdentifierBlocks"/>.
+        /// </summary>
+        IList<IIdentifier> SetExceptionIdentifierList { get; }
+
+        /// <summary>
+        /// The type name of the resolved base type.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedBaseTypeName { get; }
+
+        /// <summary>
+        /// The type name of the resolved base type.
+        /// </summary>
+        OnceReference<IClassType> ResolvedBaseType { get; }
+
+        /// <summary>
+        /// The type name of the resolved result type.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedEntityTypeName { get; }
+
+        /// <summary>
+        /// The type of the resolved result type.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedEntityType { get; }
     }
 
     /// <summary>
@@ -18,6 +57,41 @@
     /// </summary>
     public class PropertyType : BaseNode.PropertyType, IPropertyType
     {
+        #region Init
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PropertyType"/> class.
+        /// This constructor is required for deserialization.
+        /// </summary>
+        public PropertyType()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PropertyType"/> class.
+        /// </summary>
+        /// <param name="baseTypeName">The type name of the resolved base type.</param>
+        /// <param name="baseType">The type of the resolved base type.</param>
+        /// <param name="entityTypeName">The type name of the resolved result type.</param>
+        /// <param name="entityType">The type of the resolved result type.</param>
+        /// <param name="propertyKind">The type of the property.</param>
+        /// <param name="getEnsureList">The list of ensure assertions for the getter.</param>
+        /// <param name="getExceptionIdentifierList">The list of known exceptions thrown for the getter.</param>
+        /// <param name="setRequireList">The list of require assertions for the setter.</param>
+        /// <param name="setExceptionIdentifierList">The list of known exceptions thrown for the setter.</param>
+        public PropertyType(ITypeName baseTypeName, IClassType baseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType propertyKind, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IIdentifier> setExceptionIdentifierList)
+        {
+            ResolvedBaseTypeName.Item = baseTypeName;
+            ResolvedBaseType.Item = baseType;
+            ResolvedEntityTypeName.Item = entityTypeName;
+            ResolvedEntityType.Item = entityType;
+            PropertyKind = PropertyKind;
+            GetEnsureList = GetEnsureList;
+            GetExceptionIdentifierList = GetExceptionIdentifierList;
+            SetRequireList = SetRequireList;
+            SetExceptionIdentifierList = SetExceptionIdentifierList;
+        }
+        #endregion
+
         #region Implementation of INodeWithReplicatedBlocks
         /// <summary>
         /// Replicated list from <see cref="BaseNode.PropertyType.GetEnsureBlocks"/>.
@@ -135,8 +209,17 @@
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
+                ResolvedBaseTypeName = new OnceReference<ITypeName>();
+                ResolvedBaseType = new OnceReference<IClassType>();
+                ResolvedEntityTypeName = new OnceReference<ITypeName>();
+                ResolvedEntityType = new OnceReference<ICompiledType>();
+                ResolvedTypeName = new OnceReference<ITypeName>();
+                ResolvedType = new OnceReference<ICompiledType>();
                 DiscreteTable = new HashtableEx<IFeatureName, IDiscrete>();
                 FeatureTable = new HashtableEx<IFeatureName, IFeatureInstance>();
+                ExportTable = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
+                ConformanceTable = new HashtableEx<ITypeName, ICompiledType>();
+                InstancingRecordList = new List<TypeInstancingRecord>();
                 IsHandled = true;
             }
 
@@ -144,7 +227,39 @@
         }
         #endregion
 
-        #region Compiler
+        #region Implementation of IObjectType
+        /// <summary>
+        /// The type name of the resolved base type.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedBaseTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The type name of the resolved base type.
+        /// </summary>
+        public OnceReference<IClassType> ResolvedBaseType { get; private set; } = new OnceReference<IClassType>();
+
+        /// <summary>
+        /// The type name of the resolved result type.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedEntityTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The type of the resolved result type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedEntityType { get; private set; } = new OnceReference<ICompiledType>();
+
+        /// <summary>
+        /// The resolved type name.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The resolved type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedType { get; private set; } = new OnceReference<ICompiledType>();
+        #endregion
+
+        #region Implementation of ICompiledType
         /// <summary>
         /// Discretes available in this type.
         /// </summary>
@@ -154,6 +269,232 @@
         /// Features available in this type.
         /// </summary>
         public IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable { get; private set; } = new HashtableEx<IFeatureName, IFeatureInstance>();
+
+        /// <summary>
+        /// Exports available in this type.
+        /// </summary>
+        public IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> ExportTable { get; private set; } = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
+
+        /// <summary>
+        /// Table of conforming types.
+        /// </summary>
+        public IHashtableEx<ITypeName, ICompiledType> ConformanceTable { get; private set; } = new HashtableEx<ITypeName, ICompiledType>();
+
+        /// <summary>
+        /// List of type instancing.
+        /// </summary>
+        public IList<TypeInstancingRecord> InstancingRecordList { get; private set; } = new List<TypeInstancingRecord>();
+
+        /// <summary>
+        /// Type friendly name, unique.
+        /// </summary>
+        public string TypeFriendlyName
+        {
+            get
+            {
+                string BaseTypeName = ResolvedBaseType.Item.TypeFriendlyName;
+                string EntityTypeName = ResolvedEntityType.Item.TypeFriendlyName;
+
+                string Result = $"{BaseTypeName}.property: {EntityTypeName}";
+
+                bool IsHandled = false;
+                switch (PropertyKind)
+                {
+                    case BaseNode.UtilityType.ReadOnly:
+                        Result += ", readonly";
+                        IsHandled = true;
+                        break;
+                    case BaseNode.UtilityType.WriteOnly:
+                        Result += ", writeonly";
+                        IsHandled = true;
+                        break;
+                    case BaseNode.UtilityType.ReadWrite:
+                        Result += ", readwrite";
+                        IsHandled = true;
+                        break;
+                }
+
+                Debug.Assert(IsHandled);
+
+                return Result;
+            }
+        }
+
+        /// <summary>
+        /// True if the type is a reference type.
+        /// </summary>
+        public bool IsReference
+        {
+            get { return false; }
+        }
+
+        /// <summary>
+        /// True if the type is a value type.
+        /// </summary>
+        public bool IsValue
+        {
+            get { return true; }
+        }
+
+        /// <summary>
+        /// Creates an instance of a class type, or reuse an existing instance.
+        /// </summary>
+        /// <param name="instancingClassType">The class type to instanciate.</param>
+        /// <param name="resolvedTypeName">The proposed type instance name.</param>
+        /// <param name="resolvedType">The proposed type instance.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        public void InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType, IList<IError> errorList)
+        {
+            bool IsNewInstance = false;
+
+            ITypeName InstancedBaseTypeName = ResolvedBaseTypeName.Item;
+            ICompiledType InstancedBaseType = ResolvedBaseType.Item;
+            InstancedBaseType.InstanciateType(instancingClassType, ref InstancedBaseTypeName, ref InstancedBaseType, errorList);
+            if (InstancedBaseType != ResolvedBaseType.Item)
+                IsNewInstance = true;
+
+            ITypeName InstancedEntityTypeName = ResolvedEntityTypeName.Item;
+            ICompiledType InstancedEntityType = ResolvedEntityType.Item;
+            InstancedEntityType.InstanciateType(instancingClassType, ref InstancedEntityTypeName, ref InstancedEntityType, errorList);
+            if (InstancedEntityType != ResolvedEntityType.Item)
+                IsNewInstance = true;
+
+            if (IsNewInstance)
+                ResolveType(instancingClassType.BaseClass.TypeTable, InstancedBaseTypeName, InstancedBaseType, InstancedEntityTypeName, InstancedEntityType, PropertyKind, GetEnsureList, GetExceptionIdentifierList, SetRequireList, SetExceptionIdentifierList, out resolvedTypeName, out resolvedType);
+        }
+        #endregion
+
+        #region Locate type
+        /// <summary>
+        /// Locates, or creates, a resolved property type.
+        /// </summary>
+        /// <param name="typeTable">The table of existing types.</param>
+        /// <param name="baseTypeName">The type name of the resolved base type.</param>
+        /// <param name="baseType">The type of the resolved base type.</param>
+        /// <param name="entityTypeName">The type name of the resolved result type.</param>
+        /// <param name="entityType">The type of the resolved result type.</param>
+        /// <param name="propertyKind">The type of the property.</param>
+        /// <param name="getEnsureList">The list of ensure assertions for the getter.</param>
+        /// <param name="getExceptionIdentifierList">The list of known exceptions thrown for the getter.</param>
+        /// <param name="setRequireList">The list of require assertions for the setter.</param>
+        /// <param name="setExceptionIdentifierList">The list of known exceptions thrown for the setter.</param>
+        /// <param name="resolvedTypeName">The type name upon return.</param>
+        /// <param name="resolvedType">The type upon return.</param>
+        public static void ResolveType(IHashtableEx<ITypeName, ICompiledType> typeTable, ITypeName baseTypeName, ICompiledType baseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType propertyKind, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IIdentifier> setExceptionIdentifierList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        {
+            if (!TypeTableContaining(typeTable, baseType, entityType, propertyKind, getEnsureList, getExceptionIdentifierList, setRequireList, setExceptionIdentifierList, out resolvedTypeName, out resolvedType))
+            {
+                BuildType(baseTypeName, baseType, entityTypeName, entityType, propertyKind, getEnsureList, getExceptionIdentifierList, setRequireList, setExceptionIdentifierList, out resolvedTypeName, out resolvedType);
+                typeTable.Add(resolvedTypeName, resolvedType);
+            }
+        }
+
+        /// <summary>
+        /// Checks if a matching function type exists in a type table.
+        /// </summary>
+        /// <param name="typeTable">The table of existing types.</param>
+        /// <param name="baseType">The type of the resolved base type.</param>
+        /// <param name="entityType">The type of the resolved result type.</param>
+        /// <param name="propertyKind">The type of the property.</param>
+        /// <param name="getEnsureList">The list of ensure assertions for the getter.</param>
+        /// <param name="getExceptionIdentifierList">The list of known exceptions thrown for the getter.</param>
+        /// <param name="setRequireList">The list of require assertions for the setter.</param>
+        /// <param name="setExceptionIdentifierList">The list of known exceptions thrown for the setter.</param>
+        /// <param name="resolvedTypeName">The type name upon return.</param>
+        /// <param name="resolvedType">The type upon return.</param>
+        public static bool TypeTableContaining(IHashtableEx<ITypeName, ICompiledType> typeTable, ICompiledType baseType, ICompiledType entityType, BaseNode.UtilityType propertyKind, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IIdentifier> setExceptionIdentifierList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        {
+            resolvedTypeName = null;
+            resolvedType = null;
+            bool Result = false;
+
+            foreach (KeyValuePair<ITypeName, ICompiledType> Entry in typeTable)
+                if (Entry.Value is IPropertyType AsPropertyType)
+                {
+                    if (AsPropertyType.ResolvedBaseType.Item != baseType)
+                        continue;
+
+                    if (AsPropertyType.ResolvedEntityType.Item != entityType)
+                        continue;
+
+                    if (AsPropertyType.PropertyKind != propertyKind)
+                        continue;
+
+                    if (!Assertion.IsAssertionListEqual(AsPropertyType.GetEnsureList, getEnsureList))
+                        continue;
+
+                    if (!ExceptionHandler.IdenticalExceptionSignature(AsPropertyType.GetExceptionIdentifierList, getExceptionIdentifierList))
+                        continue;
+
+                    if (!Assertion.IsAssertionListEqual(AsPropertyType.SetRequireList, setRequireList))
+                        continue;
+
+                    if (!ExceptionHandler.IdenticalExceptionSignature(AsPropertyType.SetExceptionIdentifierList, setExceptionIdentifierList))
+                        continue;
+
+                    resolvedTypeName = Entry.Key;
+                    resolvedType = AsPropertyType;
+                    Result = true;
+                    break;
+                }
+
+            return Result;
+        }
+
+        /// <summary>
+        /// Creates a function type with resolved arguments.
+        /// </summary>
+        /// <param name="baseTypeName">The type name of the resolved base type.</param>
+        /// <param name="baseType">The type of the resolved base type.</param>
+        /// <param name="entityTypeName">The type name of the resolved result type.</param>
+        /// <param name="entityType">The type of the resolved result type.</param>
+        /// <param name="propertyKind">The type of the property.</param>
+        /// <param name="getEnsureList">The list of ensure assertions for the getter.</param>
+        /// <param name="getExceptionIdentifierList">The list of known exceptions thrown for the getter.</param>
+        /// <param name="setRequireList">The list of require assertions for the setter.</param>
+        /// <param name="setExceptionIdentifierList">The list of known exceptions thrown for the setter.</param>
+        /// <param name="resolvedTypeName">The type name upon return.</param>
+        /// <param name="resolvedType">The type upon return.</param>
+        public static void BuildType(ITypeName baseTypeName, ICompiledType baseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType propertyKind, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IIdentifier> setExceptionIdentifierList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        {
+            IPropertyType ResolvedPropertyType = new PropertyType(baseTypeName, (IClassType)baseType, entityTypeName, entityType, propertyKind, getEnsureList, getExceptionIdentifierList, setRequireList, setExceptionIdentifierList);
+
+            resolvedTypeName = new TypeName(ResolvedPropertyType.TypeFriendlyName);
+            resolvedType = ResolvedPropertyType;
+        }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Compares two types.
+        /// </summary>
+        /// <param name="type1">The first type.</param>
+        /// <param name="type2">The second type.</param>
+        public static bool TypesHaveIdenticalSignature(IPropertyType type1, IPropertyType type2)
+        {
+            if (!ObjectType.TypesHaveIdenticalSignature(type1.ResolvedBaseType.Item, type2.ResolvedBaseType.Item))
+                return false;
+
+            if (!ObjectType.TypesHaveIdenticalSignature(type1.ResolvedEntityType.Item, type2.ResolvedEntityType.Item))
+                return false;
+
+            if (type1.PropertyKind != type2.PropertyKind)
+                return false;
+
+            if (!Assertion.IsAssertionListEqual(type1.GetEnsureList, type2.GetEnsureList))
+                return false;
+
+            if (!ExceptionHandler.IdenticalExceptionSignature(type1.GetExceptionIdentifierList, type2.GetExceptionIdentifierList))
+                return false;
+
+            if (!Assertion.IsAssertionListEqual(type1.SetRequireList, type2.SetRequireList))
+                return false;
+
+            if (!ExceptionHandler.IdenticalExceptionSignature(type1.SetExceptionIdentifierList, type2.SetExceptionIdentifierList))
+                return false;
+
+            return true;
+        }
         #endregion
     }
 }

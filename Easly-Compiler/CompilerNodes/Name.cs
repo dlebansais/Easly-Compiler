@@ -21,6 +21,34 @@
     /// </summary>
     public class Name : BaseNode.Name, IName
     {
+        #region Init
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Name"/> class.
+        /// This constructor is required for deserialization.
+        /// </summary>
+        public Name()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Name"/> class.
+        /// </summary>
+        /// <param name="location">The location associated to this name.</param>
+        /// <param name="name">The name.</param>
+        public Name(ISource location, string name)
+        {
+            EmbeddingClass = location.EmbeddingClass;
+            EmbeddingFeature = location.EmbeddingFeature;
+            EmbeddingOverload = location.EmbeddingOverload;
+            EmbeddingBody = location.EmbeddingBody;
+            EmbeddingAssertion = location.EmbeddingAssertion;
+            ParentSource = location.ParentSource;
+
+            Text = name;
+            ValidText.Item = name;
+        }
+        #endregion
+
         #region Implementation of ISource
         /// <summary>
         /// The parent node, null if root.

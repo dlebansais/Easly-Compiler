@@ -3,6 +3,7 @@ namespace CompilerNode
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -10,6 +11,20 @@ namespace CompilerNode
     /// </summary>
     public interface IConstraint : BaseNode.IConstraint, INode, INodeWithReplicatedBlocks, ISource
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Constraint.RenameBlocks"/>.
+        /// </summary>
+        IList<IRename> RenameList { get; }
+
+        /// <summary>
+        /// The resolved parent type name.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedParentTypeName { get; }
+
+        /// <summary>
+        /// The resolved parent type.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedParentType { get; }
     }
 
     /// <summary>
@@ -107,11 +122,25 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
+                ResolvedParentTypeName = new OnceReference<ITypeName>();
+                ResolvedParentType = new OnceReference<ICompiledType>();
                 IsHandled = true;
             }
 
             Debug.Assert(IsHandled);
         }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// The resolved parent type name.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedParentTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The resolved parent type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedParentType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
     }
 }

@@ -11,7 +11,6 @@ namespace CompilerNode
     /// </summary>
     public interface IGeneric : BaseNode.IGeneric, INode, INodeWithReplicatedBlocks, ISource
     {
-        #region Compiler
         /// <summary>
         /// Replicated list from <see cref="BaseNode.Generic.ConstraintBlocks"/>.
         /// </summary>
@@ -26,7 +25,11 @@ namespace CompilerNode
         /// The corresponding resolved type.
         /// </summary>
         OnceReference<IFormalGenericType> ResolvedGenericType { get; }
-        #endregion
+
+        /// <summary>
+        /// Table of resolved conforming types.
+        /// </summary>
+        IHashtableEx<ITypeName, ICompiledType> ResolvedConformanceTable { get; }
     }
 
     /// <summary>
@@ -126,6 +129,7 @@ namespace CompilerNode
             {
                 ResolvedGenericTypeName = new OnceReference<ITypeName>();
                 ResolvedGenericType = new OnceReference<IFormalGenericType>();
+                ResolvedConformanceTable = new HashtableEx<ITypeName, ICompiledType>();
                 IsHandled = true;
             }
 
@@ -143,6 +147,11 @@ namespace CompilerNode
         /// The corresponding resolved type.
         /// </summary>
         public OnceReference<IFormalGenericType> ResolvedGenericType { get; private set; } = new OnceReference<IFormalGenericType>();
+
+        /// <summary>
+        /// Table of resolved conforming types.
+        /// </summary>
+        public IHashtableEx<ITypeName, ICompiledType> ResolvedConformanceTable { get; private set; } = new HashtableEx<ITypeName, ICompiledType>();
         #endregion
     }
 }

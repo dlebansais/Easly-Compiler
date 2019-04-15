@@ -82,5 +82,21 @@ namespace CompilerNode
             Debug.Assert(IsHandled);
         }
         #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="expression1">The first expression.</param>
+        /// <param name="expression2">The second expression.</param>
+        public static bool IsExpressionEqual(IOldExpression expression1, IOldExpression expression2)
+        {
+            bool Result = true;
+
+            Result &= QualifiedName.IsQualifiedNameEqual((IQualifiedName)expression1.Query, (IQualifiedName)expression2.Query);
+
+            return Result;
+        }
+        #endregion
     }
 }

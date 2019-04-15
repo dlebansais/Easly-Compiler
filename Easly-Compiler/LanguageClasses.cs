@@ -9,6 +9,8 @@
     internal static class LanguageClasses
     {
         public static readonly NameGuidPair Any = new NameGuidPair() { Guid = new Guid("c6297be4-e121-400f-ad78-79df3ecf2858"), Name = "Any" };
+        public static readonly NameGuidPair AnyReference = new NameGuidPair() { Guid = new Guid("c6297be4-e121-400f-ad78-79df3ecf2858"), Name = "Any Reference" };
+        public static readonly NameGuidPair AnyValue = new NameGuidPair() { Guid = new Guid("c6297be4-e121-400f-ad78-79df3ecf2858"), Name = "Any Value" };
         public static readonly NameGuidPair AttributeEntity = new NameGuidPair() { Guid = new Guid("1a3bcacb-9e25-4b39-bb4a-aaf1d826a578"), Name = "Attribute Entity" };
         public static readonly NameGuidPair Boolean = new NameGuidPair() { Guid = new Guid("0ce78910-608d-41ee-a5e2-666d834bbb86"), Name = "Boolean" };
         public static readonly NameGuidPair Character = new NameGuidPair() { Guid = new Guid("040a43ee-aa73-457f-9a32-022c2d89e041"), Name = "Character" };
@@ -48,6 +50,8 @@
         public static Dictionary<string, Guid> NameToGuid { get; } = new Dictionary<string, Guid>()
         {
             { Any.Name, Any.Guid },
+            { AnyReference.Name, AnyReference.Guid },
+            { AnyValue.Name, AnyValue.Guid },
             { AttributeEntity.Name, AttributeEntity.Guid },
             { Boolean.Name, Boolean.Guid },
             { Character.Name, Character.Guid },

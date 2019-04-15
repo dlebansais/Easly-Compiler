@@ -39,6 +39,11 @@ namespace CompilerNode
         void IncrementClassCounter();
 
         /// <summary>
+        /// The type for a pre-compiled class.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedAsCompiledType { get; }
+
+        /// <summary>
         /// Replicated list from <see cref="BaseNode.Class.InvariantBlocks"/>.
         /// </summary>
         IList<IAssertion> InvariantList { get; }
@@ -141,6 +146,16 @@ namespace CompilerNode
         IHashtableEx<IFeatureName, IDiscrete> DiscreteTable { get; }
 
         /// <summary>
+        /// Table of resolved typedefs defined in this class.
+        /// </summary>
+        IHashtableEx<IFeatureName, ITypedefType> LocalTypedefTable { get; }
+
+        /// <summary>
+        /// Table of all resolved typedefs in this class, direct or inherited.
+        /// </summary>
+        IHashtableEx<IFeatureName, ITypedefType> TypedefTable { get; }
+
+        /// <summary>
         /// Table of resolved features defined in this class.
         /// </summary>
         IHashtableEx<IFeatureName, IFeatureInstance> LocalFeatureTable { get; }
@@ -149,6 +164,16 @@ namespace CompilerNode
         /// Table of all resolved features in this class, direct or inherited.
         /// </summary>
         IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable { get; }
+
+        /// <summary>
+        /// Table of resolved exports defined in this class.
+        /// </summary>
+        IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> LocalExportTable { get; }
+
+        /// <summary>
+        /// Table of all resolved exports in this class, direct or inherited.
+        /// </summary>
+        IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> ExportTable { get; }
 
         /// <summary>
         /// The type name for this class.
@@ -164,6 +189,21 @@ namespace CompilerNode
         /// List of types corresponding to each generic argument.
         /// </summary>
         IList<ICompiledType> GenericInstanceList { get; }
+
+        /// <summary>
+        /// Table of all types used in this class.
+        /// </summary>
+        IHashtableEx<ITypeName, ICompiledType> TypeTable { get; }
+
+        /// <summary>
+        /// The group this class belongs to.
+        /// </summary>
+        StableReference<SingleClassGroup> ClassGroup { get; }
+
+        /// <summary>
+        /// Table of inherited types.
+        /// </summary>
+        IHashtableEx<ITypeName, ICompiledType> InheritanceTable { get; }
     }
 
     /// <summary>
@@ -171,6 +211,44 @@ namespace CompilerNode
     /// </summary>
     public class Class : BaseNode.Class, IClass
     {
+        #region Init
+        static Class()
+        {
+            ClassAny = ClassForTypeAny(LanguageClasses.Any.Name, BaseNode.CopySemantic.Any);
+            ClassAnyReference = ClassForTypeAny(LanguageClasses.AnyReference.Name, BaseNode.CopySemantic.Reference);
+            ClassAnyValue = ClassForTypeAny(LanguageClasses.AnyValue.Name, BaseNode.CopySemantic.Value);
+        }
+
+        private static IClass ClassForTypeAny(string className, BaseNode.CopySemantic copySpecification)
+        {
+            Class BaseClass = new Class();
+            BaseClass.CopySpecification = copySpecification;
+            BaseClass.ValidClassName = className;
+
+            return BaseClass;
+        }
+
+        /// <summary>
+        /// Compiler class 'Any'.
+        /// </summary>
+        public static IClass ClassAny { get; }
+
+        /// <summary>
+        /// Compiler class 'Any Reference'.
+        /// </summary>
+        public static IClass ClassAnyReference { get; }
+
+        /// <summary>
+        /// Compiler class 'Any Value'.
+        /// </summary>
+        public static IClass ClassAnyValue { get; }
+
+        /// <summary>
+        /// The type for a pre-compiled class.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedAsCompiledType { get; private set; } = new OnceReference<ICompiledType>();
+        #endregion
+
         #region Compiler
         /// <summary>
         /// The class path with replication info.
@@ -383,11 +461,18 @@ namespace CompilerNode
                 LocalGenericTable = new HashtableEx<string, ICompiledType>();
                 LocalDiscreteTable = new HashtableEx<IFeatureName, IDiscrete>();
                 DiscreteTable = new HashtableEx<IFeatureName, IDiscrete>();
+                LocalTypedefTable = new HashtableEx<IFeatureName, ITypedefType>();
+                TypedefTable = new HashtableEx<IFeatureName, ITypedefType>();
                 LocalFeatureTable = new HashtableEx<IFeatureName, IFeatureInstance>();
                 FeatureTable = new HashtableEx<IFeatureName, IFeatureInstance>();
+                LocalExportTable = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
+                ExportTable = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
                 ResolvedClassTypeName = new OnceReference<ITypeName>();
                 ResolvedClassType = new OnceReference<IClassType>();
                 GenericInstanceList = new List<ICompiledType>();
+                TypeTable = new HashtableEx<ITypeName, ICompiledType>();
+                ClassGroup = new StableReference<SingleClassGroup>();
+                InheritanceTable = new HashtableEx<ITypeName, ICompiledType>();
                 IsHandled = true;
             }
 
@@ -676,6 +761,16 @@ namespace CompilerNode
         public IHashtableEx<IFeatureName, IDiscrete> DiscreteTable { get; private set; } = new HashtableEx<IFeatureName, IDiscrete>();
 
         /// <summary>
+        /// Table of resolved typedefs defined in this class.
+        /// </summary>
+        public IHashtableEx<IFeatureName, ITypedefType> LocalTypedefTable { get; private set; } = new HashtableEx<IFeatureName, ITypedefType>();
+
+        /// <summary>
+        /// Table of all resolved typedefs in this class, direct or inherited.
+        /// </summary>
+        public IHashtableEx<IFeatureName, ITypedefType> TypedefTable { get; private set; } = new HashtableEx<IFeatureName, ITypedefType>();
+
+        /// <summary>
         /// Table of resolved features defined in this class.
         /// </summary>
         public IHashtableEx<IFeatureName, IFeatureInstance> LocalFeatureTable { get; private set; } = new HashtableEx<IFeatureName, IFeatureInstance>();
@@ -684,6 +779,16 @@ namespace CompilerNode
         /// Table of all resolved features in this class, direct or inherited.
         /// </summary>
         public IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable { get; private set; } = new HashtableEx<IFeatureName, IFeatureInstance>();
+
+        /// <summary>
+        /// Table of resolved exports defined in this class.
+        /// </summary>
+        public IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> LocalExportTable { get; private set; } = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
+
+        /// <summary>
+        /// Table of all resolved exports in this class, direct or inherited.
+        /// </summary>
+        public IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> ExportTable { get; private set; } = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
 
         /// <summary>
         /// The type name for this class.
@@ -699,6 +804,21 @@ namespace CompilerNode
         /// List of types corresponding to each generic argument.
         /// </summary>
         public IList<ICompiledType> GenericInstanceList { get; private set; } = new List<ICompiledType>();
+
+        /// <summary>
+        /// Table of all types used in this class.
+        /// </summary>
+        public IHashtableEx<ITypeName, ICompiledType> TypeTable { get; private set; } = new HashtableEx<ITypeName, ICompiledType>();
+
+        /// <summary>
+        /// The group this class belongs to.
+        /// </summary>
+        public StableReference<SingleClassGroup> ClassGroup { get; private set; } = new StableReference<SingleClassGroup>();
+
+        /// <summary>
+        /// Table of inherited types.
+        /// </summary>
+        public IHashtableEx<ITypeName, ICompiledType> InheritanceTable { get; private set; } = new HashtableEx<ITypeName, ICompiledType>();
         #endregion
 
         #region Debugging

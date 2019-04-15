@@ -124,6 +124,20 @@
         /// The valid value of <see cref="BaseNode.IManifestNumberExpression.Text"/>.
         /// </summary>
         public OnceReference<string> ValidText { get; private set; } = new OnceReference<string>();
+
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="expression1">The first expression.</param>
+        /// <param name="expression2">The second expression.</param>
+        public static bool IsExpressionEqual(IManifestNumberExpression expression1, IManifestNumberExpression expression2)
+        {
+            bool Result = true;
+
+            Result &= expression1.ValidText.Item == expression2.ValidText.Item;
+
+            return Result;
+        }
         #endregion
 
         #region Debugging

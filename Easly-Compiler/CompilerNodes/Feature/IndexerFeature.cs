@@ -126,6 +126,10 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
+                ResolvedFeatureTypeName = new OnceReference<ITypeName>();
+                ResolvedFeatureType = new OnceReference<ICompiledType>();
+                ValidFeatureName = new OnceReference<IFeatureName>();
+                ResolvedFeature = new OnceReference<ICompiledFeature>();
                 ResolvedEntityTypeName = new OnceReference<ITypeName>();
                 ResolvedEntityType = new OnceReference<ICompiledType>();
                 IsHandled = true;
@@ -133,6 +137,18 @@ namespace CompilerNode
 
             Debug.Assert(IsHandled);
         }
+        #endregion
+
+        #region Implementation of IFeature
+        /// <summary>
+        /// The resolved feature name.
+        /// </summary>
+        public OnceReference<IFeatureName> ValidFeatureName { get; private set; } = new OnceReference<IFeatureName>();
+
+        /// <summary>
+        /// The resolved feature.
+        /// </summary>
+        public OnceReference<ICompiledFeature> ResolvedFeature { get; private set; } = new OnceReference<ICompiledFeature>();
         #endregion
 
         #region Implementation of ICompiledFeature
@@ -150,6 +166,16 @@ namespace CompilerNode
         /// True if the feature contains precursor bodies in its overloads.
         /// </summary>
         public bool HasPrecursorBody { get { return (GetterBody.IsAssigned && GetterBody.Item is IPrecursorBody) || (SetterBody.IsAssigned && SetterBody.Item is IPrecursorBody); } }
+
+        /// <summary>
+        /// Name of the associated type.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedFeatureTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// Associated type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedFeatureType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
 
         #region Compiler

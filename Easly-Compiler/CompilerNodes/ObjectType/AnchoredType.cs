@@ -10,15 +10,6 @@ namespace CompilerNode
     /// </summary>
     public interface IAnchoredType : BaseNode.IAnchoredType, IObjectType
     {
-        /// <summary>
-        /// The name of the resolved type.
-        /// </summary>
-        OnceReference<ITypeName> ResolvedTypeName { get; }
-
-        /// <summary>
-        /// The resolved type.
-        /// </summary>
-        OnceReference<ICompiledType> ResolvedType { get; }
     }
 
     /// <summary>

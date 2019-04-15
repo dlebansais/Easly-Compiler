@@ -3,6 +3,7 @@ namespace CompilerNode
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -10,6 +11,20 @@ namespace CompilerNode
     /// </summary>
     public interface IExport : BaseNode.IExport, INode, INodeWithReplicatedBlocks, ISource
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Export.ClassIdentifierBlocks"/>.
+        /// </summary>
+        IList<IIdentifier> ClassIdentifierList { get; }
+
+        /// <summary>
+        /// The resolved export name.
+        /// </summary>
+        OnceReference<IFeatureName> ValidExportName { get; }
+
+        /// <summary>
+        /// The table of resolved class identifiers.
+        /// </summary>
+        OnceReference<IHashtableEx<string, IClass>> ExportClassTable { get; }
     }
 
     /// <summary>
@@ -107,11 +122,25 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
+                ValidExportName = new OnceReference<IFeatureName>();
+                ExportClassTable = new OnceReference<IHashtableEx<string, IClass>>();
                 IsHandled = true;
             }
 
             Debug.Assert(IsHandled);
         }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// The resolved export name.
+        /// </summary>
+        public OnceReference<IFeatureName> ValidExportName { get; private set; } = new OnceReference<IFeatureName>();
+
+        /// <summary>
+        /// The table of resolved class identifiers.
+        /// </summary>
+        public OnceReference<IHashtableEx<string, IClass>> ExportClassTable { get; set; } = new OnceReference<IHashtableEx<string, IClass>>();
         #endregion
     }
 }

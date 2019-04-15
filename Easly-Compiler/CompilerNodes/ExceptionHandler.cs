@@ -82,5 +82,40 @@ namespace CompilerNode
             Debug.Assert(IsHandled);
         }
         #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Compares two lists of exception handler identifiers.
+        /// </summary>
+        /// <param name="exceptionIdentifierList1">The first list.</param>
+        /// <param name="exceptionIdentifierList2">The second list.</param>
+        public static bool IdenticalExceptionSignature(IList<IIdentifier> exceptionIdentifierList1, IList<IIdentifier> exceptionIdentifierList2)
+        {
+            if (exceptionIdentifierList1.Count != exceptionIdentifierList2.Count)
+                return false;
+
+            for (int i = 0; i < exceptionIdentifierList1.Count; i++)
+            {
+                IIdentifier DerivedIdentifier = exceptionIdentifierList1[i];
+
+                bool Found = false;
+                for (int j = 0; j < exceptionIdentifierList2.Count; j++)
+                {
+                    IIdentifier BaseIdentifier = exceptionIdentifierList2[j];
+
+                    if (DerivedIdentifier.ValidText == BaseIdentifier.ValidText)
+                    {
+                        Found = true;
+                        break;
+                    }
+                }
+
+                if (!Found)
+                    return false;
+            }
+
+            return true;
+        }
+        #endregion
     }
 }
