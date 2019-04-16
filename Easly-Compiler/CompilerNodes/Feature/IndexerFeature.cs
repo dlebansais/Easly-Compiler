@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IIndexerFeature.
     /// </summary>
-    public interface IIndexerFeature : BaseNode.IIndexerFeature, IFeature, INodeWithReplicatedBlocks, ICompiledFeature, IScopeHolder
+    public interface IIndexerFeature : BaseNode.IIndexerFeature, IFeature, INodeWithReplicatedBlocks, ICompiledFeature, IGetterSetterScopeHolder
     {
         /// <summary>
         /// The name of the resolved indexer type.
@@ -132,6 +132,15 @@ namespace CompilerNode
                 ResolvedFeature = new OnceReference<ICompiledFeature>();
                 ResolvedEntityTypeName = new OnceReference<ITypeName>();
                 ResolvedEntityType = new OnceReference<ICompiledType>();
+                LocalScope = new HashtableEx<string, IScopeAttributeFeature>();
+                LocalGetScope = new HashtableEx<string, IScopeAttributeFeature>();
+                LocalSetScope = new HashtableEx<string, IScopeAttributeFeature>();
+                InnerScopes = new List<IScopeHolder>();
+                InnerGetScopes = new List<IScopeHolder>();
+                InnerSetScopes = new List<IScopeHolder>();
+                FullScope = new HashtableEx<string, IScopeAttributeFeature>();
+                FullGetScope = new HashtableEx<string, IScopeAttributeFeature>();
+                FullSetScope = new HashtableEx<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
 
@@ -176,6 +185,53 @@ namespace CompilerNode
         /// Associated type.
         /// </summary>
         public OnceReference<ICompiledType> ResolvedFeatureType { get; private set; } = new OnceReference<ICompiledType>();
+        #endregion
+
+        #region Implementation of IGetterSetterScopeHolder
+        /// <summary>
+        /// Entities local to a scope.
+        /// </summary>
+        public IHashtableEx<string, IScopeAttributeFeature> LocalScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+
+        /// <summary>
+        /// Entities local to a scope, getter only.
+        /// </summary>
+        public IHashtableEx<string, IScopeAttributeFeature> LocalGetScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+
+        /// <summary>
+        /// Entities local to a scope, setter only.
+        /// </summary>
+        public IHashtableEx<string, IScopeAttributeFeature> LocalSetScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+
+        /// <summary>
+        /// List of scopes containing the current instance.
+        /// </summary>
+        public IList<IScopeHolder> InnerScopes { get; private set; } = new List<IScopeHolder>();
+
+        /// <summary>
+        /// List of scopes containing the current instance, getter only.
+        /// </summary>
+        public IList<IScopeHolder> InnerGetScopes { get; private set; } = new List<IScopeHolder>();
+
+        /// <summary>
+        /// List of scopes containing the current instance, setter only.
+        /// </summary>
+        public IList<IScopeHolder> InnerSetScopes { get; private set; } = new List<IScopeHolder>();
+
+        /// <summary>
+        /// All reachable entities.
+        /// </summary>
+        public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+
+        /// <summary>
+        /// All reachable entities, getter only.
+        /// </summary>
+        public IHashtableEx<string, IScopeAttributeFeature> FullGetScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+
+        /// <summary>
+        /// All reachable entities, setter only.
+        /// </summary>
+        public IHashtableEx<string, IScopeAttributeFeature> FullSetScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
         #endregion
 
         #region Compiler

@@ -77,11 +77,31 @@
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
+                LocalScope = new HashtableEx<string, IScopeAttributeFeature>();
+                InnerScopes = new List<IScopeHolder>();
+                FullScope = new HashtableEx<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
 
             Debug.Assert(IsHandled);
         }
+        #endregion
+
+        #region Implementation of IScopeHolder
+        /// <summary>
+        /// Entities local to a scope.
+        /// </summary>
+        public IHashtableEx<string, IScopeAttributeFeature> LocalScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+
+        /// <summary>
+        /// List of scopes containing the current instance.
+        /// </summary>
+        public IList<IScopeHolder> InnerScopes { get; private set; } = new List<IScopeHolder>();
+
+        /// <summary>
+        /// All reachable entities.
+        /// </summary>
+        public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
         #endregion
     }
 }

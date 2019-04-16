@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
+    using Easly;
 
     /// <summary>
     /// A rule to process <see cref="IQualifiedName"/>.
@@ -21,7 +22,7 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceCollectionSourceTemplate<IQualifiedName, IIdentifier>(nameof(IQualifiedName.Path), nameof(IIdentifier.ValidText)),
+                new OnceReferenceCollectionSourceTemplate<IQualifiedName, IIdentifier, string>(nameof(IQualifiedName.Path), nameof(IIdentifier.ValidText)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
@@ -41,25 +42,15 @@
         /// <returns>True if an error occured.</returns>
         public override bool CheckConsistency(IQualifiedName node, IDictionary<ISourceTemplate, object> dataList, out object data)
         {
-            bool Success = true;
-            data = null;
+            Debug.Assert(SourceTemplateList.Count == 1);
+            Debug.Assert(dataList.ContainsKey(SourceTemplateList[0]));
 
-            Debug.Assert(node.Path.Count > 0);
+            IList<string> ReadyValueList = dataList[SourceTemplateList[0]] as IList<string>;
+            Debug.Assert(ReadyValueList != null);
+            Debug.Assert(ReadyValueList.Count == node.Path.Count);
 
-            List<string> ValidPath = new List<string>();
-
-            foreach (IIdentifier Identifier in node.Path)
-            {
-                Debug.Assert(StringValidation.IsValidIdentifier(node, Identifier.Text, out string ValidText, out IErrorStringValidity StringError));
-                Debug.Assert(Identifier.ValidText.IsAssigned);
-                Debug.Assert(Identifier.ValidText.Item == ValidText);
-
-                ValidPath.Add(Identifier.ValidText.Item);
-            }
-
-            data = ValidPath;
-
-            return Success;
+            data = ReadyValueList;
+            return true;
         }
 
         /// <summary>

@@ -5,6 +5,7 @@
 
     /// <summary>
     /// Specifies a destination for a <see cref="IRuleTemplate"/>.
+    /// The destination is an unsealed <see cref="IHashtableEx"/>.
     /// </summary>
     public interface IUnsealedTableDestinationTemplate : IDestinationTemplate
     {
@@ -12,6 +13,7 @@
 
     /// <summary>
     /// Specifies a destination for a <see cref="IRuleTemplate"/>.
+    /// The destination is an unsealed <see cref="IHashtableEx{TKey, TValue}"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TKey">Type of the key.</typeparam>
@@ -23,6 +25,7 @@
 
     /// <summary>
     /// Specifies a destination for a <see cref="IRuleTemplate"/>.
+    /// The destination is an unsealed <see cref="IHashtableEx{TKey, TValue}"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TKey">Type of the key.</typeparam>

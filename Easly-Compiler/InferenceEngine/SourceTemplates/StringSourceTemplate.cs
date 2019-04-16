@@ -1,33 +1,26 @@
 ﻿namespace EaslyCompiler
 {
-    using CompilerNode;
-
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
+    /// The source is a non-null string.
     /// </summary>
     public interface IStringSourceTemplate : ISourceTemplate
     {
-        /// <summary>
-        /// The string value if ready.
-        /// </summary>
-        string ReadyString { get; }
     }
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
+    /// The source is a non-null string.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     public interface IStringSourceTemplate<TSource> : ISourceTemplate<TSource, string>
         where TSource : ISource
     {
-        /// <summary>
-        /// The string value if ready.
-        /// </summary>
-        string ReadyString { get; }
     }
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
+    /// The source is a non-null string.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     public class StringSourceTemplate<TSource> : SourceTemplate<TSource, string>, IStringSourceTemplate<TSource>, IStringSourceTemplate
@@ -45,13 +38,6 @@
         }
         #endregion
 
-        #region Properties
-        /// <summary>
-        /// The string value if ready.
-        /// </summary>
-        public string ReadyString { get; private set; }
-        #endregion
-
         #region Client Interface
         /// <summary>
         /// Checks if a node source is ready.
@@ -66,7 +52,7 @@
             string Value = GetSourceObject(node);
             if (Value != null)
             {
-                ReadyString = Value;
+                data = Value;
                 Result = true;
             }
 

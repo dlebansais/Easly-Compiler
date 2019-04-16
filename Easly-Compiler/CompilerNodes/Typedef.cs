@@ -2,6 +2,7 @@ namespace CompilerNode
 {
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -9,6 +10,10 @@ namespace CompilerNode
     /// </summary>
     public interface ITypedef : BaseNode.ITypedef, INode, ISource
     {
+        /// <summary>
+        /// The valid typedef name.
+        /// </summary>
+        OnceReference<IFeatureName> ValidTypedefName { get; }
     }
 
     /// <summary>
@@ -76,11 +81,19 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
+                ValidTypedefName = new OnceReference<IFeatureName>();
                 IsHandled = true;
             }
 
             Debug.Assert(IsHandled);
         }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// The valid typedef name.
+        /// </summary>
+        public OnceReference<IFeatureName> ValidTypedefName { get; private set; } = new OnceReference<IFeatureName>();
         #endregion
     }
 }

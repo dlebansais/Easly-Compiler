@@ -43,8 +43,14 @@
             new AllImportedClassRuleTemplate(),
             new AllInheritancesInstancedRuleTemplate(),
             new AllInheritancesRuleTemplate(),
-
+            new AllLocalDiscretesRuleTemplate(),
+            new AllLocalExportsRuleTemplate(),
+            new AllLocalFeaturesRuleTemplate(),
+            new AllLocalTypedefsRuleTemplate(),
+            new AllTypedefsRuleTemplate(),
             new AnchroredTypeRuleTemplate(),
+            new AsLongAsInstructionRuleTemplate(),
+
             new GenericRuleTemplate(),
         };
     }

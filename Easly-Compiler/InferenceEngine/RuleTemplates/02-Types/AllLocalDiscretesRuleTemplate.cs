@@ -8,27 +8,26 @@
     /// <summary>
     /// A rule to process <see cref="IClass"/>.
     /// </summary>
-    public interface IAllInheritancesInstancedRuleTemplate : IRuleTemplate
+    public interface IAllLocalDiscretesRuleTemplate : IRuleTemplate
     {
     }
 
     /// <summary>
     /// A rule to process <see cref="IClass"/>.
     /// </summary>
-    public class AllInheritancesInstancedRuleTemplate : RuleTemplate<IClass, AllInheritancesInstancedRuleTemplate>, IAllInheritancesInstancedRuleTemplate
+    public class AllLocalDiscretesRuleTemplate : RuleTemplate<IClass, AllLocalDiscretesRuleTemplate>, IAllLocalDiscretesRuleTemplate
     {
         #region Init
-        static AllInheritancesInstancedRuleTemplate()
+        static AllLocalDiscretesRuleTemplate()
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, ITypeName>(nameof(IClass.InheritanceList), nameof(IInheritance.ResolvedTypeName)),
-                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, IClassType>(nameof(IClass.InheritanceList), nameof(IInheritance.ResolvedType)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IDiscrete, IFeatureName>(nameof(IClass.DiscreteList), nameof(IDiscrete.ValidDiscreteName)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new UnsealedTableDestinationTemplate<IClass, ITypeName, ICompiledType>(nameof(IClass.InheritanceTable)),
+                new UnsealedTableDestinationTemplate<IClass, IFeatureName, IDiscrete>(nameof(IClass.LocalDiscreteTable)),
             };
         }
         #endregion
@@ -56,10 +55,10 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IClass node, object data)
         {
-            IHashtableEx<ITypeName, ICompiledType> InheritanceTable = node.InheritanceTable;
+            IHashtableEx<IFeatureName, IDiscrete> LocalDiscreteTable = node.LocalDiscreteTable;
+            LocalDiscreteTable.Seal();
 
-            InheritanceTable.Seal();
-            node.LocalNamespaceTable.Add("Inheritance", InheritanceTable);
+            node.LocalNamespaceTable.Add("Discrete", LocalDiscreteTable);
         }
         #endregion
     }

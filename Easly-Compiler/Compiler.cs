@@ -1118,13 +1118,17 @@
 
                     switch (Source)
                     {
+                        case IAnchoredType AsAnchoredType:
+                            IsHandled = true;
+                            break;
+
+                        case IAsLongAsInstruction AsAsLongAsInstruction:
+                            IsHandled = true;
+                            break;
+
                         case IGeneric AsGeneric:
                             IsHandled = true;
                             IsResolved = AsGeneric.ResolvedGenericTypeName.IsAssigned && AsGeneric.ResolvedGenericType.IsAssigned;
-                            break;
-
-                        case IAnchoredType AsAnchoredType:
-                            IsHandled = true;
                             break;
                     }
 

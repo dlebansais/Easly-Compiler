@@ -5,6 +5,7 @@
 
     /// <summary>
     /// Specifies a destination for a <see cref="IRuleTemplate"/>.
+    /// The destination is an unassigned <see cref="IOnceReference"/>.
     /// </summary>
     public interface IOnceReferenceDestinationTemplate : IDestinationTemplate
     {
@@ -12,6 +13,7 @@
 
     /// <summary>
     /// Specifies a destination for a <see cref="IRuleTemplate"/>.
+    /// The destination is an unassigned <see cref="OnceReference{TRef}"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TRef">Type of the reference.</typeparam>
@@ -23,6 +25,7 @@
 
     /// <summary>
     /// Specifies a destination for a <see cref="IRuleTemplate"/>.
+    /// The destination is an unassigned <see cref="OnceReference{TRef}"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TRef">Type of the reference.</typeparam>

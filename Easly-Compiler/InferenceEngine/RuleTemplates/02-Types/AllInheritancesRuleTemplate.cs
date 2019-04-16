@@ -22,8 +22,8 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance>(nameof(IClass.InheritanceList), nameof(IInheritance.ResolvedClassParentTypeName)),
-                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance>(nameof(IClass.InheritanceList), nameof(IInheritance.ResolvedClassParentType)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, ITypeName>(nameof(IClass.InheritanceList), nameof(IInheritance.ResolvedClassParentTypeName)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, IClassType>(nameof(IClass.InheritanceList), nameof(IInheritance.ResolvedClassParentType)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()

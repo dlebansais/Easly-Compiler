@@ -8,27 +8,26 @@
     /// <summary>
     /// A rule to process <see cref="IClass"/>.
     /// </summary>
-    public interface IAllInheritancesInstancedRuleTemplate : IRuleTemplate
+    public interface IAllLocalExportsRuleTemplate : IRuleTemplate
     {
     }
 
     /// <summary>
     /// A rule to process <see cref="IClass"/>.
     /// </summary>
-    public class AllInheritancesInstancedRuleTemplate : RuleTemplate<IClass, AllInheritancesInstancedRuleTemplate>, IAllInheritancesInstancedRuleTemplate
+    public class AllLocalExportsRuleTemplate : RuleTemplate<IClass, AllLocalExportsRuleTemplate>, IAllLocalExportsRuleTemplate
     {
         #region Init
-        static AllInheritancesInstancedRuleTemplate()
+        static AllLocalExportsRuleTemplate()
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, ITypeName>(nameof(IClass.InheritanceList), nameof(IInheritance.ResolvedTypeName)),
-                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, IClassType>(nameof(IClass.InheritanceList), nameof(IInheritance.ResolvedType)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IExport, IFeatureName>(nameof(IClass.ExportList), nameof(IExport.ValidExportName)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new UnsealedTableDestinationTemplate<IClass, ITypeName, ICompiledType>(nameof(IClass.InheritanceTable)),
+                new UnsealedTableDestinationTemplate<IClass, IFeatureName, IHashtableEx<string, IClass>>(nameof(IClass.LocalExportTable)),
             };
         }
         #endregion
@@ -56,10 +55,10 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IClass node, object data)
         {
-            IHashtableEx<ITypeName, ICompiledType> InheritanceTable = node.InheritanceTable;
+            IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> LocalExportTable = node.LocalExportTable;
+            LocalExportTable.Seal();
 
-            InheritanceTable.Seal();
-            node.LocalNamespaceTable.Add("Inheritance", InheritanceTable);
+            node.LocalNamespaceTable.Add("Export", LocalExportTable);
         }
         #endregion
     }

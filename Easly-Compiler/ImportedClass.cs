@@ -47,7 +47,7 @@
         /// <summary>
         /// The resolved class type.
         /// </summary>
-        OnceReference<ClassType> ResolvedClassType { get; }
+        OnceReference<IClassType> ResolvedClassType { get; }
 
         /// <summary>
         /// Sets the parent source.
@@ -168,7 +168,7 @@
         /// <summary>
         /// The resolved class type.
         /// </summary>
-        public OnceReference<ClassType> ResolvedClassType { get; } = new OnceReference<ClassType>();
+        public OnceReference<IClassType> ResolvedClassType { get; } = new OnceReference<IClassType>();
         #endregion
 
         #region Client Interface

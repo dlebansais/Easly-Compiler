@@ -19,7 +19,17 @@
     /// The source is an assigned collection of <see cref="IIdentifier"/>, and each of them must be the name of a resolved type.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
-    public class ResolvedPathSourceTemplate<TSource> : SourceTemplate<TSource, OnceReference<IList<IIdentifier>>>, IResolvedPathSourceTemplate
+    public interface IResolvedPathSourceTemplate<TSource> : ISourceTemplate<TSource, OnceReference<IList<IIdentifier>>>
+        where TSource : ISource
+    {
+    }
+
+    /// <summary>
+    /// Specifies a source for a <see cref="IRuleTemplate"/>.
+    /// The source is an assigned collection of <see cref="IIdentifier"/>, and each of them must be the name of a resolved type.
+    /// </summary>
+    /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
+    public class ResolvedPathSourceTemplate<TSource> : SourceTemplate<TSource, OnceReference<IList<IIdentifier>>>, IResolvedPathSourceTemplate<TSource>, IResolvedPathSourceTemplate
         where TSource : ISource
     {
         #region Init
@@ -32,9 +42,6 @@
             : base(path, startingPoint)
         {
         }
-        #endregion
-
-        #region Properties
         #endregion
 
         #region Client Interface

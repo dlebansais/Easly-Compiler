@@ -2,6 +2,7 @@ namespace CompilerNode
 {
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -9,6 +10,10 @@ namespace CompilerNode
     /// </summary>
     public interface IDiscrete : BaseNode.IDiscrete, INode, ISource
     {
+        /// <summary>
+        /// The valid discrete name.
+        /// </summary>
+        OnceReference<IFeatureName> ValidDiscreteName { get; }
     }
 
     /// <summary>
@@ -76,11 +81,19 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
+                ValidDiscreteName = new OnceReference<IFeatureName>();
                 IsHandled = true;
             }
 
             Debug.Assert(IsHandled);
         }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// The valid discrete name.
+        /// </summary>
+        public OnceReference<IFeatureName> ValidDiscreteName { get; private set; } = new OnceReference<IFeatureName>();
         #endregion
     }
 }

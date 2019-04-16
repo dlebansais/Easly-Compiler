@@ -4,17 +4,15 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
+    /// The source is a sealed <see cref="IHashtableEx"/> hash table.
     /// </summary>
     public interface ISealedTableSourceTemplate : ISourceTemplate
     {
-        /// <summary>
-        /// The sealed table value if ready.
-        /// </summary>
-        IHashtableEx ReadyTable { get; }
     }
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
+    /// The source is a sealed <see cref="IHashtableEx{TKey, TValue}"/> hash table.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TKey">Type of the key.</typeparam>
@@ -22,14 +20,11 @@
     public interface ISealedTableSourceTemplate<TSource, TKey, TValue> : ISourceTemplate<TSource, HashtableEx<TKey, TValue>>
         where TSource : ISource
     {
-        /// <summary>
-        /// The reference value if ready.
-        /// </summary>
-        IHashtableEx<TKey, TValue> ReadyTable { get; }
     }
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
+    /// The source is a sealed <see cref="IHashtableEx{TKey, TValue}"/> hash table.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TKey">Type of the key.</typeparam>
@@ -49,14 +44,6 @@
         }
         #endregion
 
-        #region Properties
-        /// <summary>
-        /// The reference value if ready.
-        /// </summary>
-        public IHashtableEx<TKey, TValue> ReadyTable { get; private set; }
-        IHashtableEx ISealedTableSourceTemplate.ReadyTable { get { return ReadyTable; } }
-        #endregion
-
         #region Client Interface
         /// <summary>
         /// Checks if a node source is ready.
@@ -71,7 +58,7 @@
             IHashtableEx<TKey, TValue> Value = GetSourceObject(node);
             if (Value.IsSealed)
             {
-                ReadyTable = Value;
+                data = Value;
                 Result = true;
             }
 

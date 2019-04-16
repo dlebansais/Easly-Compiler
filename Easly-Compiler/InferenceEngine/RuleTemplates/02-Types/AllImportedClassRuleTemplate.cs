@@ -22,8 +22,8 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceTableSourceTemplate<IClass, string, IImportedClass>(nameof(IClass.ImportedClassTable), nameof(IImportedClass.ResolvedClassTypeName)),
-                new OnceReferenceTableSourceTemplate<IClass, string, IImportedClass>(nameof(IClass.ImportedClassTable), nameof(IImportedClass.ResolvedClassType)),
+                new OnceReferenceTableSourceTemplate<IClass, string, IImportedClass, ITypeName>(nameof(IClass.ImportedClassTable), nameof(IImportedClass.ResolvedClassTypeName)),
+                new OnceReferenceTableSourceTemplate<IClass, string, IImportedClass, IClassType>(nameof(IClass.ImportedClassTable), nameof(IImportedClass.ResolvedClassType)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()

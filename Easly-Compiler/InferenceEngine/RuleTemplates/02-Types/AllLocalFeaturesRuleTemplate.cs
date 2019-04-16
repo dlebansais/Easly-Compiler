@@ -8,27 +8,26 @@
     /// <summary>
     /// A rule to process <see cref="IClass"/>.
     /// </summary>
-    public interface IAllInheritancesInstancedRuleTemplate : IRuleTemplate
+    public interface IAllLocalFeaturesRuleTemplate : IRuleTemplate
     {
     }
 
     /// <summary>
     /// A rule to process <see cref="IClass"/>.
     /// </summary>
-    public class AllInheritancesInstancedRuleTemplate : RuleTemplate<IClass, AllInheritancesInstancedRuleTemplate>, IAllInheritancesInstancedRuleTemplate
+    public class AllLocalFeaturesRuleTemplate : RuleTemplate<IClass, AllLocalFeaturesRuleTemplate>, IAllLocalFeaturesRuleTemplate
     {
         #region Init
-        static AllInheritancesInstancedRuleTemplate()
+        static AllLocalFeaturesRuleTemplate()
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, ITypeName>(nameof(IClass.InheritanceList), nameof(IInheritance.ResolvedTypeName)),
-                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, IClassType>(nameof(IClass.InheritanceList), nameof(IInheritance.ResolvedType)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IFeature, IFeatureName>(nameof(IClass.FeatureList), nameof(IFeature.ValidFeatureName)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new UnsealedTableDestinationTemplate<IClass, ITypeName, ICompiledType>(nameof(IClass.InheritanceTable)),
+                new UnsealedTableDestinationTemplate<IClass, IFeatureName, IFeatureInstance>(nameof(IClass.LocalFeatureTable)),
             };
         }
         #endregion
@@ -56,10 +55,10 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IClass node, object data)
         {
-            IHashtableEx<ITypeName, ICompiledType> InheritanceTable = node.InheritanceTable;
+            IHashtableEx<IFeatureName, IFeatureInstance> LocalFeatureTable = node.LocalFeatureTable;
+            LocalFeatureTable.Seal();
 
-            InheritanceTable.Seal();
-            node.LocalNamespaceTable.Add("Inheritance", InheritanceTable);
+            node.LocalNamespaceTable.Add("Feature", LocalFeatureTable);
         }
         #endregion
     }

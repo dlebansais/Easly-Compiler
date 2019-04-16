@@ -1,6 +1,5 @@
 ﻿namespace EaslyCompiler
 {
-    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Reflection;
@@ -8,45 +7,41 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is a hash table of nodes, each with a property that must be an assigned <see cref="OnceReference{Tref}"/>.
+    /// The source is a hash table of nodes, each with a property that must be an assigned <see cref="IOnceReference"/>.
     /// </summary>
     public interface IOnceReferenceTableSourceTemplate : ISourceTemplate
     {
-        /// <summary>
-        /// The list of reference values if ready.
-        /// </summary>
-        IList<IOnceReference> ReadyReferenceList { get; }
     }
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is a hash table of nodes, each with a property that must be an assigned <see cref="OnceReference{Tref}"/>.
+    /// The source is a <typeparamref name="TKey"/>, <typeparamref name="TValue"/> hash table of nodes, each with a property that must be an assigned <see cref="OnceReference{Tref}"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TKey">Type of the key for each item.</typeparam>
-    /// <typeparam name="TValue">Type of the reference in each item.</typeparam>
-    public interface IOnceReferenceTableSourceTemplate<TSource, TKey, TValue> : ISourceTemplate<TSource, IHashtableEx<TKey, TValue>>
+    /// <typeparam name="TValue">Type of the value for each item.</typeparam>
+    /// <typeparam name="TRef">Type of the reference in each item value.</typeparam>
+    public interface IOnceReferenceTableSourceTemplate<TSource, TKey, TValue, TRef> : ISourceTemplate<TSource, IHashtableEx<TKey, TValue>>
         where TSource : ISource
+        where TRef : class
     {
-        /// <summary>
-        /// The list of reference values if ready.
-        /// </summary>
-        IList<IOnceReference> ReadyReferenceList { get; }
     }
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is a hash table of nodes, each with a property that must be an assigned <see cref="OnceReference{Tref}"/>.
+    /// The source is a <typeparamref name="TKey"/>, <typeparamref name="TValue"/> hash table of nodes, each with a property that must be an assigned <see cref="OnceReference{Tref}"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TKey">Type of the key for each item.</typeparam>
-    /// <typeparam name="TValue">Type of the reference in each item.</typeparam>
-    public class OnceReferenceTableSourceTemplate<TSource, TKey, TValue> : SourceTemplate<TSource, IHashtableEx<TKey, TValue>>, IOnceReferenceTableSourceTemplate<TSource, TKey, TValue>, IOnceReferenceTableSourceTemplate
+    /// <typeparam name="TValue">Type of the value for each item.</typeparam>
+    /// <typeparam name="TRef">Type of the reference in each item value.</typeparam>
+    public class OnceReferenceTableSourceTemplate<TSource, TKey, TValue, TRef> : SourceTemplate<TSource, IHashtableEx<TKey, TValue>>, IOnceReferenceTableSourceTemplate<TSource, TKey, TValue, TRef>, IOnceReferenceTableSourceTemplate
         where TSource : ISource
+        where TRef : class
     {
         #region Init
         /// <summary>
-        /// Initializes a new instance of the <see cref="OnceReferenceTableSourceTemplate{TSource, TKey, TValue}"/> class.
+        /// Initializes a new instance of the <see cref="OnceReferenceTableSourceTemplate{TSource, TKey, TValue, TRef}"/> class.
         /// </summary>
         /// <param name="path">Path to the source object.</param>
         /// <param name="propertyName">The name of the <see cref="OnceReference{TRef}"/> property to check in each item of the list.</param>
@@ -54,18 +49,11 @@
         public OnceReferenceTableSourceTemplate(string path, string propertyName, ITemplatePathStart<TSource> startingPoint = null)
             : base(path, startingPoint)
         {
-            ItemProperty = typeof(TValue).GetProperty(propertyName);
+            ItemProperty = BaseNodeHelper.NodeTreeHelper.GetPropertyOf(typeof(TValue), propertyName);
             Debug.Assert(ItemProperty != null);
         }
 
         private PropertyInfo ItemProperty;
-        #endregion
-
-        #region Properties
-        /// <summary>
-        /// The list of reference values if ready.
-        /// </summary>
-        public IList<IOnceReference> ReadyReferenceList { get; } = new List<IOnceReference>();
         #endregion
 
         #region Client Interface
@@ -78,7 +66,8 @@
         {
             data = null;
             bool Result = true;
-            ReadyReferenceList.Clear();
+
+            IList<TRef> ReadyReferenceList = new List<TRef>();
 
             IHashtableEx<TKey, TValue> ValueTable = GetSourceObject(node);
             foreach (KeyValuePair<TKey, TValue> Entry in ValueTable)
@@ -86,8 +75,8 @@
                 TValue Value = Entry.Value;
                 Debug.Assert(Value != null);
 
-                IOnceReference Reference = ItemProperty.GetValue(Value) as IOnceReference;
-                Debug.Assert(Value != null);
+                OnceReference<TRef> Reference = ItemProperty.GetValue(Value) as OnceReference<TRef>;
+                Debug.Assert(Reference != null);
 
                 if (!Reference.IsAssigned)
                 {
@@ -95,8 +84,11 @@
                     break;
                 }
 
-                ReadyReferenceList.Add(Reference);
+                ReadyReferenceList.Add(Reference.Item);
             }
+
+            if (Result)
+                data = ReadyReferenceList;
 
             return Result;
         }

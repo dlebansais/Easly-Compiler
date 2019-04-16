@@ -8,29 +8,28 @@
     /// <summary>
     /// A rule to process <see cref="IClass"/>.
     /// </summary>
-    public interface IAllDiscretesRuleTemplate : IRuleTemplate
+    public interface IAllTypedefsRuleTemplate : IRuleTemplate
     {
     }
 
     /// <summary>
     /// A rule to process <see cref="IClass"/>.
     /// </summary>
-    public class AllDiscretesRuleTemplate : RuleTemplate<IClass, AllDiscretesRuleTemplate>, IAllDiscretesRuleTemplate
+    public class AllTypedefsRuleTemplate : RuleTemplate<IClass, AllTypedefsRuleTemplate>, IAllTypedefsRuleTemplate
     {
         #region Init
-        static AllDiscretesRuleTemplate()
+        static AllTypedefsRuleTemplate()
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceSourceTemplate<IClass, IClassType>(nameof(IClass.ResolvedClassType)),
-                new SealedTableSourceTemplate<IClass, IFeatureName, IDiscrete>(nameof(IClass.LocalDiscreteTable)),
-                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, IClassType>(nameof(IClass.InheritanceList), nameof(IInheritance.ResolvedType)),
-                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, IHashtableEx<IFeatureName, IDiscrete>>(nameof(IClass.InheritanceList), nameof(IInheritance.DiscreteTable)),
+                new SealedTableSourceTemplate<IClass, IFeatureName, ITypedefType>(nameof(IClass.LocalTypedefTable)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, IHashtableEx<IFeatureName, ITypedefType>>(nameof(IClass.InheritanceList), nameof(IInheritance.TypedefTable)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new UnsealedTableDestinationTemplate<IClass, IFeatureName, IDiscrete>(nameof(IClass.DiscreteTable)),
+                new UnsealedTableDestinationTemplate<IClass, IFeatureName, ITypedefType>(nameof(IClass.TypedefTable)),
             };
         }
         #endregion
@@ -48,54 +47,48 @@
             bool Success = true;
             data = null;
 
-            Debug.Assert(node.LocalDiscreteTable.IsSealed);
-            IHashtableEx<IFeatureName, IDiscrete> MergedDiscreteTable = node.LocalDiscreteTable.CloneUnsealed();
+            Debug.Assert(node.LocalTypedefTable.IsSealed);
+            IHashtableEx<IFeatureName, ITypedefType> MergedTypedefTable = node.LocalTypedefTable.CloneUnsealed();
 
-            foreach (IInheritance Inheritance in node.InheritanceList)
+            foreach (IInheritance InheritanceItem in node.InheritanceList)
             {
-                Debug.Assert(Inheritance.ResolvedType.IsAssigned);
-                Debug.Assert(Inheritance.DiscreteTable.IsAssigned);
+                IClassType InheritanceParent = InheritanceItem.ResolvedType.Item;
+                IHashtableEx<IFeatureName, ITypedefType> InheritedTypedefTable = InheritanceParent.TypedefTable;
 
-                IClassType InheritanceParent = Inheritance.ResolvedType.Item;
-                IHashtableEx<IFeatureName, IDiscrete> InheritedDiscreteTable = InheritanceParent.DiscreteTable;
-
-                // TODO: verify InheritedDiscreteTable == Inheritance.DiscreteTable since the source is on the later.
-                foreach (KeyValuePair<IFeatureName, IDiscrete> InstanceEntry in InheritedDiscreteTable)
+                foreach (KeyValuePair<IFeatureName, ITypedefType> InstanceEntry in InheritedTypedefTable)
                 {
                     IFeatureName InstanceName = InstanceEntry.Key;
-                    IDiscrete InstanceItem = InstanceEntry.Value;
+                    ITypedefType InstanceItem = InstanceEntry.Value;
                     bool ConflictingEntry = false;
 
-                    foreach (KeyValuePair<IFeatureName, IDiscrete> Entry in MergedDiscreteTable)
+                    foreach (KeyValuePair<IFeatureName, ITypedefType> Entry in MergedTypedefTable)
                     {
                         IFeatureName LocalName = Entry.Key;
-                        IDiscrete LocalItem = Entry.Value;
+                        ITypedefType LocalItem = Entry.Value;
 
                         if (InstanceName.Name == LocalName.Name)
                         {
                             if (InstanceItem != LocalItem)
                             {
-                                AddSourceError(new ErrorDuplicateName(Inheritance, LocalName.Name));
+                                AddSourceError(new ErrorDuplicateName(InheritanceItem, LocalName.Name));
                                 ConflictingEntry = true;
-                                Success = false;
                             }
                         }
 
                         else if (InstanceItem == LocalItem)
                         {
-                            AddSourceError(new ErrorDiscreteNameConflict(Inheritance, LocalName.Name, InstanceName.Name));
+                            AddSourceError(new ErrorTypedefNameConflict(InheritanceItem, LocalName.Name, InstanceName.Name));
                             ConflictingEntry = true;
-                            Success = false;
                         }
                     }
 
                     if (!ConflictingEntry)
-                        MergedDiscreteTable.Add(InstanceName, InstanceItem);
+                        MergedTypedefTable.Add(InstanceName, InstanceItem);
                 }
             }
 
             if (Success)
-                data = MergedDiscreteTable;
+                data = MergedTypedefTable;
 
             return Success;
         }
@@ -107,21 +100,21 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IClass node, object data)
         {
-            IHashtableEx<IFeatureName, IDiscrete> MergedDiscreteTable = (IHashtableEx<IFeatureName, IDiscrete>)data;
+            IHashtableEx<IFeatureName, ITypedefType> MergedTypedefTable = (IHashtableEx<IFeatureName, ITypedefType>)data;
 
             Debug.Assert(node.ResolvedClassType.IsAssigned);
             IClassType ThisClassType = node.ResolvedClassType.Item;
 
-            ThisClassType.DiscreteTable.Merge(MergedDiscreteTable);
-            ThisClassType.DiscreteTable.Seal();
+            ThisClassType.TypedefTable.Merge(MergedTypedefTable);
+            ThisClassType.TypedefTable.Seal();
 
-            node.DiscreteTable.Merge(MergedDiscreteTable);
-            node.DiscreteTable.Seal();
+            node.TypedefTable.Merge(MergedTypedefTable);
+            node.TypedefTable.Seal();
 
             foreach (IClassType Item in node.GenericInstanceList)
             {
-                Item.DiscreteTable.Merge(MergedDiscreteTable);
-                Item.DiscreteTable.Seal();
+                Item.TypedefTable.Merge(MergedTypedefTable);
+                Item.TypedefTable.Seal();
             }
         }
         #endregion

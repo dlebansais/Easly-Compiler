@@ -202,6 +202,7 @@
     <Compile Include="Errors\Inference\01-Identifiers\ErrorInvalidManifestNumber.cs" />
     <Compile Include="Errors\Inference\01-Identifiers\ErrorInvalidManifestChraracter.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorCloneableClass.cs" />
+    <Compile Include="Errors\Inference\02-Types\ErrorTypedefNameConflict.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorFieldMismatchConformance.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorGetterSetterConformance.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorExceptionConformance.cs" />
@@ -252,6 +253,12 @@
     <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\ManifestNumberTextRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\ManifestCharacterTextRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\IdentifierRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\AsLongAsInstructionRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllTypedefsRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllLocalTypedefsRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllLocalFeaturesRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllLocalExportsRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllLocalDiscretesRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllInheritancesRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllInheritancesInstancedRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllImportedClassRuleTemplate.cs" />
@@ -274,12 +281,15 @@
     <Compile Include="InferenceEngine\SourceTemplates\OnceReferenceTableSourceTemplate.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\OnceReferenceCollectionSourceTemplate.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\ResolvedPathSourceTemplate.cs" />
+    <Compile Include="InferenceEngine\SourceTemplates\ConditionallyAssignedSealedTableSourceTemplate.cs" />
+    <Compile Include="InferenceEngine\SourceTemplates\SealedTableCollectionSourceTemplate.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\SealedTableSourceTemplate.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\OnceReferenceSourceTemplate.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\StringSourceTemplate.cs" />
     <Compile Include="InferenceEngine\StartingPoints\TemplateClassStart.cs" />
     <Compile Include="InferenceEngine\StartingPoints\TemplateNodeStart.cs" />
     <Compile Include="InferenceEngine\StartingPoints\TemplatePathStart.cs" />
+    <Compile Include="InferenceEngine\TemplateHelper.cs" />
     <Compile Include="NameGuidPair.cs" />
     <Compile Include="NodeWithReplicatedBlocks.cs" />
     <Compile Include="PrecursorInstance.cs" />
@@ -287,6 +297,7 @@
     <Compile Include="ReplacePhase1MacroContext.cs" />
     <Compile Include="BuildInferenceSourceList.cs" />
     <Compile Include="ReplicationContext.cs" />
+    <Compile Include="GetterSetterScopeHolder.cs" />
     <Compile Include="ScopeHolder.cs" />
     <Compile Include="Source.cs" />
     <Compile Include="LanguageClasses.cs" />

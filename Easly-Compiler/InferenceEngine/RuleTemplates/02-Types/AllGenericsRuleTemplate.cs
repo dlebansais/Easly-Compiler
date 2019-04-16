@@ -22,8 +22,8 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceCollectionSourceTemplate<IClass, IGeneric>(nameof(IClass.GenericList), nameof(IGeneric.ResolvedGenericTypeName)),
-                new OnceReferenceCollectionSourceTemplate<IClass, IGeneric>(nameof(IClass.GenericList), nameof(IGeneric.ResolvedGenericType)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IGeneric, ITypeName>(nameof(IClass.GenericList), nameof(IGeneric.ResolvedGenericTypeName)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IGeneric, IFormalGenericType>(nameof(IClass.GenericList), nameof(IGeneric.ResolvedGenericType)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()

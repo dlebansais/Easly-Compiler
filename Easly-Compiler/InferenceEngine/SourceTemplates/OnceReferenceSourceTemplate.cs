@@ -4,14 +4,10 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is an assigned <see cref="OnceReference{Tref}"/>.
+    /// The source is an assigned <see cref="IOnceReference"/>.
     /// </summary>
     public interface IOnceReferenceSourceTemplate : ISourceTemplate
     {
-        /// <summary>
-        /// The reference value if ready.
-        /// </summary>
-        IOnceReference ReadyReference { get; }
     }
 
     /// <summary>
@@ -24,10 +20,6 @@
         where TSource : ISource
         where TRef : class
     {
-        /// <summary>
-        /// The reference value if ready.
-        /// </summary>
-        OnceReference<TRef> ReadyReference { get; }
     }
 
     /// <summary>
@@ -52,14 +44,6 @@
         }
         #endregion
 
-        #region Properties
-        /// <summary>
-        /// The reference value if ready.
-        /// </summary>
-        public OnceReference<TRef> ReadyReference { get; private set; }
-        IOnceReference IOnceReferenceSourceTemplate.ReadyReference { get { return ReadyReference; } }
-        #endregion
-
         #region Client Interface
         /// <summary>
         /// Checks if a node source is ready.
@@ -74,7 +58,7 @@
             OnceReference<TRef> Value = GetSourceObject(node);
             if (Value.IsAssigned)
             {
-                ReadyReference = Value;
+                data = Value.Item;
                 Result = true;
             }
 
