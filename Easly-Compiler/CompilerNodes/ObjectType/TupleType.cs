@@ -232,8 +232,9 @@ namespace CompilerNode
         /// <param name="resolvedTypeName">The proposed type instance name.</param>
         /// <param name="resolvedType">The proposed type instance.</param>
         /// <param name="errorList">The list of errors found.</param>
-        public void InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType, IList<IError> errorList)
+        public bool InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType, IList<IError> errorList)
         {
+            bool Success = true;
             bool IsNewInstance = false;
 
             IList<IEntityDeclaration> InstancedFieldList = new List<IEntityDeclaration>();
@@ -241,7 +242,7 @@ namespace CompilerNode
             {
                 ITypeName InstancedFieldTypeName = Field.ResolvedEntityTypeName.Item;
                 ICompiledType InstancedFieldType = Field.ResolvedEntityType.Item;
-                InstancedFieldType.InstanciateType(instancingClassType, ref InstancedFieldTypeName, ref InstancedFieldType, errorList);
+                Success &= InstancedFieldType.InstanciateType(instancingClassType, ref InstancedFieldTypeName, ref InstancedFieldType, errorList);
 
                 IEntityDeclaration InstancedField = new EntityDeclaration();
                 InstancedField.ResolvedEntityTypeName.Item = InstancedFieldTypeName;
@@ -255,6 +256,8 @@ namespace CompilerNode
 
             if (IsNewInstance)
                 ResolveType(instancingClassType.BaseClass.TypeTable, EntityDeclarationList, Sharing, out resolvedTypeName, out resolvedType);
+
+            return Success;
         }
         #endregion
 

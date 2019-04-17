@@ -11,6 +11,15 @@ namespace CompilerNode
     /// </summary>
     public interface IAttachmentInstruction : BaseNode.IAttachmentInstruction, IInstruction, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.AttachmentInstruction.EntityNameBlocks"/>.
+        /// </summary>
+        IList<IName> EntityNameList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.AttachmentInstruction.AttachmentBlocks"/>.
+        /// </summary>
+        IList<IAttachment> AttachmentList { get; }
     }
 
     /// <summary>

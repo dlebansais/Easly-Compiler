@@ -6,29 +6,27 @@
     using Easly;
 
     /// <summary>
-    /// A rule to process <see cref="IAsLongAsInstruction"/>.
+    /// A rule to process <see cref="ICheckInstruction"/>.
     /// </summary>
-    public interface IAsLongAsInstructionRuleTemplate : IRuleTemplate
+    public interface ICheckInstructionRuleTemplate : IRuleTemplate
     {
     }
 
     /// <summary>
-    /// A rule to process <see cref="IAsLongAsInstruction"/>.
+    /// A rule to process <see cref="ICheckInstruction"/>.
     /// </summary>
-    public class AsLongAsInstructionRuleTemplate : RuleTemplate<IAsLongAsInstruction, AsLongAsInstructionRuleTemplate>, IAsLongAsInstructionRuleTemplate
+    public class CheckInstructionRuleTemplate : RuleTemplate<ICheckInstruction, CheckInstructionRuleTemplate>, ICheckInstructionRuleTemplate
     {
         #region Init
-        static AsLongAsInstructionRuleTemplate()
+        static CheckInstructionRuleTemplate()
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new SealedTableCollectionSourceTemplate<IAsLongAsInstruction, IContinuation, string, IScopeAttributeFeature>(nameof(IAsLongAsInstruction.ContinuationList), nameof(IContinuation.LocalScope)),
-                new ConditionallyAssignedSealedTableSourceTemplate<IAsLongAsInstruction, IScope, string, IScopeAttributeFeature>(nameof(IAsLongAsInstruction.ElseInstructions), nameof(IScope.LocalScope)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new UnsealedTableDestinationTemplate<IAsLongAsInstruction, string, IScopeAttributeFeature>(nameof(IAsLongAsInstruction.LocalScope)),
+                new UnsealedTableDestinationTemplate<ICheckInstruction, string, IScopeAttributeFeature>(nameof(ICheckInstruction.LocalScope)),
             };
         }
         #endregion
@@ -41,12 +39,10 @@
         /// <param name="dataList">Optional data collected during inspection of sources.</param>
         /// <param name="data">Private data to give to Apply() upon return.</param>
         /// <returns>True if an error occured.</returns>
-        public override bool CheckConsistency(IAsLongAsInstruction node, IDictionary<ISourceTemplate, object> dataList, out object data)
+        public override bool CheckConsistency(ICheckInstruction node, IDictionary<ISourceTemplate, object> dataList, out object data)
         {
-            bool Success = true;
             data = null;
-
-            return Success;
+            return true;
         }
 
         /// <summary>
@@ -54,7 +50,7 @@
         /// </summary>
         /// <param name="node">The node instance to modify.</param>
         /// <param name="data">Private data from CheckConsistency().</param>
-        public override void Apply(IAsLongAsInstruction node, object data)
+        public override void Apply(ICheckInstruction node, object data)
         {
             node.LocalScope.Seal();
             node.FullScope.Merge(node.LocalScope);

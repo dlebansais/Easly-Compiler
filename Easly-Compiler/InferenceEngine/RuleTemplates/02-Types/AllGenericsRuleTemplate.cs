@@ -64,7 +64,9 @@
             LocalGenericTable.Seal();
             node.LocalNamespaceTable.Add("Generic", LocalGenericTable);
 
-            IClassType NewClassType = new ClassType(node, LocalGenericTable, null, null);
+            bool Success = ClassType.Create(node, LocalGenericTable, null, null, out IClassType NewClassType);
+            Debug.Assert(Success);
+
             ITypeName NewTypeName = new TypeName(NewClassType.TypeFriendlyName);
 
             node.ResolvedClassTypeName.Item = NewTypeName;

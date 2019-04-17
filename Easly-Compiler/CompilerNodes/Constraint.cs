@@ -25,6 +25,21 @@ namespace CompilerNode
         /// The resolved parent type.
         /// </summary>
         OnceReference<ICompiledType> ResolvedParentType { get; }
+
+        /// <summary>
+        /// The resolved conforming type name.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedConformingTypeName { get; }
+
+        /// <summary>
+        /// The resolved conforming type.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedConformingType { get; }
+
+        /// <summary>
+        /// Table of resolved renames.
+        /// </summary>
+        IHashtableEx<IIdentifier, IIdentifier> RenameTable { get; }
     }
 
     /// <summary>
@@ -124,6 +139,9 @@ namespace CompilerNode
             {
                 ResolvedParentTypeName = new OnceReference<ITypeName>();
                 ResolvedParentType = new OnceReference<ICompiledType>();
+                ResolvedConformingTypeName = new OnceReference<ITypeName>();
+                ResolvedConformingType = new OnceReference<ICompiledType>();
+                RenameTable = new HashtableEx<IIdentifier, IIdentifier>();
                 IsHandled = true;
             }
 
@@ -141,6 +159,21 @@ namespace CompilerNode
         /// The resolved parent type.
         /// </summary>
         public OnceReference<ICompiledType> ResolvedParentType { get; private set; } = new OnceReference<ICompiledType>();
+
+        /// <summary>
+        /// The resolved conforming type name.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedConformingTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The resolved conforming type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedConformingType { get; private set; } = new OnceReference<ICompiledType>();
+
+        /// <summary>
+        /// Table of resolved renames.
+        /// </summary>
+        public IHashtableEx<IIdentifier, IIdentifier> RenameTable { get; private set; } = new HashtableEx<IIdentifier, IIdentifier>();
         #endregion
     }
 }

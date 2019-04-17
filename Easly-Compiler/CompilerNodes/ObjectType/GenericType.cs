@@ -11,6 +11,15 @@ namespace CompilerNode
     /// </summary>
     public interface IGenericType : BaseNode.IGenericType, IObjectType, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.GenericType.TypeArgumentBlocks"/>.
+        /// </summary>
+        IList<ITypeArgument> TypeArgumentList { get; }
+
+        /// <summary>
+        /// Table of argument identifiers for assignment.
+        /// </summary>
+        IHashtableEx<string, IIdentifier> ArgumentIdentifierTable { get; }
     }
 
     /// <summary>
@@ -110,6 +119,7 @@ namespace CompilerNode
             {
                 ResolvedTypeName = new OnceReference<ITypeName>();
                 ResolvedType = new OnceReference<ICompiledType>();
+                ArgumentIdentifierTable = new HashtableEx<string, IIdentifier>();
                 IsHandled = true;
             }
 
@@ -127,6 +137,13 @@ namespace CompilerNode
         /// The resolved type.
         /// </summary>
         public OnceReference<ICompiledType> ResolvedType { get; private set; } = new OnceReference<ICompiledType>();
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Table of argument identifiers for assignment.
+        /// </summary>
+        public IHashtableEx<string, IIdentifier> ArgumentIdentifierTable { get; private set; } = new HashtableEx<string, IIdentifier>();
         #endregion
     }
 }

@@ -224,6 +224,31 @@ namespace CompilerNode
         /// The resolved table of imported classes.
         /// </summary>
         IHashtableEx<ITypeName, IClassType> ResolvedImportedClassTable { get; }
+
+        /// <summary>
+        /// List of resolved bodies.
+        /// </summary>
+        IList<IBody> BodyList { get; }
+
+        /// <summary>
+        /// List of resolved command overloads.
+        /// </summary>
+        IList<ICommandOverload> CommandOverloadList { get; }
+
+        /// <summary>
+        /// List of resolved query overloads.
+        /// </summary>
+        IList<IQueryOverload> QueryOverloadList { get; }
+
+        /// <summary>
+        /// List of resolved expressions that are default values of features of this class.
+        /// </summary>
+        IList<IExpression> NodeWithDefaultList { get; }
+
+        /// <summary>
+        /// List of resolved expressions that are constant numbers in this class.
+        /// </summary>
+        IList<IExpression> NodeWithNumberConstantList { get; }
     }
 
     /// <summary>
@@ -497,6 +522,11 @@ namespace CompilerNode
                 ClassGroup = new StableReference<SingleClassGroup>();
                 InheritanceTable = new HashtableEx<ITypeName, ICompiledType>();
                 ResolvedImportedClassTable = new HashtableEx<ITypeName, IClassType>();
+                BodyList = new List<IBody>();
+                CommandOverloadList = new List<ICommandOverload>();
+                QueryOverloadList = new List<IQueryOverload>();
+                NodeWithDefaultList = new List<IExpression>();
+                NodeWithNumberConstantList = new List<IExpression>();
                 LocalScope = new HashtableEx<string, IScopeAttributeFeature>();
                 InnerScopes = new List<IScopeHolder>();
                 FullScope = new HashtableEx<string, IScopeAttributeFeature>();
@@ -883,6 +913,31 @@ namespace CompilerNode
         /// The resolved table of imported classes.
         /// </summary>
         public IHashtableEx<ITypeName, IClassType> ResolvedImportedClassTable { get; private set; } = new HashtableEx<ITypeName, IClassType>();
+
+        /// <summary>
+        /// List of resolved bodies.
+        /// </summary>
+        public IList<IBody> BodyList { get; private set; } = new List<IBody>();
+
+        /// <summary>
+        /// List of resolved command overloads.
+        /// </summary>
+        public IList<ICommandOverload> CommandOverloadList { get; private set; } = new List<ICommandOverload>();
+
+        /// <summary>
+        /// List of resolved query overloads.
+        /// </summary>
+        public IList<IQueryOverload> QueryOverloadList { get; private set; } = new List<IQueryOverload>();
+
+        /// <summary>
+        /// List of resolved expressions that are default values of features of this class.
+        /// </summary>
+        public IList<IExpression> NodeWithDefaultList { get; private set; } = new List<IExpression>();
+
+        /// <summary>
+        /// List of resolved expressions that are constant numbers in this class.
+        /// </summary>
+        public IList<IExpression> NodeWithNumberConstantList { get; private set; } = new List<IExpression>();
         #endregion
 
         #region Debugging

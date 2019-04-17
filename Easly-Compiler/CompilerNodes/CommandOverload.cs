@@ -11,7 +11,11 @@ namespace CompilerNode
     /// </summary>
     public interface ICommandOverload : BaseNode.ICommandOverload, INode, INodeWithReplicatedBlocks, ISource, IScopeHolder
     {
-        #region Compiler
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.CommandOverload.ParameterBlocks"/>.
+        /// </summary>
+        IList<IEntityDeclaration> ParameterList { get; }
+
         /// <summary>
         /// Indicates if the overload is deferred in another class.
         /// </summary>
@@ -26,7 +30,16 @@ namespace CompilerNode
         /// True if the overload contains a precursor body.
         /// </summary>
         bool HasPrecursorBody { get; }
-        #endregion
+
+        /// <summary>
+        /// List of overload parameters.
+        /// </summary>
+        ListTableEx<IParameter> ParameterTable { get; }
+
+        /// <summary>
+        /// The resolved associated type.
+        /// </summary>
+        OnceReference<ICommandOverloadType> ResolvedAssociatedType { get; }
     }
 
     /// <summary>
@@ -34,23 +47,6 @@ namespace CompilerNode
     /// </summary>
     public class CommandOverload : BaseNode.CommandOverload, ICommandOverload
     {
-        #region Compiler
-        /// <summary>
-        /// Indicates if the overload is deferred in another class.
-        /// </summary>
-        public bool IsDeferredOverload { get { return ((ICompiledBody)CommandBody).IsDeferredBody; } }
-
-        /// <summary>
-        /// True if the overload contains an extern body.
-        /// </summary>
-        public bool HasExternBody { get { return CommandBody is IExternBody; } }
-
-        /// <summary>
-        /// True if the overload contains a precursor body.
-        /// </summary>
-        public bool HasPrecursorBody { get { return CommandBody is IPrecursorBody; } }
-        #endregion
-
         #region Implementation of INodeWithReplicatedBlocks
         /// <summary>
         /// Replicated list from <see cref="BaseNode.CommandOverload.ParameterBlocks"/>.
@@ -144,6 +140,8 @@ namespace CompilerNode
                 LocalScope = new HashtableEx<string, IScopeAttributeFeature>();
                 InnerScopes = new List<IScopeHolder>();
                 FullScope = new HashtableEx<string, IScopeAttributeFeature>();
+                ParameterTable = new ListTableEx<IParameter>();
+                ResolvedAssociatedType = new OnceReference<ICommandOverloadType>();
                 IsHandled = true;
             }
 
@@ -166,6 +164,33 @@ namespace CompilerNode
         /// All reachable entities.
         /// </summary>
         public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Indicates if the overload is deferred in another class.
+        /// </summary>
+        public bool IsDeferredOverload { get { return ((ICompiledBody)CommandBody).IsDeferredBody; } }
+
+        /// <summary>
+        /// True if the overload contains an extern body.
+        /// </summary>
+        public bool HasExternBody { get { return CommandBody is IExternBody; } }
+
+        /// <summary>
+        /// True if the overload contains a precursor body.
+        /// </summary>
+        public bool HasPrecursorBody { get { return CommandBody is IPrecursorBody; } }
+
+        /// <summary>
+        /// List of overload parameters.
+        /// </summary>
+        public ListTableEx<IParameter> ParameterTable { get; private set; } = new ListTableEx<IParameter>();
+
+        /// <summary>
+        /// The resolved associated type.
+        /// </summary>
+        public OnceReference<ICommandOverloadType> ResolvedAssociatedType { get; private set; } = new OnceReference<ICommandOverloadType>();
         #endregion
     }
 }

@@ -1053,6 +1053,11 @@
                             IsHandled = true;
                             IsResolved = AsQualifiedName.ValidPath.IsAssigned;
                             break;
+
+                        case IRename AsRename:
+                            IsHandled = true;
+                            IsResolved = AsRename.ValidSourceText.IsAssigned && AsRename.ValidDestinationText.IsAssigned;
+                            break;
                     }
 
                     Debug.Assert(IsHandled);
@@ -1123,6 +1128,58 @@
                             break;
 
                         case IAsLongAsInstruction AsAsLongAsInstruction:
+                            IsHandled = true;
+                            break;
+
+                        case IAssignmentInstruction AsAssignmentInstruction:
+                            IsHandled = true;
+                            break;
+
+                        case IAssignmentTypeArgument AsAssignmentTypeArgument:
+                            IsHandled = true;
+                            break;
+
+                        case IAttachment AsAttachment:
+                            IsHandled = true;
+                            break;
+
+                        case IAttachmentInstruction AsAttachmentInstruction:
+                            IsHandled = true;
+                            break;
+
+                        case IAttributeFeature AsAttributeFeature:
+                            IsHandled = true;
+                            break;
+
+                        case ICheckInstruction AsCheckInstruction:
+                            IsHandled = true;
+                            break;
+
+                        case ICommandInstruction AsCommandInstruction:
+                            IsHandled = true;
+                            break;
+
+                        case ICommandOverload AsCommandOverload:
+                            IsHandled = true;
+                            break;
+
+                        case ICommandOverloadType AsCommandOverloadType:
+                            IsHandled = true;
+                            break;
+
+                        case IConditional AsConditional:
+                            IsHandled = true;
+                            break;
+
+                        case IConstantFeature AsConstantFeature:
+                            IsHandled = true;
+                            break;
+
+                        case IConstraint AsConstraint:
+                            IsHandled = true;
+                            break;
+
+                        case IContinuation AsContinuation:
                             IsHandled = true;
                             break;
 

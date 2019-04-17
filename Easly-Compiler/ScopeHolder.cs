@@ -46,6 +46,25 @@
         }
 
         /// <summary>
+        /// Finds all names that in conflict with others already defined in embedding scopes.
+        /// </summary>
+        /// <param name="source">The scope where the check is performed.</param>
+        /// <param name="innerScopeList">The list of inner scopes.</param>
+        /// <param name="conflictList">The list of conflicting names.</param>
+        public static void RecursiveCheck(IHashtableEx<string, IScopeAttributeFeature> source, IList<IScopeHolder> innerScopeList, IList<string> conflictList)
+        {
+            foreach (IScopeHolder Item in innerScopeList)
+            {
+                foreach (KeyValuePair<string, IScopeAttributeFeature> ScopeNameItem in source)
+                    if (Item.FullScope.ContainsKey(ScopeNameItem.Key))
+                        if (!conflictList.Contains(ScopeNameItem.Key))
+                            conflictList.Add(ScopeNameItem.Key);
+
+                RecursiveCheck(source, Item.InnerScopes, conflictList);
+            }
+        }
+
+        /// <summary>
         /// Gets the scope embedding the provided one.
         /// </summary>
         /// <param name="source">The scope.</param>

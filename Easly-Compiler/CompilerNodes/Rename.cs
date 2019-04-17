@@ -12,6 +12,16 @@ namespace CompilerNode
     public interface IRename : BaseNode.IRename, INode, ISource
     {
         /// <summary>
+        /// The valid value of <see cref="BaseNode.IRename.SourceIdentifier"/>.
+        /// </summary>
+        OnceReference<string> ValidSourceText { get; }
+
+        /// <summary>
+        /// The valid value of <see cref="BaseNode.IRename.DestinationIdentifier"/>.
+        /// </summary>
+        OnceReference<string> ValidDestinationText { get; }
+
+        /// <summary>
         /// Checks and validates a rename clause.
         /// </summary>
         /// <typeparam name="TKey">The object type on which rename operates.</typeparam>
@@ -90,6 +100,8 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
+                ValidSourceText = new OnceReference<string>();
+                ValidDestinationText = new OnceReference<string>();
                 IsHandled = true;
             }
 
@@ -98,6 +110,16 @@ namespace CompilerNode
         #endregion
 
         #region Compiler
+        /// <summary>
+        /// The valid value of <see cref="BaseNode.IRename.SourceIdentifier"/>.
+        /// </summary>
+        public OnceReference<string> ValidSourceText { get; private set; } = new OnceReference<string>();
+
+        /// <summary>
+        /// The valid value of <see cref="BaseNode.IRename.DestinationIdentifier"/>.
+        /// </summary>
+        public OnceReference<string> ValidDestinationText { get; private set; } = new OnceReference<string>();
+
         /// <summary>
         /// Checks and validates a rename clause.
         /// </summary>

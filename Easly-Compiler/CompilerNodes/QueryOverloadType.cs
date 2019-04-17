@@ -255,8 +255,9 @@
         /// <param name="instancingClassType">The type attempting to find the overload type.</param>
         /// <param name="instancedOverload">The new overload type upon return if not found.</param>
         /// <param name="errorList">The list of errors.</param>
-        public static void InstanciateQueryOverloadType(IClassType instancingClassType, ref IQueryOverloadType instancedOverload, IList<IError> errorList)
+        public static bool InstanciateQueryOverloadType(IClassType instancingClassType, ref IQueryOverloadType instancedOverload, IList<IError> errorList)
         {
+            bool Success = true;
             bool IsNewInstance = false;
 
             IList<IEntityDeclaration> InstancedParameterList = new List<IEntityDeclaration>();
@@ -264,16 +265,16 @@
             {
                 ITypeName InstancedParameterTypeName = Parameter.ValidEntity.Item.ResolvedFeatureTypeName.Item;
                 ICompiledType InstancedParameterType = Parameter.ValidEntity.Item.ResolvedFeatureType.Item;
-                InstancedParameterType.InstanciateType(instancingClassType, ref InstancedParameterTypeName, ref InstancedParameterType, errorList);
+                Success &= InstancedParameterType.InstanciateType(instancingClassType, ref InstancedParameterTypeName, ref InstancedParameterType, errorList);
 
                 IEntityDeclaration InstancedParameter = new EntityDeclaration(InstancedParameterTypeName, InstancedParameterType);
                 IName ParameterName = (IName)Parameter.EntityName;
 
                 IScopeAttributeFeature NewEntity;
                 if (Parameter.DefaultValue.IsAssigned)
-                    NewEntity = new ScopeAttributeFeature(Parameter, ParameterName.ValidText.Item, InstancedParameterTypeName, InstancedParameterType, (IExpression)Parameter.DefaultValue.Item, errorList);
+                    Success &= ScopeAttributeFeature.Create(Parameter, ParameterName.ValidText.Item, InstancedParameterTypeName, InstancedParameterType, (IExpression)Parameter.DefaultValue.Item, errorList, out NewEntity);
                 else
-                    NewEntity = new ScopeAttributeFeature(Parameter, ParameterName.ValidText.Item, InstancedParameterTypeName, InstancedParameterType, errorList);
+                    Success &= ScopeAttributeFeature.Create(Parameter, ParameterName.ValidText.Item, InstancedParameterTypeName, InstancedParameterType, errorList, out NewEntity);
                 InstancedParameter.ValidEntity.Item = NewEntity;
 
                 InstancedParameterList.Add(InstancedParameter);
@@ -287,16 +288,16 @@
             {
                 ITypeName InstancedResultTypeName = Result.ValidEntity.Item.ResolvedFeatureTypeName.Item;
                 ICompiledType InstancedResultType = Result.ValidEntity.Item.ResolvedFeatureType.Item;
-                InstancedResultType.InstanciateType(instancingClassType, ref InstancedResultTypeName, ref InstancedResultType, errorList);
+                Success &= InstancedResultType.InstanciateType(instancingClassType, ref InstancedResultTypeName, ref InstancedResultType, errorList);
 
                 IEntityDeclaration InstancedResult = new EntityDeclaration(InstancedResultTypeName, InstancedResultType);
                 IName ResultName = (IName)Result.EntityName;
 
                 IScopeAttributeFeature NewEntity;
                 if (Result.DefaultValue.IsAssigned)
-                    NewEntity = new ScopeAttributeFeature(Result, ResultName.ValidText.Item, InstancedResultTypeName, InstancedResultType, (IExpression)Result.DefaultValue.Item, errorList);
+                    Success &= ScopeAttributeFeature.Create(Result, ResultName.ValidText.Item, InstancedResultTypeName, InstancedResultType, (IExpression)Result.DefaultValue.Item, errorList, out NewEntity);
                 else
-                    NewEntity = new ScopeAttributeFeature(Result, ResultName.ValidText.Item, InstancedResultTypeName, InstancedResultType, errorList);
+                    Success &= ScopeAttributeFeature.Create(Result, ResultName.ValidText.Item, InstancedResultTypeName, InstancedResultType, errorList, out NewEntity);
                 InstancedResult.ValidEntity.Item = NewEntity;
 
                 InstancedResultList.Add(InstancedResult);
@@ -323,6 +324,8 @@
 
                 instancedOverload = NewOverloadInstance;
             }
+
+            return Success;
         }
 
         /// <summary>

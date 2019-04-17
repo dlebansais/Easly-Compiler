@@ -3,6 +3,7 @@ namespace CompilerNode
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -17,6 +18,16 @@ namespace CompilerNode
     /// </summary>
     public class DeferredBody : BaseNode.DeferredBody, IDeferredBody
     {
+        #region Init
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeferredBody"/> class.
+        /// </summary>
+        public DeferredBody()
+        {
+            LocalScope.Seal();
+        }
+        #endregion
+
         #region Implementation of INodeWithReplicatedBlocks
         /// <summary>
         /// Replicated list from <see cref="BaseNode.Body.RequireBlocks"/>.
@@ -137,6 +148,13 @@ namespace CompilerNode
         /// Indicates if the body is deferred in another class.
         /// </summary>
         public bool IsDeferredBody { get { return true; } }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Entities local to a scope.
+        /// </summary>
+        public IHashtableEx<string, IScopeAttributeFeature> LocalScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
         #endregion
     }
 }

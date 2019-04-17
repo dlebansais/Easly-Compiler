@@ -29,6 +29,7 @@
             new ManifestStringTextRuleTemplate(),
             new NameRuleTemplate(),
             new QualifiedNameRuleTemplate(),
+            new RenameRuleTemplate(),
         };
 
         /// <summary>
@@ -50,6 +51,21 @@
             new AllTypedefsRuleTemplate(),
             new AnchroredTypeRuleTemplate(),
             new AsLongAsInstructionRuleTemplate(),
+            new AssignmentInstructionRuleTemplate(),
+            new AssignmentTypeArgumentRuleTemplate(),
+            new AttachmentInstructionRuleTemplate(),
+            new AttachmentRuleTemplate(),
+            new AttributeFeatureRuleTemplate(),
+            new CheckInstructionRuleTemplate(),
+            new CommandInstructionRuleTemplate(),
+            new CommandOverloadRuleTemplate(),
+            new CommandOverloadTypeRuleTemplate(),
+            new ConditionalRuleTemplate(),
+            new ConstantFeatureRuleTemplate(),
+            new ConstraintConformanceRuleTemplate(),
+            new ConstraintParentTypeRuleTemplate(),
+            new ConstraintRenameRuleTemplate(),
+            new ContinuationRuleTemplate(),
 
             new GenericRuleTemplate(),
         };

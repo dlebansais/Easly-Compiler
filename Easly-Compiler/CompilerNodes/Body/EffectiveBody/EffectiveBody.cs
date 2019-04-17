@@ -11,6 +11,20 @@ namespace CompilerNode
     /// </summary>
     public interface IEffectiveBody : BaseNode.IEffectiveBody, IBody, ICompiledBody, IScopeHolder
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.EffectiveBody.EntityDeclarationBlocks"/>.
+        /// </summary>
+        IList<IEntityDeclaration> EntityDeclarationList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.EffectiveBody.BodyInstructionBlocks"/>.
+        /// </summary>
+        IList<IInstruction> BodyInstructionList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.EffectiveBody.ExceptionHandlerBlocks"/>.
+        /// </summary>
+        IList<IExceptionHandler> ExceptionHandlerList { get; }
     }
 
     /// <summary>

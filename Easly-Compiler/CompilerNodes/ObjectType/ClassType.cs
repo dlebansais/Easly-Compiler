@@ -65,14 +65,30 @@
         public static IClassType ClassAnyValueType { get; }
 
         /// <summary>
+        /// Creates a <see cref="ClassType"/>.
+        /// </summary>
+        /// <param name="baseClass">The class used to instanciate this type.</param>
+        /// <param name="typeArgumentTable">Arguments if the class is generic.</param>
+        /// <param name="instancingClassType">The class type if this instance is a derivation (such as renaming).</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="classType">The class type, if successful.</param>
+        public static bool Create(IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, IList<IError> errorList, out IClassType classType)
+        {
+            classType = new ClassType(baseClass, typeArgumentTable, instancingClassType, errorList);
+            return true;
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ClassType"/> class.
         /// </summary>
         /// <param name="baseClass">The class used to instanciate this type.</param>
         /// <param name="typeArgumentTable">Arguments if the class is generic.</param>
         /// <param name="instancingClassType">The class type if this instance is a derivation (such as renaming).</param>
         /// <param name="errorList">The list of errors found.</param>
-        public ClassType(IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, IList<IError> errorList)
+        private ClassType(IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, IList<IError> errorList)
         {
+            bool Success = true;
+
             BaseClass = baseClass;
             TypeArgumentTable = typeArgumentTable;
 
@@ -87,7 +103,7 @@
                         {
                             ITypeName ParentTypeName = InheritanceItem.ResolvedParentTypeName.Item;
                             ICompiledType ParentType = InheritanceItem.ResolvedParentType.Item;
-                            ParentType.InstanciateType(instancingClassType, ref ParentTypeName, ref ParentType, errorList);
+                            Success &= ParentType.InstanciateType(instancingClassType, ref ParentTypeName, ref ParentType, errorList);
                             ConformanceTable.Add(ParentTypeName, ParentType);
                         }
 
@@ -271,8 +287,10 @@
         /// <param name="baseClass">The class with inheritance to merge.</param>
         /// <param name="resolvedClassType">The type from the class.</param>
         /// <param name="errorList">The list of errors found.</param>
-        public static void MergeConformingParentTypes(IClass baseClass, IClassType resolvedClassType, IList<IError> errorList)
+        public static bool MergeConformingParentTypes(IClass baseClass, IClassType resolvedClassType, IList<IError> errorList)
         {
+            bool Success = true;
+
             foreach (IInheritance InheritanceItem in baseClass.InheritanceList)
                 if (InheritanceItem.Conformance == BaseNode.ConformanceType.Conformant)
                 {
@@ -289,7 +307,7 @@
                 ITypeName ResolvedTypeName = Record.ResolvedTypeName;
                 ICompiledType ResolvedType = Record.ResolvedType;
 
-                ResolvedType.InstanciateType(InstancingClassType, ref ResolvedTypeName, ref ResolvedType, errorList);
+                Success &= ResolvedType.InstanciateType(InstancingClassType, ref ResolvedTypeName, ref ResolvedType, errorList);
                 Record.ResolvedTypeName = ResolvedTypeName;
                 Record.ResolvedType = ResolvedType;
 
@@ -302,7 +320,7 @@
                         {
                             ITypeName ParentTypeName = InheritanceItem.ResolvedParentTypeName.Item;
                             ICompiledType ParentType = InheritanceItem.ResolvedParentType.Item;
-                            ParentType.InstanciateType(ResolvedInstancingClassType, ref ParentTypeName, ref ParentType, errorList);
+                            Success &= ParentType.InstanciateType(ResolvedInstancingClassType, ref ParentTypeName, ref ParentType, errorList);
 
                             Record.ResolvedType.ConformanceTable.Add(ParentTypeName, ParentType);
                         }
@@ -310,6 +328,8 @@
                     Record.ResolvedType.ConformanceTable.Seal();
                 }
             }
+
+            return Success;
         }
 
         /// <summary>
@@ -319,8 +339,9 @@
         /// <param name="resolvedTypeName">The proposed type instance name.</param>
         /// <param name="resolvedType">The proposed type instance.</param>
         /// <param name="errorList">The list of errors found.</param>
-        public void InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType, IList<IError> errorList)
+        public bool InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType, IList<IError> errorList)
         {
+            bool Success = true;
             bool IsNewInstance = false;
 
             IHashtableEx<string, ICompiledType> InstancedTypeArgumentTable = new HashtableEx<string, ICompiledType>();
@@ -328,7 +349,7 @@
             {
                 ITypeName InstancedTypeArgumentName = null;
                 ICompiledType InstancedTypeArgument = TypeArgument.Value;
-                InstancedTypeArgument.InstanciateType(instancingClassType, ref InstancedTypeArgumentName, ref InstancedTypeArgument, errorList);
+                Success &= InstancedTypeArgument.InstanciateType(instancingClassType, ref InstancedTypeArgumentName, ref InstancedTypeArgument, errorList);
 
                 InstancedTypeArgumentTable.Add(TypeArgument.Key, InstancedTypeArgument);
 
@@ -338,6 +359,8 @@
 
             if (IsNewInstance)
                 ResolveType(instancingClassType.BaseClass.TypeTable, BaseClass, InstancedTypeArgumentTable, instancingClassType, errorList, out resolvedTypeName, out resolvedType);
+
+            return Success;
         }
         #endregion
 

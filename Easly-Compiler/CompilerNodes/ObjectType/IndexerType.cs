@@ -406,19 +406,20 @@
         /// <param name="resolvedTypeName">The proposed type instance name.</param>
         /// <param name="resolvedType">The proposed type instance.</param>
         /// <param name="errorList">The list of errors found.</param>
-        public void InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType, IList<IError> errorList)
+        public bool InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType, IList<IError> errorList)
         {
+            bool Success = true;
             bool IsNewInstance = false;
 
             ITypeName InstancedBaseTypeName = ResolvedBaseTypeName.Item;
             ICompiledType InstancedBaseType = ResolvedBaseType.Item;
-            InstancedBaseType.InstanciateType(instancingClassType, ref InstancedBaseTypeName, ref InstancedBaseType, errorList);
+            Success &= InstancedBaseType.InstanciateType(instancingClassType, ref InstancedBaseTypeName, ref InstancedBaseType, errorList);
             if (InstancedBaseType != ResolvedBaseType.Item)
                 IsNewInstance = true;
 
             ITypeName InstancedEntityTypeName = ResolvedEntityTypeName.Item;
             ICompiledType InstancedEntityType = ResolvedEntityType.Item;
-            InstancedEntityType.InstanciateType(instancingClassType, ref InstancedEntityTypeName, ref InstancedEntityType, errorList);
+            Success &= InstancedEntityType.InstanciateType(instancingClassType, ref InstancedEntityTypeName, ref InstancedEntityType, errorList);
             if (InstancedEntityType != ResolvedEntityType.Item)
                 IsNewInstance = true;
 
@@ -427,7 +428,7 @@
             {
                 ITypeName InstancedParameterTypeName = Parameter.ValidEntity.Item.ResolvedFeatureTypeName.Item;
                 ICompiledType InstancedParameterType = Parameter.ValidEntity.Item.ResolvedFeatureType.Item;
-                InstancedParameterType.InstanciateType(instancingClassType, ref InstancedParameterTypeName, ref InstancedParameterType, errorList);
+                Success &= InstancedParameterType.InstanciateType(instancingClassType, ref InstancedParameterTypeName, ref InstancedParameterType, errorList);
 
                 IEntityDeclaration InstancedParameter = new EntityDeclaration();
                 InstancedParameter.ResolvedEntityTypeName.Item = InstancedParameterTypeName;
@@ -437,9 +438,9 @@
 
                 IScopeAttributeFeature NewEntity;
                 if (Parameter.DefaultValue.IsAssigned)
-                    NewEntity = new ScopeAttributeFeature(Parameter, ParameterName.ValidText.Item, InstancedParameterTypeName, InstancedParameterType, (IExpression)Parameter.DefaultValue.Item, errorList);
+                    Success &= ScopeAttributeFeature.Create(Parameter, ParameterName.ValidText.Item, InstancedParameterTypeName, InstancedParameterType, (IExpression)Parameter.DefaultValue.Item, errorList, out NewEntity);
                 else
-                    NewEntity = new ScopeAttributeFeature(Parameter, ParameterName.ValidText.Item, InstancedParameterTypeName, InstancedParameterType, errorList);
+                    Success &= ScopeAttributeFeature.Create(Parameter, ParameterName.ValidText.Item, InstancedParameterTypeName, InstancedParameterType, errorList, out NewEntity);
                 InstancedParameter.ValidEntity.Item = NewEntity;
 
                 InstancedIndexParameterList.Add(InstancedParameter);
@@ -450,6 +451,8 @@
 
             if (IsNewInstance)
                 ResolveType(instancingClassType.BaseClass.TypeTable, InstancedBaseTypeName, InstancedBaseType, InstancedEntityTypeName, InstancedEntityType, IndexerKind, InstancedIndexParameterList, ParameterEnd, GetRequireList, GetEnsureList, GetExceptionIdentifierList, SetRequireList, SetEnsureList, SetExceptionIdentifierList, out resolvedTypeName, out resolvedType);
+
+            return Success;
         }
         #endregion
 

@@ -6,29 +6,28 @@
     using Easly;
 
     /// <summary>
-    /// A rule to process <see cref="IAsLongAsInstruction"/>.
+    /// A rule to process <see cref="IAttachment"/>.
     /// </summary>
-    public interface IAsLongAsInstructionRuleTemplate : IRuleTemplate
+    public interface IAttachmentRuleTemplate : IRuleTemplate
     {
     }
 
     /// <summary>
-    /// A rule to process <see cref="IAsLongAsInstruction"/>.
+    /// A rule to process <see cref="IAttachment"/>.
     /// </summary>
-    public class AsLongAsInstructionRuleTemplate : RuleTemplate<IAsLongAsInstruction, AsLongAsInstructionRuleTemplate>, IAsLongAsInstructionRuleTemplate
+    public class AttachmentRuleTemplate : RuleTemplate<IAttachment, AttachmentRuleTemplate>, IAttachmentRuleTemplate
     {
         #region Init
-        static AsLongAsInstructionRuleTemplate()
+        static AttachmentRuleTemplate()
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new SealedTableCollectionSourceTemplate<IAsLongAsInstruction, IContinuation, string, IScopeAttributeFeature>(nameof(IAsLongAsInstruction.ContinuationList), nameof(IContinuation.LocalScope)),
-                new ConditionallyAssignedSealedTableSourceTemplate<IAsLongAsInstruction, IScope, string, IScopeAttributeFeature>(nameof(IAsLongAsInstruction.ElseInstructions), nameof(IScope.LocalScope)),
+                new SealedTableSourceTemplate<IAttachment, string, IScopeAttributeFeature>(nameof(IAttachment.Instructions) + Dot + nameof(IInstruction.LocalScope)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new UnsealedTableDestinationTemplate<IAsLongAsInstruction, string, IScopeAttributeFeature>(nameof(IAsLongAsInstruction.LocalScope)),
+                new UnsealedTableDestinationTemplate<IAttachment, string, IScopeAttributeFeature>(nameof(IAttachment.LocalScope)),
             };
         }
         #endregion
@@ -41,7 +40,7 @@
         /// <param name="dataList">Optional data collected during inspection of sources.</param>
         /// <param name="data">Private data to give to Apply() upon return.</param>
         /// <returns>True if an error occured.</returns>
-        public override bool CheckConsistency(IAsLongAsInstruction node, IDictionary<ISourceTemplate, object> dataList, out object data)
+        public override bool CheckConsistency(IAttachment node, IDictionary<ISourceTemplate, object> dataList, out object data)
         {
             bool Success = true;
             data = null;
@@ -54,7 +53,7 @@
         /// </summary>
         /// <param name="node">The node instance to modify.</param>
         /// <param name="data">Private data from CheckConsistency().</param>
-        public override void Apply(IAsLongAsInstruction node, object data)
+        public override void Apply(IAttachment node, object data)
         {
             node.LocalScope.Seal();
             node.FullScope.Merge(node.LocalScope);
