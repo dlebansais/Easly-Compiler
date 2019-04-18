@@ -24,6 +24,18 @@
         /// Typedefs available in this type.
         /// </summary>
        IHashtableEx<IFeatureName, ITypedefType> TypedefTable { get; }
+
+        /// <summary>
+        /// Creates a clone of this type with renamed identifiers.
+        /// </summary>
+        /// <param name="renamedExportTable">The rename table for exports.</param>
+        /// <param name="renamedTypedefTable">The rename table for typedefs.</param>
+        /// <param name="renamedDiscreteTable">The rename table for discretes.</param>
+        /// <param name="renamedFeatureTable">The rename table for features.</param>
+        /// <param name="instancingClassType">The type that is requesting cloning.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="clonedType">The cloned type, if successful.</param>
+        bool CloneWithRenames(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> renamedExportTable, IHashtableEx<IFeatureName, ITypedefType> renamedTypedefTable, IHashtableEx<IFeatureName, IDiscrete> renamedDiscreteTable, IHashtableEx<IFeatureName, IFeatureInstance> renamedFeatureTable, IClassType instancingClassType, IList<IError> errorList, out IClassType clonedType);
     }
 
     /// <summary>
@@ -507,6 +519,36 @@
                     return false;
 
             return true;
+        }
+
+        /// <summary>
+        /// Creates a clone of this type with renamed identifiers.
+        /// </summary>
+        /// <param name="renamedExportTable">The rename table for exports.</param>
+        /// <param name="renamedTypedefTable">The rename table for typedefs.</param>
+        /// <param name="renamedDiscreteTable">The rename table for discretes.</param>
+        /// <param name="renamedFeatureTable">The rename table for features.</param>
+        /// <param name="instancingClassType">The type that is requesting cloning.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="clonedType">The cloned type, if successful.</param>
+        public bool CloneWithRenames(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> renamedExportTable, IHashtableEx<IFeatureName, ITypedefType> renamedTypedefTable, IHashtableEx<IFeatureName, IDiscrete> renamedDiscreteTable, IHashtableEx<IFeatureName, IFeatureInstance> renamedFeatureTable, IClassType instancingClassType, IList<IError> errorList, out IClassType clonedType)
+        {
+            bool Success = false;
+
+            if (Create(BaseClass, TypeArgumentTable, instancingClassType, errorList, out clonedType))
+            {
+                clonedType.ExportTable.Merge(renamedExportTable);
+                clonedType.ExportTable.Seal();
+                clonedType.TypedefTable.Merge(renamedTypedefTable);
+                clonedType.TypedefTable.Seal();
+                clonedType.DiscreteTable.Merge(renamedDiscreteTable);
+                clonedType.DiscreteTable.Seal();
+                clonedType.FeatureTable.Merge(renamedFeatureTable);
+                clonedType.FeatureTable.Seal();
+                Success = true;
+            }
+
+            return Success;
         }
         #endregion
     }

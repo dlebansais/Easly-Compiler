@@ -15,6 +15,12 @@ namespace CompilerNode
         /// Replicated list from <see cref="BaseNode.TupleType.EntityDeclarationBlocks"/>.
         /// </summary>
         IList<IEntityDeclaration> EntityDeclarationList { get; }
+
+        /// <summary>
+        /// Creates a clone of this type with renamed identifiers.
+        /// </summary>
+        /// <param name="renamedFieldTable">The rename table for fields.</param>
+        ITupleType CloneWithRenames(IHashtableEx<IFeatureName, IFeatureInstance> renamedFieldTable);
     }
 
     /// <summary>
@@ -346,6 +352,21 @@ namespace CompilerNode
                     return false;
 
             return true;
+        }
+
+        /// <summary>
+        /// Creates a clone of this type with renamed identifiers.
+        /// </summary>
+        /// <param name="renamedFieldTable">The rename table for fields.</param>
+        public ITupleType CloneWithRenames(IHashtableEx<IFeatureName, IFeatureInstance> renamedFieldTable)
+        {
+            ITupleType ClonedTupleType = new TupleType(EntityDeclarationList, Sharing);
+            ClonedTupleType.ResolvedTypeName.Item = new TypeName(ResolvedTypeName.Item.Name);
+            ClonedTupleType.ResolvedType.Item = ResolvedType.Item;
+            ClonedTupleType.FeatureTable.Merge(renamedFieldTable);
+            ClonedTupleType.FeatureTable.Seal();
+
+            return ClonedTupleType;
         }
         #endregion
     }

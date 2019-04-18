@@ -55,8 +55,8 @@
             data = null;
             bool Result = false;
 
-            IHashtableEx<TKey, TValue> Value = GetSourceObject(node);
-            if (Value.IsSealed)
+            IHashtableEx<TKey, TValue> Value = GetSourceObject(node, out bool IsInterrupted);
+            if (!IsInterrupted && Value.IsSealed)
             {
                 data = Value;
                 Result = true;

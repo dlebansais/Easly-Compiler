@@ -1183,6 +1183,14 @@
                             IsHandled = true;
                             break;
 
+                        case ICreateInstruction AsCreateInstruction:
+                            IsHandled = true;
+                            break;
+
+                        case ICreationFeature AsCreationFeature:
+                            IsHandled = true;
+                            break;
+
                         case IGeneric AsGeneric:
                             IsHandled = true;
                             IsResolved = AsGeneric.ResolvedGenericTypeName.IsAssigned && AsGeneric.ResolvedGenericType.IsAssigned;

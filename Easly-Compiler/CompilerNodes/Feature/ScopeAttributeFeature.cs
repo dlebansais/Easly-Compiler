@@ -10,6 +10,10 @@ namespace CompilerNode
     /// </summary>
     public interface IScopeAttributeFeature : IFeatureWithName, ICompiledFeature
     {
+        /// <summary>
+        /// The default value, if any.
+        /// </summary>
+        IOptionalReference<IExpression> DefaultValue { get; }
     }
 
     /// <summary>

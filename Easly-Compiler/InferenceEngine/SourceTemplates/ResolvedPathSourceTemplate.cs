@@ -55,8 +55,8 @@
             data = null;
             bool Result = false;
 
-            OnceReference<IList<IIdentifier>> Value = GetSourceObject(node);
-            if (Value.IsAssigned)
+            OnceReference<IList<IIdentifier>> Value = GetSourceObject(node, out bool IsInterrupted);
+            if (!IsInterrupted && Value.IsAssigned)
             {
                 IList<IIdentifier> Path = Value.Item;
                 foreach (IIdentifier Identifier in Path)

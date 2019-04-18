@@ -40,6 +40,11 @@ namespace CompilerNode
         /// Table of resolved renames.
         /// </summary>
         IHashtableEx<IIdentifier, IIdentifier> RenameTable { get; }
+
+        /// <summary>
+        /// The resolved type after rename.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedTypeWithRename { get; }
     }
 
     /// <summary>
@@ -142,6 +147,7 @@ namespace CompilerNode
                 ResolvedConformingTypeName = new OnceReference<ITypeName>();
                 ResolvedConformingType = new OnceReference<ICompiledType>();
                 RenameTable = new HashtableEx<IIdentifier, IIdentifier>();
+                ResolvedTypeWithRename = new OnceReference<ICompiledType>();
                 IsHandled = true;
             }
 
@@ -174,6 +180,11 @@ namespace CompilerNode
         /// Table of resolved renames.
         /// </summary>
         public IHashtableEx<IIdentifier, IIdentifier> RenameTable { get; private set; } = new HashtableEx<IIdentifier, IIdentifier>();
+
+        /// <summary>
+        /// The resolved type after rename.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedTypeWithRename { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
     }
 }

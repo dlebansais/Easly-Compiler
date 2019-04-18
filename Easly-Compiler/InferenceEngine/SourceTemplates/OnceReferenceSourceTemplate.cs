@@ -55,8 +55,8 @@
             data = null;
             bool Result = false;
 
-            OnceReference<TRef> Value = GetSourceObject(node);
-            if (Value.IsAssigned)
+            OnceReference<TRef> Value = GetSourceObject(node, out bool IsInterrupted);
+            if (!IsInterrupted && Value.IsAssigned)
             {
                 data = Value.Item;
                 Result = true;

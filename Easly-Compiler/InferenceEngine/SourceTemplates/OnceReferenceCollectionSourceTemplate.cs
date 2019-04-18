@@ -64,30 +64,32 @@
         /// <param name="data">Optional data returned to the caller.</param>
         public override bool IsReady(TSource node, out object data)
         {
-            data = null;
-            bool Result = true;
-
-            IList ValueList = GetSourceObject(node);
+            IList ItemList = GetSourceObject(node, out bool IsInterrupted);
             IList<TValue> ReadyValueList = new List<TValue>();
 
-            foreach (TItem Value in ValueList)
+            for (int i = 0; i < ItemList.Count && !IsInterrupted; i++)
             {
-                OnceReference<TValue> Reference = ItemProperty.GetValue(Value) as OnceReference<TValue>;
+                TItem Item = (TItem)ItemList[i];
+
+                OnceReference<TValue> Reference = ItemProperty.GetValue(Item) as OnceReference<TValue>;
                 Debug.Assert(Reference != null);
 
-                if (!Reference.IsAssigned)
-                {
-                    Result = false;
-                    break;
-                }
-
-                ReadyValueList.Add(Reference.Item);
+                if (Reference.IsAssigned)
+                    ReadyValueList.Add(Reference.Item);
+                else
+                    IsInterrupted = true;
             }
 
-            if (Result)
+            if (IsInterrupted)
+            {
+                data = null;
+                return false;
+            }
+            else
+            {
                 data = ReadyValueList;
-
-            return Result;
+                return true;
+            }
         }
         #endregion
     }

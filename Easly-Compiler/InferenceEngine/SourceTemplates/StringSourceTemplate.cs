@@ -49,8 +49,8 @@
             data = null;
             bool Result = false;
 
-            string Value = GetSourceObject(node);
-            if (Value != null)
+            string Value = GetSourceObject(node, out bool IsInterrupted);
+            if (!IsInterrupted && Value != null)
             {
                 data = Value;
                 Result = true;

@@ -69,23 +69,27 @@
 
             IList<TRef> ReadyReferenceList = new List<TRef>();
 
-            IHashtableEx<TKey, TValue> ValueTable = GetSourceObject(node);
-            foreach (KeyValuePair<TKey, TValue> Entry in ValueTable)
-            {
-                TValue Value = Entry.Value;
-                Debug.Assert(Value != null);
+            IHashtableEx<TKey, TValue> ValueTable = GetSourceObject(node, out bool IsInterrupted);
 
-                OnceReference<TRef> Reference = ItemProperty.GetValue(Value) as OnceReference<TRef>;
-                Debug.Assert(Reference != null);
-
-                if (!Reference.IsAssigned)
+            if (IsInterrupted)
+                Result = false;
+            else
+                foreach (KeyValuePair<TKey, TValue> Entry in ValueTable)
                 {
-                    Result = false;
-                    break;
-                }
+                    TValue Value = Entry.Value;
+                    Debug.Assert(Value != null);
 
-                ReadyReferenceList.Add(Reference.Item);
-            }
+                    OnceReference<TRef> Reference = ItemProperty.GetValue(Value) as OnceReference<TRef>;
+                    Debug.Assert(Reference != null);
+
+                    if (!Reference.IsAssigned)
+                    {
+                        Result = false;
+                        break;
+                    }
+
+                    ReadyReferenceList.Add(Reference.Item);
+                }
 
             if (Result)
                 data = ReadyReferenceList;

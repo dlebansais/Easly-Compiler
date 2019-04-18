@@ -38,7 +38,8 @@
         /// Gets the source's current value.
         /// </summary>
         /// <param name="source">The node for which the value is requested.</param>
-        TValue GetSourceObject(TSource source);
+        /// <param name="isInterrupted">True is progressing through the path was interrupted.</param>
+        TValue GetSourceObject(TSource source, out bool isInterrupted);
     }
 
     /// <summary>
@@ -60,7 +61,7 @@
             StartingPoint = startingPoint ?? TemplateNodeStart<TSource>.Default;
 
             List<PropertyInfo> PropertyPath = new List<PropertyInfo>();
-            BuildPropertyPath(StartingPoint.PropertyType, path, PropertyPath);
+            TemplateHelper.BuildPropertyPath(StartingPoint.PropertyType, path, PropertyPath);
             Debug.Assert(PropertyPath.Count > 0);
 
             this.PropertyPath = PropertyPath.AsReadOnly();
@@ -89,53 +90,10 @@
         /// Gets the source's current value.
         /// </summary>
         /// <param name="source">The node for which the value is requested.</param>
-        public virtual TValue GetSourceObject(TSource source)
+        /// <param name="isInterrupted">True is progressing through the path was interrupted.</param>
+        public virtual TValue GetSourceObject(TSource source, out bool isInterrupted)
         {
-            object IntermediateResult = StartingPoint.GetStart(source);
-
-            for (int i = 0; i < PropertyPath.Count; i++)
-                IntermediateResult = PropertyPath[i].GetValue(IntermediateResult);
-
-            TValue Result = default;
-
-            try
-            {
-                Result = (TValue)IntermediateResult;
-            }
-            catch (Exception e)
-            {
-                Debug.Fail(e.Message);
-            }
-
-            return Result;
-        }
-        #endregion
-
-        #region Implementation
-        /// <summary>
-        /// Recursively build a path of properties from a base node to the final property.
-        /// </summary>
-        /// <param name="type">The current object type.</param>
-        /// <param name="path">The remaining path to parse.</param>
-        /// <param name="propertyPath">Accumulated properties in the path so far.</param>
-        private void BuildPropertyPath(Type type, string path, List<PropertyInfo> propertyPath)
-        {
-            if (path.Length == 0)
-                return;
-
-            int Index = path.IndexOf(InferenceEngine.Dot);
-            int ThisPathIndex = (Index >= 0) ? Index : path.Length;
-            string PropertyName = path.Substring(0, ThisPathIndex);
-            int NextPathIndex = (Index >= 0) ? Index + 1 : path.Length;
-            string NextPath = path.Substring(NextPathIndex);
-
-            PropertyInfo Property = NodeTreeHelper.GetPropertyOf(type, PropertyName);
-            Debug.Assert(Property != null);
-
-            propertyPath.Add(Property);
-
-            Type NestedType = TemplateHelper.ToCompilerType(Property.PropertyType);
-            BuildPropertyPath(NestedType, NextPath, propertyPath);
+            return TemplateHelper.GetPropertyPathValue<TSource, TValue>(source, StartingPoint, PropertyPath, out isInterrupted);
         }
 
         /// <summary></summary>

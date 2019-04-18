@@ -65,7 +65,10 @@
             new ConstraintConformanceRuleTemplate(),
             new ConstraintParentTypeRuleTemplate(),
             new ConstraintRenameRuleTemplate(),
+            new ConstraintRuleTemplate(),
             new ContinuationRuleTemplate(),
+            new CreateInstructionRuleTemplate(),
+            new CreationFeatureRuleTemplate(),
 
             new GenericRuleTemplate(),
         };
