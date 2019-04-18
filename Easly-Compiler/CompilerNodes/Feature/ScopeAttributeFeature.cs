@@ -288,7 +288,7 @@ namespace CompilerNode
         /// <summary>
         /// The generated attribute name.
         /// </summary>
-        public IName EntityName { get; }
+        public BaseNode.IName EntityName { get; }
 
         /// <summary>
         /// The default value, if any.

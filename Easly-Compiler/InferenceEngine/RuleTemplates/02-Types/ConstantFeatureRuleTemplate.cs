@@ -50,7 +50,7 @@
             data = null;
             bool Success = false;
 
-            IName EntityName = (IName)node.EntityName;
+            IName EntityName = (IName)((IFeatureWithName)node).EntityName;
             IObjectType TypeToResolve = (IObjectType)node.EntityType;
             IClass EmbeddingClass = node.EmbeddingClass;
 

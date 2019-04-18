@@ -49,7 +49,7 @@
             bool Success = true;
             data = null;
 
-            IName CreationName = (IName)node.EntityName;
+            IName EntityName = (IName)((IFeatureWithName)node).EntityName;
 
             // This is ensured because the root not is valid.
             Debug.Assert(node.OverloadList.Count > 0);
@@ -64,7 +64,7 @@
 
                 if (ThisOverloadBody.IsDeferredBody != FirstOverloadBody.IsDeferredBody)
                 {
-                    ErrorList.Add(new ErrorBodyTypeMismatch(node, CreationName.ValidText.Item));
+                    ErrorList.Add(new ErrorBodyTypeMismatch(node, EntityName.ValidText.Item));
                     Success = false;
                     break;
                 }

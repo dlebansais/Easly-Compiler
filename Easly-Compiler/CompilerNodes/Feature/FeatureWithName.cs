@@ -7,5 +7,9 @@
     /// </summary>
     public interface IFeatureWithName : IFeature
     {
+        /// <summary>
+        /// The feature name.
+        /// </summary>
+        BaseNode.IName EntityName { get; }
     }
 }

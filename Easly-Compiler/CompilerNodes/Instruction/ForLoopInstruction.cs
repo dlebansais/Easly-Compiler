@@ -11,6 +11,30 @@ namespace CompilerNode
     /// </summary>
     public interface IForLoopInstruction : BaseNode.IForLoopInstruction, IInstruction, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.ForLoopInstruction.EntityDeclarationBlocks"/>.
+        /// </summary>
+        IList<IEntityDeclaration> EntityDeclarationList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.ForLoopInstruction.InitInstructionBlocks"/>.
+        /// </summary>
+        IList<IInstruction> InitInstructionList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.ForLoopInstruction.LoopInstructionBlocks"/>.
+        /// </summary>
+        IList<IInstruction> LoopInstructionList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.ForLoopInstruction.IterationInstructionBlocks"/>.
+        /// </summary>
+        IList<IInstruction> IterationInstructionList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.ForLoopInstruction. InvariantBlocks"/>.
+        /// </summary>
+        IList<IAssertion> InvariantList { get; }
     }
 
     /// <summary>

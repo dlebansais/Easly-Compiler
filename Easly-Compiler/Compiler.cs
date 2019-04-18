@@ -1191,9 +1191,49 @@
                             IsHandled = true;
                             break;
 
+                        case IDebugInstruction AsDebugInstruction:
+                            IsHandled = true;
+                            break;
+
+                        case IDiscrete AsDiscrete:
+                            IsHandled = true;
+                            break;
+
+                        case IEffectiveBody AsEffectiveBody:
+                            IsHandled = true;
+                            break;
+
+                        case IEntityDeclaration AsEntityDeclaration:
+                            IsHandled = true;
+                            break;
+
+                        case IExportChange AsExportChange:
+                            IsHandled = true;
+                            break;
+
+                        case IExport AsExport:
+                            IsHandled = true;
+                            break;
+
+                        case IFunctionFeature AsFunctionFeature:
+                            IsHandled = true;
+                            break;
+
+                        case IForLoopInstruction AsForLoopInstruction:
+                            IsHandled = true;
+                            break;
+
                         case IGeneric AsGeneric:
                             IsHandled = true;
                             IsResolved = AsGeneric.ResolvedGenericTypeName.IsAssigned && AsGeneric.ResolvedGenericType.IsAssigned;
+                            break;
+
+                        case IProcedureFeature AsProcedureFeature:
+                            IsHandled = true;
+                            break;
+
+                        case IPropertyFeature AsPropertyFeature:
+                            IsHandled = true;
                             break;
                     }
 
