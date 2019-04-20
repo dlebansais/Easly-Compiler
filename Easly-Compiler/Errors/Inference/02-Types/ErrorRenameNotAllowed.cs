@@ -1,7 +1,5 @@
 ﻿namespace EaslyCompiler
 {
-    using CompilerNode;
-
     /// <summary>
     /// Rename not allowed.
     /// </summary>

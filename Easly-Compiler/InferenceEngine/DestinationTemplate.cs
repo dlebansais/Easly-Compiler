@@ -1,10 +1,8 @@
 ﻿namespace EaslyCompiler
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Reflection;
-    using BaseNodeHelper;
 
     /// <summary>
     /// Specifies a destination for a <see cref="IRuleTemplate"/>.

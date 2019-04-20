@@ -1,7 +1,5 @@
 ﻿namespace EaslyCompiler
 {
-    using CompilerNode;
-
     /// <summary>
     /// Type of an expression.
     /// </summary>

@@ -2,9 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using CompilerNode;
-    using Easly;
 
     /// <summary>
     /// A rule to process <see cref="IKeywordAnchoredType"/>.
