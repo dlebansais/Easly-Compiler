@@ -1,5 +1,6 @@
 namespace CompilerNode
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -249,6 +250,16 @@ namespace CompilerNode
         /// List of resolved expressions that are constant numbers in this class.
         /// </summary>
         IList<IExpression> NodeWithNumberConstantList { get; }
+
+        /// <summary>
+        /// Table of imported language types.
+        /// </summary>
+        Dictionary<Guid, Tuple<ITypeName, IClassType>> ImportedLanguageTypeTable { get; }
+
+        /// <summary>
+        /// All resolved names.
+        /// </summary>
+        IHashtableEx<string, IHashtableEx> NamespaceTable { get; }
     }
 
     /// <summary>
@@ -520,6 +531,7 @@ namespace CompilerNode
                 GenericInstanceList = new List<IClassType>();
                 TypeTable = new HashtableEx<ITypeName, ICompiledType>();
                 ClassGroup = new StableReference<SingleClassGroup>();
+                ClassGroup.Item = new SingleClassGroup(this);
                 InheritanceTable = new HashtableEx<ITypeName, ICompiledType>();
                 ResolvedImportedClassTable = new HashtableEx<ITypeName, IClassType>();
                 BodyList = new List<IBody>();
@@ -527,6 +539,8 @@ namespace CompilerNode
                 QueryOverloadList = new List<IQueryOverload>();
                 NodeWithDefaultList = new List<IExpression>();
                 NodeWithNumberConstantList = new List<IExpression>();
+                ImportedLanguageTypeTable = new Dictionary<Guid, Tuple<ITypeName, IClassType>>();
+                NamespaceTable = new HashtableEx<string, IHashtableEx>();
                 LocalScope = new HashtableEx<string, IScopeAttributeFeature>();
                 InnerScopes = new List<IScopeHolder>();
                 FullScope = new HashtableEx<string, IScopeAttributeFeature>();
@@ -938,6 +952,16 @@ namespace CompilerNode
         /// List of resolved expressions that are constant numbers in this class.
         /// </summary>
         public IList<IExpression> NodeWithNumberConstantList { get; private set; } = new List<IExpression>();
+
+        /// <summary>
+        /// Table of imported language types.
+        /// </summary>
+        public Dictionary<Guid, Tuple<ITypeName, IClassType>> ImportedLanguageTypeTable { get; private set; } = new Dictionary<Guid, Tuple<ITypeName, IClassType>>();
+
+        /// <summary>
+        /// All resolved names.
+        /// </summary>
+        public IHashtableEx<string, IHashtableEx> NamespaceTable { get; private set; } = new HashtableEx<string, IHashtableEx>();
         #endregion
 
         #region Debugging

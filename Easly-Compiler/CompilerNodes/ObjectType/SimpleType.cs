@@ -10,6 +10,30 @@ namespace CompilerNode
     /// </summary>
     public interface ISimpleType : BaseNode.ISimpleType, IObjectType
     {
+        /// <summary>
+        /// Type name of the source.
+        /// </summary>
+        OnceReference<ITypeName> TypeNameSource { get; }
+
+        /// <summary>
+        /// Type of the source.
+        /// </summary>
+        OnceReference<ICompiledType> TypeSource { get; }
+
+        /// <summary>
+        /// Name of the source type.
+        /// </summary>
+        OnceReference<string> ValidTypeSource { get; }
+
+        /// <summary>
+        /// Name of the source type when a formal generic.
+        /// </summary>
+        OnceReference<ITypeName> FormalGenericNameSource { get; }
+
+        /// <summary>
+        /// Source type when a formal generic.
+        /// </summary>
+        OnceReference<ICompiledType> FormalGenericSource { get; }
     }
 
     /// <summary>
@@ -79,6 +103,11 @@ namespace CompilerNode
             {
                 ResolvedTypeName = new OnceReference<ITypeName>();
                 ResolvedType = new OnceReference<ICompiledType>();
+                TypeNameSource = new OnceReference<ITypeName>();
+                TypeSource = new OnceReference<ICompiledType>();
+                ValidTypeSource = new OnceReference<string>();
+                FormalGenericNameSource = new OnceReference<ITypeName>();
+                FormalGenericSource = new OnceReference<ICompiledType>();
                 IsHandled = true;
             }
 
@@ -96,6 +125,33 @@ namespace CompilerNode
         /// The resolved type.
         /// </summary>
         public OnceReference<ICompiledType> ResolvedType { get; private set; } = new OnceReference<ICompiledType>();
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Type name of the source.
+        /// </summary>
+        public OnceReference<ITypeName> TypeNameSource { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// Type of the source.
+        /// </summary>
+        public OnceReference<ICompiledType> TypeSource { get; private set; } = new OnceReference<ICompiledType>();
+
+        /// <summary>
+        /// Name of the source type.
+        /// </summary>
+        public OnceReference<string> ValidTypeSource { get; private set; } = new OnceReference<string>();
+
+        /// <summary>
+        /// Name of the source type when a formal generic.
+        /// </summary>
+        public OnceReference<ITypeName> FormalGenericNameSource { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// Source type when a formal generic.
+        /// </summary>
+        public OnceReference<ICompiledType> FormalGenericSource { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
     }
 }

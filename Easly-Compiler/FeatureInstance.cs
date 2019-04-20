@@ -48,6 +48,36 @@
         /// The first precursor in the inheritance tree.
         /// </summary>
         OnceReference<IPrecursorInstance> OriginalPrecursor { get; }
+
+        /// <summary>
+        /// Sets the <see cref="IsForgotten"/> flag.
+        /// </summary>
+        /// <param name="isForgotten">The new value.</param>
+        void SetIsForgotten(bool isForgotten);
+
+        /// <summary>
+        /// Sets the <see cref="IsKept"/> flag.
+        /// </summary>
+        /// <param name="isKept">The new value.</param>
+        void SetIsKept(bool isKept);
+
+        /// <summary>
+        /// Sets the <see cref="IsDiscontinued"/> flag.
+        /// </summary>
+        /// <param name="isDiscontinued">The new value.</param>
+        void SetIsDiscontinued(bool isDiscontinued);
+
+        /// <summary>
+        /// Sets the <see cref="InheritBySideAttribute"/> flag.
+        /// </summary>
+        /// <param name="inheritBySideAttribute">The new value.</param>
+        void SetInheritBySideAttribute(bool inheritBySideAttribute);
+
+        /// <summary>
+        /// Clones this instance using the specified ancestor.
+        /// </summary>
+        /// <param name="ancestor">The ancestor.</param>
+        IFeatureInstance Clone(IClassType ancestor);
     }
 
     /// <summary>
@@ -122,5 +152,71 @@
         /// The first precursor in the inheritance tree.
         /// </summary>
         public OnceReference<IPrecursorInstance> OriginalPrecursor { get; private set; }
+
+        #region Client Interface
+        /// <summary>
+        /// Sets the <see cref="IsForgotten"/> flag.
+        /// </summary>
+        /// <param name="isForgotten">The new value.</param>
+        public virtual void SetIsForgotten(bool isForgotten)
+        {
+            IsForgotten = isForgotten;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="IsKept"/> flag.
+        /// </summary>
+        /// <param name="isKept">The new value.</param>
+        public virtual void SetIsKept(bool isKept)
+        {
+            IsKept = isKept;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="IsDiscontinued"/> flag.
+        /// </summary>
+        /// <param name="isDiscontinued">The new value.</param>
+        public virtual void SetIsDiscontinued(bool isDiscontinued)
+        {
+            IsDiscontinued = isDiscontinued;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="InheritBySideAttribute"/> flag.
+        /// </summary>
+        /// <param name="inheritBySideAttribute">The new value.</param>
+        public virtual void SetInheritBySideAttribute(bool inheritBySideAttribute)
+        {
+            InheritBySideAttribute = inheritBySideAttribute;
+        }
+
+        /// <summary>
+        /// Clones this instance using the specified ancestor.
+        /// </summary>
+        /// <param name="ancestor">The ancestor.</param>
+        public virtual IFeatureInstance Clone(IClassType ancestor)
+        {
+            IPrecursorInstance NewPrecursor = new PrecursorInstance(ancestor, this);
+
+            IFeatureInstance ClonedObject;
+            if (Feature.IsAssigned)
+                ClonedObject = new FeatureInstance(Owner.Item, Feature.Item);
+            else
+                ClonedObject = new FeatureInstance(Owner.Item, Feature.Item); // Wait, what??
+
+            foreach (IPrecursorInstance PrecursorInstance in PrecursorList)
+                ClonedObject.PrecursorList.Add(PrecursorInstance);
+            ClonedObject.PrecursorList.Add(NewPrecursor);
+            ClonedObject.SetIsForgotten(IsForgotten);
+            ClonedObject.SetIsKept(IsKept);
+            ClonedObject.SetIsDiscontinued(IsDiscontinued);
+            ClonedObject.SetInheritBySideAttribute(InheritBySideAttribute);
+
+            if (OriginalPrecursor.IsAssigned)
+                ClonedObject.OriginalPrecursor.Item = OriginalPrecursor.Item;
+
+            return ClonedObject;
+        }
+        #endregion
     }
 }

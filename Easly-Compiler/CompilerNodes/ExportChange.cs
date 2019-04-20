@@ -25,6 +25,14 @@ namespace CompilerNode
         /// Valid export identifier.
         /// </summary>
         OnceReference<string> ValidExportIdentifier { get; }
+
+        /// <summary>
+        /// Apply changes in this instance to arguments.
+        /// </summary>
+        /// <param name="importedClassTable">The table of imported classes</param>
+        /// <param name="exportTable">The list of exports to change.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        bool ApplyChange(IHashtableEx<string, IImportedClass> importedClassTable, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IList<IError> errorList);
     }
 
     /// <summary>
@@ -139,6 +147,134 @@ namespace CompilerNode
         /// Valid export identifier.
         /// </summary>
         public OnceReference<string> ValidExportIdentifier { get; } = new OnceReference<string>();
+
+        /// <summary>
+        /// Apply changes in this instance to arguments.
+        /// </summary>
+        /// <param name="importedClassTable">The table of imported classes</param>
+        /// <param name="exportTable">The list of exports to change.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        public virtual bool ApplyChange(IHashtableEx<string, IImportedClass> importedClassTable, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IList<IError> errorList)
+        {
+            IIdentifier NodeExportIdentifier = (IIdentifier)ExportIdentifier;
+
+            if (!StringValidation.IsValidIdentifier(NodeExportIdentifier, ExportIdentifier.Text, out string ValidIdentifier, out IErrorStringValidity StringError))
+            {
+                errorList.Add(StringError);
+                return false;
+            }
+
+            OnceReference<IFeatureName> CurrentExportName = new OnceReference<IFeatureName>();
+            OnceReference<IHashtableEx<string, IClass>> CurrentClassTable = new OnceReference<IHashtableEx<string, IClass>>();
+            foreach (KeyValuePair<IFeatureName, IHashtableEx<string, IClass>> Entry in exportTable)
+            {
+                IFeatureName EntryName = Entry.Key;
+                if (EntryName.Name == ValidIdentifier)
+                {
+                    CurrentExportName.Item = EntryName;
+                    CurrentClassTable.Item = Entry.Value;
+                    break;
+                }
+            }
+
+            if (!CurrentClassTable.IsAssigned)
+            {
+                errorList.Add(new ErrorUnknownIdentifier((IIdentifier)ExportIdentifier, ValidIdentifier));
+                return false;
+            }
+
+            IHashtableEx<string, IHashtableEx<string, IClass>> ListedExportTable = new HashtableEx<string, IHashtableEx<string, IClass>>(); // string (export name) -> hashtable // string (class name) -> Class
+            IHashtableEx<string, IClass> ListedClassTable = new HashtableEx<string, IClass>(); // string (class name) -> Class
+
+            bool InvalidExportChange = false;
+            foreach (IIdentifier IdentifierItem in IdentifierList)
+            {
+                if (!StringValidation.IsValidIdentifier(NodeExportIdentifier, ExportIdentifier.Text, out ValidIdentifier, out StringError))
+                {
+                    errorList.Add(StringError);
+                    return false;
+                }
+
+                OnceReference<IHashtableEx<string, IClass>> ListedExport = new OnceReference<IHashtableEx<string, IClass>>();
+                foreach (KeyValuePair<IFeatureName, IHashtableEx<string, IClass>> Entry in exportTable)
+                {
+                    IFeatureName EntryName = Entry.Key;
+                    if (EntryName.Name == ValidIdentifier)
+                    {
+                        ListedExport.Item = Entry.Value;
+                        break;
+                    }
+                }
+
+                if (ListedExport.IsAssigned)
+                {
+                    if (ListedExportTable.ContainsKey(ValidIdentifier))
+                    {
+                        errorList.Add(new ErrorIdentifierAlreadyListed(IdentifierItem, ValidIdentifier));
+                        InvalidExportChange = true;
+                    }
+                    else
+                        ListedExportTable.Add(ValidIdentifier, ListedExport.Item);
+                }
+
+                else if (importedClassTable.ContainsKey(ValidIdentifier))
+                {
+                    if (ListedExportTable.ContainsKey(ValidIdentifier))
+                    {
+                        errorList.Add(new ErrorIdentifierAlreadyListed(IdentifierItem, ValidIdentifier));
+                        InvalidExportChange = true;
+                    }
+                    else
+                        ListedClassTable.Add(ValidIdentifier, importedClassTable[ValidIdentifier].Item);
+                }
+
+                else if (ValidIdentifier.ToLower() != LanguageClasses.Any.Name.ToLower())
+                {
+                    errorList.Add(new ErrorUnknownIdentifier(IdentifierItem, ValidIdentifier));
+                    InvalidExportChange = true;
+                }
+            }
+
+            if (InvalidExportChange)
+                return false;
+
+            IHashtableEx<string, IClass> ChangedClassTable = new HashtableEx<string, IClass>();
+
+            foreach (KeyValuePair<string, IClass> ListedEntry in CurrentClassTable.Item)
+            {
+                string ClassIdentifier = ListedEntry.Key;
+                IClass ListedClass = ListedEntry.Value;
+
+                if (!ChangedClassTable.ContainsKey(ClassIdentifier))
+                    ChangedClassTable.Add(ClassIdentifier, ListedClass);
+            }
+
+            foreach (KeyValuePair<string, IHashtableEx<string, IClass>> Entry in ListedExportTable)
+            {
+                IHashtableEx<string, IClass> ClassTable = Entry.Value;
+
+                foreach (KeyValuePair<string, IClass> ListedEntry in ClassTable)
+                {
+                    string ClassIdentifier = ListedEntry.Key;
+                    IClass ListedClass = ListedEntry.Value;
+
+                    if (!ChangedClassTable.ContainsKey(ClassIdentifier))
+                        ChangedClassTable.Add(ClassIdentifier, ListedClass);
+                }
+            }
+
+            foreach (KeyValuePair<string, IClass> ListedEntry in ListedClassTable)
+            {
+                string ClassIdentifier = ListedEntry.Key;
+                IClass ListedClass = ListedEntry.Value;
+
+                if (!ChangedClassTable.ContainsKey(ClassIdentifier))
+                    ChangedClassTable.Add(ClassIdentifier, ListedClass);
+            }
+
+            exportTable[CurrentExportName.Item] = ChangedClassTable;
+            return true;
+        }
         #endregion
     }
 }

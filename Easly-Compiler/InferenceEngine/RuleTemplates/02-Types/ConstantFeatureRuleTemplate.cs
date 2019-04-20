@@ -48,7 +48,7 @@
         public override bool CheckConsistency(IConstantFeature node, IDictionary<ISourceTemplate, object> dataList, out object data)
         {
             data = null;
-            bool Success = false;
+            bool Success = true;
 
             IName EntityName = (IName)((IFeatureWithName)node).EntityName;
             IObjectType TypeToResolve = (IObjectType)node.EntityType;

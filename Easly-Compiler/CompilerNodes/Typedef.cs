@@ -14,6 +14,16 @@ namespace CompilerNode
         /// The valid typedef name.
         /// </summary>
         OnceReference<IFeatureName> ValidTypedefName { get; }
+
+        /// <summary>
+        /// Resolved type name.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedDefinedTypeName { get; }
+
+        /// <summary>
+        /// Resolved type.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedDefinedType { get; }
     }
 
     /// <summary>
@@ -82,6 +92,8 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 ValidTypedefName = new OnceReference<IFeatureName>();
+                ResolvedDefinedTypeName = new OnceReference<ITypeName>();
+                ResolvedDefinedType = new OnceReference<ICompiledType>();
                 IsHandled = true;
             }
 
@@ -94,6 +106,16 @@ namespace CompilerNode
         /// The valid typedef name.
         /// </summary>
         public OnceReference<IFeatureName> ValidTypedefName { get; private set; } = new OnceReference<IFeatureName>();
+
+        /// <summary>
+        /// Resolved type name.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedDefinedTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// Resolved type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedDefinedType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
     }
 }

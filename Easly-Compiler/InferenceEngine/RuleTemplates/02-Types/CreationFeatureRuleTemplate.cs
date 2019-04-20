@@ -51,7 +51,7 @@
 
             IName EntityName = (IName)((IFeatureWithName)node).EntityName;
 
-            // This is ensured because the root not is valid.
+            // This is ensured because the root node is valid.
             Debug.Assert(node.OverloadList.Count > 0);
 
             ICommandOverload FirstOverload = node.OverloadList[0];

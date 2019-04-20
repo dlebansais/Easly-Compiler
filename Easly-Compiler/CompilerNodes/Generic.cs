@@ -27,6 +27,11 @@ namespace CompilerNode
         OnceReference<IFormalGenericType> ResolvedGenericType { get; }
 
         /// <summary>
+        /// Resolved type for the default value of the generic.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedDefaultType { get; }
+
+        /// <summary>
         /// Table of resolved conforming types.
         /// </summary>
         IHashtableEx<ITypeName, ICompiledType> ResolvedConformanceTable { get; }
@@ -129,6 +134,7 @@ namespace CompilerNode
             {
                 ResolvedGenericTypeName = new OnceReference<ITypeName>();
                 ResolvedGenericType = new OnceReference<IFormalGenericType>();
+                ResolvedDefaultType = new OnceReference<ICompiledType>();
                 ResolvedConformanceTable = new HashtableEx<ITypeName, ICompiledType>();
                 IsHandled = true;
             }
@@ -147,6 +153,11 @@ namespace CompilerNode
         /// The corresponding resolved type.
         /// </summary>
         public OnceReference<IFormalGenericType> ResolvedGenericType { get; private set; } = new OnceReference<IFormalGenericType>();
+
+        /// <summary>
+        /// Resolved type for the default value of the generic.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedDefaultType { get; private set; } = new OnceReference<ICompiledType>();
 
         /// <summary>
         /// Table of resolved conforming types.

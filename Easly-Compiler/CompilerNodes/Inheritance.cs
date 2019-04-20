@@ -49,7 +49,7 @@ namespace CompilerNode
         /// <summary>
         /// Name of the resolved parent type.
         /// </summary>
-        OnceReference<TypeName> ResolvedParentTypeName { get; }
+        OnceReference<ITypeName> ResolvedParentTypeName { get; }
 
         /// <summary>
         /// The resolved parent type.
@@ -220,7 +220,7 @@ namespace CompilerNode
             {
                 ResolvedTypeName = new OnceReference<ITypeName>();
                 ResolvedType = new OnceReference<IClassType>();
-                ResolvedParentTypeName = new OnceReference<TypeName>();
+                ResolvedParentTypeName = new OnceReference<ITypeName>();
                 ResolvedParentType = new OnceReference<ICompiledType>();
                 ResolvedClassParentTypeName = new OnceReference<ITypeName>();
                 ResolvedClassParentType = new OnceReference<IClassType>();
@@ -249,7 +249,7 @@ namespace CompilerNode
         /// <summary>
         /// Name of the resolved parent type.
         /// </summary>
-        public OnceReference<TypeName> ResolvedParentTypeName { get; private set; } = new OnceReference<TypeName>();
+        public OnceReference<ITypeName> ResolvedParentTypeName { get; private set; } = new OnceReference<ITypeName>();
 
         /// <summary>
         /// The resolved parent type.

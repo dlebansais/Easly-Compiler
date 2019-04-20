@@ -12,6 +12,11 @@ namespace CompilerNode
     public interface IFunctionFeature : BaseNode.IFunctionFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature
     {
         /// <summary>
+        /// Replicated list from <see cref="BaseNode.FunctionFeature.OverloadBlocks"/>.
+        /// </summary>
+        IList<IQueryOverload> OverloadList { get; }
+
+        /// <summary>
         /// The name of the resolved function type processing all overloads.
         /// </summary>
         OnceReference<ITypeName> MostCommonTypeName { get; }

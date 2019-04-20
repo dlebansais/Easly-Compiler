@@ -11,6 +11,20 @@ namespace CompilerNode
     /// </summary>
     public interface IOverLoopInstruction : BaseNode.IOverLoopInstruction, IInstruction, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.OverLoopInstruction.IndexerBlocks"/>.
+        /// </summary>
+        IList<IName> IndexerList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.OverLoopInstruction.InvariantBlocks"/>.
+        /// </summary>
+        IList<IAssertion> InvariantList { get; }
+
+        /// <summary>
+        /// Scope of instructions in the loop.
+        /// </summary>
+        IHashtableEx<string, IScopeAttributeFeature> InnerLoopScope { get; }
     }
 
     /// <summary>
@@ -117,6 +131,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
+                InnerLoopScope = new HashtableEx<string, IScopeAttributeFeature>();
                 LocalScope = new HashtableEx<string, IScopeAttributeFeature>();
                 InnerScopes = new List<IScopeHolder>();
                 FullScope = new HashtableEx<string, IScopeAttributeFeature>();
@@ -142,6 +157,13 @@ namespace CompilerNode
         /// All reachable entities.
         /// </summary>
         public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Scope of instructions in the loop.
+        /// </summary>
+        public IHashtableEx<string, IScopeAttributeFeature> InnerLoopScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
         #endregion
     }
 }

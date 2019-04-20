@@ -17,9 +17,35 @@ namespace CompilerNode
         IList<ITypeArgument> TypeArgumentList { get; }
 
         /// <summary>
+        /// Base class of the generic type.
+        /// </summary>
+        OnceReference<IClass> BaseClass { get; }
+
+        /// <summary>
+        /// The style of type arguments.
+        /// </summary>
+        TypeArgumentStyles ArgumentStyle { get; }
+
+        /// <summary>
         /// Table of argument identifiers for assignment.
         /// </summary>
         IHashtableEx<string, IIdentifier> ArgumentIdentifierTable { get; }
+
+        /// <summary>
+        /// Resolved types for arguments.
+        /// </summary>
+        OnceReference<IHashtableEx<string, ICompiledType>> ResolvedTypeArgumentTable { get; }
+
+        /// <summary>
+        /// Resolved locations for arguments.
+        /// </summary>
+        OnceReference<IHashtableEx<string, IObjectType>> ResolvedArgumentLocationTable { get; }
+
+        /// <summary>
+        /// Sets the style of type arguments.
+        /// </summary>
+        /// <param name="argumentStyle">The style of type arguments.</param>
+        void SetArgumentStyle(TypeArgumentStyles argumentStyle);
     }
 
     /// <summary>
@@ -117,9 +143,13 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
+                BaseClass = new OnceReference<IClass>();
+                ArgumentStyle = (TypeArgumentStyles)(-1);
                 ResolvedTypeName = new OnceReference<ITypeName>();
                 ResolvedType = new OnceReference<ICompiledType>();
                 ArgumentIdentifierTable = new HashtableEx<string, IIdentifier>();
+                ResolvedTypeArgumentTable = new OnceReference<IHashtableEx<string, ICompiledType>>();
+                ResolvedArgumentLocationTable = new OnceReference<IHashtableEx<string, IObjectType>>();
                 IsHandled = true;
             }
 
@@ -141,9 +171,41 @@ namespace CompilerNode
 
         #region Compiler
         /// <summary>
+        /// Base class of the generic type.
+        /// </summary>
+        public OnceReference<IClass> BaseClass { get; private set; } = new OnceReference<IClass>();
+
+        /// <summary>
+        /// The style of type arguments.
+        /// </summary>
+        public TypeArgumentStyles ArgumentStyle { get; private set; } = (TypeArgumentStyles)(-1);
+
+        /// <summary>
         /// Table of argument identifiers for assignment.
         /// </summary>
         public IHashtableEx<string, IIdentifier> ArgumentIdentifierTable { get; private set; } = new HashtableEx<string, IIdentifier>();
+
+        /// <summary>
+        /// Resolved types for arguments.
+        /// </summary>
+        public OnceReference<IHashtableEx<string, ICompiledType>> ResolvedTypeArgumentTable { get; private set; } = new OnceReference<IHashtableEx<string, ICompiledType>>();
+
+        /// <summary>
+        /// Resolved locations for arguments.
+        /// </summary>
+        public OnceReference<IHashtableEx<string, IObjectType>> ResolvedArgumentLocationTable { get; private set; } = new OnceReference<IHashtableEx<string, IObjectType>>();
+
+        /// <summary>
+        /// Sets the style of type arguments.
+        /// </summary>
+        /// <param name="argumentStyle">The style of type arguments.</param>
+        public void SetArgumentStyle(TypeArgumentStyles argumentStyle)
+        {
+            Debug.Assert(ArgumentStyle == (TypeArgumentStyles)(-1));
+            Debug.Assert(argumentStyle >= TypeArgumentStyles.None);
+
+            ArgumentStyle = argumentStyle;
+        }
         #endregion
     }
 }

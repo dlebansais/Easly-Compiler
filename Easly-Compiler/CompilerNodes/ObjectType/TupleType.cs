@@ -17,6 +17,11 @@ namespace CompilerNode
         IList<IEntityDeclaration> EntityDeclarationList { get; }
 
         /// <summary>
+        /// Table of resolved fields.
+        /// </summary>
+        IHashtableEx<string, IScopeAttributeFeature> FieldTable { get; }
+
+        /// <summary>
         /// Creates a clone of this type with renamed identifiers.
         /// </summary>
         /// <param name="renamedFieldTable">The rename table for fields.</param>
@@ -146,6 +151,8 @@ namespace CompilerNode
                 ExportTable = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
                 ConformanceTable = new HashtableEx<ITypeName, ICompiledType>();
                 InstancingRecordList = new List<TypeInstancingRecord>();
+                OriginatingTypedef = new OnceReference<ITypedef>();
+                FieldTable = new HashtableEx<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
 
@@ -230,6 +237,11 @@ namespace CompilerNode
         {
             get { return true; }
         }
+
+        /// <summary>
+        /// The typedef this type comes from, if assigned.
+        /// </summary>
+        public OnceReference<ITypedef> OriginatingTypedef { get; private set; } = new OnceReference<ITypedef>();
 
         /// <summary>
         /// Creates an instance of a class type, or reuse an existing instance.
@@ -340,6 +352,11 @@ namespace CompilerNode
         #endregion
 
         #region Compiler
+        /// <summary>
+        /// Table of resolved fields.
+        /// </summary>
+        public IHashtableEx<string, IScopeAttributeFeature> FieldTable { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+
         /// <summary>
         /// Compares two types.
         /// </summary>

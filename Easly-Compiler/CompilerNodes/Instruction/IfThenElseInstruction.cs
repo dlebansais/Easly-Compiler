@@ -11,6 +11,10 @@ namespace CompilerNode
     /// </summary>
     public interface IIfThenElseInstruction : BaseNode.IIfThenElseInstruction, IInstruction, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.IfThenElseInstruction.ConditionalBlocks"/>.
+        /// </summary>
+        IList<IConditional> ConditionalList { get; }
     }
 
     /// <summary>

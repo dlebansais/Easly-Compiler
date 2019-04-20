@@ -65,6 +65,11 @@
         /// The type of the resolved result type.
         /// </summary>
         OnceReference<ICompiledType> ResolvedEntityType { get; }
+
+        /// <summary>
+        /// Table of resolved parameters.
+        /// </summary>
+        ListTableEx<IParameter> ParameterTable { get; }
     }
 
     /// <summary>
@@ -263,6 +268,7 @@
                 ResolvedBaseType = new OnceReference<IClassType>();
                 ResolvedEntityTypeName = new OnceReference<ITypeName>();
                 ResolvedEntityType = new OnceReference<ICompiledType>();
+                ParameterTable = new ListTableEx<IParameter>();
                 ResolvedTypeName = new OnceReference<ITypeName>();
                 ResolvedType = new OnceReference<ICompiledType>();
                 DiscreteTable = new HashtableEx<IFeatureName, IDiscrete>();
@@ -270,6 +276,7 @@
                 ExportTable = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
                 ConformanceTable = new HashtableEx<ITypeName, ICompiledType>();
                 InstancingRecordList = new List<TypeInstancingRecord>();
+                OriginatingTypedef = new OnceReference<ITypedef>();
                 IsHandled = true;
             }
 
@@ -297,6 +304,11 @@
         /// The type of the resolved result type.
         /// </summary>
         public OnceReference<ICompiledType> ResolvedEntityType { get; private set; } = new OnceReference<ICompiledType>();
+
+        /// <summary>
+        /// Table of resolved parameters.
+        /// </summary>
+        public ListTableEx<IParameter> ParameterTable { get; private set; } = new ListTableEx<IParameter>();
         #endregion
 
         #region Implementation of IObjectType
@@ -398,6 +410,11 @@
         {
             get { return true; }
         }
+
+        /// <summary>
+        /// The typedef this type comes from, if assigned.
+        /// </summary>
+        public OnceReference<ITypedef> OriginatingTypedef { get; private set; } = new OnceReference<ITypedef>();
 
         /// <summary>
         /// Creates an instance of a class type, or reuse an existing instance.

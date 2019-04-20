@@ -11,7 +11,21 @@ namespace CompilerNode
     /// </summary>
     public interface IQueryOverload : BaseNode.IQueryOverload, INode, INodeWithReplicatedBlocks, ISource, IScopeHolder
     {
-        #region Compiler
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.QueryOverload.ParameterBlocks"/>.
+        /// </summary>
+        IList<IEntityDeclaration> ParameterList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.QueryOverload.ResultBlocks"/>.
+        /// </summary>
+        IList<IEntityDeclaration> ResultList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.QueryOverload.ModifiedQueryBlocks"/>.
+        /// </summary>
+        IList<IIdentifier> ModifiedQueryList { get; }
+
         /// <summary>
         /// Indicates if the overload is deferred in another class.
         /// </summary>
@@ -26,7 +40,21 @@ namespace CompilerNode
         /// True if the overload contains a precursor body.
         /// </summary>
         bool HasPrecursorBody { get; }
-        #endregion
+
+        /// <summary>
+        /// List of resolved parameters.
+        /// </summary>
+        ListTableEx<IParameter> ParameterTable { get; }
+
+        /// <summary>
+        /// List of resolved parameters.
+        /// </summary>
+        ListTableEx<IParameter> ResultTable { get; }
+
+        /// <summary>
+        /// The resolved associated type.
+        /// </summary>
+        OnceReference<IQueryOverloadType> ResolvedAssociatedType { get; }
     }
 
     /// <summary>
@@ -34,23 +62,6 @@ namespace CompilerNode
     /// </summary>
     public class QueryOverload : BaseNode.QueryOverload, IQueryOverload
     {
-        #region Compiler
-        /// <summary>
-        /// Indicates if the overload is deferred in another class.
-        /// </summary>
-        public bool IsDeferredOverload { get { return ((ICompiledBody)QueryBody).IsDeferredBody; } }
-
-        /// <summary>
-        /// True if the overload contains an extern body.
-        /// </summary>
-        public bool HasExternBody { get { return QueryBody is IExternBody; } }
-
-        /// <summary>
-        /// True if the overload contains a precursor body.
-        /// </summary>
-        public bool HasPrecursorBody { get { return QueryBody is IPrecursorBody; } }
-        #endregion
-
         #region Implementation of INodeWithReplicatedBlocks
         /// <summary>
         /// Replicated list from <see cref="BaseNode.QueryOverload.ParameterBlocks"/>.
@@ -162,6 +173,9 @@ namespace CompilerNode
                 LocalScope = new HashtableEx<string, IScopeAttributeFeature>();
                 InnerScopes = new List<IScopeHolder>();
                 FullScope = new HashtableEx<string, IScopeAttributeFeature>();
+                ParameterTable = new ListTableEx<IParameter>();
+                ResultTable = new ListTableEx<IParameter>();
+                ResolvedAssociatedType = new OnceReference<IQueryOverloadType>();
                 IsHandled = true;
             }
 
@@ -184,6 +198,38 @@ namespace CompilerNode
         /// All reachable entities.
         /// </summary>
         public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Indicates if the overload is deferred in another class.
+        /// </summary>
+        public bool IsDeferredOverload { get { return ((ICompiledBody)QueryBody).IsDeferredBody; } }
+
+        /// <summary>
+        /// True if the overload contains an extern body.
+        /// </summary>
+        public bool HasExternBody { get { return QueryBody is IExternBody; } }
+
+        /// <summary>
+        /// True if the overload contains a precursor body.
+        /// </summary>
+        public bool HasPrecursorBody { get { return QueryBody is IPrecursorBody; } }
+
+        /// <summary>
+        /// List of resolved parameters.
+        /// </summary>
+        public ListTableEx<IParameter> ParameterTable { get; private set; } = new ListTableEx<IParameter>();
+
+        /// <summary>
+        /// List of resolved parameters.
+        /// </summary>
+        public ListTableEx<IParameter> ResultTable { get; private set; } = new ListTableEx<IParameter>();
+
+        /// <summary>
+        /// The resolved associated type.
+        /// </summary>
+        public OnceReference<IQueryOverloadType> ResolvedAssociatedType { get; private set; } = new OnceReference<IQueryOverloadType>();
         #endregion
     }
 }

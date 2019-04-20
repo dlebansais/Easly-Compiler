@@ -11,6 +11,10 @@ namespace CompilerNode
     /// </summary>
     public interface IInspectInstruction : BaseNode.IInspectInstruction, IInstruction, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.InspectInstruction.WithBlocks"/>.
+        /// </summary>
+        IList<IWith> WithList { get; }
     }
 
     /// <summary>

@@ -109,6 +109,7 @@
                 ExportTable = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
                 ConformanceTable = new HashtableEx<ITypeName, ICompiledType>();
                 InstancingRecordList = new List<TypeInstancingRecord>();
+                OriginatingTypedef = new OnceReference<ITypedef>();
                 IsHandled = true;
             }
 
@@ -191,6 +192,11 @@
                 return false;
             }
         }
+
+        /// <summary>
+        /// The typedef this type comes from, if assigned.
+        /// </summary>
+        public OnceReference<ITypedef> OriginatingTypedef { get; private set; } = new OnceReference<ITypedef>();
 
         /// <summary>
         /// Creates an instance of a class type, or reuse an existing instance.

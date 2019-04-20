@@ -50,16 +50,14 @@
         public override bool CheckConsistency(IAttributeFeature node, IDictionary<ISourceTemplate, object> dataList, out object data)
         {
             data = null;
-            bool Success = false;
+            bool Success = true;
 
             IObjectType TypeToResolve = (IObjectType)node.EntityType;
             IClass EmbeddingClass = node.EmbeddingClass;
 
-            if (ScopeAttributeFeature.CreateResultFeature(TypeToResolve, EmbeddingClass, node, ErrorList, out IScopeAttributeFeature resultFeature))
-            {
+            Success &= ScopeAttributeFeature.CreateResultFeature(TypeToResolve, EmbeddingClass, node, ErrorList, out IScopeAttributeFeature resultFeature);
+            if (Success)
                 data = resultFeature;
-                Success = true;
-            }
 
             return Success;
         }

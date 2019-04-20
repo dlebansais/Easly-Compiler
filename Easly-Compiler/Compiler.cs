@@ -1215,11 +1215,15 @@
                             IsHandled = true;
                             break;
 
+                        case IForLoopInstruction AsForLoopInstruction:
+                            IsHandled = true;
+                            break;
+
                         case IFunctionFeature AsFunctionFeature:
                             IsHandled = true;
                             break;
 
-                        case IForLoopInstruction AsForLoopInstruction:
+                        case IFunctionType AsFunctionType:
                             IsHandled = true;
                             break;
 
@@ -1228,11 +1232,111 @@
                             IsResolved = AsGeneric.ResolvedGenericTypeName.IsAssigned && AsGeneric.ResolvedGenericType.IsAssigned;
                             break;
 
+                        case IGenericType AsGenericType:
+                            IsHandled = true;
+                            break;
+
+                        case IIfThenElseInstruction AsIfThenElseInstruction:
+                            IsHandled = true;
+                            break;
+
+                        case IIndexAssignmentInstruction AsIndexAssignmentInstruction:
+                            IsHandled = true;
+                            break;
+
+                        case IIndexerFeature AsIndexerFeature:
+                            IsHandled = true;
+                            break;
+
+                        case IIndexerType AsIndexerType:
+                            IsHandled = true;
+                            break;
+
+                        case IInheritance AsInheritance:
+                            IsHandled = true;
+                            break;
+
+                        case IInspectInstruction AsInspectInstruction:
+                            IsHandled = true;
+                            break;
+
+                        case IKeywordAnchoredType AsKeywordAnchoredType:
+                            IsHandled = true;
+                            break;
+
+                        case IKeywordAssignmentInstruction AsKeywordAssignmentInstruction:
+                            IsHandled = true;
+                            break;
+
+                        case IOverLoopInstruction AsOverLoopInstruction:
+                            IsHandled = true;
+                            break;
+
+                        case IPositionalTypeArgument AsPositionalTypeArgument:
+                            IsHandled = true;
+                            break;
+
+                        case IPrecursorIndexAssignmentInstruction AsPrecursorIndexAssignmentInstruction:
+                            IsHandled = true;
+                            break;
+
+                        case IPrecursorInstruction AsPrecursorInstruction:
+                            IsHandled = true;
+                            break;
+
                         case IProcedureFeature AsProcedureFeature:
                             IsHandled = true;
                             break;
 
+                        case IProcedureType AsProcedureType:
+                            IsHandled = true;
+                            break;
+
                         case IPropertyFeature AsPropertyFeature:
+                            IsHandled = true;
+                            break;
+
+                        case IPropertyType AsPropertyType:
+                            IsHandled = true;
+                            break;
+
+                        case IQueryOverload AsQueryOverload:
+                            IsHandled = true;
+                            break;
+
+                        case IQueryOverloadType AsQueryOverloadType:
+                            IsHandled = true;
+                            break;
+
+                        case IRaiseEventInstruction AsRaiseEventInstruction:
+                            IsHandled = true;
+                            break;
+
+                        case IReleaseInstruction AsReleaseInstruction:
+                            IsHandled = true;
+                            break;
+
+                        case IScope AsScope:
+                            IsHandled = true;
+                            break;
+
+                        case ISimpleType AsSimpleType:
+                            IsHandled = true;
+                            break;
+
+                        case IThrowInstruction AsThrowInstruction:
+                            IsHandled = true;
+                            break;
+
+                        case ITupleType AsTupleType:
+                            IsHandled = true;
+                            break;
+
+                        case ITypedef AsTypedef:
+                            IsHandled = true;
+                            break;
+
+                        case IWith AsWith:
                             IsHandled = true;
                             break;
                     }

@@ -25,6 +25,16 @@ namespace CompilerNode
         /// Resolved type for the base type.
         /// </summary>
         OnceReference<IClassType> ResolvedBaseType { get; }
+
+        /// <summary>
+        /// Resolved type name for the most common result of all overloads.
+        /// </summary>
+        OnceReference<ITypeName> MostCommonTypeName { get; }
+
+        /// <summary>
+        /// Resolved type for the most common result of all overloads.
+        /// </summary>
+        OnceReference<ICompiledType> MostCommonType { get; }
     }
 
     /// <summary>
@@ -149,11 +159,14 @@ namespace CompilerNode
                 ResolvedBaseType = new OnceReference<IClassType>();
                 ResolvedTypeName = new OnceReference<ITypeName>();
                 ResolvedType = new OnceReference<ICompiledType>();
+                MostCommonTypeName = new OnceReference<ITypeName>();
+                MostCommonType = new OnceReference<ICompiledType>();
                 DiscreteTable = new HashtableEx<IFeatureName, IDiscrete>();
                 FeatureTable = new HashtableEx<IFeatureName, IFeatureInstance>();
                 ExportTable = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
                 ConformanceTable = new HashtableEx<ITypeName, ICompiledType>();
                 InstancingRecordList = new List<TypeInstancingRecord>();
+                OriginatingTypedef = new OnceReference<ITypedef>();
                 IsHandled = true;
             }
 
@@ -171,6 +184,16 @@ namespace CompilerNode
         /// Resolved type for the base type.
         /// </summary>
         public OnceReference<IClassType> ResolvedBaseType { get; private set; } = new OnceReference<IClassType>();
+
+        /// <summary>
+        /// Resolved type name for the most common result of all overloads.
+        /// </summary>
+        public OnceReference<ITypeName> MostCommonTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// Resolved type for the most common result of all overloads.
+        /// </summary>
+        public OnceReference<ICompiledType> MostCommonType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
 
         #region Implementation of IObjectType
@@ -245,6 +268,11 @@ namespace CompilerNode
         {
             get { return true; }
         }
+
+        /// <summary>
+        /// The typedef this type comes from, if assigned.
+        /// </summary>
+        public OnceReference<ITypedef> OriginatingTypedef { get; private set; } = new OnceReference<ITypedef>();
 
         /// <summary>
         /// Creates an instance of a class type, or reuse an existing instance.

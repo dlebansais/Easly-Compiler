@@ -12,6 +12,16 @@ namespace CompilerNode
     public interface IIndexerFeature : BaseNode.IIndexerFeature, IFeature, INodeWithReplicatedBlocks, ICompiledFeature, IGetterSetterScopeHolder
     {
         /// <summary>
+        /// Replicated list from <see cref="BaseNode.IndexerFeature.IndexParameterBlocks"/>.
+        /// </summary>
+        IList<IEntityDeclaration> IndexParameterList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.IndexerFeature.ModifiedQueryBlocks"/>.
+        /// </summary>
+        IList<IIdentifier> ModifiedQueryList { get; }
+
+        /// <summary>
         /// The name of the resolved indexer type.
         /// </summary>
         OnceReference<ITypeName> ResolvedEntityTypeName { get; }
@@ -20,6 +30,11 @@ namespace CompilerNode
         /// The resolved indexer type.
         /// </summary>
         OnceReference<ICompiledType> ResolvedEntityType { get; }
+
+        /// <summary>
+        /// Table of resolved parameters.
+        /// </summary>
+        IHashtableEx<string, IScopeAttributeFeature> IndexerParameterTable { get; }
     }
 
     /// <summary>
@@ -132,6 +147,7 @@ namespace CompilerNode
                 ResolvedFeature = new OnceReference<ICompiledFeature>();
                 ResolvedEntityTypeName = new OnceReference<ITypeName>();
                 ResolvedEntityType = new OnceReference<ICompiledType>();
+                IndexerParameterTable = new HashtableEx<string, IScopeAttributeFeature>();
                 LocalScope = new HashtableEx<string, IScopeAttributeFeature>();
                 LocalGetScope = new HashtableEx<string, IScopeAttributeFeature>();
                 LocalSetScope = new HashtableEx<string, IScopeAttributeFeature>();
@@ -244,6 +260,11 @@ namespace CompilerNode
         /// The resolved indexer type.
         /// </summary>
         public OnceReference<ICompiledType> ResolvedEntityType { get; private set; } = new OnceReference<ICompiledType>();
+
+        /// <summary>
+        /// Table of resolved parameters.
+        /// </summary>
+        public IHashtableEx<string, IScopeAttributeFeature> IndexerParameterTable { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
         #endregion
     }
 }

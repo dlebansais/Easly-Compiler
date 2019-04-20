@@ -11,6 +11,15 @@ namespace CompilerNode
     /// </summary>
     public interface IScope : BaseNode.IScope, INode, INodeWithReplicatedBlocks, ISource, IScopeHolder
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Scope.EntityDeclarationBlocks"/>.
+        /// </summary>
+        IList<IEntityDeclaration> EntityDeclarationList { get; }
+
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Scope.InstructionBlocks"/>.
+        /// </summary>
+        IList<IInstruction> InstructionList { get; }
     }
 
     /// <summary>

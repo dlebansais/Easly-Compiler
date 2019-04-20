@@ -9,17 +9,17 @@
     /// <summary>
     /// A rule to process <see cref="IAnchoredType"/>.
     /// </summary>
-    public interface IAnchroredTypeRuleTemplate : IRuleTemplate
+    public interface IAnchoredTypeRuleTemplate : IRuleTemplate
     {
     }
 
     /// <summary>
     /// A rule to process <see cref="IAnchoredType"/>.
     /// </summary>
-    public class AnchroredTypeRuleTemplate : RuleTemplate<IAnchoredType, AnchroredTypeRuleTemplate>, IAnchroredTypeRuleTemplate
+    public class AnchoredTypeRuleTemplate : RuleTemplate<IAnchoredType, AnchoredTypeRuleTemplate>, IAnchoredTypeRuleTemplate
     {
         #region Init
-        static AnchroredTypeRuleTemplate()
+        static AnchoredTypeRuleTemplate()
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {

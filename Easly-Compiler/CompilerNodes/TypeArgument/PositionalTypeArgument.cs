@@ -2,6 +2,7 @@ namespace CompilerNode
 {
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -76,11 +77,25 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
+                ResolvedSourceTypeName = new OnceReference<ITypeName>();
+                ResolvedSourceType = new OnceReference<ICompiledType>();
                 IsHandled = true;
             }
 
             Debug.Assert(IsHandled);
         }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Name of the resolved source type.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedSourceTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The resolved source type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedSourceType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
     }
 }

@@ -10,15 +10,6 @@ namespace CompilerNode
     /// </summary>
     public interface IAssignmentTypeArgument : BaseNode.IAssignmentTypeArgument, ITypeArgument
     {
-        /// <summary>
-        /// Name of the resolved source type.
-        /// </summary>
-        OnceReference<ITypeName> ResolvedSourceTypeName { get; }
-
-        /// <summary>
-        /// The resolved source type.
-        /// </summary>
-        OnceReference<ICompiledType> ResolvedSourceType { get; }
     }
 
     /// <summary>
