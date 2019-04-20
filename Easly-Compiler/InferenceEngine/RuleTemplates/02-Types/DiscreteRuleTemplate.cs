@@ -28,7 +28,6 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new UnsealedTableDestinationTemplate<IDiscrete, IFeatureName, IDiscrete>(nameof(IClass.LocalDiscreteTable), TemplateClassStart<IDiscrete>.Default),
                 new OnceReferenceDestinationTemplate<IDiscrete, IFeatureName>(nameof(IDiscrete.ValidDiscreteName)),
             };
         }

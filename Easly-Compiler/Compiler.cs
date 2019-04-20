@@ -1124,219 +1124,319 @@
                     switch (Source)
                     {
                         case IAnchoredType AsAnchoredType:
+                            Debug.Assert(AsAnchoredType.ResolvedTypeName.IsAssigned == AsAnchoredType.ResolvedType.IsAssigned);
+                            IsResolved = AsAnchoredType.ResolvedType.IsAssigned;
                             IsHandled = true;
                             break;
 
                         case IAsLongAsInstruction AsAsLongAsInstruction:
+                            IsResolved = AsAsLongAsInstruction.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case IAssignmentInstruction AsAssignmentInstruction:
+                            IsResolved = AsAssignmentInstruction.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case IAssignmentTypeArgument AsAssignmentTypeArgument:
+                            Debug.Assert(AsAssignmentTypeArgument.ResolvedSourceTypeName.IsAssigned == AsAssignmentTypeArgument.ResolvedSourceType.IsAssigned);
+                            IsResolved = AsAssignmentTypeArgument.ResolvedSourceType.IsAssigned;
                             IsHandled = true;
                             break;
 
                         case IAttachment AsAttachment:
+                            IsResolved = AsAttachment.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case IAttachmentInstruction AsAttachmentInstruction:
+                            IsResolved = AsAttachmentInstruction.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case IAttributeFeature AsAttributeFeature:
+                            Debug.Assert(AsAttributeFeature.ResolvedEntityTypeName.IsAssigned == AsAttributeFeature.ResolvedEntityType.IsAssigned);
+                            Debug.Assert(AsAttributeFeature.ResolvedFeatureTypeName.IsAssigned == AsAttributeFeature.ResolvedFeatureType.IsAssigned);
+                            IsResolved = AsAttributeFeature.ResolvedFeature.IsAssigned;
+                            Debug.Assert(AsAttributeFeature.ResolvedEntityType.IsAssigned == IsResolved);
+                            Debug.Assert(AsAttributeFeature.ResolvedFeatureType.IsAssigned == IsResolved);
                             IsHandled = true;
                             break;
 
                         case ICheckInstruction AsCheckInstruction:
+                            IsResolved = AsCheckInstruction.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case ICommandInstruction AsCommandInstruction:
+                            IsResolved = AsCommandInstruction.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case ICommandOverload AsCommandOverload:
+                            IsResolved = AsCommandOverload.LocalScope.IsSealed;
+                            Debug.Assert(AsCommandOverload.ParameterTable.IsSealed == IsResolved);
                             IsHandled = true;
                             break;
 
                         case ICommandOverloadType AsCommandOverloadType:
+                            IsResolved = AsCommandOverloadType.ParameterTable.IsSealed;
                             IsHandled = true;
                             break;
 
                         case IConditional AsConditional:
+                            IsResolved = AsConditional.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case IConstantFeature AsConstantFeature:
+                            Debug.Assert(AsConstantFeature.ResolvedEntityTypeName.IsAssigned == AsConstantFeature.ResolvedEntityType.IsAssigned);
+                            Debug.Assert(AsConstantFeature.ResolvedFeatureTypeName.IsAssigned == AsConstantFeature.ResolvedFeatureType.IsAssigned);
+                            IsResolved = AsConstantFeature.ResolvedFeature.IsAssigned;
+                            Debug.Assert(AsConstantFeature.ResolvedEntityType.IsAssigned == IsResolved);
+                            Debug.Assert(AsConstantFeature.ResolvedFeatureType.IsAssigned == IsResolved);
                             IsHandled = true;
                             break;
 
                         case IConstraint AsConstraint:
+                            IsResolved = AsConstraint.ResolvedTypeWithRename.IsAssigned;
                             IsHandled = true;
                             break;
 
                         case IContinuation AsContinuation:
+                            IsResolved = AsContinuation.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case ICreateInstruction AsCreateInstruction:
+                            IsResolved = AsCreateInstruction.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case ICreationFeature AsCreationFeature:
+                            Debug.Assert(AsCreationFeature.ResolvedFeatureTypeName.IsAssigned == AsCreationFeature.ResolvedFeatureType.IsAssigned);
+                            IsResolved = AsCreationFeature.ResolvedFeature.IsAssigned;
+                            Debug.Assert(AsCreationFeature.ResolvedFeatureType.IsAssigned == IsResolved);
                             IsHandled = true;
                             break;
 
                         case IDebugInstruction AsDebugInstruction:
+                            IsResolved = AsDebugInstruction.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case IDiscrete AsDiscrete:
+                            IsResolved = AsDiscrete.ValidDiscreteName.IsAssigned;
                             IsHandled = true;
                             break;
 
                         case IEffectiveBody AsEffectiveBody:
+                            IsResolved = ((IBody)AsEffectiveBody).LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case IEntityDeclaration AsEntityDeclaration:
+                            IsResolved = AsEntityDeclaration.ValidEntity.IsAssigned;
                             IsHandled = true;
                             break;
 
                         case IExportChange AsExportChange:
+                            IsResolved = AsExportChange.IdentifierTable.IsSealed;
+                            Debug.Assert(AsExportChange.ValidExportIdentifier.IsAssigned == IsResolved);
                             IsHandled = true;
                             break;
 
                         case IExport AsExport:
+                            IsResolved = AsExport.ValidExportName.IsAssigned;
                             IsHandled = true;
                             break;
 
                         case IForLoopInstruction AsForLoopInstruction:
+                            IsResolved = AsForLoopInstruction.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case IFunctionFeature AsFunctionFeature:
+                            Debug.Assert(AsFunctionFeature.MostCommonTypeName.IsAssigned == AsFunctionFeature.MostCommonType.IsAssigned);
+                            Debug.Assert(AsFunctionFeature.ResolvedFeatureTypeName.IsAssigned == AsFunctionFeature.ResolvedFeatureType.IsAssigned);
+                            IsResolved = AsFunctionFeature.ResolvedFeature.IsAssigned;
+                            Debug.Assert(AsFunctionFeature.MostCommonType.IsAssigned == IsResolved);
+                            Debug.Assert(AsFunctionFeature.ResolvedFeatureType.IsAssigned == IsResolved);
                             IsHandled = true;
                             break;
 
                         case IFunctionType AsFunctionType:
+                            Debug.Assert(AsFunctionType.ResolvedTypeName.IsAssigned == AsFunctionType.ResolvedType.IsAssigned);
+                            Debug.Assert(AsFunctionType.MostCommonTypeName.IsAssigned == AsFunctionType.MostCommonType.IsAssigned);
+                            IsResolved = AsFunctionType.ResolvedType.IsAssigned;
+                            Debug.Assert(AsFunctionType.MostCommonType.IsAssigned == IsResolved);
                             IsHandled = true;
                             break;
 
                         case IGeneric AsGeneric:
+                            IsResolved = AsGeneric.ResolvedConformanceTable.IsSealed;
                             IsHandled = true;
-                            IsResolved = AsGeneric.ResolvedGenericTypeName.IsAssigned && AsGeneric.ResolvedGenericType.IsAssigned;
                             break;
 
                         case IGenericType AsGenericType:
+                            Debug.Assert(AsGenericType.ResolvedTypeName.IsAssigned == AsGenericType.ResolvedType.IsAssigned);
+                            IsResolved = AsGenericType.ResolvedType.IsAssigned;
+                            Debug.Assert(AsGenericType.ResolvedArgumentLocationTable.IsAssigned == IsResolved);
+                            Debug.Assert(AsGenericType.ResolvedTypeArgumentTable.IsAssigned == IsResolved);
+                            Debug.Assert(AsGenericType.BaseClass.IsAssigned == IsResolved);
                             IsHandled = true;
                             break;
 
                         case IIfThenElseInstruction AsIfThenElseInstruction:
+                            IsResolved = AsIfThenElseInstruction.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case IIndexAssignmentInstruction AsIndexAssignmentInstruction:
+                            IsResolved = AsIndexAssignmentInstruction.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case IIndexerFeature AsIndexerFeature:
+                            IsResolved = AsIndexerFeature.ResolvedFeature.IsAssigned; // TODO confirm
                             IsHandled = true;
                             break;
 
                         case IIndexerType AsIndexerType:
+                            Debug.Assert(AsIndexerType.ResolvedTypeName.IsAssigned == AsIndexerType.ResolvedType.IsAssigned);
+                            IsResolved = AsIndexerType.ParameterTable.IsSealed;
+                            Debug.Assert(AsIndexerType.ResolvedType.IsAssigned == IsResolved);
                             IsHandled = true;
                             break;
 
                         case IInheritance AsInheritance:
+                            Debug.Assert(AsInheritance.ResolvedTypeName.IsAssigned == AsInheritance.ResolvedType.IsAssigned);
+                            IsResolved = AsInheritance.ResolvedType.IsAssigned;
+                            Debug.Assert(AsInheritance.ExportTable.IsAssigned == IsResolved);
+                            Debug.Assert(AsInheritance.TypedefTable.IsAssigned == IsResolved);
+                            Debug.Assert(AsInheritance.DiscreteTable.IsAssigned == IsResolved);
+                            Debug.Assert(AsInheritance.FeatureTable.IsAssigned == IsResolved);
                             IsHandled = true;
                             break;
 
                         case IInspectInstruction AsInspectInstruction:
+                            IsResolved = AsInspectInstruction.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case IKeywordAnchoredType AsKeywordAnchoredType:
+                            Debug.Assert(AsKeywordAnchoredType.ResolvedTypeName.IsAssigned == AsKeywordAnchoredType.ResolvedType.IsAssigned);
+                            IsResolved = AsKeywordAnchoredType.ResolvedType.IsAssigned;
                             IsHandled = true;
                             break;
 
                         case IKeywordAssignmentInstruction AsKeywordAssignmentInstruction:
+                            IsResolved = AsKeywordAssignmentInstruction.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case IOverLoopInstruction AsOverLoopInstruction:
+                            IsResolved = AsOverLoopInstruction.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case IPositionalTypeArgument AsPositionalTypeArgument:
+                            Debug.Assert(AsPositionalTypeArgument.ResolvedSourceTypeName.IsAssigned == AsPositionalTypeArgument.ResolvedSourceType.IsAssigned);
+                            IsResolved = AsPositionalTypeArgument.ResolvedSourceType.IsAssigned;
                             IsHandled = true;
                             break;
 
                         case IPrecursorIndexAssignmentInstruction AsPrecursorIndexAssignmentInstruction:
+                            IsResolved = AsPrecursorIndexAssignmentInstruction.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case IPrecursorInstruction AsPrecursorInstruction:
+                            IsResolved = AsPrecursorInstruction.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case IProcedureFeature AsProcedureFeature:
+                            Debug.Assert(AsProcedureFeature.ResolvedFeatureTypeName.IsAssigned == AsProcedureFeature.ResolvedFeatureType.IsAssigned);
+                            IsResolved = AsProcedureFeature.ResolvedFeature.IsAssigned;
                             IsHandled = true;
                             break;
 
                         case IProcedureType AsProcedureType:
+                            Debug.Assert(AsProcedureType.ResolvedTypeName.IsAssigned == AsProcedureType.ResolvedType.IsAssigned);
+                            IsResolved = AsProcedureType.ResolvedType.IsAssigned;
                             IsHandled = true;
                             break;
 
                         case IPropertyFeature AsPropertyFeature:
+                            Debug.Assert(AsPropertyFeature.ResolvedEntityTypeName.IsAssigned == AsPropertyFeature.ResolvedEntityType.IsAssigned);
+                            Debug.Assert(AsPropertyFeature.ResolvedFeatureTypeName.IsAssigned == AsPropertyFeature.ResolvedFeatureType.IsAssigned);
+                            IsResolved = AsPropertyFeature.ResolvedFeature.IsAssigned;
+                            Debug.Assert(AsPropertyFeature.ResolvedEntityType.IsAssigned == IsResolved);
+                            Debug.Assert(AsPropertyFeature.ResolvedFeatureType.IsAssigned == IsResolved);
                             IsHandled = true;
                             break;
 
                         case IPropertyType AsPropertyType:
+                            Debug.Assert(AsPropertyType.ResolvedTypeName.IsAssigned == AsPropertyType.ResolvedType.IsAssigned);
+                            IsResolved = AsPropertyType.ResolvedType.IsAssigned;
                             IsHandled = true;
                             break;
 
                         case IQueryOverload AsQueryOverload:
+                            IsResolved = AsQueryOverload.LocalScope.IsSealed;
+                            Debug.Assert(AsQueryOverload.ParameterTable.IsSealed == IsResolved);
+                            Debug.Assert(AsQueryOverload.ResultTable.IsSealed == IsResolved);
                             IsHandled = true;
                             break;
 
                         case IQueryOverloadType AsQueryOverloadType:
+                            IsResolved = AsQueryOverloadType.ParameterTable.IsSealed;
+                            Debug.Assert(AsQueryOverloadType.ResultTable.IsSealed == IsResolved);
                             IsHandled = true;
                             break;
 
                         case IRaiseEventInstruction AsRaiseEventInstruction:
+                            IsResolved = AsRaiseEventInstruction.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case IReleaseInstruction AsReleaseInstruction:
+                            IsResolved = AsReleaseInstruction.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case IScope AsScope:
+                            IsResolved = AsScope.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case ISimpleType AsSimpleType:
+                            Debug.Assert(AsSimpleType.ResolvedTypeName.IsAssigned == AsSimpleType.ResolvedType.IsAssigned);
+                            IsResolved = AsSimpleType.ResolvedType.IsAssigned;
                             IsHandled = true;
                             break;
 
                         case IThrowInstruction AsThrowInstruction:
+                            IsResolved = AsThrowInstruction.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
 
                         case ITupleType AsTupleType:
+                            Debug.Assert(AsTupleType.ResolvedTypeName.IsAssigned == AsTupleType.ResolvedType.IsAssigned);
+                            IsResolved = AsTupleType.ResolvedType.IsAssigned;
+                            Debug.Assert(AsTupleType.FieldTable.IsSealed == IsResolved);
                             IsHandled = true;
                             break;
 
                         case ITypedef AsTypedef:
+                            IsResolved = AsTypedef.ValidTypedefName.IsAssigned;
                             IsHandled = true;
                             break;
 
                         case IWith AsWith:
+                            IsResolved = AsWith.LocalScope.IsSealed;
                             IsHandled = true;
                             break;
                     }

@@ -31,7 +31,6 @@
             {
                 new OnceReferenceDestinationTemplate<IFunctionFeature, ITypeName>(nameof(IFunctionFeature.ResolvedFeatureTypeName)),
                 new OnceReferenceDestinationTemplate<IFunctionFeature, ICompiledType>(nameof(IFunctionFeature.ResolvedFeatureType)),
-                new UnsealedTableDestinationTemplate<IFunctionFeature, ITypeName, ICompiledType>(nameof(IClass.TypeTable), TemplateClassStart<IFunctionFeature>.Default),
                 new OnceReferenceDestinationTemplate<IFunctionFeature, ICompiledFeature>(nameof(IFunctionFeature.ResolvedFeature)),
             };
         }

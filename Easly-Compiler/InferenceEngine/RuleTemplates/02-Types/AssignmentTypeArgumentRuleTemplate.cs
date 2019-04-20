@@ -29,7 +29,6 @@
             {
                 new OnceReferenceDestinationTemplate<IAssignmentTypeArgument, ITypeName>(nameof(IAssignmentTypeArgument.ResolvedSourceTypeName)),
                 new OnceReferenceDestinationTemplate<IAssignmentTypeArgument, ICompiledType>(nameof(IAssignmentTypeArgument.ResolvedSourceType)),
-                new UnsealedTableDestinationTemplate<IAssignmentTypeArgument, string, IIdentifier>(nameof(IGenericType.ArgumentIdentifierTable), TemplateGenericTypeStart<IAssignmentTypeArgument>.Default),
             };
         }
         #endregion

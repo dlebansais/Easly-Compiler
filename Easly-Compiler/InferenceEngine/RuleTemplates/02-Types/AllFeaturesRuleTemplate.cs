@@ -49,6 +49,8 @@
             bool Success = true;
             data = null;
 
+            IHashtableEx<IFeatureName, IFeatureInstance> MergedFeatureTable = null;
+
             IList<AncestorFeatureInfo> FeatureTableList = new List<AncestorFeatureInfo>();
             ListLocalAndInheritedFeatures(node, FeatureTableList);
 
@@ -64,9 +66,12 @@
                 Success = false;
             else
             {
-                MergeInheritedFeatures(node, ByNameTable, out IHashtableEx<IFeatureName, IFeatureInstance> MergedFeatureTable);
-                ClassType.MergeConformingParentTypes(node, node.ResolvedClassType.Item, ErrorList);
+                MergeInheritedFeatures(node, ByNameTable, out MergedFeatureTable);
+                Success &= ClassType.MergeConformingParentTypes(node, node.ResolvedClassType.Item, ErrorList);
             }
+
+            if (Success)
+                data = MergedFeatureTable;
 
             return Success;
         }
@@ -541,6 +546,20 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IClass node, object data)
         {
+            IHashtableEx<IFeatureName, IFeatureInstance> MergedFeatureTable = (IHashtableEx<IFeatureName, IFeatureInstance>)data;
+            IClassType ThisClassType = node.ResolvedClassType.Item;
+
+            ThisClassType.FeatureTable.Merge(MergedFeatureTable);
+            ThisClassType.FeatureTable.Seal();
+
+            node.FeatureTable.Merge(MergedFeatureTable);
+            node.FeatureTable.Seal();
+
+            foreach (ICompiledType Item in node.GenericInstanceList)
+            {
+                Item.FeatureTable.Merge(MergedFeatureTable);
+                Item.FeatureTable.Seal();
+            }
         }
         #endregion
     }

@@ -86,7 +86,7 @@ namespace CompilerNode
         }
         #endregion
 
-        #region Compiler
+        #region Implementation of IObjectType
         /// <summary>
         /// The name of the resolved type.
         /// </summary>

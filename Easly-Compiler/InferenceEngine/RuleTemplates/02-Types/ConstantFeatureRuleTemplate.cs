@@ -27,9 +27,10 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
+                new OnceReferenceDestinationTemplate<IConstantFeature, ITypeName>(nameof(IConstantFeature.ResolvedEntityTypeName)),
+                new OnceReferenceDestinationTemplate<IConstantFeature, ICompiledType>(nameof(IConstantFeature.ResolvedEntityType)),
                 new OnceReferenceDestinationTemplate<IConstantFeature, ITypeName>(nameof(IConstantFeature.ResolvedFeatureTypeName)),
                 new OnceReferenceDestinationTemplate<IConstantFeature, ICompiledType>(nameof(IConstantFeature.ResolvedFeatureType)),
-                new UnsealedTableDestinationTemplate<IConstantFeature, ITypeName, ICompiledType>(nameof(IClass.TypeTable), TemplateClassStart<IConstantFeature>.Default),
                 new OnceReferenceDestinationTemplate<IConstantFeature, ICompiledFeature>(nameof(IConstantFeature.ResolvedFeature)),
             };
         }

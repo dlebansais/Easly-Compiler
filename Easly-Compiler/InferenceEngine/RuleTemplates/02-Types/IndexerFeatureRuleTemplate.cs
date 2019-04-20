@@ -32,7 +32,6 @@
             {
                 new OnceReferenceDestinationTemplate<IIndexerFeature, ITypeName>(nameof(IIndexerFeature.ResolvedFeatureTypeName)),
                 new OnceReferenceDestinationTemplate<IIndexerFeature, ICompiledType>(nameof(IIndexerFeature.ResolvedFeatureType)),
-                new UnsealedTableDestinationTemplate<IIndexerFeature, ITypeName, ICompiledType>(nameof(IClass.TypeTable), TemplateClassStart<IIndexerFeature>.Default),
                 new OnceReferenceDestinationTemplate<IIndexerFeature, ICompiledFeature>(nameof(IIndexerFeature.ResolvedFeature)),
                 new UnsealedTableDestinationTemplate<IIndexerFeature, string, IScopeAttributeFeature>(nameof(IIndexerFeature.LocalScope)),
                 new UnsealedTableDestinationTemplate<IIndexerFeature, string, IScopeAttributeFeature>(nameof(IIndexerFeature.LocalGetScope)),

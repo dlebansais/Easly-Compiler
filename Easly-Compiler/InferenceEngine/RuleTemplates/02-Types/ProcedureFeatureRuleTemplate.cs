@@ -29,7 +29,6 @@
             {
                 new OnceReferenceDestinationTemplate<IProcedureFeature, ITypeName>(nameof(IProcedureFeature.ResolvedFeatureTypeName)),
                 new OnceReferenceDestinationTemplate<IProcedureFeature, ICompiledType>(nameof(IProcedureFeature.ResolvedFeatureType)),
-                // new UnsealedTableDestinationTemplate<IProcedureFeature, ITypeName, ICompiledType>(nameof(IClass.TypeTable), TemplateClassStart<IProcedureFeature>.Default),
                 new OnceReferenceDestinationTemplate<IProcedureFeature, ICompiledFeature>(nameof(IProcedureFeature.ResolvedFeature)),
             };
         }

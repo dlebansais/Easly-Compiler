@@ -62,7 +62,6 @@
         public override void Apply(IIndexerFeature node, object data)
         {
             IClass EmbeddingClass = node.EmbeddingClass;
-
             IFeatureName FeatureEntityName = FeatureName.IndexerFeatureName;
             IFeatureInstance NewInstance = new FeatureInstance(EmbeddingClass, node);
 

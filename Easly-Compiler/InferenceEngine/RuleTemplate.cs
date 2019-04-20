@@ -237,10 +237,10 @@
         /// <summary>
         /// Adds several errors.
         /// </summary>
-        /// <param name="errorList">The list of errors to add.</param>
-        protected virtual void AddSourceErrorList(IList<IError> errorList)
+        /// <param name="sourceErrorList">The list of errors to add.</param>
+        protected virtual void AddSourceErrorList(IList<IError> sourceErrorList)
         {
-            foreach (IError Error in ErrorList)
+            foreach (IError Error in sourceErrorList)
                 ErrorList.Add(Error);
         }
         #endregion
