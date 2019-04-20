@@ -142,7 +142,6 @@
                 }
                 else if (node.GetterBody.IsAssigned)
                     IndexerKind = BaseNode.UtilityType.ReadOnly;
-
                 else if (node.SetterBody.IsAssigned)
                     IndexerKind = BaseNode.UtilityType.WriteOnly;
                 else

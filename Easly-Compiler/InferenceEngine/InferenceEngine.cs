@@ -26,11 +26,6 @@
         IList<IClass> ClassList { get; }
 
         /// <summary>
-        /// Checks if a class is fully resolved.
-        /// </summary>
-        Func<IList<ISource>, IClass, bool> IsResolvedHandler { get; }
-
-        /// <summary>
         /// True if the engine should check for cyclic dependencies errors.
         /// </summary>
         bool IsCycleErrorChecked { get; }
@@ -67,15 +62,13 @@
         /// <param name="ruleTemplateList">The set of rules to execute.</param>
         /// <param name="sourceList">The list of nodes on which rules are checked and applied.</param>
         /// <param name="classList">The list of classes to resolve.</param>
-        /// <param name="isResolvedHandler">Checks if a class is fully resolved.</param>
         /// <param name="isCycleErrorChecked">True if the engine should check for cyclic dependencies errors.</param>
         /// <param name="retries">Number of retries (debug only).</param>
-        public InferenceEngine(IList<IRuleTemplate> ruleTemplateList, IList<ISource> sourceList, IList<IClass> classList, Func<IList<ISource>, IClass, bool> isResolvedHandler, bool isCycleErrorChecked, int retries)
+        public InferenceEngine(IList<IRuleTemplate> ruleTemplateList, IList<ISource> sourceList, IList<IClass> classList, bool isCycleErrorChecked, int retries)
         {
             RuleTemplateList = ruleTemplateList;
             SourceList = sourceList;
             ClassList = classList;
-            IsResolvedHandler = isResolvedHandler;
             IsCycleErrorChecked = isCycleErrorChecked;
             Retries = retries;
         }
@@ -96,11 +89,6 @@
         /// The list of classes to resolve.
         /// </summary>
         public IList<IClass> ClassList { get; }
-
-        /// <summary>
-        /// Checks if a class is fully resolved.
-        /// </summary>
-        public Func<IList<ISource>, IClass, bool> IsResolvedHandler { get; }
 
         /// <summary>
         /// True if the engine should check for cyclic dependencies errors.
@@ -266,7 +254,7 @@
             IList<IClass> ToMove = new List<IClass>();
 
             foreach (IClass Class in unresolvedClassList)
-                if (IsResolvedHandler(SourceList, Class))
+                if (CheckTypesResolved(Class))
                     ToMove.Add(Class);
 
             if (ToMove.Count > 0)
@@ -286,6 +274,22 @@
         {
             foreach (ISource Source in SourceList)
                 Source.Reset(RuleTemplateList);
+        }
+
+        /// <summary></summary>
+        protected virtual bool CheckTypesResolved(IClass item)
+        {
+            bool IsResolved = true;
+
+            foreach (ISource Source in SourceList)
+                if (Source.EmbeddingClass == item)
+                {
+                    IsResolved = Source.IsResolved(RuleTemplateList);
+                    if (!IsResolved)
+                        break;
+                }
+
+            return IsResolved;
         }
 
         private static void ShuffleRules(IList<IRuleTemplate> ruleTemplateList)

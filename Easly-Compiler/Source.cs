@@ -49,5 +49,11 @@
         /// </summary>
         /// <param name="ruleTemplateList">The list of rule templates that would read the properties to reset.</param>
         void Reset(IList<IRuleTemplate> ruleTemplateList);
+
+        /// <summary>
+        /// Checks if a rule is resolved for this source.
+        /// </summary>
+        /// <param name="ruleTemplateList">The list of rule templates that would read the properties to check.</param>
+        bool IsResolved(IList<IRuleTemplate> ruleTemplateList);
     }
 }

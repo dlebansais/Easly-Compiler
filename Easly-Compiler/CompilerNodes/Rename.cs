@@ -107,6 +107,31 @@ namespace CompilerNode
 
             Debug.Assert(IsHandled);
         }
+
+        /// <summary>
+        /// Checks if a rule is resolved for this source.
+        /// </summary>
+        /// <param name="ruleTemplateList">The list of rule templates that would read the properties to check.</param>
+        public virtual bool IsResolved(IList<IRuleTemplate> ruleTemplateList)
+        {
+            bool IsResolved = false;
+
+            bool IsHandled = false;
+
+            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            {
+                IsResolved = ValidSourceText.IsAssigned && ValidDestinationText.IsAssigned;
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Types)
+            {
+                IsResolved = false;
+                IsHandled = true;
+            }
+
+            Debug.Assert(IsHandled);
+            return IsResolved;
+        }
         #endregion
 
         #region Compiler
