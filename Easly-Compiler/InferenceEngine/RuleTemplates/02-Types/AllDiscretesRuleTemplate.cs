@@ -80,7 +80,6 @@
                                 Success = false;
                             }
                         }
-
                         else if (InstanceItem == LocalItem)
                         {
                             AddSourceError(new ErrorDiscreteNameConflict(Inheritance, LocalName.Name, InstanceName.Name));

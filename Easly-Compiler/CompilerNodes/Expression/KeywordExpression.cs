@@ -159,7 +159,6 @@ namespace CompilerNode
                 case BaseNode.Keyword.Result:
                     if (source.EmbeddingOverload is IQueryOverload AsQueryOverload)
                         Result = CheckQueryConsistency(source, AsQueryOverload, errorList, out resultTypeName, out resultType);
-
                     else if (source.EmbeddingFeature is IPropertyFeature AsPropertyFeature)
                     {
                         if (CheckGetterConsistency(source, AsPropertyFeature.GetterBody, errorList))
@@ -169,7 +168,6 @@ namespace CompilerNode
                             Result = true;
                         }
                     }
-
                     else if (source.EmbeddingFeature is IIndexerFeature AsIndexerFeature)
                     {
                         if (CheckGetterConsistency(source, AsIndexerFeature.GetterBody, errorList))

@@ -104,7 +104,6 @@
                         Success = false;
                     }
                 }
-
                 else if (node.GetterBody.IsAssigned)
                 {
                     if (node.PropertyKind == BaseNode.UtilityType.WriteOnly)
@@ -113,7 +112,6 @@
                         Success = false;
                     }
                 }
-
                 else if (node.SetterBody.IsAssigned)
                 {
                     if (node.PropertyKind == BaseNode.UtilityType.ReadOnly)

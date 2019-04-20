@@ -81,7 +81,6 @@
                                 ConflictingEntry = true;
                             }
                         }
-
                         else if (InstanceItem == LocalItem)
                         {
                             AddSourceError(new ErrorExportNameConflict(Inheritance, LocalName.Name, InstanceName.Name));
@@ -111,13 +110,10 @@
 
                         if (ValidText.ToLower() == LanguageClasses.Any.Name.ToLower())
                             ListedClassList.Add(LanguageClasses.Any.Name);
-
                         else if (node.ImportedClassTable.ContainsKey(ValidText))
                             ListedClassList.Add(ValidText);
-
                         else if (FeatureName.TableContain(MergedExportTable, ValidText, out IFeatureName Key, out IHashtableEx<string, IClass> Item))
                             ListedExportList.Add(Key, Identifier);
-
                         else
                         {
                             AddSourceError(new ErrorUnknownIdentifier(Identifier, ValidText));

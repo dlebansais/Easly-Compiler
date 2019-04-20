@@ -66,26 +66,22 @@
                 IClass BaseClass = Class.ClassAny;
                 Success &= CheckValidityAsClass(BaseClass, node, out ValidTypeName, out ValidType);
             }
-
             else if (ValidIdentifier.ToLower() == LanguageClasses.AnyReference.Name.ToLower())
             {
                 IClass BaseClass = Class.ClassAnyReference;
                 Success &= CheckValidityAsClass(BaseClass, node, out ValidTypeName, out ValidType);
             }
-
             else if (ValidIdentifier.ToLower() == LanguageClasses.AnyValue.Name.ToLower())
             {
                 IClass BaseClass = Class.ClassAnyValue;
                 Success &= CheckValidityAsClass(BaseClass, node, out ValidTypeName, out ValidType);
             }
-
             else if (ImportedClassTable.ContainsKey(ValidIdentifier))
             {
                 IImportedClass Imported = ImportedClassTable[ValidIdentifier];
                 IClass BaseClass = Imported.Item;
                 Success &= CheckValidityAsClass(BaseClass, node, out ValidTypeName, out ValidType);
             }
-
             else if (LocalGenericTable.ContainsKey(ValidIdentifier))
             {
                 IFormalGenericType FormalGeneric = (IFormalGenericType)LocalGenericTable[ValidIdentifier];
@@ -93,10 +89,8 @@
                 node.FormalGenericNameSource.Item = FormalGeneric.ResolvedTypeName;
                 CheckValidityAsGeneric(node.FormalGenericNameSource.Item, node.FormalGenericSource.Item, out ValidTypeName, out ValidType);
             }
-
             else if (FeatureName.TableContain(LocalTypedefTable, ValidIdentifier, out IFeatureName Key, out ITypedefType DefinedType))
                 CheckValidityAsTypedef(DefinedType, out ValidTypeName, out ValidType);
-
             else
             {
                 AddSourceError(new ErrorUnknownIdentifier(ClassIdentifier, ValidIdentifier));

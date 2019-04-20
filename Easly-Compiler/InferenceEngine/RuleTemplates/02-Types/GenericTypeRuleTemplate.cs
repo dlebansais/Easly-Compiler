@@ -78,7 +78,6 @@
                     {
                         if (ArgumentStyle == TypeArgumentStyles.None)
                             ArgumentStyle = TypeArgumentStyles.Positional;
-
                         else if (ArgumentStyle == TypeArgumentStyles.Assignment)
                         {
                             AddSourceError(new ErrorTypeArgumentMixed(Item));
@@ -87,12 +86,10 @@
 
                         IsHandled = true;
                     }
-
                     else if (Item is IAssignmentTypeArgument AsAssignmentTypeArgument)
                     {
                         if (ArgumentStyle == TypeArgumentStyles.None)
                             ArgumentStyle = TypeArgumentStyles.Assignment;
-
                         else if (ArgumentStyle == TypeArgumentStyles.Positional)
                         {
                             AddSourceError(new ErrorTypeArgumentMixed(Item));
@@ -171,7 +168,6 @@
                 AddSourceError(new ErrorTooManyTypeArguments(node, ValidIdentifier, baseClass.GenericTable.Count));
                 return false;
             }
-
             else if (node.TypeArgumentList.Count < MinimumArgumentCount)
             {
                 AddSourceError(new ErrorTypeArgumentCount(node, ValidIdentifier, MinimumArgumentCount));

@@ -56,7 +56,6 @@
                     AddSourceError(new ErrorReferenceValueConstraintConformance(node, node.ResolvedDefaultType.Item, CopyConstraint));
                     Success = false;
                 }
-
                 else if (node.ResolvedDefaultType.Item.IsValue && CopyConstraint == BaseNode.CopySemantic.Reference)
                 {
                     AddSourceError(new ErrorReferenceValueConstraintConformance(node, node.ResolvedDefaultType.Item, CopyConstraint));
@@ -87,7 +86,6 @@
                             break;
                         }
                     }
-
                     else if (InducedConstraint == BaseNode.CopySemantic.Value)
                     {
                         if (BaseType.IsReference)
@@ -97,12 +95,10 @@
                             break;
                         }
                     }
-
                     else
                     {
                         if (BaseType.IsReference)
                             InducedConstraint = BaseNode.CopySemantic.Reference;
-
                         else if (BaseType.IsValue)
                             InducedConstraint = BaseNode.CopySemantic.Value;
                     }

@@ -641,7 +641,6 @@ namespace CompilerNode
                         return false;
                     }
                 }
-
                 else
                     SourceNameTable.Add(ValidSourceName, this);
             }

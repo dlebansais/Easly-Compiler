@@ -57,10 +57,8 @@
 
             if (ValidText.ToLower() == LanguageClasses.Any.Name.ToLower())
                 AddSourceError(new ErrorReservedName(EntityName, ValidText));
-
             else if (ImportedClassTable.ContainsKey(ValidText))
                 AddSourceError(new ErrorDuplicateName(EntityName, ValidText));
-
             else if (LocalGenericTable.ContainsKey(ValidText))
                 AddSourceError(new ErrorDuplicateName(EntityName, ValidText));
 
@@ -70,7 +68,6 @@
 
                 if (ConstraintType is IAnchoredType AsAnchoredType)
                     AddSourceError(new ErrorInvalidAnchoredType(AsAnchoredType));
-
                 else if (ConstraintType is IKeywordAnchoredType AsKeywordAnchoredType)
                     AddSourceError(new ErrorInvalidAnchoredType(AsKeywordAnchoredType));
             }

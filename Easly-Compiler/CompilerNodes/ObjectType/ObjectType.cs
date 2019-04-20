@@ -116,10 +116,8 @@
 
                 return false;
             }
-
             else if (IsDirectDescendantOf(derivedType, baseType, substitutionTypeTable, sourceLocation))
                 return true;
-
             else
                 return TypeConformDirectlyToBase(derivedType, baseType, substitutionTypeTable, errorList, sourceLocation, reportError);
         }
@@ -132,10 +130,8 @@
                 {
                     if (DerivedClassType.BaseClass.CopySpecification == BaseNode.CopySemantic.Reference && (baseType == ClassType.ClassAnyReferenceType || baseType == ClassType.ClassAnyType))
                         return true;
-
                     else if (DerivedClassType.BaseClass.CopySpecification == BaseNode.CopySemantic.Value && (baseType == ClassType.ClassAnyValueType || baseType == ClassType.ClassAnyType))
                         return true;
-
                     else if (DerivedClassType.BaseClass.CopySpecification == BaseNode.CopySemantic.Any && baseType == ClassType.ClassAnyType)
                         return true;
                 }
@@ -182,7 +178,6 @@
 
             if (ConformToBaseAny(derivedType, baseType))
                 return true;
-
             else
                 foreach (IConstraint Item in derivedType.FormalGeneric.ConstraintList)
                     if (Item.ResolvedParentType.Item is IClassType Parent)
@@ -205,7 +200,6 @@
 
             if (baseType is IFormalGenericType AsFormalGenericBaseType)
                 return TypeConformToFormalGenericType(derivedType, AsFormalGenericBaseType, substitutionTypeTable, errorList, sourceLocation, reportError);
-
             else if (derivedType is FormalGenericType AsFormalGenericDerivedType)
                 return FormalGenericTypeConformToBase(AsFormalGenericDerivedType, baseType, substitutionTypeTable, errorList, sourceLocation, reportError);
             else
@@ -313,7 +307,6 @@
                     return false;
                 }
             }
-
             else if (baseType != ClassType.ClassAnyType && baseType != ClassType.ClassAnyReferenceType && baseType != ClassType.ClassAnyValueType)
             {
                 if (reportError)
@@ -342,7 +335,6 @@
         {
             if (derivedType is IClassType AsClassType)
                 return ClassTypeConformToClassType(AsClassType, baseType, substitutionTypeTable, errorList, sourceLocation, reportError);
-
             else
             {
                 if (reportError)
@@ -839,7 +831,6 @@
                 Result = false;
                 IsHandled = true;
             }
-
             else if (derivedType is ITupleType AsTupleType)
             {
                 if (reportError)

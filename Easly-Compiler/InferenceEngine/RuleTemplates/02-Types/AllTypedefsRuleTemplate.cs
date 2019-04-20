@@ -74,7 +74,6 @@
                                 ConflictingEntry = true;
                             }
                         }
-
                         else if (InstanceItem == LocalItem)
                         {
                             AddSourceError(new ErrorTypedefNameConflict(InheritanceItem, LocalName.Name, InstanceName.Name));

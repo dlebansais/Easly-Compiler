@@ -216,7 +216,6 @@ namespace CompilerNode
                     else
                         ListedExportTable.Add(ValidIdentifier, ListedExport.Item);
                 }
-
                 else if (importedClassTable.ContainsKey(ValidIdentifier))
                 {
                     if (ListedExportTable.ContainsKey(ValidIdentifier))
@@ -227,7 +226,6 @@ namespace CompilerNode
                     else
                         ListedClassTable.Add(ValidIdentifier, importedClassTable[ValidIdentifier].Item);
                 }
-
                 else if (ValidIdentifier.ToLower() != LanguageClasses.Any.Name.ToLower())
                 {
                     errorList.Add(new ErrorUnknownIdentifier(IdentifierItem, ValidIdentifier));

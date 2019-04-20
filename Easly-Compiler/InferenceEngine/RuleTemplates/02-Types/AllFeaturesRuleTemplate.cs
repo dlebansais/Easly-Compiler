@@ -242,7 +242,6 @@
                     {
                         if (!ImportedInstance.EffectiveInstance.IsAssigned)
                             ImportedInstance.EffectiveInstance.Item = Item;
-
                         else
                         {
                             errorList.Add(new ErrorMultipleEffectiveFeature(Item.Location, Item.Name.Name));
