@@ -11,7 +11,8 @@ namespace Test
         static void Main(string[] args)
         {
             Compiler c = new Compiler();
-            c.Compile("../../../coverage/coverage.easly");
+            c.Compile(@"C:\Users\DLB\AppData\Local\Temp\root.easly");
+            //c.Compile("../../../coverage/coverage.easly");
             //c.Compile("../../../coverage/coverage invalid 02-08.easly");
             //c.Compile("../../../test.easly");
             //c.Compile("../../../root.easly");

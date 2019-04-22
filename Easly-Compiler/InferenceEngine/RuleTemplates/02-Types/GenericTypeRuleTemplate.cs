@@ -34,7 +34,6 @@
                 new OnceReferenceDestinationTemplate<IGenericType, IHashtableEx<string, IObjectType>>(nameof(IGenericType.ResolvedArgumentLocationTable)),
                 new OnceReferenceDestinationTemplate<IGenericType, ITypeName>(nameof(IGenericType.ResolvedTypeName)),
                 new OnceReferenceDestinationTemplate<IGenericType, ICompiledType>(nameof(IGenericType.ResolvedType)),
-                new UnsealedTableDestinationTemplate<IGenericType, ITypeName, ICompiledType>(nameof(IClass.TypeTable), TemplateClassStart<IGenericType>.Default),
             };
         }
         #endregion

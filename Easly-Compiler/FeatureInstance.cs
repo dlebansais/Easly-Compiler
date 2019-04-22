@@ -151,7 +151,7 @@
         /// <summary>
         /// The first precursor in the inheritance tree.
         /// </summary>
-        public OnceReference<IPrecursorInstance> OriginalPrecursor { get; private set; }
+        public OnceReference<IPrecursorInstance> OriginalPrecursor { get; private set; } = new OnceReference<IPrecursorInstance>();
 
         #region Client Interface
         /// <summary>

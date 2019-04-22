@@ -221,7 +221,7 @@
             if (!FeatureName.TableContain(featureTable, Text, out IFeatureName ItemName, out IFeatureInstance ItemInstance))
             {
                 errorList.Add(new ErrorUnknownIdentifier(item, Text));
-                return true;
+                return false;
             }
 
             ICompiledFeature ItemFeature = ItemInstance.Feature.Item;
@@ -262,7 +262,7 @@
             }
 
             Debug.Assert(IsHandled);
-            return true;
+            return Result;
         }
 
         private static bool IsAttributeFeatureReady(IAttributeFeature feature, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)

@@ -31,7 +31,6 @@
                 new OnceReferenceDestinationTemplate<IAttributeFeature, ICompiledType>(nameof(IAttributeFeature.ResolvedEntityType)),
                 new OnceReferenceDestinationTemplate<IAttributeFeature, ITypeName>(nameof(IAttributeFeature.ResolvedFeatureTypeName)),
                 new OnceReferenceDestinationTemplate<IAttributeFeature, ICompiledType>(nameof(IAttributeFeature.ResolvedFeatureType)),
-                new UnsealedTableDestinationTemplate<IAttributeFeature, ITypeName, ICompiledType>(nameof(IClass.TypeTable), TemplateClassStart<IAttributeFeature>.Default),
                 new OnceReferenceDestinationTemplate<IAttributeFeature, ICompiledFeature>(nameof(IAttributeFeature.ResolvedFeature)),
             };
         }

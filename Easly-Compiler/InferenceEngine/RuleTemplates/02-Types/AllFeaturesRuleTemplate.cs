@@ -460,7 +460,10 @@
 
                         if (!HasEffectiveAncestor)
                         {
-                            errorList.Add(new ErrorMissingAncestor(Item.Location, Item.Name.Name));
+                            IFeature AsFeature = EffectiveFeature as IFeature;
+                            Debug.Assert(AsFeature != null);
+
+                            errorList.Add(new ErrorMissingAncestor(AsFeature, Item.Name.Name));
                             return false;
                         }
                     }

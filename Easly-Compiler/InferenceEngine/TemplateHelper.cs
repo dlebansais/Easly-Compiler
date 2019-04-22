@@ -74,12 +74,22 @@
             isInterrupted = true;
             object IntermediateResult = startingPoint.GetStart(source);
 
-            for (int i = 0; i < propertyPath.Count; i++)
+            try
             {
-                if (IntermediateResult is IOnceReference AsOnceReference && !AsOnceReference.IsAssigned)
-                    return default;
+                for (int i = 0; i < propertyPath.Count; i++)
+                {
+                    if (IntermediateResult is IOnceReference AsOnceReference)
+                        if (!AsOnceReference.IsAssigned)
+                            return default;
+                        else
+                            IntermediateResult = AsOnceReference.Reference;
 
-                IntermediateResult = propertyPath[i].GetValue(IntermediateResult);
+                    IntermediateResult = propertyPath[i].GetValue(IntermediateResult);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Fail(e.Message);
             }
 
             TValue Result = default;

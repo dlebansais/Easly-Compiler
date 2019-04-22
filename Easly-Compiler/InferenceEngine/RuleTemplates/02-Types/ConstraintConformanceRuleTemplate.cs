@@ -29,7 +29,6 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new UnsealedTableDestinationTemplate<IConstraint, ITypeName, ICompiledType>(nameof(IGeneric.ResolvedConformanceTable), TemplateGenericStart<IConstraint>.Default),
                 new OnceReferenceDestinationTemplate<IConstraint, ITypeName>(nameof(IConstraint.ResolvedConformingTypeName)),
                 new OnceReferenceDestinationTemplate<IConstraint, ICompiledType>(nameof(IConstraint.ResolvedConformingType)),
             };

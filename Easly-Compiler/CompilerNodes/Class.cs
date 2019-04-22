@@ -280,6 +280,15 @@ namespace CompilerNode
             Class BaseClass = new Class();
             BaseClass.CopySpecification = copySpecification;
             BaseClass.ValidClassName = className;
+            BaseClass.ClassGroup.Item = new SingleClassGroup(BaseClass);
+            BaseClass.DiscreteTable.Seal();
+            BaseClass.FeatureTable.Seal();
+            BaseClass.FullClassPath = string.Empty; // TODO
+            BaseClass.GenericTable.Seal();
+            BaseClass.InheritanceTable.Seal();
+            BaseClass.InheritedClassTypeTable.Seal();
+            BaseClass.TypedefTable.Seal();
+            BaseClass.ValidSourceName = string.Empty;
 
             return BaseClass;
         }
