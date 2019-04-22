@@ -48,11 +48,22 @@
             bool Success = true;
             data = null;
 
-            bool HasConflictingEntry = false;
-            IList<IFeatureName> ListedIdentifiers;
-
             Debug.Assert(node.LocalExportTable.IsSealed);
             IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> MergedExportTable = node.LocalExportTable.CloneUnsealed();
+
+            if (!HasConflictingEntry(node, MergedExportTable))
+                foreach (IExport Export in node.ExportList)
+                    Success &= MergeExportEntry(node, Export, MergedExportTable);
+
+            if (Success)
+                data = MergedExportTable;
+
+            return Success;
+        }
+
+        private bool HasConflictingEntry(IClass node, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> mergedExportTable)
+        {
+            bool Result = false;
 
             foreach (IInheritance Inheritance in node.InheritanceList)
             {
@@ -68,7 +79,7 @@
                     IHashtableEx<string, IClass> InstanceItem = InstanceEntry.Value;
                     bool ConflictingEntry = false;
 
-                    foreach (KeyValuePair<IFeatureName, IHashtableEx<string, IClass>> Entry in MergedExportTable)
+                    foreach (KeyValuePair<IFeatureName, IHashtableEx<string, IClass>> Entry in mergedExportTable)
                     {
                         IFeatureName LocalName = Entry.Key;
                         IHashtableEx<string, IClass> LocalItem = Entry.Value;
@@ -89,98 +100,96 @@
                     }
 
                     if (!ConflictingEntry)
-                        MergedExportTable.Add(InstanceName, InstanceItem);
+                        mergedExportTable.Add(InstanceName, InstanceItem);
                     else
-                        HasConflictingEntry = true;
+                        Result = true;
                 }
             }
 
-            if (!HasConflictingEntry)
+            return Result;
+        }
+
+        private bool MergeExportEntry(IClass node, IExport export, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> mergedExportTable)
+        {
+            bool Success = true;
+
+            IList<string> ListedClassList = new List<string>();
+            IHashtableEx<IFeatureName, IIdentifier> ListedExportList = new HashtableEx<IFeatureName, IIdentifier>();
+            for (int i = 0; i < export.ClassIdentifierList.Count; i++)
             {
-                foreach (IExport Export in node.ExportList)
+                IIdentifier Identifier = export.ClassIdentifierList[i];
+
+                Debug.Assert(Identifier.ValidText.IsAssigned);
+                string ValidText = Identifier.ValidText.Item;
+
+                if (ValidText.ToLower() == LanguageClasses.Any.Name.ToLower())
+                    ListedClassList.Add(LanguageClasses.Any.Name);
+                else if (node.ImportedClassTable.ContainsKey(ValidText))
+                    ListedClassList.Add(ValidText);
+                else if (FeatureName.TableContain(mergedExportTable, ValidText, out IFeatureName Key, out IHashtableEx<string, IClass> Item))
+                    ListedExportList.Add(Key, Identifier);
+                else
                 {
-                    IList<string> ListedClassList = new List<string>();
-                    IHashtableEx<IFeatureName, IIdentifier> ListedExportList = new HashtableEx<IFeatureName, IIdentifier>();
-                    for (int i = 0; i < Export.ClassIdentifierList.Count; i++)
-                    {
-                        IIdentifier Identifier = Export.ClassIdentifierList[i];
-
-                        Debug.Assert(Identifier.ValidText.IsAssigned);
-                        string ValidText = Identifier.ValidText.Item;
-
-                        if (ValidText.ToLower() == LanguageClasses.Any.Name.ToLower())
-                            ListedClassList.Add(LanguageClasses.Any.Name);
-                        else if (node.ImportedClassTable.ContainsKey(ValidText))
-                            ListedClassList.Add(ValidText);
-                        else if (FeatureName.TableContain(MergedExportTable, ValidText, out IFeatureName Key, out IHashtableEx<string, IClass> Item))
-                            ListedExportList.Add(Key, Identifier);
-                        else
-                        {
-                            AddSourceError(new ErrorUnknownIdentifier(Identifier, ValidText));
-                            Success = false;
-                        }
-                    }
-
-                    ListedIdentifiers = new List<IFeatureName>();
-
-                    foreach (KeyValuePair<IFeatureName, IIdentifier> Entry in ListedExportList)
-                    {
-                        IFeatureName ExportName = Entry.Key;
-                        IIdentifier Identifier = Entry.Value;
-
-                        if (ListedIdentifiers.Contains(ExportName))
-                        {
-                            AddSourceError(new ErrorIdentifierAlreadyListed(Identifier, ExportName.Name));
-                            Success = false;
-                        }
-                        else
-                            ListedIdentifiers.Add(ExportName);
-                    }
-
-                    List<IHashtableEx<string, IClass>> OtherClassTableList = new List<IHashtableEx<string, IClass>>();
-                    foreach (IFeatureName ExportName in ListedIdentifiers)
-                    {
-                        IHashtableEx<string, IClass> OtherClassTable = MergedExportTable[ExportName];
-                        OtherClassTableList.Add(OtherClassTable);
-                    }
-
-                    IHashtableEx<string, IClass> FilledClassTable = new HashtableEx<string, IClass>();
-
-                    foreach (IHashtableEx<string, IClass> OtherClassTable in OtherClassTableList)
-                        ResolveAsExportIdentifier(OtherClassTable, FilledClassTable);
-
-                    bool AllClassIdentifiersHandled = true;
-                    for (int i = 0; i < Export.ClassIdentifierList.Count; i++)
-                    {
-                        IIdentifier Identifier = Export.ClassIdentifierList[i];
-                        string ValidIdentifier = Identifier.ValidText.Item;
-
-                        if (ValidIdentifier.ToLower() == LanguageClasses.Any.Name.ToLower() || node.ImportedClassTable.ContainsKey(ValidIdentifier))
-                            if (!ResolveAsClassIdentifier(ValidIdentifier, node.ImportedClassTable, FilledClassTable, Identifier, ErrorList))
-                            {
-                                AllClassIdentifiersHandled = false;
-                                Success = false;
-                            }
-                    }
-
-                    if (AllClassIdentifiersHandled)
-                    {
-                        IHashtableEx<string, IClass> ClassTable = node.LocalExportTable[Export.ValidExportName.Item];
-                        foreach (KeyValuePair<string, IClass> Entry in FilledClassTable)
-                        {
-                            string ClassIdentifier = Entry.Key;
-                            IClass ExportClassItem = Entry.Value;
-
-                            ClassTable.Add(ClassIdentifier, ExportClassItem);
-                        }
-
-                        Export.ExportClassTable.Item = FilledClassTable;
-                    }
+                    AddSourceError(new ErrorUnknownIdentifier(Identifier, ValidText));
+                    Success = false;
                 }
             }
 
-            if (Success)
-                data = MergedExportTable;
+            IList<IFeatureName> ListedIdentifiers = new List<IFeatureName>();
+
+            foreach (KeyValuePair<IFeatureName, IIdentifier> Entry in ListedExportList)
+            {
+                IFeatureName ExportName = Entry.Key;
+                IIdentifier Identifier = Entry.Value;
+
+                if (ListedIdentifiers.Contains(ExportName))
+                {
+                    AddSourceError(new ErrorIdentifierAlreadyListed(Identifier, ExportName.Name));
+                    Success = false;
+                }
+                else
+                    ListedIdentifiers.Add(ExportName);
+            }
+
+            List<IHashtableEx<string, IClass>> OtherClassTableList = new List<IHashtableEx<string, IClass>>();
+            foreach (IFeatureName ExportName in ListedIdentifiers)
+            {
+                IHashtableEx<string, IClass> OtherClassTable = mergedExportTable[ExportName];
+                OtherClassTableList.Add(OtherClassTable);
+            }
+
+            IHashtableEx<string, IClass> FilledClassTable = new HashtableEx<string, IClass>();
+
+            foreach (IHashtableEx<string, IClass> OtherClassTable in OtherClassTableList)
+                ResolveAsExportIdentifier(OtherClassTable, FilledClassTable);
+
+            bool AllClassIdentifiersHandled = true;
+            for (int i = 0; i < export.ClassIdentifierList.Count; i++)
+            {
+                IIdentifier Identifier = export.ClassIdentifierList[i];
+                string ValidIdentifier = Identifier.ValidText.Item;
+
+                if (ValidIdentifier.ToLower() == LanguageClasses.Any.Name.ToLower() || node.ImportedClassTable.ContainsKey(ValidIdentifier))
+                    if (!ResolveAsClassIdentifier(ValidIdentifier, node.ImportedClassTable, FilledClassTable, Identifier, ErrorList))
+                    {
+                        AllClassIdentifiersHandled = false;
+                        Success = false;
+                    }
+            }
+
+            if (AllClassIdentifiersHandled)
+            {
+                IHashtableEx<string, IClass> ClassTable = node.LocalExportTable[export.ValidExportName.Item];
+                foreach (KeyValuePair<string, IClass> Entry in FilledClassTable)
+                {
+                    string ClassIdentifier = Entry.Key;
+                    IClass ExportClassItem = Entry.Value;
+
+                    ClassTable.Add(ClassIdentifier, ExportClassItem);
+                }
+
+                export.ExportClassTable.Item = FilledClassTable;
+            }
 
             return Success;
         }

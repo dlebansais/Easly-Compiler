@@ -147,16 +147,7 @@ namespace CompilerNode
                 case BaseNode.Keyword.True:
                 case BaseNode.Keyword.False:
                 case BaseNode.Keyword.Retry:
-                    if (EmbeddingClass.ImportedLanguageTypeTable.ContainsKey(LanguageClasses.Boolean.Guid))
-                    {
-                        Tuple<ITypeName, IClassType> ImportedLanguageType = EmbeddingClass.ImportedLanguageTypeTable[LanguageClasses.Boolean.Guid];
-                        resultTypeName = ImportedLanguageType.Item1;
-                        resultType = ImportedLanguageType.Item2;
-                        Result = true;
-                    }
-                    else
-                        errorList.Add(new ErrorBooleanTypeMissing(source));
-
+                    Result = IsLanguageTypeAvailable(source, LanguageClasses.Boolean.Guid, errorList, out resultTypeName, out resultType);
                     IsHandled = true;
                     break;
 
@@ -168,57 +159,17 @@ namespace CompilerNode
                     break;
 
                 case BaseNode.Keyword.Value:
-                    IPropertyFeature EmbeddingProperty = source.EmbeddingFeature as IPropertyFeature;
-                    if (EmbeddingProperty != null)
-                    {
-                        resultTypeName = EmbeddingProperty.ResolvedEntityTypeName.Item;
-                        resultType = EmbeddingProperty.ResolvedEntityType.Item;
-                        Result = true;
-                    }
-                    else
-                        errorList.Add(new ErrorUnavailableValue(source));
-
+                    Result = IsWithinProperty(source, errorList, out resultTypeName, out resultType);
                     IsHandled = true;
                     break;
 
                 case BaseNode.Keyword.Result:
-                    if (source.EmbeddingOverload is IQueryOverload AsQueryOverload)
-                        Result = CheckQueryConsistency(source, AsQueryOverload, errorList, out resultTypeName, out resultType);
-                    else if (source.EmbeddingFeature is IPropertyFeature AsPropertyFeature)
-                    {
-                        if (CheckGetterConsistency(source, AsPropertyFeature.GetterBody, errorList))
-                        {
-                            resultTypeName = AsPropertyFeature.ResolvedEntityTypeName.Item;
-                            resultType = AsPropertyFeature.ResolvedEntityType.Item;
-                            Result = true;
-                        }
-                    }
-                    else if (source.EmbeddingFeature is IIndexerFeature AsIndexerFeature)
-                    {
-                        if (CheckGetterConsistency(source, AsIndexerFeature.GetterBody, errorList))
-                        {
-                            resultTypeName = AsIndexerFeature.ResolvedEntityTypeName.Item;
-                            resultType = AsIndexerFeature.ResolvedEntityType.Item;
-                            Result = true;
-                        }
-                    }
-                    else
-                        errorList.Add(new ErrorUnavailableResult(source));
-
+                    Result = IsWithinGetter(source, errorList, out resultTypeName, out resultType);
                     IsHandled = true;
                     break;
 
                 case BaseNode.Keyword.Exception:
-                    if (EmbeddingClass.ImportedLanguageTypeTable.ContainsKey(LanguageClasses.Exception.Guid))
-                    {
-                        Tuple<ITypeName, IClassType> ImportedLanguageType = EmbeddingClass.ImportedLanguageTypeTable[LanguageClasses.Exception.Guid];
-                        resultTypeName = ImportedLanguageType.Item1;
-                        resultType = ImportedLanguageType.Item2;
-                        Result = true;
-                    }
-                    else
-                        errorList.Add(new ErrorExceptionTypeMissing(source));
-
+                    Result = IsLanguageTypeAvailable(source, LanguageClasses.Exception.Guid, errorList, out resultTypeName, out resultType);
                     IsHandled = true;
                     break;
             }
@@ -226,6 +177,73 @@ namespace CompilerNode
             Debug.Assert(IsHandled);
 
             return Result;
+        }
+
+        private static bool IsLanguageTypeAvailable(ISource source, Guid guid, IList<IError> errorList, out ITypeName resultTypeName, out ICompiledType resultType)
+        {
+            resultTypeName = null;
+            resultType = null;
+
+            IClass EmbeddingClass = source.EmbeddingClass;
+
+            if (!EmbeddingClass.ImportedLanguageTypeTable.ContainsKey(guid))
+            {
+                errorList.Add(new ErrorBooleanTypeMissing(source));
+                return false;
+            }
+
+            Tuple<ITypeName, IClassType> ImportedLanguageType = EmbeddingClass.ImportedLanguageTypeTable[guid];
+            resultTypeName = ImportedLanguageType.Item1;
+            resultType = ImportedLanguageType.Item2;
+            return true;
+        }
+
+        private static bool IsWithinProperty(ISource source, IList<IError> errorList, out ITypeName resultTypeName, out ICompiledType resultType)
+        {
+            resultTypeName = null;
+            resultType = null;
+
+            IPropertyFeature EmbeddingProperty = source.EmbeddingFeature as IPropertyFeature;
+            if (EmbeddingProperty == null)
+            {
+                errorList.Add(new ErrorUnavailableValue(source));
+                return false;
+            }
+
+            resultTypeName = EmbeddingProperty.ResolvedEntityTypeName.Item;
+            resultType = EmbeddingProperty.ResolvedEntityType.Item;
+            return true;
+        }
+
+        private static bool IsWithinGetter(ISource source, IList<IError> errorList, out ITypeName resultTypeName, out ICompiledType resultType)
+        {
+            resultTypeName = null;
+            resultType = null;
+
+            if (source.EmbeddingOverload is IQueryOverload AsQueryOverload)
+                return CheckQueryConsistency(source, AsQueryOverload, errorList, out resultTypeName, out resultType);
+            else if (source.EmbeddingFeature is IPropertyFeature AsPropertyFeature)
+            {
+                if (CheckGetterConsistency(source, AsPropertyFeature.GetterBody, errorList))
+                {
+                    resultTypeName = AsPropertyFeature.ResolvedEntityTypeName.Item;
+                    resultType = AsPropertyFeature.ResolvedEntityType.Item;
+                    return true;
+                }
+            }
+            else if (source.EmbeddingFeature is IIndexerFeature AsIndexerFeature)
+            {
+                if (CheckGetterConsistency(source, AsIndexerFeature.GetterBody, errorList))
+                {
+                    resultTypeName = AsIndexerFeature.ResolvedEntityTypeName.Item;
+                    resultType = AsIndexerFeature.ResolvedEntityType.Item;
+                    return true;
+                }
+            }
+            else
+                errorList.Add(new ErrorUnavailableResult(source));
+
+            return false;
         }
 
         private static bool CheckQueryConsistency(ISource source, IQueryOverload innerQueryOverload, IList<IError> errorList, out ITypeName resultTypeName, out ICompiledType resultType)

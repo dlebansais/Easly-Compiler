@@ -288,24 +288,8 @@
 
             if (derivedType.FormalGeneric.ResolvedConformanceTable.Count > 0)
             {
-                bool ConformantConstraintFound = false;
-                foreach (KeyValuePair<ITypeName, ICompiledType> ConformingEntry in derivedType.FormalGeneric.ResolvedConformanceTable)
-                {
-                    ICompiledType ConformingType = ConformingEntry.Value;
-                    IList<IError> FakeErrorList = new List<IError>();
-
-                    if (TypeConformToBase(ConformingType, baseType, substitutionTypeTable, FakeErrorList, sourceLocation, false))
-                    {
-                        ConformantConstraintFound = true;
-                        break;
-                    }
-                }
-                if (!ConformantConstraintFound)
-                {
-                    if (reportError)
-                        errorList.Add(new ErrorInsufficientConstraintConformance(sourceLocation, derivedType, baseType));
+                if (!FormalGenericTypeConformToBaseWithConformance(derivedType, baseType, substitutionTypeTable, errorList, sourceLocation, reportError))
                     return false;
-                }
             }
             else if (baseType != ClassType.ClassAnyType && baseType != ClassType.ClassAnyReferenceType && baseType != ClassType.ClassAnyValueType)
             {
@@ -325,6 +309,30 @@
             {
                 if (reportError)
                     errorList.Add(new ErrorReferenceValueConformance(sourceLocation, derivedType, baseType));
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool FormalGenericTypeConformToBaseWithConformance(IFormalGenericType derivedType, ICompiledType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        {
+            bool ConformantConstraintFound = false;
+            foreach (KeyValuePair<ITypeName, ICompiledType> ConformingEntry in derivedType.FormalGeneric.ResolvedConformanceTable)
+            {
+                ICompiledType ConformingType = ConformingEntry.Value;
+                IList<IError> FakeErrorList = new List<IError>();
+
+                if (TypeConformToBase(ConformingType, baseType, substitutionTypeTable, FakeErrorList, sourceLocation, false))
+                {
+                    ConformantConstraintFound = true;
+                    break;
+                }
+            }
+            if (!ConformantConstraintFound)
+            {
+                if (reportError)
+                    errorList.Add(new ErrorInsufficientConstraintConformance(sourceLocation, derivedType, baseType));
                 return false;
             }
 
@@ -1042,35 +1050,13 @@
             bool MatchingOverload = false;
             foreach (IQueryOverloadType DerivedOverload in derivedType.OverloadList)
             {
-                if (DerivedOverload.ParameterList.Count != baseType.IndexParameterList.Count || DerivedOverload.ResultList.Count != 1 || DerivedOverload.ParameterEnd != BaseNode.ParameterEndStatus.Closed)
+                if (FunctionTypeConformToIndexerTypeOverloads(DerivedOverload, baseType, substitutionTypeTable, errorList, sourceLocation, reportError, ref MatchingOverload))
                     continue;
 
-                for (int i = 0; i < DerivedOverload.ParameterList.Count; i++)
-                {
-                    IEntityDeclaration BaseParameter = baseType.IndexParameterList[i];
-                    IEntityDeclaration DerivedParameter = DerivedOverload.ParameterList[i];
-
-                    if (!DerivedParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned || !BaseParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned)
-                        return false;
-
-                    if (!TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, substitutionTypeTable, errorList, sourceLocation, reportError))
-                        return false;
-                }
-
-                IList<IError> FakeErrorList = new List<IError>();
-                IEntityDeclaration OverloadResult = DerivedOverload.ResultList[0];
-
-                if (!baseType.ResolvedEntityType.IsAssigned || !OverloadResult.ResolvedEntityType.IsAssigned)
+                if (!MatchingOverload)
                     return false;
-
-                if (!TypeConformToBase(baseType.ResolvedEntityType.Item, OverloadResult.ResolvedEntityType.Item, substitutionTypeTable, FakeErrorList, sourceLocation, reportError))
-                    continue;
-
-                if (!ExceptionListConformToBase(DerivedOverload.ExceptionIdentifierList, baseType.GetExceptionIdentifierList, errorList, sourceLocation, reportError))
-                    return false;
-
-                MatchingOverload = true;
-                break;
+                else
+                    break;
             }
             if (!MatchingOverload)
             {
@@ -1080,6 +1066,39 @@
             }
 
             return true;
+        }
+
+        private static bool FunctionTypeConformToIndexerTypeOverloads(IQueryOverloadType derivedOverload, IIndexerType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError, ref bool matchingOverload)
+        {
+            if (derivedOverload.ParameterList.Count != baseType.IndexParameterList.Count || derivedOverload.ResultList.Count != 1 || derivedOverload.ParameterEnd != BaseNode.ParameterEndStatus.Closed)
+                return true;
+
+            for (int i = 0; i < derivedOverload.ParameterList.Count; i++)
+            {
+                IEntityDeclaration BaseParameter = baseType.IndexParameterList[i];
+                IEntityDeclaration DerivedParameter = derivedOverload.ParameterList[i];
+
+                if (!DerivedParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned || !BaseParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned)
+                    return false;
+
+                if (!TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, substitutionTypeTable, errorList, sourceLocation, reportError))
+                    return false;
+            }
+
+            IList<IError> FakeErrorList = new List<IError>();
+            IEntityDeclaration OverloadResult = derivedOverload.ResultList[0];
+
+            if (!baseType.ResolvedEntityType.IsAssigned || !OverloadResult.ResolvedEntityType.IsAssigned)
+                return false;
+
+            if (!TypeConformToBase(baseType.ResolvedEntityType.Item, OverloadResult.ResolvedEntityType.Item, substitutionTypeTable, FakeErrorList, sourceLocation, reportError))
+                return true;
+
+            if (!ExceptionListConformToBase(derivedOverload.ExceptionIdentifierList, baseType.GetExceptionIdentifierList, errorList, sourceLocation, reportError))
+                return false;
+
+            matchingOverload = true;
+            return false;
         }
 
         private static bool ProcedureTypeConformToIndexerType(IProcedureType derivedType, IIndexerType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)

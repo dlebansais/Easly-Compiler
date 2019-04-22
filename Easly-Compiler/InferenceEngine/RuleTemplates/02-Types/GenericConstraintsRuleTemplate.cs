@@ -69,40 +69,52 @@
 
                 foreach (IConstraint ConstraintItem in node.ConstraintList)
                 {
-                    ITypeName BaseTypeName = ConstraintItem.ResolvedParentTypeName.Item;
-                    ICompiledType BaseType = ConstraintItem.ResolvedParentType.Item;
-                    IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-                    IList<IError> ConstraintErrorList = new List<IError>();
-
-                    if (node.DefaultValue.IsAssigned && !ObjectType.TypeConformToBase(node.ResolvedDefaultType.Item, BaseType, SubstitutionTypeTable, ConstraintErrorList, (IObjectType)node.DefaultValue.Item, true))
-                        AddSourceErrorList(ConstraintErrorList);
-
-                    if (InducedConstraint == BaseNode.CopySemantic.Reference)
-                    {
-                        if (BaseType.IsValue)
-                        {
-                            AddSourceError(new ErrorReferenceValueConstraintConformance(node, node.ResolvedDefaultType.Item, InducedConstraint));
-                            Success = false;
-                            break;
-                        }
-                    }
-                    else if (InducedConstraint == BaseNode.CopySemantic.Value)
-                    {
-                        if (BaseType.IsReference)
-                        {
-                            AddSourceError(new ErrorReferenceValueConstraintConformance(node, node.ResolvedDefaultType.Item, InducedConstraint));
-                            Success = false;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        if (BaseType.IsReference)
-                            InducedConstraint = BaseNode.CopySemantic.Reference;
-                        else if (BaseType.IsValue)
-                            InducedConstraint = BaseNode.CopySemantic.Value;
-                    }
+                    Success = CheckConstraintConsistency(node, ConstraintItem, ref InducedConstraint);
+                    if (!Success)
+                        break;
                 }
+            }
+
+            return Success;
+        }
+
+        private bool CheckConstraintConsistency(IGeneric node, IConstraint constraintItem, ref BaseNode.CopySemantic inducedConstraint)
+        {
+            bool Success = true;
+
+            ITypeName BaseTypeName = constraintItem.ResolvedParentTypeName.Item;
+            ICompiledType BaseType = constraintItem.ResolvedParentType.Item;
+            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
+            IList<IError> ConstraintErrorList = new List<IError>();
+
+            if (node.DefaultValue.IsAssigned && !ObjectType.TypeConformToBase(node.ResolvedDefaultType.Item, BaseType, SubstitutionTypeTable, ConstraintErrorList, (IObjectType)node.DefaultValue.Item, true))
+            {
+                AddSourceErrorList(ConstraintErrorList);
+                Success = false;
+            }
+
+            if (inducedConstraint == BaseNode.CopySemantic.Reference)
+            {
+                if (BaseType.IsValue)
+                {
+                    AddSourceError(new ErrorReferenceValueConstraintConformance(node, node.ResolvedDefaultType.Item, inducedConstraint));
+                    Success = false;
+                }
+            }
+            else if (inducedConstraint == BaseNode.CopySemantic.Value)
+            {
+                if (BaseType.IsReference)
+                {
+                    AddSourceError(new ErrorReferenceValueConstraintConformance(node, node.ResolvedDefaultType.Item, inducedConstraint));
+                    Success = false;
+                }
+            }
+            else
+            {
+                if (BaseType.IsReference)
+                    inducedConstraint = BaseNode.CopySemantic.Reference;
+                else if (BaseType.IsValue)
+                    inducedConstraint = BaseNode.CopySemantic.Value;
             }
 
             return Success;

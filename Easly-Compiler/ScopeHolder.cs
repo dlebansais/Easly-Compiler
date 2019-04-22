@@ -81,42 +81,14 @@
                 switch (ParentSource)
                 {
                     case IScope AsScope:
-                        Result = AsScope.InnerScopes;
-                        IsHandled = true;
-                        break;
-
                     case IContinuation AsContinuation:
-                        Result = AsContinuation.InnerScopes;
-                        IsHandled = true;
-                        break;
-
                     case IConditional AsConditional:
-                        Result = AsConditional.InnerScopes;
-                        IsHandled = true;
-                        break;
-
                     case IAttachment AsAttachment:
-                        Result = AsAttachment.InnerScopes;
-                        IsHandled = true;
-                        break;
-
                     case IInstruction AsInstruction:
-                        Result = AsInstruction.InnerScopes;
-                        IsHandled = true;
-                        break;
-
                     case IEffectiveBody AsEffectiveBody:
-                        Result = AsEffectiveBody.InnerScopes;
-                        IsHandled = true;
-                        break;
-
                     case ICommandOverload AsCommandOverload:
-                        Result = AsCommandOverload.InnerScopes;
-                        IsHandled = true;
-                        break;
-
                     case IQueryOverload AsQueryOverload:
-                        Result = AsQueryOverload.InnerScopes;
+                        Result = ((IScopeHolder)ParentSource).InnerScopes;
                         IsHandled = true;
                         break;
 

@@ -324,40 +324,7 @@
         private bool CheckAllPrecursorSelected(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IList<IError> errorList)
         {
             IList<IHashtableEx<IFeatureName, IList<ICompiledFeature>>> PrecursorSetList = new List<IHashtableEx<IFeatureName, IList<ICompiledFeature>>>(); // FeatureName -> List<ICompiledFeature> (Precursor list)
-
-            foreach (KeyValuePair<IFeatureName, InheritedInstanceInfo> Entry in byNameTable)
-            {
-                IFeatureName Key = Entry.Key;
-                InheritedInstanceInfo Value = Entry.Value;
-
-                IList<ICompiledFeature> PrecursorList = new List<ICompiledFeature>();
-                foreach (InstanceNameInfo PrecursorItem in Value.PrecursorInstanceList)
-                    FillPrecursorList(PrecursorList, PrecursorItem.Instance);
-
-                bool FoundInSet = false;
-                foreach (IHashtableEx<IFeatureName, IList<ICompiledFeature>> PrecursorSet in PrecursorSetList)
-                {
-                    foreach (KeyValuePair<IFeatureName, IList<ICompiledFeature>> SetMemberEntry in PrecursorSet)
-                    {
-                        IFeatureName SetMemberKey = SetMemberEntry.Key;
-                        IList<ICompiledFeature> SetMemberPrecursorList = SetMemberEntry.Value;
-
-                        if (PrecursorListIntersect(PrecursorList, SetMemberPrecursorList))
-                        {
-                            PrecursorSet.Add(Key, PrecursorList);
-                            FoundInSet = true;
-                            break;
-                        }
-                    }
-                    if (FoundInSet)
-                        break;
-                }
-                if (!FoundInSet)
-                {
-                    IHashtableEx<IFeatureName, IList<ICompiledFeature>> NewSet = new HashtableEx<IFeatureName, IList<ICompiledFeature>>();
-                    NewSet.Add(Key, PrecursorList);
-                }
-            }
+            CheckAllPrecursorSelectedInNameTable(byNameTable, PrecursorSetList);
 
             bool MissingKeptFlag = false;
             foreach (IHashtableEx<IFeatureName, IList<ICompiledFeature>> PrecursorSet in PrecursorSetList)
@@ -409,6 +376,43 @@
             return true;
         }
 
+        private void CheckAllPrecursorSelectedInNameTable(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IList<IHashtableEx<IFeatureName, IList<ICompiledFeature>>> precursorSetList)
+        {
+            foreach (KeyValuePair<IFeatureName, InheritedInstanceInfo> Entry in byNameTable)
+            {
+                IFeatureName Key = Entry.Key;
+                InheritedInstanceInfo Value = Entry.Value;
+
+                IList<ICompiledFeature> PrecursorList = new List<ICompiledFeature>();
+                foreach (InstanceNameInfo PrecursorItem in Value.PrecursorInstanceList)
+                    FillPrecursorList(PrecursorList, PrecursorItem.Instance);
+
+                bool FoundInSet = false;
+                foreach (IHashtableEx<IFeatureName, IList<ICompiledFeature>> PrecursorSet in precursorSetList)
+                {
+                    foreach (KeyValuePair<IFeatureName, IList<ICompiledFeature>> SetMemberEntry in PrecursorSet)
+                    {
+                        IFeatureName SetMemberKey = SetMemberEntry.Key;
+                        IList<ICompiledFeature> SetMemberPrecursorList = SetMemberEntry.Value;
+
+                        if (PrecursorListIntersect(PrecursorList, SetMemberPrecursorList))
+                        {
+                            PrecursorSet.Add(Key, PrecursorList);
+                            FoundInSet = true;
+                            break;
+                        }
+                    }
+                    if (FoundInSet)
+                        break;
+                }
+                if (!FoundInSet)
+                {
+                    IHashtableEx<IFeatureName, IList<ICompiledFeature>> NewSet = new HashtableEx<IFeatureName, IList<ICompiledFeature>>();
+                    NewSet.Add(Key, PrecursorList);
+                }
+            }
+        }
+
         private bool CheckPrecursorBodiesHaveAncestor(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IList<IError> errorList)
         {
             foreach (KeyValuePair<IFeatureName, InheritedInstanceInfo> ImportedEntry in byNameTable)
@@ -456,28 +460,8 @@
             {
                 IFeatureName ImportedKey = ImportedEntry.Key;
                 InheritedInstanceInfo ImportedInstance = ImportedEntry.Value;
-                InstanceNameInfo SelectedInstanceInfo;
 
-                IFeatureInstance NewInstance;
-                if (ImportedInstance.EffectiveInstance.IsAssigned)
-                    SelectedInstanceInfo = ImportedInstance.EffectiveInstance.Item;
-                else
-                {
-                    IList<InstanceNameInfo> InstancePrecursorList = ImportedInstance.PrecursorInstanceList;
-
-                    SelectedInstanceInfo = null;
-                    foreach (InstanceNameInfo Item in InstancePrecursorList)
-                        if (Item.Instance.Owner.Item == item)
-                        {
-                            SelectedInstanceInfo = Item;
-                            break;
-                        }
-
-                    if (SelectedInstanceInfo == null)
-                        SelectedInstanceInfo = InstancePrecursorList[0];
-                }
-
-                NewInstance = new FeatureInstance(SelectedInstanceInfo.Instance.Owner.Item, SelectedInstanceInfo.Instance.Feature.Item, ImportedInstance.IsKept, ImportedInstance.IsDiscontinued);
+                IFeatureInstance NewInstance = MergeCreateNewInstance(item, ImportedKey, ImportedInstance, out InstanceNameInfo SelectedInstanceInfo);
 
                 StableReference<IPrecursorInstance> OriginalPrecursor = new StableReference<IPrecursorInstance>();
                 IList<IPrecursorInstance> PrecursorList = new List<IPrecursorInstance>();
@@ -515,6 +499,31 @@
 
                 mergedFeatureTable.Add(ImportedKey, NewInstance);
             }
+        }
+
+        private IFeatureInstance MergeCreateNewInstance(IClass item, IFeatureName importedKey, InheritedInstanceInfo importedInstance, out InstanceNameInfo selectedInstanceInfo)
+        {
+            IFeatureInstance NewInstance;
+            if (importedInstance.EffectiveInstance.IsAssigned)
+                selectedInstanceInfo = importedInstance.EffectiveInstance.Item;
+            else
+            {
+                IList<InstanceNameInfo> InstancePrecursorList = importedInstance.PrecursorInstanceList;
+
+                selectedInstanceInfo = null;
+                foreach (InstanceNameInfo Item in InstancePrecursorList)
+                    if (Item.Instance.Owner.Item == item)
+                    {
+                        selectedInstanceInfo = Item;
+                        break;
+                    }
+
+                if (selectedInstanceInfo == null)
+                    selectedInstanceInfo = InstancePrecursorList[0];
+            }
+
+            NewInstance = new FeatureInstance(selectedInstanceInfo.Instance.Owner.Item, selectedInstanceInfo.Instance.Feature.Item, importedInstance.IsKept, importedInstance.IsDiscontinued);
+            return NewInstance;
         }
 
         private void FillPrecursorList(IList<ICompiledFeature> precursorList, IFeatureInstance instance)

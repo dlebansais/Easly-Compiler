@@ -182,32 +182,11 @@ namespace CompilerNode
         /// <param name="errorList">The list of errors found.</param>
         public virtual bool ApplyChange(IHashtableEx<string, IImportedClass> importedClassTable, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IList<IError> errorList)
         {
+            if (!IsExportIdentifierFree(exportTable, errorList, out IFeatureName CurrentExportName, out IHashtableEx<string, IClass> CurrentClassTable))
+                return false;
+
             IIdentifier NodeExportIdentifier = (IIdentifier)ExportIdentifier;
-
-            if (!StringValidation.IsValidIdentifier(NodeExportIdentifier, ExportIdentifier.Text, out string ValidIdentifier, out IErrorStringValidity StringError))
-            {
-                errorList.Add(StringError);
-                return false;
-            }
-
-            OnceReference<IFeatureName> CurrentExportName = new OnceReference<IFeatureName>();
-            OnceReference<IHashtableEx<string, IClass>> CurrentClassTable = new OnceReference<IHashtableEx<string, IClass>>();
-            foreach (KeyValuePair<IFeatureName, IHashtableEx<string, IClass>> Entry in exportTable)
-            {
-                IFeatureName EntryName = Entry.Key;
-                if (EntryName.Name == ValidIdentifier)
-                {
-                    CurrentExportName.Item = EntryName;
-                    CurrentClassTable.Item = Entry.Value;
-                    break;
-                }
-            }
-
-            if (!CurrentClassTable.IsAssigned)
-            {
-                errorList.Add(new ErrorUnknownIdentifier((IIdentifier)ExportIdentifier, ValidIdentifier));
-                return false;
-            }
+            IErrorStringValidity StringError;
 
             IHashtableEx<string, IHashtableEx<string, IClass>> ListedExportTable = new HashtableEx<string, IHashtableEx<string, IClass>>(); // string (export name) -> hashtable // string (class name) -> Class
             IHashtableEx<string, IClass> ListedClassTable = new HashtableEx<string, IClass>(); // string (class name) -> Class
@@ -215,7 +194,7 @@ namespace CompilerNode
             bool InvalidExportChange = false;
             foreach (IIdentifier IdentifierItem in IdentifierList)
             {
-                if (!StringValidation.IsValidIdentifier(NodeExportIdentifier, ExportIdentifier.Text, out ValidIdentifier, out StringError))
+                if (!StringValidation.IsValidIdentifier(NodeExportIdentifier, ExportIdentifier.Text, out string ValidIdentifier, out StringError))
                 {
                     errorList.Add(StringError);
                     return false;
@@ -262,9 +241,49 @@ namespace CompilerNode
             if (InvalidExportChange)
                 return false;
 
+            UpdateTables(exportTable, CurrentExportName, CurrentClassTable, ListedExportTable, ListedClassTable);
+
+            return true;
+        }
+
+        private bool IsExportIdentifierFree(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IList<IError> errorList, out IFeatureName currentExportName, out IHashtableEx<string, IClass> currentClassTable)
+        {
+            currentExportName = null;
+            currentClassTable = null;
+
+            IIdentifier NodeExportIdentifier = (IIdentifier)ExportIdentifier;
+
+            if (!StringValidation.IsValidIdentifier(NodeExportIdentifier, ExportIdentifier.Text, out string ValidIdentifier, out IErrorStringValidity StringError))
+            {
+                errorList.Add(StringError);
+                return false;
+            }
+
+            foreach (KeyValuePair<IFeatureName, IHashtableEx<string, IClass>> Entry in exportTable)
+            {
+                IFeatureName EntryName = Entry.Key;
+                if (EntryName.Name == ValidIdentifier)
+                {
+                    currentExportName = EntryName;
+                    currentClassTable = Entry.Value;
+                    break;
+                }
+            }
+
+            if (currentExportName == null || currentClassTable == null)
+            {
+                errorList.Add(new ErrorUnknownIdentifier((IIdentifier)ExportIdentifier, ValidIdentifier));
+                return false;
+            }
+
+            return true;
+        }
+
+        private void UpdateTables(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IFeatureName currentExportName, IHashtableEx<string, IClass> currentClassTable, IHashtableEx<string, IHashtableEx<string, IClass>> listedExportTable, IHashtableEx<string, IClass> listedClassTable)
+        {
             IHashtableEx<string, IClass> ChangedClassTable = new HashtableEx<string, IClass>();
 
-            foreach (KeyValuePair<string, IClass> ListedEntry in CurrentClassTable.Item)
+            foreach (KeyValuePair<string, IClass> ListedEntry in currentClassTable)
             {
                 string ClassIdentifier = ListedEntry.Key;
                 IClass ListedClass = ListedEntry.Value;
@@ -273,7 +292,7 @@ namespace CompilerNode
                     ChangedClassTable.Add(ClassIdentifier, ListedClass);
             }
 
-            foreach (KeyValuePair<string, IHashtableEx<string, IClass>> Entry in ListedExportTable)
+            foreach (KeyValuePair<string, IHashtableEx<string, IClass>> Entry in listedExportTable)
             {
                 IHashtableEx<string, IClass> ClassTable = Entry.Value;
 
@@ -287,7 +306,7 @@ namespace CompilerNode
                 }
             }
 
-            foreach (KeyValuePair<string, IClass> ListedEntry in ListedClassTable)
+            foreach (KeyValuePair<string, IClass> ListedEntry in listedClassTable)
             {
                 string ClassIdentifier = ListedEntry.Key;
                 IClass ListedClass = ListedEntry.Value;
@@ -296,8 +315,7 @@ namespace CompilerNode
                     ChangedClassTable.Add(ClassIdentifier, ListedClass);
             }
 
-            exportTable[CurrentExportName.Item] = ChangedClassTable;
-            return true;
+            exportTable[currentExportName] = ChangedClassTable;
         }
         #endregion
     }

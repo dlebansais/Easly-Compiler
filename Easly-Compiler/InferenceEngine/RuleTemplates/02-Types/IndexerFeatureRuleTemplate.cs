@@ -53,105 +53,140 @@
             data = null;
             bool Success = true;
 
+            IClass EmbeddingClass = node.EmbeddingClass;
+            IObjectType TypeToResolve = (IObjectType)node.EntityType;
+
+            Success &= ScopeAttributeFeature.CreateResultFeature(TypeToResolve, EmbeddingClass, node, ErrorList, out IScopeAttributeFeature ResultFeature);
+            Success &= ScopeAttributeFeature.CreateValueFeature(TypeToResolve, EmbeddingClass, node, ErrorList, out IScopeAttributeFeature ValueFeature);
+
+            if (Success)
+                Success = CheckResultValueConsistency(node, dataList, ResultFeature, ValueFeature, out data);
+
+            return Success;
+        }
+
+        private bool CheckResultValueConsistency(IIndexerFeature node, IDictionary<ISourceTemplate, object> dataList, IScopeAttributeFeature resultFeature, IScopeAttributeFeature valueFeature, out object data)
+        {
+            data = null;
+            bool Success = true;
+
             IHashtableEx<string, IScopeAttributeFeature> CheckedScope = new HashtableEx<string, IScopeAttributeFeature>();
             IHashtableEx<string, IScopeAttributeFeature> CheckedGetScope = new HashtableEx<string, IScopeAttributeFeature>();
             IHashtableEx<string, IScopeAttributeFeature> CheckedSetScope = new HashtableEx<string, IScopeAttributeFeature>();
 
-            IClass EmbeddingClass = node.EmbeddingClass;
-            IObjectType TypeToResolve = (IObjectType)node.EntityType;
+            string NameResult = resultFeature.ValidFeatureName.Item.Name;
+            string NameValue = valueFeature.ValidFeatureName.Item.Name;
 
-            Success &= ScopeAttributeFeature.CreateResultFeature(TypeToResolve, EmbeddingClass, node, ErrorList, out IScopeAttributeFeature Result);
-            Success &= ScopeAttributeFeature.CreateValueFeature(TypeToResolve, EmbeddingClass, node, ErrorList, out IScopeAttributeFeature Value);
+            Success &= CheckParameters(node, resultFeature, valueFeature, CheckedScope);
+
+            CheckedGetScope.Merge(CheckedScope);
+            CheckedGetScope.Add(NameResult, resultFeature);
+
+            CheckedSetScope.Merge(CheckedScope);
+            CheckedSetScope.Add(NameValue, valueFeature);
+
+            List<string> ConflictList = new List<string>();
+            ScopeHolder.RecursiveCheck(CheckedGetScope, node.InnerScopes, ConflictList);
+            ScopeHolder.RecursiveCheck(CheckedSetScope, node.InnerScopes, ConflictList);
+
+            if (ConflictList.Contains(NameResult))
+            {
+                AddSourceError(new ErrorNameResultNotAllowed(node));
+                Success = false;
+            }
+            if (ConflictList.Contains(NameValue))
+            {
+                AddSourceError(new ErrorNameValueNotAllowed(node));
+                Success = false;
+            }
+
+            Success &= CheckParameterConflicts(node, ConflictList);
+            Success &= CheckIndexerKind(node, out BaseNode.UtilityType IndexerKind);
 
             if (Success)
+                data = new Tuple<BaseNode.UtilityType, IHashtableEx<string, IScopeAttributeFeature>, IHashtableEx<string, IScopeAttributeFeature>, IHashtableEx<string, IScopeAttributeFeature>>(IndexerKind, CheckedScope, CheckedGetScope, CheckedSetScope);
+
+            return Success;
+        }
+
+        private bool CheckParameters(IIndexerFeature node, IScopeAttributeFeature resultFeature, IScopeAttributeFeature valueFeature, IHashtableEx<string, IScopeAttributeFeature> checkedScope)
+        {
+            bool Success = true;
+            string NameResult = resultFeature.ValidFeatureName.Item.Name;
+            string NameValue = valueFeature.ValidFeatureName.Item.Name;
+
+            foreach (IEntityDeclaration Item in node.IndexParameterList)
             {
-                string NameResult = Result.ValidFeatureName.Item.Name;
-                string NameValue = Value.ValidFeatureName.Item.Name;
+                IName SourceName = (IName)Item.EntityName;
+                string ValidName = SourceName.ValidText.Item;
 
-                foreach (IEntityDeclaration Item in node.IndexParameterList)
+                if (checkedScope.ContainsKey(ValidName))
                 {
-                    IName SourceName = (IName)Item.EntityName;
-                    string ValidName = SourceName.ValidText.Item;
-
-                    if (CheckedScope.ContainsKey(ValidName))
-                    {
-                        AddSourceError(new ErrorDuplicateName(SourceName, ValidName));
-                        Success = false;
-                    }
-                    else if (ValidName == NameResult)
-                    {
-                        AddSourceError(new ErrorNameResultNotAllowed(SourceName));
-                        Success = false;
-                    }
-                    else if (ValidName == NameValue)
-                    {
-                        AddSourceError(new ErrorNameValueNotAllowed(SourceName));
-                        Success = false;
-                    }
-                    else
-                        CheckedScope.Add(ValidName, Item.ValidEntity.Item);
-                }
-
-                CheckedGetScope.Merge(CheckedScope);
-                CheckedGetScope.Add(NameResult, Result);
-
-                CheckedSetScope.Merge(CheckedScope);
-                CheckedSetScope.Add(NameValue, Value);
-
-                List<string> ConflictList = new List<string>();
-                ScopeHolder.RecursiveCheck(CheckedGetScope, node.InnerScopes, ConflictList);
-                ScopeHolder.RecursiveCheck(CheckedSetScope, node.InnerScopes, ConflictList);
-
-                if (ConflictList.Contains(NameResult))
-                {
-                    AddSourceError(new ErrorNameResultNotAllowed(node));
+                    AddSourceError(new ErrorDuplicateName(SourceName, ValidName));
                     Success = false;
                 }
-                if (ConflictList.Contains(NameValue))
+                else if (ValidName == NameResult)
                 {
-                    AddSourceError(new ErrorNameValueNotAllowed(node));
+                    AddSourceError(new ErrorNameResultNotAllowed(SourceName));
                     Success = false;
                 }
-
-                foreach (IEntityDeclaration Item in node.IndexParameterList)
+                else if (ValidName == NameValue)
                 {
-                    IScopeAttributeFeature LocalEntity = Item.ValidEntity.Item;
-                    string ValidFeatureName = LocalEntity.ValidFeatureName.Item.Name;
-
-                    if (ConflictList.Contains(ValidFeatureName))
-                    {
-                        AddSourceError(new ErrorVariableAlreadyDefined(Item, ValidFeatureName));
-                        Success = false;
-                    }
+                    AddSourceError(new ErrorNameValueNotAllowed(SourceName));
+                    Success = false;
                 }
-
-                BaseNode.UtilityType IndexerKind = (BaseNode.UtilityType)(-1);
-
-                if (node.GetterBody.IsAssigned && node.SetterBody.IsAssigned)
-                {
-                    IndexerKind = BaseNode.UtilityType.ReadWrite;
-
-                    ICompiledBody AsCompiledGetter = (ICompiledBody)node.GetterBody.Item;
-                    ICompiledBody AsCompiledSetter = (ICompiledBody)node.SetterBody.Item;
-
-                    if (AsCompiledGetter.IsDeferredBody != AsCompiledSetter.IsDeferredBody)
-                    {
-                        AddSourceError(new ErrorIndexerBodyTypeMismatch(node));
-                        Success = false;
-                    }
-                }
-                else if (node.GetterBody.IsAssigned)
-                    IndexerKind = BaseNode.UtilityType.ReadOnly;
-                else if (node.SetterBody.IsAssigned)
-                    IndexerKind = BaseNode.UtilityType.WriteOnly;
                 else
+                    checkedScope.Add(ValidName, Item.ValidEntity.Item);
+            }
+
+            return Success;
+        }
+
+        private bool CheckParameterConflicts(IIndexerFeature node, List<string> conflictList)
+        {
+            bool Success = true;
+
+            foreach (IEntityDeclaration Item in node.IndexParameterList)
+            {
+                IScopeAttributeFeature LocalEntity = Item.ValidEntity.Item;
+                string ValidFeatureName = LocalEntity.ValidFeatureName.Item.Name;
+
+                if (conflictList.Contains(ValidFeatureName))
                 {
-                    AddSourceError(new ErrorIndexerMissingBody(node));
+                    AddSourceError(new ErrorVariableAlreadyDefined(Item, ValidFeatureName));
                     Success = false;
                 }
+            }
 
-                if (Success)
-                    data = new Tuple<BaseNode.UtilityType, IHashtableEx<string, IScopeAttributeFeature>, IHashtableEx<string, IScopeAttributeFeature>, IHashtableEx<string, IScopeAttributeFeature>>(IndexerKind, CheckedScope, CheckedGetScope, CheckedSetScope);
+            return Success;
+        }
+
+        private bool CheckIndexerKind(IIndexerFeature node, out BaseNode.UtilityType indexerKind)
+        {
+            bool Success = true;
+            indexerKind = (BaseNode.UtilityType)(-1);
+
+            if (node.GetterBody.IsAssigned && node.SetterBody.IsAssigned)
+            {
+                indexerKind = BaseNode.UtilityType.ReadWrite;
+
+                ICompiledBody AsCompiledGetter = (ICompiledBody)node.GetterBody.Item;
+                ICompiledBody AsCompiledSetter = (ICompiledBody)node.SetterBody.Item;
+
+                if (AsCompiledGetter.IsDeferredBody != AsCompiledSetter.IsDeferredBody)
+                {
+                    AddSourceError(new ErrorIndexerBodyTypeMismatch(node));
+                    Success = false;
+                }
+            }
+            else if (node.GetterBody.IsAssigned)
+                indexerKind = BaseNode.UtilityType.ReadOnly;
+            else if (node.SetterBody.IsAssigned)
+                indexerKind = BaseNode.UtilityType.WriteOnly;
+            else
+            {
+                AddSourceError(new ErrorIndexerMissingBody(node));
+                Success = false;
             }
 
             return Success;

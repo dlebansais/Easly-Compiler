@@ -406,40 +406,10 @@ namespace CompilerNode
         {
             foreach (IQueryOverloadType Item in overloadList)
             {
-                if (overload.ParameterList.Count != Item.ParameterList.Count || overload.ResultList.Count != Item.ResultList.Count)
+                if (!IsParametersMatching(overload, Item))
                     continue;
 
-                bool AllParametersMatch = true;
-                for (int i = 0; i < overload.ParameterList.Count; i++)
-                {
-                    IScopeAttributeFeature OverloadAttribute = overload.ParameterList[i].ValidEntity.Item;
-                    IScopeAttributeFeature ItemAttribute = Item.ParameterList[i].ValidEntity.Item;
-
-                    if (OverloadAttribute.ResolvedFeatureType.Item != ItemAttribute.ResolvedFeatureType.Item)
-                    {
-                        AllParametersMatch = false;
-                        break;
-                    }
-                }
-                if (!AllParametersMatch)
-                    continue;
-
-                bool AllResultsMatch = true;
-                for (int i = 0; i < overload.ResultList.Count; i++)
-                {
-                    IScopeAttributeFeature OverloadAttribute = overload.ResultList[i].ValidEntity.Item;
-                    IScopeAttributeFeature ItemAttribute = Item.ResultList[i].ValidEntity.Item;
-
-                    if (OverloadAttribute.ResolvedFeatureType.Item != ItemAttribute.ResolvedFeatureType.Item)
-                    {
-                        AllResultsMatch = false;
-                        break;
-                    }
-                }
-                if (!AllResultsMatch)
-                    continue;
-
-                if (overload.ParameterEnd != Item.ParameterEnd)
+                if (!IsResultsMatching(overload, Item))
                     continue;
 
                 if (!Assertion.IsAssertionListEqual(overload.RequireList, Item.RequireList))
@@ -455,6 +425,55 @@ namespace CompilerNode
             }
 
             return false;
+        }
+
+        private static bool IsParametersMatching(IQueryOverloadType overload, IQueryOverloadType otherOverload)
+        {
+            if (overload.ParameterList.Count != otherOverload.ParameterList.Count)
+                return false;
+
+            bool AllParametersMatch = true;
+            for (int i = 0; i < overload.ParameterList.Count; i++)
+            {
+                IScopeAttributeFeature OverloadAttribute = overload.ParameterList[i].ValidEntity.Item;
+                IScopeAttributeFeature ItemAttribute = otherOverload.ParameterList[i].ValidEntity.Item;
+
+                if (OverloadAttribute.ResolvedFeatureType.Item != ItemAttribute.ResolvedFeatureType.Item)
+                {
+                    AllParametersMatch = false;
+                    break;
+                }
+            }
+            if (!AllParametersMatch)
+                return false;
+
+            if (overload.ParameterEnd != otherOverload.ParameterEnd)
+                return false;
+
+            return true;
+        }
+
+        private static bool IsResultsMatching(IQueryOverloadType overload, IQueryOverloadType otherOverload)
+        {
+            if (overload.ResultList.Count != otherOverload.ResultList.Count)
+                return false;
+
+            bool AllResultsMatch = true;
+            for (int i = 0; i < overload.ResultList.Count; i++)
+            {
+                IScopeAttributeFeature OverloadAttribute = overload.ResultList[i].ValidEntity.Item;
+                IScopeAttributeFeature ItemAttribute = otherOverload.ResultList[i].ValidEntity.Item;
+
+                if (OverloadAttribute.ResolvedFeatureType.Item != ItemAttribute.ResolvedFeatureType.Item)
+                {
+                    AllResultsMatch = false;
+                    break;
+                }
+            }
+            if (!AllResultsMatch)
+                return false;
+
+            return true;
         }
 
         /// <summary>

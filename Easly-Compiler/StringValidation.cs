@@ -61,43 +61,15 @@
                 return false;
             }
 
-            bool WhiteSpaceFound = false;
+            bool IsWhiteSpaceFound = false;
             byte[] Bytes = Encoding.UTF32.GetBytes(text);
             int[] Codes = new int[Bytes.Length / 4];
             for (int i = 0; i < Codes.Length; i++)
                 Codes[i] = BitConverter.ToInt32(Bytes, i * 4);
 
             for (int i = 0; i < Codes.Length; i++)
-            {
-                int c = Codes[i];
-
-                if (!AllowedCharactersTypes.ContainsKey(c))
-                {
-                    error = new ErrorInvalidCharacter(source, c);
+                if (!IsValidIdentifierCharacter(Codes, text, i, ref IsWhiteSpaceFound, ref validText, source, out error))
                     return false;
-                }
-
-                CharacterType t = AllowedCharactersTypes[c];
-                if (t == CharacterType.WhiteSpace)
-                {
-                    if (i == 0 || i + 1 >= text.Length)
-                    {
-                        error = new ErrorWhiteSpaceNotAllowed(source);
-                        return false;
-                    }
-
-                    if (!WhiteSpaceFound)
-                    {
-                        validText += ' ';
-                        WhiteSpaceFound = true;
-                    }
-                }
-                else
-                {
-                    validText += text[i];
-                    WhiteSpaceFound = false;
-                }
-            }
 
             if (validText.Length == 0)
             {
@@ -105,7 +77,43 @@
                 return false;
             }
 
-            validText = validText.Normalize(NormalizationForm.FormD);
+            Debug.Assert(validText.IsNormalized(NormalizationForm.FormD));
+
+            return true;
+        }
+
+        private static bool IsValidIdentifierCharacter(int[] codes, string text, int index, ref bool isWhiteSpaceFound, ref string validText, ISource source, out IErrorStringValidity error)
+        {
+            int c = codes[index];
+
+            if (!AllowedCharactersTypes.ContainsKey(c))
+            {
+                error = new ErrorInvalidCharacter(source, c);
+                return false;
+            }
+
+            CharacterType t = AllowedCharactersTypes[c];
+            if (t == CharacterType.WhiteSpace)
+            {
+                if (index == 0 || index + 1 >= text.Length)
+                {
+                    error = new ErrorWhiteSpaceNotAllowed(source);
+                    return false;
+                }
+
+                if (!isWhiteSpaceFound)
+                {
+                    validText += ' ';
+                    isWhiteSpaceFound = true;
+                }
+            }
+            else
+            {
+                validText += text[index];
+                isWhiteSpaceFound = false;
+            }
+
+            error = null;
             return true;
         }
 
@@ -150,9 +158,8 @@
                 return false;
             }
 
-            bool InEscapeSequence = false;
-            bool InUnicodeSyntax = false;
-            string UnicodeCharacter = string.Empty;
+            bool IsEscapeSequence = false;
+            bool IsUnicodeSyntax = false;
 
             byte[] Bytes = Encoding.UTF32.GetBytes(text);
             int[] Codes = new int[Bytes.Length / 4];
@@ -160,76 +167,85 @@
                 Codes[i] = BitConverter.ToInt32(Bytes, i * 4);
 
             for (int i = 0; i < Codes.Length; i++)
-            {
-                int c = Codes[i];
+                if (!IsValidManifestCharacter(Bytes, Codes, source, text, ref validText, i, ref IsEscapeSequence, ref IsUnicodeSyntax, out error))
+                    return false;
 
-                if (InEscapeSequence)
-                {
-                    if (c == 'u' || c == 'U')
-                    {
-                        InEscapeSequence = false;
-                        InUnicodeSyntax = true;
-                        UnicodeCharacter = string.Empty;
-                    }
-                    else
-                    {
-                        InEscapeSequence = false;
-
-                        bool IsTranslated = false;
-                        foreach (KeyValuePair<char, string> Entry in CSharpEscapeTable)
-                            if (c == Entry.Value[1])
-                            {
-                                IsTranslated = true;
-                                validText += Entry.Key;
-                                break;
-                            }
-                        if (!IsTranslated)
-                        {
-                            error = new ErrorIllFormedString(source);
-                            return false;
-                        }
-                    }
-                }
-                else if (InUnicodeSyntax)
-                {
-                    if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
-                    {
-                        UnicodeCharacter += (char)c;
-
-                        if (UnicodeCharacter.Length == 4)
-                        {
-                            bool IsTranslated = int.TryParse(UnicodeCharacter, NumberStyles.HexNumber, null, out int CodePoint);
-                            Debug.Assert(IsTranslated);
-
-                            byte[] CodeBytes = BitConverter.GetBytes(CodePoint);
-                            validText += Encoding.UTF32.GetString(CodeBytes);
-
-                            InUnicodeSyntax = false;
-                            UnicodeCharacter = string.Empty;
-                        }
-                    }
-                    else
-                    {
-                        error = new ErrorIllFormedString(source);
-                        return false;
-                    }
-                }
-                else
-                {
-                    if (c == '\\')
-                        InEscapeSequence = true;
-                    else
-                        validText += Encoding.UTF32.GetString(Bytes, i * 4, 4);
-                }
-            }
-
-            if (InUnicodeSyntax || InEscapeSequence)
+            if (IsUnicodeSyntax || IsEscapeSequence)
             {
                 error = new ErrorIllFormedString(source);
                 return false;
             }
 
-            validText = validText.Normalize(NormalizationForm.FormD);
+            Debug.Assert(validText.IsNormalized(NormalizationForm.FormD));
+
+            return true;
+        }
+
+        private static bool IsValidManifestCharacter(byte[] bytes, int[] codes, ISource source, string text, ref string validText, int index, ref bool isEscapeSequence, ref bool isUnicodeSyntax, out IErrorStringValidity error)
+        {
+            string UnicodeCharacter = string.Empty;
+            int c = codes[index];
+
+            if (isEscapeSequence)
+            {
+                if (c == 'u' || c == 'U')
+                {
+                    isEscapeSequence = false;
+                    isUnicodeSyntax = true;
+                    UnicodeCharacter = string.Empty;
+                }
+                else
+                {
+                    isEscapeSequence = false;
+
+                    bool IsTranslated = false;
+                    foreach (KeyValuePair<char, string> Entry in CSharpEscapeTable)
+                        if (c == Entry.Value[1])
+                        {
+                            IsTranslated = true;
+                            validText += Entry.Key;
+                            break;
+                        }
+                    if (!IsTranslated)
+                    {
+                        error = new ErrorIllFormedString(source);
+                        return false;
+                    }
+                }
+            }
+            else if (isUnicodeSyntax)
+            {
+                if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
+                {
+                    UnicodeCharacter += (char)c;
+
+                    if (UnicodeCharacter.Length == 4)
+                    {
+                        bool IsTranslated = int.TryParse(UnicodeCharacter, NumberStyles.HexNumber, null, out int CodePoint);
+                        Debug.Assert(IsTranslated);
+
+                        byte[] CodeBytes = BitConverter.GetBytes(CodePoint);
+                        validText += Encoding.UTF32.GetString(CodeBytes);
+
+                        isUnicodeSyntax = false;
+                        UnicodeCharacter = string.Empty;
+                    }
+                }
+                else
+                {
+                    error = new ErrorIllFormedString(source);
+                    return false;
+                }
+            }
+            else
+            {
+                if (c == '\\')
+                    isEscapeSequence = true;
+                else
+                    validText += Encoding.UTF32.GetString(bytes, index * 4, 4);
+            }
+
+            error = null;
             return true;
         }
 

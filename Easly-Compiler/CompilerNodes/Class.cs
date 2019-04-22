@@ -824,35 +824,33 @@ namespace CompilerNode
                 else
                 {
                     // New class, at least by name. Make sure it's not an already imported class using a different name.
-                    bool AlreadyImported = false;
-                    foreach (KeyValuePair<string, IImportedClass> ImportedEntry in importedClassTable)
-                    {
-                        IImportedClass ClassItem = ImportedEntry.Value;
-                        if (ClassItem.Item == MergedClassItem.Item)
-                        {
-                            string OldName = ImportedEntry.Key;
-                            errorList.Add(new ErrorClassAlreadyImported(importLocation, OldName, ClassName));
-                            AlreadyImported = true;
-                            break;
-                        }
-                    }
-
-                    if (AlreadyImported)
-                    {
-                        Success = false;
-                        continue;
-                    }
-
-                    // First time this class is imported, use the merge import type specification and location since they are known.
-                    MergedClassItem.SetImportType(mergedImportType);
-                    MergedClassItem.SetImportLocation(importLocation);
-
-                    importedClassTable.Add(ClassName, MergedClassItem);
+                    MergeClassTablesWithNewClass(importedClassTable, ClassName, MergedClassItem, importLocation, mergedImportType, errorList, ref Success);
                 }
             }
 
             Debug.Assert(Success || errorList.Count > 0);
             return Success;
+        }
+
+        private static void MergeClassTablesWithNewClass(IHashtableEx<string, IImportedClass> importedClassTable, string className, IImportedClass mergedClassItem, IImport importLocation, BaseNode.ImportType mergedImportType, IList<IError> errorList, ref bool success)
+        {
+            foreach (KeyValuePair<string, IImportedClass> ImportedEntry in importedClassTable)
+            {
+                IImportedClass ClassItem = ImportedEntry.Value;
+                if (ClassItem.Item == mergedClassItem.Item)
+                {
+                    string OldName = ImportedEntry.Key;
+                    errorList.Add(new ErrorClassAlreadyImported(importLocation, OldName, className));
+                    success = false;
+                    return;
+                }
+            }
+
+            // First time this class is imported, use the merge import type specification and location since they are known.
+            mergedClassItem.SetImportType(mergedImportType);
+            mergedClassItem.SetImportLocation(importLocation);
+
+            importedClassTable.Add(className, mergedClassItem);
         }
         #endregion
 

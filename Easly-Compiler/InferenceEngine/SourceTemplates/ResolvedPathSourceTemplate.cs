@@ -225,25 +225,18 @@
             }
 
             ICompiledFeature ItemFeature = ItemInstance.Feature.Item;
-
+            bool Result = false;
             bool IsHandled = false;
+
             switch (ItemFeature)
             {
                 case IAttributeFeature AsAttributeFeature:
-                    if (!AsAttributeFeature.ResolvedEntityTypeName.IsAssigned || !AsAttributeFeature.ResolvedEntityType.IsAssigned)
-                        return false;
-
-                    resolvedPathTypeName = AsAttributeFeature.ResolvedEntityTypeName.Item;
-                    resolvedPathType = AsAttributeFeature.ResolvedEntityType.Item;
+                    Result = IsAttributeFeatureReady(AsAttributeFeature, out resolvedPathTypeName, out resolvedPathType);
                     IsHandled = true;
                     break;
 
                 case IConstantFeature AsConstantFeature:
-                    if (!AsConstantFeature.ResolvedEntityTypeName.IsAssigned || !AsConstantFeature.ResolvedEntityType.IsAssigned)
-                        return false;
-
-                    resolvedPathTypeName = AsConstantFeature.ResolvedEntityTypeName.Item;
-                    resolvedPathType = AsConstantFeature.ResolvedEntityType.Item;
+                    Result = IsConstantFeatureReady(AsConstantFeature, out resolvedPathTypeName, out resolvedPathType);
                     IsHandled = true;
                     break;
 
@@ -253,35 +246,98 @@
                     return true;
 
                 case IFunctionFeature AsFunctionFeature:
-                    if (!AsFunctionFeature.MostCommonTypeName.IsAssigned || !AsFunctionFeature.MostCommonType.IsAssigned)
-                        return false;
-
-                    resolvedPathTypeName = AsFunctionFeature.MostCommonTypeName.Item;
-                    resolvedPathType = AsFunctionFeature.MostCommonType.Item;
+                    Result = IsFunctionFeatureReady(AsFunctionFeature, out resolvedPathTypeName, out resolvedPathType);
                     IsHandled = true;
                     break;
 
                 case IPropertyFeature AsPropertyFeature:
-                    if (!AsPropertyFeature.ResolvedEntityTypeName.IsAssigned || !AsPropertyFeature.ResolvedEntityType.IsAssigned)
-                        return false;
-
-                    resolvedPathTypeName = AsPropertyFeature.ResolvedEntityTypeName.Item;
-                    resolvedPathType = AsPropertyFeature.ResolvedEntityType.Item;
+                    Result = IsPropertyFeatureReady(AsPropertyFeature, out resolvedPathTypeName, out resolvedPathType);
                     IsHandled = true;
                     break;
 
                 case IIndexerFeature AsIndexerFeature:
-                    if (!AsIndexerFeature.ResolvedEntityTypeName.IsAssigned || !AsIndexerFeature.ResolvedEntityType.IsAssigned)
-                        return false;
-
-                    resolvedPathTypeName = AsIndexerFeature.ResolvedEntityTypeName.Item;
-                    resolvedPathType = AsIndexerFeature.ResolvedEntityType.Item;
+                    Result = IsIndexerFeatureReady(AsIndexerFeature, out resolvedPathTypeName, out resolvedPathType);
                     IsHandled = true;
                     break;
             }
 
             Debug.Assert(IsHandled);
             return true;
+        }
+
+        private static bool IsAttributeFeatureReady(IAttributeFeature feature, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
+        {
+            bool Result = true;
+            resolvedPathTypeName = null;
+            resolvedPathType = null;
+
+            if (!feature.ResolvedEntityTypeName.IsAssigned || !feature.ResolvedEntityType.IsAssigned)
+                return false;
+
+            resolvedPathTypeName = feature.ResolvedEntityTypeName.Item;
+            resolvedPathType = feature.ResolvedEntityType.Item;
+
+            return Result;
+        }
+
+        private static bool IsConstantFeatureReady(IConstantFeature feature, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
+        {
+            bool Result = true;
+            resolvedPathTypeName = null;
+            resolvedPathType = null;
+
+            if (!feature.ResolvedEntityTypeName.IsAssigned || !feature.ResolvedEntityType.IsAssigned)
+                return false;
+
+            resolvedPathTypeName = feature.ResolvedEntityTypeName.Item;
+            resolvedPathType = feature.ResolvedEntityType.Item;
+
+            return Result;
+        }
+
+        private static bool IsFunctionFeatureReady(IFunctionFeature feature, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
+        {
+            bool Result = true;
+            resolvedPathTypeName = null;
+            resolvedPathType = null;
+
+            if (!feature.MostCommonTypeName.IsAssigned || !feature.MostCommonType.IsAssigned)
+                return false;
+
+            resolvedPathTypeName = feature.MostCommonTypeName.Item;
+            resolvedPathType = feature.MostCommonType.Item;
+
+            return Result;
+        }
+
+        private static bool IsPropertyFeatureReady(IPropertyFeature feature, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
+        {
+            bool Result = true;
+            resolvedPathTypeName = null;
+            resolvedPathType = null;
+
+            if (!feature.ResolvedEntityTypeName.IsAssigned || !feature.ResolvedEntityType.IsAssigned)
+                return false;
+
+            resolvedPathTypeName = feature.ResolvedEntityTypeName.Item;
+            resolvedPathType = feature.ResolvedEntityType.Item;
+
+            return Result;
+        }
+
+        private static bool IsIndexerFeatureReady(IIndexerFeature feature, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
+        {
+            bool Result = true;
+            resolvedPathTypeName = null;
+            resolvedPathType = null;
+
+            if (!feature.ResolvedEntityTypeName.IsAssigned || !feature.ResolvedEntityType.IsAssigned)
+                return false;
+
+            resolvedPathTypeName = feature.ResolvedEntityTypeName.Item;
+            resolvedPathType = feature.ResolvedEntityType.Item;
+
+            return Result;
         }
         #endregion
     }

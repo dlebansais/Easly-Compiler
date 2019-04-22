@@ -72,35 +72,7 @@
 
                 foreach (ITypeArgument Item in node.TypeArgumentList)
                 {
-                    bool IsHandled = false;
-
-                    if (Item is IPositionalTypeArgument AsPositionalTypeArgument)
-                    {
-                        if (ArgumentStyle == TypeArgumentStyles.None)
-                            ArgumentStyle = TypeArgumentStyles.Positional;
-                        else if (ArgumentStyle == TypeArgumentStyles.Assignment)
-                        {
-                            AddSourceError(new ErrorTypeArgumentMixed(Item));
-                            Success = false;
-                        }
-
-                        IsHandled = true;
-                    }
-                    else if (Item is IAssignmentTypeArgument AsAssignmentTypeArgument)
-                    {
-                        if (ArgumentStyle == TypeArgumentStyles.None)
-                            ArgumentStyle = TypeArgumentStyles.Assignment;
-                        else if (ArgumentStyle == TypeArgumentStyles.Positional)
-                        {
-                            AddSourceError(new ErrorTypeArgumentMixed(Item));
-                            Success = false;
-                        }
-
-                        IsHandled = true;
-                    }
-
-                    Debug.Assert(IsHandled);
-
+                    Success &= IsTypeArgumentValid(Item, ref ArgumentStyle);
                     if (!Success)
                         break;
                 }
@@ -141,6 +113,41 @@
                     }
                 }
             }
+
+            return Success;
+        }
+
+        private bool IsTypeArgumentValid(ITypeArgument item, ref TypeArgumentStyles argumentStyle)
+        {
+            bool Success = true;
+            bool IsHandled = false;
+
+            if (item is IPositionalTypeArgument AsPositionalTypeArgument)
+            {
+                if (argumentStyle == TypeArgumentStyles.None)
+                    argumentStyle = TypeArgumentStyles.Positional;
+                else if (argumentStyle == TypeArgumentStyles.Assignment)
+                {
+                    AddSourceError(new ErrorTypeArgumentMixed(item));
+                    Success = false;
+                }
+
+                IsHandled = true;
+            }
+            else if (item is IAssignmentTypeArgument AsAssignmentTypeArgument)
+            {
+                if (argumentStyle == TypeArgumentStyles.None)
+                    argumentStyle = TypeArgumentStyles.Assignment;
+                else if (argumentStyle == TypeArgumentStyles.Positional)
+                {
+                    AddSourceError(new ErrorTypeArgumentMixed(item));
+                    Success = false;
+                }
+
+                IsHandled = true;
+            }
+
+            Debug.Assert(IsHandled);
 
             return Success;
         }
