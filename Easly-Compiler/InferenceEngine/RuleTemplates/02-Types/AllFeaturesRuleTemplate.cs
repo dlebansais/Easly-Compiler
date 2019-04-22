@@ -213,7 +213,35 @@
 
         private bool CheckInheritanceConsistency(IHashtableEx<ICompiledFeature, IList<InstanceNameInfo>> byFeatureTable, IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IClassType localClassType, IList<IError> errorList)
         {
+            if (!IsKeepDiscontinueConsistent(byFeatureTable, errorList))
+                return false;
+
+            if (!IsSingleEffective(byNameTable, errorList))
+                return false;
+
+            bool AllRedefineConformant = true;
             bool AllFlagsTheSame = true;
+
+            foreach (KeyValuePair<IFeatureName, InheritedInstanceInfo> ImportedEntry in byNameTable)
+            {
+                IFeatureName ImportedKey = ImportedEntry.Key;
+                InheritedInstanceInfo ImportedInstance = ImportedEntry.Value;
+
+                // If there is no effective instance for this name
+                if (!ImportedInstance.EffectiveInstance.IsAssigned)
+                    CompareNonEffectiveFlags(ImportedInstance, errorList, ref AllFlagsTheSame);
+                else
+                    CompareEffectiveFlags(ImportedInstance, errorList, localClassType, ref AllRedefineConformant);
+            }
+            if (!AllFlagsTheSame || !AllRedefineConformant)
+                return false;
+
+            return true;
+        }
+
+        private bool IsKeepDiscontinueConsistent(IHashtableEx<ICompiledFeature, IList<InstanceNameInfo>> byFeatureTable, IList<IError> errorList)
+        {
+            bool IsConsistent = true;
             foreach (KeyValuePair<ICompiledFeature, IList<InstanceNameInfo>> ImportedEntry in byFeatureTable)
             {
                 IList<InstanceNameInfo> NameList = ImportedEntry.Value;
@@ -222,15 +250,18 @@
                     if (!Item.SameIsKept || !Item.SameIsDiscontinued)
                     {
                         // C inherit f from A and B, effectively or not, but keep or discontinue flags don't match.
-                        AllFlagsTheSame = false;
                         errorList.Add(new ErrorInheritanceConflict(Item.Location, Item.Name.Name));
+                        IsConsistent = false;
                         break;
                     }
             }
-            if (!AllFlagsTheSame)
-                return false;
 
-            bool MultipleEffective = false;
+            return IsConsistent;
+        }
+
+        private bool IsSingleEffective(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IList<IError> errorList)
+        {
+            bool IsSingle = true;
             foreach (KeyValuePair<IFeatureName, InheritedInstanceInfo> ImportedEntry in byNameTable)
             {
                 IFeatureName ImportedKey = ImportedEntry.Key;
@@ -245,80 +276,67 @@
                         else
                         {
                             errorList.Add(new ErrorMultipleEffectiveFeature(Item.Location, Item.Name.Name));
-                            MultipleEffective = true;
+                            IsSingle = false;
                             break;
                         }
                     }
             }
-            if (MultipleEffective)
-                return false;
 
-            bool AllRedefineConformant = true;
+            return IsSingle;
+        }
 
-            AllFlagsTheSame = true;
-            foreach (KeyValuePair<IFeatureName, InheritedInstanceInfo> ImportedEntry in byNameTable)
+        private void CompareNonEffectiveFlags(InheritedInstanceInfo importedInstance, IList<IError> errorList, ref bool allFlagsTheSame)
+        {
+            IList<InstanceNameInfo> InstanceList = importedInstance.PrecursorInstanceList;
+            importedInstance.IsKept = InstanceList[0].Instance.IsKept;
+            importedInstance.IsDiscontinued = InstanceList[0].Instance.IsDiscontinued;
+
+            if (InstanceList.Count > 1)
             {
-                IFeatureName ImportedKey = ImportedEntry.Key;
-                InheritedInstanceInfo ImportedInstance = ImportedEntry.Value;
+                ICompiledType FeatureType = InstanceList[0].Instance.Feature.Item.ResolvedFeatureType.Item;
 
-                // If there is no effective instance for this name
-                if (!ImportedInstance.EffectiveInstance.IsAssigned)
+                for (int i = 1; i < InstanceList.Count; i++)
                 {
-                    IList<InstanceNameInfo> InstanceList = ImportedInstance.PrecursorInstanceList;
-                    ImportedInstance.IsKept = InstanceList[0].Instance.IsKept;
-                    ImportedInstance.IsDiscontinued = InstanceList[0].Instance.IsDiscontinued;
+                    InstanceNameInfo ThisInstance = InstanceList[i];
 
-                    if (InstanceList.Count > 1)
+                    if (importedInstance.IsKept != ThisInstance.Instance.IsKept ||
+                        importedInstance.IsDiscontinued != ThisInstance.Instance.IsDiscontinued ||
+                        !ObjectType.TypesHaveIdenticalSignature(FeatureType, ThisInstance.Instance.Feature.Item.ResolvedFeatureType.Item))
                     {
-                        ICompiledType FeatureType = InstanceList[0].Instance.Feature.Item.ResolvedFeatureType.Item;
-
-                        for (int i = 1; i < InstanceList.Count; i++)
-                        {
-                            InstanceNameInfo ThisInstance = InstanceList[i];
-
-                            if (ImportedInstance.IsKept != ThisInstance.Instance.IsKept ||
-                                ImportedInstance.IsDiscontinued != ThisInstance.Instance.IsDiscontinued ||
-                                !ObjectType.TypesHaveIdenticalSignature(FeatureType, ThisInstance.Instance.Feature.Item.ResolvedFeatureType.Item))
-                            {
-                                errorList.Add(new ErrorInheritanceConflict(ThisInstance.Location, ThisInstance.Name.Name));
-                                AllFlagsTheSame = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    ImportedInstance.IsKept = ImportedInstance.EffectiveInstance.Item.Instance.IsKept;
-                    ImportedInstance.IsDiscontinued = ImportedInstance.EffectiveInstance.Item.Instance.IsDiscontinued;
-
-                    // If the effective instance is a redefine.
-                    if (ImportedInstance.EffectiveInstance.Item.Ancestor == localClassType && ImportedInstance.EffectiveInstance.Item.Instance.Feature.Item.ResolvedFeatureType.IsAssigned)
-                    {
-                        ICompiledType DescendantFeatureType = ImportedInstance.EffectiveInstance.Item.Instance.Feature.Item.ResolvedFeatureType.Item;
-
-                        IList<InstanceNameInfo> InstanceList = ImportedInstance.PrecursorInstanceList;
-                        foreach (InstanceNameInfo Item in InstanceList)
-                        {
-                            if (Item == ImportedInstance.EffectiveInstance.Item)
-                                continue;
-
-                            ICompiledType AncestorFeatureType = Item.Instance.Feature.Item.ResolvedFeatureType.Item;
-                            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-
-                            if (!ObjectType.TypeConformToBase(DescendantFeatureType, AncestorFeatureType, SubstitutionTypeTable, errorList, (ISource)ImportedInstance.EffectiveInstance.Item.Instance.Feature.Item, true))
-                            {
-                                errorList.Add(new ErrorInheritanceConflict(Item.Location, Item.Name.Name));
-                                AllRedefineConformant = false;
-                            }
-                        }
+                        errorList.Add(new ErrorInheritanceConflict(ThisInstance.Location, ThisInstance.Name.Name));
+                        allFlagsTheSame = false;
+                        break;
                     }
                 }
             }
-            if (!AllFlagsTheSame || !AllRedefineConformant)
-                return false;
+        }
 
-            return true;
+        private void CompareEffectiveFlags(InheritedInstanceInfo importedInstance, IList<IError> errorList, IClassType localClassType, ref bool allRedefineConformant)
+        {
+            importedInstance.IsKept = importedInstance.EffectiveInstance.Item.Instance.IsKept;
+            importedInstance.IsDiscontinued = importedInstance.EffectiveInstance.Item.Instance.IsDiscontinued;
+
+            // If the effective instance is a redefine.
+            if (importedInstance.EffectiveInstance.Item.Ancestor == localClassType && importedInstance.EffectiveInstance.Item.Instance.Feature.Item.ResolvedFeatureType.IsAssigned)
+            {
+                ICompiledType DescendantFeatureType = importedInstance.EffectiveInstance.Item.Instance.Feature.Item.ResolvedFeatureType.Item;
+
+                IList<InstanceNameInfo> InstanceList = importedInstance.PrecursorInstanceList;
+                foreach (InstanceNameInfo Item in InstanceList)
+                {
+                    if (Item == importedInstance.EffectiveInstance.Item)
+                        continue;
+
+                    ICompiledType AncestorFeatureType = Item.Instance.Feature.Item.ResolvedFeatureType.Item;
+                    IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
+
+                    if (!ObjectType.TypeConformToBase(DescendantFeatureType, AncestorFeatureType, SubstitutionTypeTable, errorList, (ISource)importedInstance.EffectiveInstance.Item.Instance.Feature.Item, true))
+                    {
+                        errorList.Add(new ErrorInheritanceConflict(Item.Location, Item.Name.Name));
+                        allRedefineConformant = false;
+                    }
+                }
+            }
         }
 
         private bool CheckAllPrecursorSelected(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IList<IError> errorList)
