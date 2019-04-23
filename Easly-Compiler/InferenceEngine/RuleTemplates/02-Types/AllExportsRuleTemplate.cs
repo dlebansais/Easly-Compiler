@@ -127,7 +127,15 @@
                 else if (node.ImportedClassTable.ContainsKey(ValidText))
                     ListedClassList.Add(ValidText);
                 else if (FeatureName.TableContain(mergedExportTable, ValidText, out IFeatureName Key, out IHashtableEx<string, IClass> Item))
-                    ListedExportList.Add(Key, Identifier);
+                {
+                    if (ListedExportList.ContainsKey(Key))
+                    {
+                        AddSourceError(new ErrorIdentifierAlreadyListed(Identifier, ValidText));
+                        Success = false;
+                    }
+                    else
+                        ListedExportList.Add(Key, Identifier);
+                }
                 else
                 {
                     AddSourceError(new ErrorUnknownIdentifier(Identifier, ValidText));

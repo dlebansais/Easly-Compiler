@@ -1054,6 +1054,7 @@
 
             // TODO: remove this code, for code coverage purpose only.
             Source.Reset(context.RuleTemplateList);
+            Debug.Assert(!Source.IsResolved(context.RuleTemplateList));
 
             foreach (IRuleTemplate RuleTemplate in context.RuleTemplateList)
                 if (RuleTemplate.NodeType.IsAssignableFrom(Source.GetType()))
