@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Reflection;
@@ -9,6 +10,21 @@
     /// </summary>
     public interface IDestinationTemplate
     {
+        /// <summary>
+        /// Path to the destination object.
+        /// </summary>
+        string Path { get; }
+
+        /// <summary>
+        /// Type of the destination.
+        /// </summary>
+        Type DestinationType { get; }
+
+        /// <summary>
+        /// The starting point for the path.
+        /// </summary>
+        ITemplatePathStart StartingPoint { get; }
+
         /// <summary>
         /// True if the destination value has been set;
         /// </summary>
@@ -30,6 +46,21 @@
     public interface IDestinationTemplate<TSource, TValue>
         where TSource : ISource
     {
+        /// <summary>
+        /// Path to the destination object.
+        /// </summary>
+        string Path { get; }
+
+        /// <summary>
+        /// Type of the destination.
+        /// </summary>
+        Type DestinationType { get; }
+
+        /// <summary>
+        /// The starting point for the path.
+        /// </summary>
+        ITemplatePathStart<TSource> StartingPoint { get; }
+
         /// <summary>
         /// True if the destination value has been set;
         /// </summary>
@@ -59,6 +90,7 @@
         /// <param name="startingPoint">The starting point for the path.</param>
         public DestinationTemplate(string path, ITemplatePathStart<TSource> startingPoint = null)
         {
+            Path = path;
             StartingPoint = startingPoint ?? TemplateNodeStart<TSource>.Default;
 
             List<PropertyInfo> PropertyPath = new List<PropertyInfo>();
@@ -71,9 +103,20 @@
 
         #region Properties
         /// <summary>
+        /// Path to the destination object.
+        /// </summary>
+        public string Path { get; }
+
+        /// <summary>
+        /// Type of the destination.
+        /// </summary>
+        public Type DestinationType { get { return typeof(TValue); } }
+
+        /// <summary>
         /// The starting point for the path.
         /// </summary>
         public ITemplatePathStart<TSource> StartingPoint { get; }
+        ITemplatePathStart IDestinationTemplate.StartingPoint { get { return (ITemplatePathStart)StartingPoint; } }
         #endregion
 
         #region Client Interface

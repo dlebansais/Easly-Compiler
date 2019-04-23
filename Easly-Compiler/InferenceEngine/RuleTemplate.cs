@@ -52,6 +52,18 @@
         /// </summary>
         /// <param name="source">The node instance to check.</param>
         bool AreAllDestinationsSet(ISource source);
+
+        /// <summary>
+        /// Gets all sources that are not ready.
+        /// </summary>
+        /// <param name="source">The node instance to check.</param>
+        IList<ISourceTemplate> GetAllSourceTemplatesNotReady(ISource source);
+
+        /// <summary>
+        /// Gets all destinations that are not set.
+        /// </summary>
+        /// <param name="source">The node instance to check.</param>
+        IList<IDestinationTemplate> GetAllDestinationTemplatesNotSet(ISource source);
     }
 
     /// <summary>
@@ -107,6 +119,18 @@
         /// </summary>
         /// <param name="source">The node instance to check.</param>
         bool AreAllDestinationsSet(TSource source);
+
+        /// <summary>
+        /// Gets all sources that are not ready.
+        /// </summary>
+        /// <param name="source">The node instance to check.</param>
+        IList<ISourceTemplate> GetAllSourceTemplatesNotReady(TSource source);
+
+        /// <summary>
+        /// Gets all destinations that are not set.
+        /// </summary>
+        /// <param name="source">The node instance to check.</param>
+        IList<IDestinationTemplate> GetAllDestinationTemplatesNotSet(TSource source);
     }
 
     /// <summary>
@@ -222,6 +246,42 @@
         }
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public bool AreAllDestinationsSet(ISource source) { return AreAllDestinationsSet((TSource)source); }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+        /// <summary>
+        /// Gets all sources that are not ready.
+        /// </summary>
+        /// <param name="source">The node instance to check.</param>
+        public virtual IList<ISourceTemplate> GetAllSourceTemplatesNotReady(TSource source)
+        {
+            IList<ISourceTemplate> Result = new List<ISourceTemplate>();
+
+            foreach (ISourceTemplate SourceTemplate in SourceTemplateList)
+                if (!SourceTemplate.IsReady(source, out object data))
+                    Result.Add(SourceTemplate);
+
+            return Result;
+        }
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        public IList<ISourceTemplate> GetAllSourceTemplatesNotReady(ISource source) { return GetAllSourceTemplatesNotReady((TSource)source); }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+        /// <summary>
+        /// Gets all destinations that are not set.
+        /// </summary>
+        /// <param name="source">The node instance to check.</param>
+        public virtual IList<IDestinationTemplate> GetAllDestinationTemplatesNotSet(TSource source)
+        {
+            IList<IDestinationTemplate> Result = new List<IDestinationTemplate>();
+
+            foreach (IDestinationTemplate DestinationTemplate in DestinationTemplateList)
+                if (!DestinationTemplate.IsSet(source))
+                    Result.Add(DestinationTemplate);
+
+            return Result;
+        }
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        public IList<IDestinationTemplate> GetAllDestinationTemplatesNotSet(ISource source) { return GetAllDestinationTemplatesNotSet((TSource)source); }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         #region Implementation

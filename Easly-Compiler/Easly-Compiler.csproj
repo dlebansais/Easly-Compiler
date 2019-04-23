@@ -371,7 +371,7 @@
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\AttachmentRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\FeatureRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\ExportRuleTemplate.cs" />
-    <Compile Include="InferenceEngine\RuleTemplates\02-Types\ExportChangeRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\ExportChangeRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\EffectiveBodyRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\DiscreteRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\EntityDeclarationRuleTemplate.cs" />

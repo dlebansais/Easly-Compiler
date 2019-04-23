@@ -142,22 +142,26 @@
             IIdentifier SourceIdentifier = entry.Key;
             IIdentifier DestinationIdentifier = entry.Value;
 
-            OnceReference<IHashtableEx<IFeatureName, IFeatureInstance>> SourceTable = new OnceReference<IHashtableEx<IFeatureName, IFeatureInstance>>();
+            OnceReference<IHashtableEx> SourceTable = new OnceReference<IHashtableEx>();
             OnceReference<IFeatureName> SourceKey = new OnceReference<IFeatureName>();
-            OnceReference<IFeatureInstance> SourceItem = new OnceReference<IFeatureInstance>();
-            foreach (IHashtableEx<IFeatureName, IFeatureInstance> Table in renamedItemTables)
+            OnceReference<object> SourceItem = new OnceReference<object>();
+            foreach (IHashtableEx Table in renamedItemTables)
             {
-                foreach (KeyValuePair<IFeatureName, IFeatureInstance> SourceEntry in Table)
+                foreach (System.Collections.DictionaryEntry SourceEntry in (System.Collections.IDictionary)Table)
                 {
-                    string ValidName = key2String(SourceEntry.Key);
+                    IFeatureName EntryKey = SourceEntry.Key as IFeatureName;
+                    object EntryValue = SourceEntry.Value;
+
+                    string ValidName = key2String(EntryKey);
                     if (ValidName == SourceIdentifier.Text)
                     {
                         SourceTable.Item = Table;
-                        SourceKey.Item = SourceEntry.Key;
-                        SourceItem.Item = SourceEntry.Value;
+                        SourceKey.Item = EntryKey;
+                        SourceItem.Item = EntryValue;
                         break;
                     }
                 }
+
                 if (SourceTable.IsAssigned)
                     break;
             }
@@ -168,10 +172,12 @@
                 return false;
             }
 
-            foreach (IHashtableEx<IFeatureName, IFeatureInstance> Table in renamedItemTables)
-                foreach (KeyValuePair<IFeatureName, IFeatureInstance> DestinationEntry in Table)
+            foreach (IHashtableEx Table in renamedItemTables)
+                foreach (System.Collections.DictionaryEntry SourceEntry in (System.Collections.IDictionary)Table)
                 {
-                    string ValidName = key2String(DestinationEntry.Key);
+                    IFeatureName EntryKey = SourceEntry.Key as IFeatureName;
+
+                    string ValidName = key2String(EntryKey);
                     if (ValidName == DestinationIdentifier.Text)
                     {
                         ErrorList.Add(new ErrorIdentifierAlreadyListed(DestinationIdentifier, DestinationIdentifier.Text));
@@ -182,8 +188,8 @@
             sourceIdentifierTable.Add(SourceIdentifier.Text, DestinationIdentifier.Text);
             destinationIdentifierTable.Add(DestinationIdentifier.Text, SourceIdentifier.Text);
 
-            SourceTable.Item.Remove(SourceKey.Item);
-            SourceTable.Item.Add(string2Key(DestinationIdentifier.Text), SourceItem.Item);
+            ((System.Collections.IDictionary)SourceTable.Item).Remove(SourceKey.Item);
+            ((System.Collections.IDictionary)SourceTable.Item).Add(string2Key(DestinationIdentifier.Text), SourceItem.Item);
 
             return true;
         }

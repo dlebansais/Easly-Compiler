@@ -5,6 +5,17 @@
     /// <summary>
     /// An interface to find the starting point of a source template path.
     /// </summary>
+    public interface ITemplatePathStart
+    {
+        /// <summary>
+        /// The type of the starting point.
+        /// </summary>
+        Type PropertyType { get; }
+    }
+
+    /// <summary>
+    /// An interface to find the starting point of a source template path.
+    /// </summary>
     /// <typeparam name="TSource">The node type for the starting point.</typeparam>
     public interface ITemplatePathStart<TSource>
         where TSource : ISource

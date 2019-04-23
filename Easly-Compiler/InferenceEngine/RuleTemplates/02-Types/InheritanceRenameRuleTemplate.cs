@@ -42,7 +42,6 @@
                 new OnceReferenceDestinationTemplate<IInheritance, IHashtableEx<IFeatureName, IFeatureInstance>>(nameof(IInheritance.FeatureTable)),
                 new OnceReferenceDestinationTemplate<IInheritance, ITypeName>(nameof(IInheritance.ResolvedTypeName)),
                 new OnceReferenceDestinationTemplate<IInheritance, IClassType>(nameof(IInheritance.ResolvedType)),
-                new UnsealedTableDestinationTemplate<IInheritance, ITypeName, ICompiledType>(nameof(IClass.InheritanceTable), TemplateClassStart<IInheritance>.Default),
             };
         }
         #endregion

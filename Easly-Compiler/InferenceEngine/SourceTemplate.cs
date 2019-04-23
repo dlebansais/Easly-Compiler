@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Reflection;
@@ -9,6 +10,21 @@
     /// </summary>
     public interface ISourceTemplate
     {
+        /// <summary>
+        /// Path to the source object.
+        /// </summary>
+        string Path { get; }
+
+        /// <summary>
+        /// Type of the source.
+        /// </summary>
+        Type SourceType { get; }
+
+        /// <summary>
+        /// The starting point for the path.
+        /// </summary>
+        ITemplatePathStart StartingPoint { get; }
+
         /// <summary>
         /// Checks if a node source is ready.
         /// </summary>
@@ -25,6 +41,21 @@
     public interface ISourceTemplate<TSource, TValue>
         where TSource : ISource
     {
+        /// <summary>
+        /// Path to the source object.
+        /// </summary>
+        string Path { get; }
+
+        /// <summary>
+        /// Type of the source.
+        /// </summary>
+        Type SourceType { get; }
+
+        /// <summary>
+        /// The starting point for the path.
+        /// </summary>
+        ITemplatePathStart<TSource> StartingPoint { get; }
+
         /// <summary>
         /// Checks if a node source is ready.
         /// </summary>
@@ -56,6 +87,7 @@
         /// <param name="startingPoint">The starting point for the path.</param>
         public SourceTemplate(string path, ITemplatePathStart<TSource> startingPoint = null)
         {
+            Path = path;
             StartingPoint = startingPoint ?? TemplateNodeStart<TSource>.Default;
 
             List<PropertyInfo> PropertyPath = new List<PropertyInfo>();
@@ -68,9 +100,20 @@
 
         #region Properties
         /// <summary>
+        /// Path to the source object.
+        /// </summary>
+        public string Path { get; }
+
+        /// <summary>
+        /// Type of the source.
+        /// </summary>
+        public Type SourceType { get { return typeof(TValue); } }
+
+        /// <summary>
         /// The starting point for the path.
         /// </summary>
         public ITemplatePathStart<TSource> StartingPoint { get; }
+        ITemplatePathStart ISourceTemplate.StartingPoint { get { return (ITemplatePathStart)StartingPoint; } }
         #endregion
 
         #region Client Interface

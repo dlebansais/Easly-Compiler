@@ -68,16 +68,21 @@
             bool Result = false;
 
             IOptionalReference OptionalValue = GetSourceObject(node, out bool IsInterrupted);
-            if (!IsInterrupted && OptionalValue.IsAssigned)
+            if (!IsInterrupted)
             {
-                TRef Value = (TRef)OptionalValue.Item;
-                OnceReference<TValue> Reference = ItemProperty.GetValue(Value) as OnceReference<TValue>;
-                Debug.Assert(Reference != null);
-                if (Reference.IsAssigned)
+                if (OptionalValue.IsAssigned)
                 {
-                    data = Reference.Item;
-                    Result = true;
+                    TRef Value = (TRef)OptionalValue.Item;
+                    OnceReference<TValue> Reference = ItemProperty.GetValue(Value) as OnceReference<TValue>;
+                    Debug.Assert(Reference != null);
+                    if (Reference.IsAssigned)
+                    {
+                        data = Reference.Item;
+                        Result = true;
+                    }
                 }
+                else
+                    Result = true;
             }
 
             return Result;

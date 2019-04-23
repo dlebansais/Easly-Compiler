@@ -58,6 +58,14 @@
             classAny.ResolvedClassType.Item = Result;
             classAny.ResolvedAsCompiledType.Item = Result;
 
+            Debug.Assert(classAny.FeatureTable.IsSealed);
+            Debug.Assert(classAny.FeatureTable.Count == 0);
+            Debug.Assert(classAny.DiscreteTable.IsSealed);
+            Debug.Assert(classAny.DiscreteTable.Count == 0);
+
+            Result.FeatureTable.Seal();
+            Result.DiscreteTable.Seal();
+
             return Result;
         }
 

@@ -17,7 +17,7 @@
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TKey">Type of the key.</typeparam>
     /// <typeparam name="TValue">Type of the value.</typeparam>
-    public interface ISealedTableSourceTemplate<TSource, TKey, TValue> : ISourceTemplate<TSource, HashtableEx<TKey, TValue>>
+    public interface ISealedTableSourceTemplate<TSource, TKey, TValue> : ISourceTemplate<TSource, IHashtableEx<TKey, TValue>>
         where TSource : ISource
     {
     }
@@ -29,7 +29,7 @@
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TKey">Type of the key.</typeparam>
     /// <typeparam name="TValue">Type of the value.</typeparam>
-    public class SealedTableSourceTemplate<TSource, TKey, TValue> : SourceTemplate<TSource, HashtableEx<TKey, TValue>>, ISealedTableSourceTemplate<TSource, TKey, TValue>, ISealedTableSourceTemplate
+    public class SealedTableSourceTemplate<TSource, TKey, TValue> : SourceTemplate<TSource, IHashtableEx<TKey, TValue>>, ISealedTableSourceTemplate<TSource, TKey, TValue>, ISealedTableSourceTemplate
         where TSource : ISource
     {
         #region Init

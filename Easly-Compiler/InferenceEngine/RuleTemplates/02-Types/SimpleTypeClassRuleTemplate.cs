@@ -14,7 +14,7 @@
     /// <summary>
     /// A rule to process <see cref="ISimpleType"/>.
     /// </summary>
-    public class SimpleTypeClassRuleTemplate : SimpleTypeRuleTemplate, ISimpleTypeClassRuleTemplate
+    public class SimpleTypeClassRuleTemplate : SimpleTypeRuleTemplate<IClass>, ISimpleTypeClassRuleTemplate
     {
         #region Init
         static SimpleTypeClassRuleTemplate()

@@ -20,6 +20,8 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
+                new ConditionallyAssignedReferenceSourceTemplate<IPrecursorInstruction, IObjectType, ITypeName>(nameof(IPrecursorInstruction.AncestorType), nameof(IObjectType.ResolvedTypeName)),
+                new ConditionallyAssignedReferenceSourceTemplate<IPrecursorInstruction, IObjectType, ICompiledType>(nameof(IPrecursorInstruction.AncestorType), nameof(IObjectType.ResolvedType)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()

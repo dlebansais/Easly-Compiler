@@ -172,6 +172,8 @@
 
             if (Success && IsCycleErrorChecked && UnresolvedClassList.Count > 0)
             {
+                ListDependencies(SourceList);
+
                 IList<string> NameList = new List<string>();
                 foreach (IClass Class in UnresolvedClassList)
                     NameList.Add(Class.ValidClassName);
@@ -207,6 +209,7 @@
         protected virtual bool InferTemplates(ref bool exit, IList<ISource> unresolvedSourceList, IList<IError> errorList)
         {
             bool Success = true;
+            List<ISource> FailedSourceList = new List<ISource>();
 
             foreach (IRuleTemplate Rule in RuleTemplateList)
             {
@@ -221,6 +224,9 @@
                     {
                         bool AreAllSourcesReady = Rule.AreAllSourcesReady(Source, out IDictionary<ISourceTemplate, object> DataList);
                         bool NoError = Rule.ErrorList.Count == 0;
+
+                        if (!AreAllSourcesReady && !FailedSourceList.Contains(Source))
+                            FailedSourceList.Add(Source);
 
                         if (AreAllSourcesReady && NoError)
                         {
@@ -307,6 +313,111 @@
                 Index = Rng.Next(Count);
                 ruleTemplateList.Insert(Index, RuleTemplate);
             }
+        }
+
+        private void ListDependencies(IList<ISource> unresolvedSourceList)
+        {
+            Debug.WriteLine("Performing cyclic dependencies analysis...");
+
+            Dictionary<IRuleTemplate, IList<ISource>> Analysis = new Dictionary<IRuleTemplate, IList<ISource>>();
+
+            foreach (IRuleTemplate Rule in RuleTemplateList)
+            {
+                foreach (ISource Source in unresolvedSourceList)
+                {
+                    if (!Rule.NodeType.IsAssignableFrom(Source.GetType()))
+                        continue;
+
+                    bool IsNoDestinationSet = Rule.IsNoDestinationSet(Source);
+                    if (IsNoDestinationSet)
+                    {
+                        bool AreAllSourcesReady = Rule.AreAllSourcesReady(Source, out IDictionary<ISourceTemplate, object> DataList);
+                        if (!AreAllSourcesReady)
+                        {
+                            IList<ISourceTemplate> SourceTemplateList = Rule.GetAllSourceTemplatesNotReady(Source);
+                            Debug.Assert(SourceTemplateList.Count > 0);
+
+                            if (!Analysis.ContainsKey(Rule))
+                                Analysis.Add(Rule, new List<ISource>());
+                            Analysis[Rule].Add(Source);
+                        }
+                    }
+                }
+            }
+
+            bool Exit;
+            do
+            {
+                ICollection<IRuleTemplate> Rules = Analysis.Keys;
+                IList<IRuleTemplate> ToRemove = new List<IRuleTemplate>();
+
+                foreach (KeyValuePair<IRuleTemplate, IList<ISource>> Entry in Analysis)
+                {
+                    IRuleTemplate Rule = Entry.Key;
+                    IList<ISource> SourceList = Entry.Value;
+                    Debug.Assert(SourceList.Count > 0);
+
+                    foreach (ISource Source in SourceList)
+                    {
+                        IList<ISourceTemplate> SourceTemplateList = Rule.GetAllSourceTemplatesNotReady(Source);
+                        Debug.Assert(SourceTemplateList.Count > 0);
+
+                        foreach (ISourceTemplate SourceTemplate in SourceTemplateList)
+                        {
+                            string Path = SourceTemplate.Path;
+                            Type SourceType = SourceTemplate.SourceType;
+                            ITemplatePathStart StartingPoint = SourceTemplate.StartingPoint;
+
+                            if (FindRuleWithDestination(Rules, unresolvedSourceList, Path, SourceType, StartingPoint, out IRuleTemplate MatchingRule))
+                                if (!ToRemove.Contains(Rule))
+                                    ToRemove.Add(Rule);
+                        }
+                    }
+                }
+
+                foreach (IRuleTemplate Rule in ToRemove)
+                    Analysis.Remove(Rule);
+
+                Exit = ToRemove.Count == 0;
+            }
+            while (!Exit);
+
+            if (Analysis.Count == 0)
+                Debug.WriteLine("No missing rule found.");
+            else
+            {
+                Debug.WriteLine("The following rules are waiting on a source template:");
+                foreach (KeyValuePair<IRuleTemplate, IList<ISource>> Entry in Analysis)
+                    Debug.WriteLine($"{Entry.Key} on {Entry.Value.Count} node(s)");
+            }
+        }
+
+        private bool FindRuleWithDestination(ICollection<IRuleTemplate> ruleTemplateList, IList<ISource> unresolvedSourceList, string path, Type type, ITemplatePathStart startingPoint, out IRuleTemplate matchingRule)
+        {
+            matchingRule = null;
+
+            if (path == nameof(IClass.ResolvedImportedClassTable))
+                path = nameof(IClass.ResolvedImportedClassTable);
+
+            foreach (IRuleTemplate Rule in ruleTemplateList)
+            {
+                foreach (ISource Source in unresolvedSourceList)
+                {
+                    if (!Rule.NodeType.IsAssignableFrom(Source.GetType()))
+                        continue;
+
+                    IList<IDestinationTemplate> DestinationTemplateList = Rule.GetAllDestinationTemplatesNotSet(Source);
+                    foreach (IDestinationTemplate DestinationTemplate in DestinationTemplateList)
+                        if (DestinationTemplate.Path == path && DestinationTemplate.StartingPoint == startingPoint)
+                            if (DestinationTemplate.DestinationType == type)
+                            {
+                                matchingRule = Rule;
+                                return true;
+                            }
+                }
+            }
+
+            return false;
         }
         #endregion
     }

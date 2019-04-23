@@ -226,6 +226,17 @@
             root.ClassBlocks.NodeBlockList.Add(BlockClass);
 
             Debug.Assert(languageRoot.Replicates.Count == 0);
+
+            // Remove hard-coded classes.
+            List<BaseNode.IIdentifier> IdentifierCopyList = new List<BaseNode.IIdentifier>(BlockIdentifier.NodeList);
+            foreach (IIdentifier Item in IdentifierCopyList)
+                if (Item.Text == "Any" || Item.Text == "Any Reference" || Item.Text == "Any Value")
+                    BlockIdentifier.NodeList.Remove(Item);
+
+            List<BaseNode.IClass> ClassCopyList = new List<BaseNode.IClass>(BlockClass.NodeList);
+            foreach (IClass Item in ClassCopyList)
+                if (Item.EntityName.Text == "Any" || Item.EntityName.Text == "Any Reference" || Item.EntityName.Text == "Any Value")
+                    BlockClass.NodeList.Remove(Item);
         }
 
         /// <summary></summary>

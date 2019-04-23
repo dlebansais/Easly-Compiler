@@ -5,6 +5,13 @@
     /// <summary>
     /// The identity starting point.
     /// </summary>
+    public interface ITemplateNodeStart : ITemplatePathStart
+    {
+    }
+
+    /// <summary>
+    /// The identity starting point.
+    /// </summary>
     /// <typeparam name="TSource">The node type for the starting point.</typeparam>
     public interface ITemplateNodeStart<TSource> : ITemplatePathStart<TSource>
         where TSource : ISource
@@ -15,7 +22,7 @@
     /// The identity starting point.
     /// </summary>
     /// <typeparam name="TSource">The node type for the starting point.</typeparam>
-    public class TemplateNodeStart<TSource> : ITemplateNodeStart<TSource>
+    public class TemplateNodeStart<TSource> : ITemplateNodeStart<TSource>, ITemplateNodeStart
         where TSource : ISource
     {
         #region Init

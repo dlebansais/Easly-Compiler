@@ -148,13 +148,13 @@ namespace CompilerNode
 
             if (ruleTemplateList == RuleTemplateSet.Identifiers)
             {
-                IsResolved = false;
+                IsResolved = IdentifierTable.IsSealed;
+                Debug.Assert(ValidExportIdentifier.IsAssigned == IsResolved);
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                IsResolved = IdentifierTable.IsSealed;
-                Debug.Assert(ValidExportIdentifier.IsAssigned == IsResolved);
+                IsResolved = false;
                 IsHandled = true;
             }
 

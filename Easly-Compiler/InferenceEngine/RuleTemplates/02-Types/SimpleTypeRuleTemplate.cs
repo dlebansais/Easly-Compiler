@@ -16,7 +16,8 @@
     /// <summary>
     /// A rule to process <see cref="ISimpleType"/>.
     /// </summary>
-    public abstract class SimpleTypeRuleTemplate : RuleTemplate<ISimpleType, SimpleTypeRuleTemplate>, ISimpleTypeRuleTemplate
+    /// <typeparam name="T">Type used to have separate static constructor.</typeparam>
+    public abstract class SimpleTypeRuleTemplate<T> : RuleTemplate<ISimpleType, SimpleTypeRuleTemplate<T>>, ISimpleTypeRuleTemplate
     {
         #region Init
         static SimpleTypeRuleTemplate()

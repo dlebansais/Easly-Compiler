@@ -14,6 +14,7 @@
         public static IList<IRuleTemplate> Identifiers { get; } = new List<IRuleTemplate>()
         {
             // Create many derivations of IdentifierRuleTemplate to have separate static constructors, to ensure separate namespaces.
+            new ExportChangeRuleTemplate(),
             new IdentifierRuleTemplate<IIdentifier>(),
             new IdentifierRuleTemplate<IClassIdentifier>(),
             new IdentifierRuleTemplate<IClassOrExportIdentifier>(),
@@ -76,7 +77,6 @@
             new EffectiveBodyRuleTemplate<IOverloadEffectiveBody>(),
             new EffectiveBodyRuleTemplate<ISetterEffectiveBody>(),
             new EntityDeclarationRuleTemplate(),
-            new ExportChangeRuleTemplate(),
             new ExportRuleTemplate(),
             new FeatureRuleTemplate<IAttributeFeature>(),
             new FeatureRuleTemplate<IConstantFeature>(),
@@ -109,6 +109,7 @@
             new OverLoopInstructionRuleTemplate(),
             new PositionalTypeArgumentRuleTemplate(),
             new PrecursorIndexAssignmentInstructionRuleTemplate(),
+            new PrecursorInstructionRuleTemplate(),
             new ProcedureFeatureRuleTemplate(),
             new ProcedureTypeRuleTemplate(),
             new PropertyFeatureRuleTemplate(),

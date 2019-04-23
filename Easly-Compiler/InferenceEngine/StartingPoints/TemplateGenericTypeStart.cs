@@ -7,6 +7,13 @@
     /// <summary>
     /// The embedding generic type starting point.
     /// </summary>
+    public interface ITemplateGenericTypeStart : ITemplatePathStart
+    {
+    }
+
+    /// <summary>
+    /// The embedding generic type starting point.
+    /// </summary>
     /// <typeparam name="TSource">The node type for the starting point.</typeparam>
     public interface ITemplateGenericTypeStart<TSource> : ITemplatePathStart<TSource>
         where TSource : ISource
@@ -17,7 +24,7 @@
     /// The embedding generic type starting point.
     /// </summary>
     /// <typeparam name="TSource">The node type for the starting point.</typeparam>
-    public class TemplateGenericTypeStart<TSource> : ITemplateGenericTypeStart<TSource>
+    public class TemplateGenericTypeStart<TSource> : ITemplateGenericTypeStart<TSource>, ITemplateGenericTypeStart
         where TSource : ISource
     {
         #region Init

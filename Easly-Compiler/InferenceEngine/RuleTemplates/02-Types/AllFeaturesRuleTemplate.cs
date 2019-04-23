@@ -27,6 +27,7 @@
                 new OnceReferenceCollectionSourceTemplate<IClass, IFeature, ICompiledFeature>(nameof(IClass.FeatureList), nameof(IFeature.ResolvedFeature)),
                 new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, IClassType>(nameof(IClass.InheritanceList), nameof(IInheritance.ResolvedType)),
                 new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, IHashtableEx<IFeatureName, IFeatureInstance>>(nameof(IClass.InheritanceList), nameof(IInheritance.FeatureTable)),
+                new SealedTableCollectionSourceTemplate<IClass, IGeneric, ITypeName, ICompiledType>(nameof(IClass.GenericList), nameof(IGeneric.ResolvedConformanceTable)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()

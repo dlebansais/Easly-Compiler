@@ -68,16 +68,21 @@
             bool Result = false;
 
             IOptionalReference OptionalValue = GetSourceObject(node, out bool IsInterrupted);
-            if (!IsInterrupted && OptionalValue.IsAssigned)
+            if (!IsInterrupted)
             {
-                TRef Value = (TRef)OptionalValue.Item;
-                IHashtableEx<TKey, TValue> ValueTable = ItemProperty.GetValue(Value) as IHashtableEx<TKey, TValue>;
-                Debug.Assert(ValueTable != null);
-                if (ValueTable.IsSealed)
+                if (OptionalValue.IsAssigned)
                 {
-                    data = ValueTable;
-                    Result = true;
+                    TRef Value = (TRef)OptionalValue.Item;
+                    IHashtableEx<TKey, TValue> ValueTable = ItemProperty.GetValue(Value) as IHashtableEx<TKey, TValue>;
+                    Debug.Assert(ValueTable != null);
+                    if (ValueTable.IsSealed)
+                    {
+                        data = ValueTable;
+                        Result = true;
+                    }
                 }
+                else
+                    Result = true;
             }
 
             return Result;

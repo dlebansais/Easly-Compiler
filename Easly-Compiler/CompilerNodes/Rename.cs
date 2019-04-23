@@ -96,12 +96,12 @@ namespace CompilerNode
 
             if (ruleTemplateList == RuleTemplateSet.Identifiers)
             {
+                ValidSourceText = new OnceReference<string>();
+                ValidDestinationText = new OnceReference<string>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                ValidSourceText = new OnceReference<string>();
-                ValidDestinationText = new OnceReference<string>();
                 IsHandled = true;
             }
 

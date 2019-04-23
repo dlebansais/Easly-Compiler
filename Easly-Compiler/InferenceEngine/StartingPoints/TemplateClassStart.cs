@@ -6,6 +6,13 @@
     /// <summary>
     /// The embedding class starting point.
     /// </summary>
+    public interface ITemplateClassStart : ITemplatePathStart
+    {
+    }
+
+    /// <summary>
+    /// The embedding class starting point.
+    /// </summary>
     /// <typeparam name="TSource">The node type for the starting point.</typeparam>
     public interface ITemplateClassStart<TSource> : ITemplatePathStart<TSource>
         where TSource : ISource
@@ -16,7 +23,7 @@
     /// The embedding class starting point.
     /// </summary>
     /// <typeparam name="TSource">The node type for the starting point.</typeparam>
-    public class TemplateClassStart<TSource> : ITemplateClassStart<TSource>
+    public class TemplateClassStart<TSource> : ITemplateClassStart<TSource>, ITemplateClassStart
         where TSource : ISource
     {
         #region Init
