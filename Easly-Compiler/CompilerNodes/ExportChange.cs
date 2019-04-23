@@ -126,6 +126,8 @@ namespace CompilerNode
 
             if (ruleTemplateList == RuleTemplateSet.Identifiers)
             {
+                IdentifierTable = new HashtableEx<string, IIdentifier>();
+                ValidExportIdentifier = new OnceReference<string>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
@@ -167,12 +169,12 @@ namespace CompilerNode
         /// <summary>
         /// Table of valid identifiers.
         /// </summary>
-        public IHashtableEx<string, IIdentifier> IdentifierTable { get; } = new HashtableEx<string, IIdentifier>();
+        public IHashtableEx<string, IIdentifier> IdentifierTable { get; private set; } = new HashtableEx<string, IIdentifier>();
 
         /// <summary>
         /// Valid export identifier.
         /// </summary>
-        public OnceReference<string> ValidExportIdentifier { get; } = new OnceReference<string>();
+        public OnceReference<string> ValidExportIdentifier { get; private set; } = new OnceReference<string>();
 
         /// <summary>
         /// Apply changes in this instance to arguments.

@@ -307,11 +307,6 @@ namespace CompilerNode
         /// Compiler class 'Any Value'.
         /// </summary>
         public static IClass ClassAnyValue { get; }
-
-        /// <summary>
-        /// The type for a pre-compiled class.
-        /// </summary>
-        public OnceReference<ICompiledType> ResolvedAsCompiledType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
 
         #region Compiler
@@ -543,6 +538,7 @@ namespace CompilerNode
                 ClassGroup.Item = new SingleClassGroup(this);
                 InheritanceTable = new HashtableEx<ITypeName, ICompiledType>();
                 ResolvedImportedClassTable = new HashtableEx<ITypeName, IClassType>();
+                ResolvedAsCompiledType = new OnceReference<ICompiledType>();
                 BodyList = new List<IBody>();
                 CommandOverloadList = new List<ICommandOverload>();
                 QueryOverloadList = new List<IQueryOverload>();
@@ -958,6 +954,11 @@ namespace CompilerNode
         /// The resolved table of imported classes.
         /// </summary>
         public IHashtableEx<ITypeName, IClassType> ResolvedImportedClassTable { get; private set; } = new HashtableEx<ITypeName, IClassType>();
+
+        /// <summary>
+        /// The type for a pre-compiled class.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedAsCompiledType { get; private set; } = new OnceReference<ICompiledType>();
 
         /// <summary>
         /// List of resolved bodies.
