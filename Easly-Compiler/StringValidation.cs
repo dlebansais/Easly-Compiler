@@ -158,16 +158,17 @@
                 return false;
             }
 
-            bool IsEscapeSequence = false;
-            bool IsUnicodeSyntax = false;
-
             byte[] Bytes = Encoding.UTF32.GetBytes(text);
             int[] Codes = new int[Bytes.Length / 4];
             for (int i = 0; i < Codes.Length; i++)
                 Codes[i] = BitConverter.ToInt32(Bytes, i * 4);
 
+            bool IsEscapeSequence = false;
+            bool IsUnicodeSyntax = false;
+            string UnicodeCharacter = string.Empty;
+
             for (int i = 0; i < Codes.Length; i++)
-                if (!IsValidManifestCharacter(Bytes, Codes, source, text, ref validText, i, ref IsEscapeSequence, ref IsUnicodeSyntax, out error))
+                if (!IsValidManifestCharacter(Bytes, Codes, source, text, ref validText, i, ref IsEscapeSequence, ref IsUnicodeSyntax, ref UnicodeCharacter, out error))
                     return false;
 
             if (IsUnicodeSyntax || IsEscapeSequence)
@@ -181,9 +182,8 @@
             return true;
         }
 
-        private static bool IsValidManifestCharacter(byte[] bytes, int[] codes, ISource source, string text, ref string validText, int index, ref bool isEscapeSequence, ref bool isUnicodeSyntax, out IErrorStringValidity error)
+        private static bool IsValidManifestCharacter(byte[] bytes, int[] codes, ISource source, string text, ref string validText, int index, ref bool isEscapeSequence, ref bool isUnicodeSyntax, ref string unicodeCharacter, out IErrorStringValidity error)
         {
-            string UnicodeCharacter = string.Empty;
             int c = codes[index];
 
             if (isEscapeSequence)
@@ -192,7 +192,7 @@
                 {
                     isEscapeSequence = false;
                     isUnicodeSyntax = true;
-                    UnicodeCharacter = string.Empty;
+                    unicodeCharacter = string.Empty;
                 }
                 else
                 {
@@ -217,18 +217,18 @@
             {
                 if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
                 {
-                    UnicodeCharacter += (char)c;
+                    unicodeCharacter += (char)c;
 
-                    if (UnicodeCharacter.Length == 4)
+                    if (unicodeCharacter.Length == 4)
                     {
-                        bool IsTranslated = int.TryParse(UnicodeCharacter, NumberStyles.HexNumber, null, out int CodePoint);
+                        bool IsTranslated = int.TryParse(unicodeCharacter, NumberStyles.HexNumber, null, out int CodePoint);
                         Debug.Assert(IsTranslated);
 
                         byte[] CodeBytes = BitConverter.GetBytes(CodePoint);
                         validText += Encoding.UTF32.GetString(CodeBytes);
 
                         isUnicodeSyntax = false;
-                        UnicodeCharacter = string.Empty;
+                        unicodeCharacter = string.Empty;
                     }
                 }
                 else
