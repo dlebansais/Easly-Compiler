@@ -704,5 +704,18 @@
             return true;
         }
         #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        public string TypeToString { get { return $"indexer {{{((IObjectType)BaseType).TypeToString}}}"; } }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Function Type '{TypeToString}'";
+        }
+        #endregion
     }
 }

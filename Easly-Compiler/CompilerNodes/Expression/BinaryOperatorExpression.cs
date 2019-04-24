@@ -127,10 +127,15 @@ namespace CompilerNode
         #endregion
 
         #region Debugging
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        public string ExpressionToString { get { return $"({((IExpression)LeftExpression).ExpressionToString}) {Operator.Text} ({((IExpression)RightExpression).ExpressionToString})"; } }
+
         /// <summary></summary>
         public override string ToString()
         {
-            return $"({LeftExpression}) {Operator.Text} ({RightExpression})";
+            return $"Binary Operator Expression '{ExpressionToString}'";
         }
         #endregion
     }

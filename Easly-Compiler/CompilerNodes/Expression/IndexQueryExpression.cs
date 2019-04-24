@@ -161,11 +161,22 @@ namespace CompilerNode
         #endregion
 
         #region Debugging
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        public string ExpressionToString
+        {
+            get
+            {
+                string Arguments = Argument.ArgumentListToString(ArgumentList);
+                return $"({((IExpression)IndexedExpression).ExpressionToString})[{Arguments}]";
+            }
+        }
+
         /// <summary></summary>
         public override string ToString()
         {
-            string Arguments = Argument.ArgumentListToString(ArgumentList);
-            return $"({IndexedExpression})[{Arguments}]";
+            return $"Index Query Expression '{ExpressionToString}'";
         }
         #endregion
     }

@@ -129,7 +129,7 @@ namespace CompilerNode
         /// <summary>
         /// Gets a string representation of the argument.
         /// </summary>
-        public string ArgumentToString { get { return Source.ToString(); } }
+        public string ArgumentToString { get { return ((IExpression)Source).ExpressionToString; } }
 
         /// <summary></summary>
         public override string ToString()

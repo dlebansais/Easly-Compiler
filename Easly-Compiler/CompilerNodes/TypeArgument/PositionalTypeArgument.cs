@@ -123,5 +123,18 @@ namespace CompilerNode
         /// </summary>
         public OnceReference<ICompiledType> ResolvedSourceType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of the type argument.
+        /// </summary>
+        public string TypeArgumentToString { get { return ((IObjectType)Source).TypeToString; } }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Positional Type Argument '{TypeArgumentToString}'";
+        }
+        #endregion
     }
 }

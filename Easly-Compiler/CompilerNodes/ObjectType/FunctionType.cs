@@ -536,5 +536,18 @@ namespace CompilerNode
             return true;
         }
         #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        public string TypeToString { get { return $"function {{{((IObjectType)BaseType).TypeToString}}}"; } }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Function Type '{TypeToString}'";
+        }
+        #endregion
     }
 }

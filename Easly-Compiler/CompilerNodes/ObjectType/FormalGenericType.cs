@@ -254,5 +254,13 @@
             return type1.FormalGeneric == type2.FormalGeneric;
         }
         #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Formal Generic Type '{FormalGeneric.EntityName.Text}'";
+        }
+        #endregion
     }
 }

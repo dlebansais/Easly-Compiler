@@ -125,10 +125,15 @@ namespace CompilerNode
         #endregion
 
         #region Debugging
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        public string ExpressionToString { get { return $"clone ({Type}) of {((IExpression)Source).ExpressionToString}"; } }
+
         /// <summary></summary>
         public override string ToString()
         {
-            return $"clone ({Type}) of {Source}";
+            return $"Clone Of Expression '{ExpressionToString}'";
         }
         #endregion
     }

@@ -1,5 +1,6 @@
 namespace CompilerNode
 {
+    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
     using Easly;
@@ -34,6 +35,11 @@ namespace CompilerNode
         /// The entity as an atribute feature.
         /// </summary>
         OnceReference<IScopeAttributeFeature> ValidEntity { get; }
+
+        /// <summary>
+        /// Gets a string representation of the entity declaration.
+        /// </summary>
+        string EntityDeclarationToString { get; }
     }
 
     /// <summary>
@@ -184,6 +190,44 @@ namespace CompilerNode
         /// The entity as an atribute feature.
         /// </summary>
         public OnceReference<IScopeAttributeFeature> ValidEntity { get; private set; } = new OnceReference<IScopeAttributeFeature>();
+        #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of a list of entity declarations.
+        /// </summary>
+        /// <param name="entityDeclarationList">The list of entity declarations.</param>
+        public static string EntityDeclarationListToString(IEnumerable entityDeclarationList)
+        {
+            string Result = string.Empty;
+
+            foreach (IEntityDeclaration EntityDeclaration in entityDeclarationList)
+            {
+                if (Result.Length > 0)
+                    Result += ", ";
+                Result += EntityDeclaration.EntityDeclarationToString;
+            }
+
+            return Result;
+        }
+
+        /// <summary>
+        /// Gets a string representation of the entity declaration.
+        /// </summary>
+        public string EntityDeclarationToString
+        {
+            get
+            {
+                string DefaultString = DefaultValue.IsAssigned ? $" = {((IExpression)DefaultValue.Item).ExpressionToString}" : string.Empty;
+                return $"{EntityName.Text}: {((IObjectType)EntityType).TypeToString}{DefaultString}";
+            }
+        }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Entity Declaration '{EntityDeclarationToString}'";
+        }
         #endregion
     }
 }

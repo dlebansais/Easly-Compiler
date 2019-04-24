@@ -177,7 +177,7 @@
         {
             get
             {
-                return $"{Identifier.IdentifierListToString(ParameterList)} ← {Source}";
+                return $"{Identifier.IdentifierListToString(ParameterList)} ← {((IExpression)Source).ExpressionToString}";
             }
         }
 

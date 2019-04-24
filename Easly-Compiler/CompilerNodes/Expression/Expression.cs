@@ -8,6 +8,10 @@ namespace CompilerNode
     /// </summary>
     public interface IExpression : BaseNode.IExpression, INode, ISource
     {
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        string ExpressionToString { get; }
     }
 
     /// <summary>

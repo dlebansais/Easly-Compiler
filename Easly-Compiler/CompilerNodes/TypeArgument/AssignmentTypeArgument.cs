@@ -1,4 +1,4 @@
-namespace CompilerNode
+﻿namespace CompilerNode
 {
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -122,6 +122,19 @@ namespace CompilerNode
         /// The resolved source type.
         /// </summary>
         public OnceReference<ICompiledType> ResolvedSourceType { get; private set; } = new OnceReference<ICompiledType>();
+        #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of the type argument.
+        /// </summary>
+        public string TypeArgumentToString { get { return $"{ParameterIdentifier.Text} ← {((IObjectType)Source).TypeToString}"; } }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Assignment Type Argument '{TypeArgumentToString}'";
+        }
         #endregion
     }
 }

@@ -168,11 +168,22 @@
         #endregion
 
         #region Debugging
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        public string ExpressionToString
+        {
+            get
+            {
+                string Arguments = Argument.ArgumentListToString(AssignmentList);
+                return $"{ClassIdentifier.Text} {{{Arguments}}}";
+            }
+        }
+
         /// <summary></summary>
         public override string ToString()
         {
-            string Arguments = Argument.ArgumentListToString(AssignmentList);
-            return $"{ClassIdentifier.Text} {{{Arguments}}}";
+            return $"Initialized Object Expression '{ExpressionToString}'";
         }
         #endregion
     }

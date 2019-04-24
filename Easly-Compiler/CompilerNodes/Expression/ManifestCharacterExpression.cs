@@ -136,10 +136,15 @@ namespace CompilerNode
         #endregion
 
         #region Debugging
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        public string ExpressionToString { get { return $"'{Text}'"; } }
+
         /// <summary></summary>
         public override string ToString()
         {
-            return $"Manifest Character '{Text}'";
+            return $"Manifest Character {ExpressionToString}";
         }
         #endregion
     }

@@ -19,6 +19,11 @@
         /// The resolved type.
         /// </summary>
         OnceReference<ICompiledType> ResolvedType { get; }
+
+        /// <summary>
+        /// Gets a string representation of the type.
+        /// </summary>
+        string TypeToString { get; }
     }
 
     /// <summary>

@@ -590,5 +590,13 @@
             return Success;
         }
         #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Class Type '{BaseClass.EntityName.Text}'";
+        }
+        #endregion
     }
 }

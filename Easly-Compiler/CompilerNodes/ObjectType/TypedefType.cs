@@ -145,5 +145,25 @@
         /// </summary>
         public OnceReference<ICompiledType> ReferencedType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        public string TypeToString
+        {
+            get
+            {
+                string TypeString = ReferencedType.Item is IObjectType AsObjectType ? $" = {AsObjectType.TypeToString}" : string.Empty;
+                return $"typedef {ReferencedTypeName.Item.Name}{TypeString}";
+            }
+        }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Typedef Type '{TypeToString}'";
+        }
+        #endregion
     }
 }

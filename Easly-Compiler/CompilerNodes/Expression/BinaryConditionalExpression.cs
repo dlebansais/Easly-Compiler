@@ -127,10 +127,15 @@
         #endregion
 
         #region Debugging
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        public string ExpressionToString { get { return $"({((IExpression)LeftExpression).ExpressionToString}) {Conditional.ToString().ToLower()} ({((IExpression)RightExpression).ExpressionToString})"; } }
+
         /// <summary></summary>
         public override string ToString()
         {
-            return $"({LeftExpression}) {Conditional} ({RightExpression})";
+            return $"Binary Conditional Expression '{ExpressionToString}'";
         }
         #endregion
     }

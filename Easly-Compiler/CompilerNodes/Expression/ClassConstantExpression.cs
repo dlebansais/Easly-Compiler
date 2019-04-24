@@ -126,10 +126,15 @@ namespace CompilerNode
         #endregion
 
         #region Debugging
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        public string ExpressionToString { get { return $"{{{ClassIdentifier.Text}}}.{ConstantIdentifier.Text}"; } }
+
         /// <summary></summary>
         public override string ToString()
         {
-            return $"{{{ClassIdentifier.Text}}}.{ConstantIdentifier.Text}";
+            return $"Class Constant Expression '{ExpressionToString}'";
         }
         #endregion
     }

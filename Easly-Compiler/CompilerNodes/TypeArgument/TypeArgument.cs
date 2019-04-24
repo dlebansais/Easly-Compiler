@@ -1,5 +1,6 @@
 ﻿namespace CompilerNode
 {
+    using System.Collections;
     using Easly;
     using EaslyCompiler;
 
@@ -17,5 +18,34 @@
         /// The resolved source type.
         /// </summary>
         OnceReference<ICompiledType> ResolvedSourceType { get; }
+
+        /// <summary>
+        /// Gets a string representation of the type argument.
+        /// </summary>
+        string TypeArgumentToString { get; }
+    }
+
+    /// <summary>
+    /// Type Argument helper class.
+    /// </summary>
+    public static class TypeArgument
+    {
+        /// <summary>
+        /// Gets a string representation of a list of type arguments.
+        /// </summary>
+        /// <param name="argumentList">The list of type arguments.</param>
+        public static string TypeArgumentListToString(IEnumerable argumentList)
+        {
+            string Result = string.Empty;
+
+            foreach (ITypeArgument TypeArgument in argumentList)
+            {
+                if (Result.Length > 0)
+                    Result += ", ";
+                Result += TypeArgument.TypeArgumentToString;
+            }
+
+            return Result;
+        }
     }
 }

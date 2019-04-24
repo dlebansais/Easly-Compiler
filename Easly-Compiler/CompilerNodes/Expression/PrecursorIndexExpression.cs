@@ -170,5 +170,25 @@ namespace CompilerNode
             return Result;
         }
         #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        public string ExpressionToString
+        {
+            get
+            {
+                string AncestorString = AncestorType.IsAssigned ? $" {{{((IObjectType)AncestorType.Item).TypeToString}}} " : string.Empty;
+                return $"precursor{AncestorString}[{Argument.ArgumentListToString(ArgumentList)}]";
+            }
+        }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Precursor Index Expression '{ExpressionToString}'";
+        }
+        #endregion
     }
 }

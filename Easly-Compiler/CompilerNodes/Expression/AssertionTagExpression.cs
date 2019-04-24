@@ -125,10 +125,15 @@ namespace CompilerNode
         #endregion
 
         #region Debugging
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        public string ExpressionToString { get { return $"tag {TagIdentifier.Text}"; } }
+
         /// <summary></summary>
         public override string ToString()
         {
-            return $"tag {TagIdentifier.Text}";
+            return $"Assertion Tag Expression '{ExpressionToString}'";
         }
         #endregion
     }

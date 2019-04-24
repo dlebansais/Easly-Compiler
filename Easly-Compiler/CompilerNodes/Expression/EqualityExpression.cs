@@ -128,12 +128,23 @@
         #endregion
 
         #region Debugging
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        public string ExpressionToString
+        {
+            get
+            {
+                string ComparisonString = Comparison == BaseNode.ComparisonType.Equal ? "=" : "≠";
+                string EqualityString = Equality == BaseNode.EqualityType.Deep ? string.Empty : "/phys";
+                return $"({((IExpression)LeftExpression).ExpressionToString}) {ComparisonString}{EqualityString} ({((IExpression)RightExpression).ExpressionToString})";
+            }
+        }
+
         /// <summary></summary>
         public override string ToString()
         {
-            string ComparisonString = Comparison == BaseNode.ComparisonType.Equal ? "=" : "≠";
-            string EqualityString = Equality == BaseNode.EqualityType.Deep ? string.Empty : "/phys";
-            return $"({LeftExpression}) {ComparisonString}{EqualityString} ({RightExpression})";
+            return $"Equality Expression '{ExpressionToString}'";
         }
         #endregion
     }

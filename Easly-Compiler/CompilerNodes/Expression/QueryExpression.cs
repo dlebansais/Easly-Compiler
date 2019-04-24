@@ -159,5 +159,18 @@ namespace CompilerNode
             return Result;
         }
         #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        public string ExpressionToString { get { return $"{((IQualifiedName)Query).PathToString}({Argument.ArgumentListToString(ArgumentList)})"; } }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Query Expression '{ExpressionToString}'";
+        }
+        #endregion
     }
 }

@@ -123,5 +123,18 @@ namespace CompilerNode
         /// </summary>
         public OnceReference<ICompiledType> ResolvedType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        public string TypeToString { get { return $"{Anchor}†"; } }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Keyword Anchored Type '{TypeToString}'";
+        }
+        #endregion
     }
 }

@@ -125,11 +125,22 @@ namespace CompilerNode
         #endregion
 
         #region Debugging
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        public string ExpressionToString
+        {
+            get
+            {
+                string BaseTypeString = BaseType.IsAssigned ? $"{{{((IObjectType)BaseType.Item).TypeToString}}} " : string.Empty;
+                return $"agent {BaseTypeString}{Delegated.Text}";
+            }
+        }
+
         /// <summary></summary>
         public override string ToString()
         {
-            string BaseTypeString = BaseType.IsAssigned ? $"{{{BaseType.Item}}} " : string.Empty;
-            return $"agent {BaseTypeString}{Delegated.Text}";
+            return $"Agent Expression '{ExpressionToString}'";
         }
         #endregion
     }

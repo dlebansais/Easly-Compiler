@@ -179,5 +179,18 @@ namespace CompilerNode
         /// </summary>
         public OnceReference<ICompiledType> FormalGenericSource { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        public string TypeToString { get { return ClassIdentifier.Text; } }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Simple Type '{TypeToString}'";
+        }
+        #endregion
     }
 }

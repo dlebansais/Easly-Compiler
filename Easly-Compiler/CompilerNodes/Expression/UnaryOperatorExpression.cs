@@ -124,5 +124,18 @@ namespace CompilerNode
             return Result;
         }
         #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        public string ExpressionToString { get { return $"{Operator.Text}{((IExpression)RightExpression).ExpressionToString}"; } }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Unary Operator Expression '{ExpressionToString}'";
+        }
+        #endregion
     }
 }
