@@ -123,5 +123,13 @@ namespace CompilerNode
             return Result;
         }
         #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"tag {TagIdentifier.Text}";
+        }
+        #endregion
     }
 }

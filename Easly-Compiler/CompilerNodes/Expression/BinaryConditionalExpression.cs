@@ -125,5 +125,13 @@
             return Result;
         }
         #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"({LeftExpression}) {Conditional} ({RightExpression})";
+        }
+        #endregion
     }
 }

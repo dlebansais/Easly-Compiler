@@ -1,4 +1,4 @@
-namespace CompilerNode
+﻿namespace CompilerNode
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -166,6 +166,25 @@ namespace CompilerNode
             Result &= Expression.IsExpressionEqual((IExpression)argument1.Source, (IExpression)argument2.Source);
 
             return Result;
+        }
+        #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of the argument.
+        /// </summary>
+        public string ArgumentToString
+        {
+            get
+            {
+                return $"{Identifier.IdentifierListToString(ParameterList)} ← {Source}";
+            }
+        }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Assignment Argument '{ArgumentToString}'";
         }
         #endregion
     }

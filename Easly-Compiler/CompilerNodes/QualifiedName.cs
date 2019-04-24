@@ -14,6 +14,11 @@
         /// The valid value of <see cref="BaseNode.IQualifiedName.Path"/>.
         /// </summary>
         OnceReference<IList<IIdentifier>> ValidPath { get; }
+
+        /// <summary>
+        /// Raw path as string.
+        /// </summary>
+        string PathToString { get; }
     }
 
     /// <summary>
@@ -143,14 +148,25 @@
         #endregion
 
         #region Debugging
+        /// <summary>
+        /// Raw path as string.
+        /// </summary>
+        public string PathToString
+        {
+            get
+            {
+                string Result = Path[0].Text;
+                for (int i = 1; i < Path.Count; i++)
+                    Result += $".{Path[i].Text}";
+
+                return Result;
+            }
+        }
+
         /// <summary></summary>
         public override string ToString()
         {
-            string Result = Path[0].Text;
-            for (int i = 1; i < Path.Count; i++)
-                Result += $".{Path[i].Text}";
-
-            return $"Qualified Name '{Result}'";
+            return $"Qualified Name '{PathToString}'";
         }
         #endregion
     }

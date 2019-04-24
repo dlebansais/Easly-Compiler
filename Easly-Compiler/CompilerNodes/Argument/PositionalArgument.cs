@@ -124,5 +124,18 @@ namespace CompilerNode
             return Result;
         }
         #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of the argument.
+        /// </summary>
+        public string ArgumentToString { get { return Source.ToString(); } }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Positional Argument '{ArgumentToString}'";
+        }
+        #endregion
     }
 }

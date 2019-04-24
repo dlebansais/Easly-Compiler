@@ -265,5 +265,13 @@ namespace CompilerNode
         /// </summary>
         public OnceReference<ICompiledType> ResolvedEntityType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Property '{EntityName.Text}'";
+        }
+        #endregion
     }
 }

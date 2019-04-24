@@ -359,5 +359,13 @@ namespace CompilerNode
         /// </summary>
         public OnceReference<ICompiledFeature> ResolvedFeature { get; private set; } = new OnceReference<ICompiledFeature>();
         #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"(Scope) Attribute '{EntityName.Text}'";
+        }
+        #endregion
     }
 }

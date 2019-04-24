@@ -123,5 +123,14 @@ namespace CompilerNode
             return Result;
         }
         #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            string BaseTypeString = BaseType.IsAssigned ? $"{{{BaseType.Item}}} " : string.Empty;
+            return $"agent {BaseTypeString}{Delegated.Text}";
+        }
+        #endregion
     }
 }

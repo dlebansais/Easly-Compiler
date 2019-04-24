@@ -159,5 +159,14 @@ namespace CompilerNode
             return Result;
         }
         #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            string Arguments = Argument.ArgumentListToString(ArgumentList);
+            return $"({IndexedExpression})[{Arguments}]";
+        }
+        #endregion
     }
 }

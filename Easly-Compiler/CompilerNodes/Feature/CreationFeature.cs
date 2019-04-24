@@ -188,5 +188,13 @@ namespace CompilerNode
         /// </summary>
         public OnceReference<ICompiledType> ResolvedFeatureType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Creation '{EntityName.Text}'";
+        }
+        #endregion
     }
 }

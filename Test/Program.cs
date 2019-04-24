@@ -13,9 +13,9 @@ namespace Test
             Compiler c = new Compiler();
             //c.InferenceRetries = 3;
 
-            //c.Compile(@"C:\Users\DLB\AppData\Local\Temp\root.easly");
+            c.Compile(@"C:\Users\DLB\AppData\Local\Temp\root.easly");
             //c.Compile("../../../coverage/coverage.easly");
-            c.Compile("../../../coverage/coverage invalid 02-03.easly");
+            //c.Compile("../../../coverage/coverage invalid 02-03.easly");
             //c.Compile("../../../test.easly");
             //c.Compile("../../../root.easly");
             //c.Compile("../../../coverage/coverage replication.easly");

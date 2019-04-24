@@ -166,5 +166,14 @@
             return Result;
         }
         #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            string Arguments = Argument.ArgumentListToString(AssignmentList);
+            return $"{ClassIdentifier.Text} {{{Arguments}}}";
+        }
+        #endregion
     }
 }

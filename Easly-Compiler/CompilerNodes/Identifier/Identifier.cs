@@ -122,6 +122,26 @@
         #endregion
 
         #region Debugging
+
+        /// <summary>
+        /// Gets a string representation of a list of identifiers.
+        /// </summary>
+        /// <param name="identifierList">The list of identifiers.</param>
+        public static string IdentifierListToString(IList<IIdentifier> identifierList)
+        {
+            string Result = string.Empty;
+
+            for (int i = 0; i < identifierList.Count; i++)
+            {
+                if (i > 0)
+                    Result += ", ";
+
+                Result += identifierList[i].Text;
+            }
+
+            return Result;
+        }
+
         /// <summary></summary>
         public override string ToString()
         {

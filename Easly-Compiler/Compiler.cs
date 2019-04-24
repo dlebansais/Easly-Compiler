@@ -1012,6 +1012,8 @@
 
             // TODO: remove this code, for code coverage purpose only.
             Source.Reset(context.RuleTemplateList);
+            Debug.Assert(!Source.IsResolved(context.RuleTemplateList));
+            string SourceString = Source.ToString();
 
             foreach (IRuleTemplate RuleTemplate in context.RuleTemplateList)
                 if (RuleTemplate.NodeType.IsAssignableFrom(Source.GetType()))

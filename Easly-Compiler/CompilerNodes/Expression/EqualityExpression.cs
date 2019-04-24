@@ -126,5 +126,15 @@
             return Result;
         }
         #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            string ComparisonString = Comparison == BaseNode.ComparisonType.Equal ? "=" : "≠";
+            string EqualityString = Equality == BaseNode.EqualityType.Deep ? string.Empty : "/phys";
+            return $"({LeftExpression}) {ComparisonString}{EqualityString} ({RightExpression})";
+        }
+        #endregion
     }
 }

@@ -214,5 +214,13 @@ namespace CompilerNode
         /// </summary>
         public OnceReference<ICompiledType> MostCommonType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Function '{EntityName.Text}'";
+        }
+        #endregion
     }
 }

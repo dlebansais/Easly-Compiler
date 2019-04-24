@@ -125,5 +125,13 @@ namespace CompilerNode
             return Result;
         }
         #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"({LeftExpression}) {Operator.Text} ({RightExpression})";
+        }
+        #endregion
     }
 }

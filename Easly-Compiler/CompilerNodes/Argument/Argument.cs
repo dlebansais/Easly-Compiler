@@ -1,5 +1,6 @@
 namespace CompilerNode
 {
+    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
     using EaslyCompiler;
@@ -9,6 +10,10 @@ namespace CompilerNode
     /// </summary>
     public interface IArgument : BaseNode.IArgument, INode, ISource
     {
+        /// <summary>
+        /// Gets a string representation of the argument.
+        /// </summary>
+        string ArgumentToString { get; }
     }
 
     /// <summary>
@@ -49,13 +54,13 @@ namespace CompilerNode
 
             if (argument1 is IPositionalArgument AsPositionalArgument1)
             {
-                if (argument2 is IPositionalArgument AsPositionalArgument2)
+                if (argument2 is IAssignmentArgument AsAssignmentArgument2)
+                    IsHandled = true;
+                else if (argument2 is IPositionalArgument AsPositionalArgument2)
                 {
                     Result = PositionalArgument.IsPositionalArgumentEqual(AsPositionalArgument1, AsPositionalArgument2);
                     IsHandled = true;
                 }
-                else if (argument2 is IAssignmentArgument AsAssignmentArgument2)
-                    IsHandled = true;
             }
             else if (argument1 is IAssignmentArgument AsAssignmentArgument1)
             {
@@ -69,6 +74,24 @@ namespace CompilerNode
             }
 
             Debug.Assert(IsHandled);
+
+            return Result;
+        }
+
+        /// <summary>
+        /// Gets a string representation of a list of arguments.
+        /// </summary>
+        /// <param name="argumentList">The list of arguments.</param>
+        public static string ArgumentListToString(IEnumerable argumentList)
+        {
+            string Result = string.Empty;
+
+            foreach (IArgument Argument in argumentList)
+            {
+                if (Result.Length > 0)
+                    Result += ", ";
+                Result += Argument.ArgumentToString;
+            }
 
             return Result;
         }

@@ -279,5 +279,13 @@ namespace CompilerNode
             return false;
         }
         #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
+        #endregion
     }
 }
