@@ -230,9 +230,9 @@
 
                 // If there is no effective instance for this name
                 if (!ImportedInstance.EffectiveInstance.IsAssigned)
-                    CompareNonEffectiveFlags(ImportedInstance, errorList, ref AllFlagsTheSame);
+                    AllFlagsTheSame &= CompareNonEffectiveFlags(ImportedInstance, errorList);
                 else
-                    CompareEffectiveFlags(ImportedInstance, errorList, localClassType, ref AllRedefineConformant);
+                    AllRedefineConformant &= CompareEffectiveFlags(ImportedInstance, errorList, localClassType);
             }
             if (!AllFlagsTheSame || !AllRedefineConformant)
                 return false;
@@ -286,8 +286,10 @@
             return IsSingle;
         }
 
-        private void CompareNonEffectiveFlags(InheritedInstanceInfo importedInstance, IList<IError> errorList, ref bool allFlagsTheSame)
+        private bool CompareNonEffectiveFlags(InheritedInstanceInfo importedInstance, IList<IError> errorList)
         {
+            bool Result = true;
+
             IList<InstanceNameInfo> InstanceList = importedInstance.PrecursorInstanceList;
             importedInstance.IsKept = InstanceList[0].Instance.IsKept;
             importedInstance.IsDiscontinued = InstanceList[0].Instance.IsDiscontinued;
@@ -305,15 +307,19 @@
                         !ObjectType.TypesHaveIdenticalSignature(FeatureType, ThisInstance.Instance.Feature.Item.ResolvedFeatureType.Item))
                     {
                         errorList.Add(new ErrorInheritanceConflict(ThisInstance.Location, ThisInstance.Name.Name));
-                        allFlagsTheSame = false;
+                        Result = false;
                         break;
                     }
                 }
             }
+
+            return Result;
         }
 
-        private void CompareEffectiveFlags(InheritedInstanceInfo importedInstance, IList<IError> errorList, IClassType localClassType, ref bool allRedefineConformant)
+        private bool CompareEffectiveFlags(InheritedInstanceInfo importedInstance, IList<IError> errorList, IClassType localClassType)
         {
+            bool Result = true;
+
             importedInstance.IsKept = importedInstance.EffectiveInstance.Item.Instance.IsKept;
             importedInstance.IsDiscontinued = importedInstance.EffectiveInstance.Item.Instance.IsDiscontinued;
 
@@ -334,10 +340,12 @@
                     if (!ObjectType.TypeConformToBase(DescendantFeatureType, AncestorFeatureType, SubstitutionTypeTable, errorList, (ISource)importedInstance.EffectiveInstance.Item.Instance.Feature.Item, true))
                     {
                         errorList.Add(new ErrorInheritanceConflict(Item.Location, Item.Name.Name));
-                        allRedefineConformant = false;
+                        Result = false;
                     }
                 }
             }
+
+            return Result;
         }
 
         private bool CheckAllPrecursorSelected(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IList<IError> errorList)

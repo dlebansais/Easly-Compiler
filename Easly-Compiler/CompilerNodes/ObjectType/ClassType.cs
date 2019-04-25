@@ -85,6 +85,19 @@
         public static IClassType ClassAnyValueType { get; }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ClassType"/> class.
+        /// </summary>
+        /// <param name="baseClass">The class used to instanciate this type.</param>
+        /// <param name="typeArgumentTable">Arguments if the class is generic.</param>
+        public ClassType(IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable)
+        {
+            Debug.Assert(!baseClass.ResolvedClassType.IsAssigned);
+
+            BaseClass = baseClass;
+            TypeArgumentTable = typeArgumentTable;
+        }
+
+        /// <summary>
         /// Creates a <see cref="ClassType"/>.
         /// </summary>
         /// <param name="baseClass">The class used to instanciate this type.</param>
@@ -94,31 +107,18 @@
         /// <param name="classType">The class type, if successful.</param>
         public static bool Create(IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, IList<IError> errorList, out IClassType classType)
         {
-            classType = new ClassType(baseClass, typeArgumentTable, instancingClassType, errorList);
-            return true;
-        }
+            classType = null;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ClassType"/> class.
-        /// </summary>
-        /// <param name="baseClass">The class used to instanciate this type.</param>
-        /// <param name="typeArgumentTable">Arguments if the class is generic.</param>
-        /// <param name="instancingClassType">The class type if this instance is a derivation (such as renaming).</param>
-        /// <param name="errorList">The list of errors found.</param>
-        private ClassType(IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, IList<IError> errorList)
-        {
+            IHashtableEx<ITypeName, ICompiledType> ConformanceTable = new HashtableEx<ITypeName, ICompiledType>();
             bool Success = true;
 
-            BaseClass = baseClass;
-            TypeArgumentTable = typeArgumentTable;
-
-            if (BaseClass.ResolvedClassType.IsAssigned)
+            if (baseClass.ResolvedClassType.IsAssigned)
             {
-                IClassType ResolvedClassType = BaseClass.ResolvedClassType.Item;
+                IClassType ResolvedClassType = baseClass.ResolvedClassType.Item;
 
                 if (ResolvedClassType.ConformanceTable.IsSealed)
                 {
-                    foreach (IInheritance InheritanceItem in BaseClass.InheritanceList)
+                    foreach (IInheritance InheritanceItem in baseClass.InheritanceList)
                         if (InheritanceItem.Conformance == BaseNode.ConformanceType.Conformant)
                         {
                             ITypeName ParentTypeName = InheritanceItem.ResolvedParentTypeName.Item;
@@ -127,6 +127,33 @@
                             ConformanceTable.Add(ParentTypeName, ParentType);
                         }
 
+                    ConformanceTable.Seal();
+                }
+            }
+
+            if (Success)
+                classType = new ClassType(baseClass, typeArgumentTable, instancingClassType, ConformanceTable);
+
+            return Success;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClassType"/> class.
+        /// </summary>
+        /// <param name="baseClass">The class used to instanciate this type.</param>
+        /// <param name="typeArgumentTable">Arguments if the class is generic.</param>
+        /// <param name="instancingClassType">The class type if this instance is a derivation (such as renaming).</param>
+        /// <param name="conformanceTable">The initialized conformance table.</param>
+        private ClassType(IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, IHashtableEx<ITypeName, ICompiledType> conformanceTable)
+        {
+            BaseClass = baseClass;
+            TypeArgumentTable = typeArgumentTable;
+
+            if (BaseClass.ResolvedClassType.IsAssigned)
+            {
+                if (conformanceTable.IsSealed)
+                {
+                    ConformanceTable.Merge(conformanceTable);
                     ConformanceTable.Seal();
                 }
                 else
@@ -409,7 +436,7 @@
             }
 
             if (IsNewInstance)
-                ResolveType(instancingClassType.BaseClass.TypeTable, BaseClass, InstancedTypeArgumentTable, instancingClassType, errorList, out resolvedTypeName, out resolvedType);
+                Success &= ResolveType(instancingClassType.BaseClass.TypeTable, BaseClass, InstancedTypeArgumentTable, instancingClassType, errorList, out resolvedTypeName, out resolvedType);
 
             return Success;
         }
@@ -426,13 +453,20 @@
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void ResolveType(IHashtableEx<ITypeName, ICompiledType> typeTable, IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, IList<IError> errorList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static bool ResolveType(IHashtableEx<ITypeName, ICompiledType> typeTable, IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, IList<IError> errorList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
+            resolvedTypeName = null;
+            resolvedType = null;
+            bool Success = true;
+
             if (!TypeTableContaining(typeTable, baseClass, typeArgumentTable, out resolvedTypeName, out resolvedType))
             {
-                BuildType(baseClass, typeArgumentTable, instancingClassType, errorList, out resolvedTypeName, out resolvedType);
-                typeTable.Add(resolvedTypeName, resolvedType);
+                Success &= BuildType(baseClass, typeArgumentTable, instancingClassType, errorList, out resolvedTypeName, out resolvedType);
+                if (Success)
+                    typeTable.Add(resolvedTypeName, resolvedType);
             }
+
+            return Success;
         }
 
         /// <summary>
@@ -490,9 +524,14 @@
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void BuildType(IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, IList<IError> errorList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static bool BuildType(IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, IList<IError> errorList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
-            IClassType ResolvedClassType = new ClassType(baseClass, typeArgumentTable, instancingClassType, errorList);
+            resolvedTypeName = null;
+            resolvedType = null;
+
+            if (!Create(baseClass, typeArgumentTable, instancingClassType, errorList, out IClassType ResolvedClassType))
+                return false;
+
             resolvedTypeName = new TypeName(ResolvedClassType.TypeFriendlyName);
             resolvedType = ResolvedClassType;
 
@@ -521,6 +560,7 @@
             }
 
             baseClass.GenericInstanceList.Add(ResolvedClassType);
+            return true;
         }
         #endregion
 

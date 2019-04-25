@@ -245,9 +245,8 @@ namespace CompilerNode
                     return true;
                 }
             }
-            else
-                errorList.Add(new ErrorUnavailableResult(source));
 
+            errorList.Add(new ErrorUnavailableResult(source));
             return false;
         }
 

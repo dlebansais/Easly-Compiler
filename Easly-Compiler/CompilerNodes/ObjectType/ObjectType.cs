@@ -1349,7 +1349,7 @@
                 {
                     IIdentifier BaseIdentifier = baseExceptionIdentifierList[j];
 
-                    if (DerivedIdentifier.ValidText == BaseIdentifier.ValidText)
+                    if (DerivedIdentifier.ValidText.Item == BaseIdentifier.ValidText.Item)
                     {
                         Found = true;
                         break;

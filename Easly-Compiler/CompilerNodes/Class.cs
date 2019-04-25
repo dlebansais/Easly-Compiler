@@ -829,7 +829,7 @@ namespace CompilerNode
                 else
                 {
                     // New class, at least by name. Make sure it's not an already imported class using a different name.
-                    MergeClassTablesWithNewClass(importedClassTable, ClassName, MergedClassItem, importLocation, mergedImportType, errorList, ref Success);
+                    Success &= MergeClassTablesWithNewClass(importedClassTable, ClassName, MergedClassItem, importLocation, mergedImportType, errorList);
                 }
             }
 
@@ -837,8 +837,10 @@ namespace CompilerNode
             return Success;
         }
 
-        private static void MergeClassTablesWithNewClass(IHashtableEx<string, IImportedClass> importedClassTable, string className, IImportedClass mergedClassItem, IImport importLocation, BaseNode.ImportType mergedImportType, IList<IError> errorList, ref bool success)
+        private static bool MergeClassTablesWithNewClass(IHashtableEx<string, IImportedClass> importedClassTable, string className, IImportedClass mergedClassItem, IImport importLocation, BaseNode.ImportType mergedImportType, IList<IError> errorList)
         {
+            bool Success = true;
+
             foreach (KeyValuePair<string, IImportedClass> ImportedEntry in importedClassTable)
             {
                 IImportedClass ClassItem = ImportedEntry.Value;
@@ -846,16 +848,21 @@ namespace CompilerNode
                 {
                     string OldName = ImportedEntry.Key;
                     errorList.Add(new ErrorClassAlreadyImported(importLocation, OldName, className));
-                    success = false;
-                    return;
+                    Success = false;
+                    break;
                 }
             }
 
             // First time this class is imported, use the merge import type specification and location since they are known.
-            mergedClassItem.SetImportType(mergedImportType);
-            mergedClassItem.SetImportLocation(importLocation);
+            if (Success)
+            {
+                mergedClassItem.SetImportType(mergedImportType);
+                mergedClassItem.SetImportLocation(importLocation);
 
-            importedClassTable.Add(className, mergedClassItem);
+                importedClassTable.Add(className, mergedClassItem);
+            }
+
+            return Success;
         }
         #endregion
 

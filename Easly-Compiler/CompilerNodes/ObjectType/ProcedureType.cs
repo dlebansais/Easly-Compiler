@@ -300,7 +300,7 @@ namespace CompilerNode
             foreach (ICommandOverloadType Overload in OverloadList)
             {
                 ICommandOverloadType InstancedOverload = Overload;
-                CommandOverloadType.InstanciateCommandOverloadType(instancingClassType, ref InstancedOverload, errorList);
+                Success &= CommandOverloadType.InstanciateCommandOverloadType(instancingClassType, ref InstancedOverload, errorList);
 
                 InstancedOverloadList.Add(InstancedOverload);
 
