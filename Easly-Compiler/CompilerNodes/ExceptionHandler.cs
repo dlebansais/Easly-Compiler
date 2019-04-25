@@ -116,8 +116,9 @@ namespace CompilerNode
         /// <param name="exceptionIdentifierList2">The second list.</param>
         public static bool IdenticalExceptionSignature(IList<IIdentifier> exceptionIdentifierList1, IList<IIdentifier> exceptionIdentifierList2)
         {
-            if (exceptionIdentifierList1.Count != exceptionIdentifierList2.Count)
-                return false;
+            bool Result = true;
+
+            Result &= exceptionIdentifierList1.Count == exceptionIdentifierList2.Count;
 
             for (int i = 0; i < exceptionIdentifierList1.Count; i++)
             {
@@ -127,19 +128,13 @@ namespace CompilerNode
                 for (int j = 0; j < exceptionIdentifierList2.Count; j++)
                 {
                     IIdentifier BaseIdentifier = exceptionIdentifierList2[j];
-
-                    if (DerivedIdentifier.ValidText == BaseIdentifier.ValidText)
-                    {
-                        Found = true;
-                        break;
-                    }
+                    Found |= DerivedIdentifier.ValidText == BaseIdentifier.ValidText;
                 }
 
-                if (!Found)
-                    return false;
+                Result &= Found;
             }
 
-            return true;
+            return Result;
         }
         #endregion
     }

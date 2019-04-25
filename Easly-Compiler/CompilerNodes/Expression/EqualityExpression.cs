@@ -120,7 +120,7 @@
 
             Result &= Expression.IsExpressionEqual((IExpression)expression1.LeftExpression, (IExpression)expression2.LeftExpression);
             Result &= expression1.Comparison == expression2.Comparison;
-            Result &= expression1.Equality != expression2.Equality;
+            Result &= expression1.Equality == expression2.Equality;
             Result &= Expression.IsExpressionEqual((IExpression)expression1.RightExpression, (IExpression)expression2.RightExpression);
 
             return Result;

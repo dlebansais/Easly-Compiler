@@ -155,8 +155,8 @@ namespace CompilerNode
 
             if (expression1.AncestorType.IsAssigned && expression2.AncestorType.IsAssigned)
             {
-                IObjectType AncestorType1 = (IObjectType)expression1.AncestorType;
-                IObjectType AncestorType2 = (IObjectType)expression2.AncestorType;
+                IObjectType AncestorType1 = (IObjectType)expression1.AncestorType.Item;
+                IObjectType AncestorType2 = (IObjectType)expression2.AncestorType.Item;
 
                 Debug.Assert(AncestorType1.ResolvedType.IsAssigned);
                 Debug.Assert(AncestorType2.ResolvedType.IsAssigned);

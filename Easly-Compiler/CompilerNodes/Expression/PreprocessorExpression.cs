@@ -5,6 +5,10 @@ namespace CompilerNode
     /// </summary>
     public interface IPreprocessorExpression : BaseNode.IPreprocessorExpression
     {
+        /// <summary>
+        /// Gets a string representation of the expression.
+        /// </summary>
+        string ExpressionToString { get; }
     }
 
     /// <summary>

@@ -255,7 +255,7 @@
         }
         #endregion
 
-        #region Replication, phase 1
+        #region Preprocessor, phase 1
         /// <summary></summary>
         protected virtual void ReplacePhase1Macroes(IRoot root)
         {
@@ -695,7 +695,7 @@
         }
         #endregion
 
-        #region Replication, phase 2
+        #region Preprocessor, phase 2
         /// <summary></summary>
         protected virtual void ReplacePhase2Macroes(IRoot root)
         {
@@ -718,6 +718,9 @@
             {
                 bool IsHandled = false;
                 IExpression ReplacementNode;
+
+                // TODO: remove this code, for code coverage purpose only.
+                Debug.Assert(AsPreprocessorExpression.ToString().Length > 0);
 
                 switch (AsPreprocessorExpression.Value)
                 {
@@ -1013,7 +1016,7 @@
             // TODO: remove this code, for code coverage purpose only.
             Source.Reset(context.RuleTemplateList);
             Debug.Assert(!Source.IsResolved(context.RuleTemplateList));
-            string SourceString = Source.ToString();
+            Debug.Assert(Source.ToString().Length > 0);
 
             foreach (IRuleTemplate RuleTemplate in context.RuleTemplateList)
                 if (RuleTemplate.NodeType.IsAssignableFrom(Source.GetType()))
@@ -1057,6 +1060,7 @@
             // TODO: remove this code, for code coverage purpose only.
             Source.Reset(context.RuleTemplateList);
             Debug.Assert(!Source.IsResolved(context.RuleTemplateList));
+            Debug.Assert(Source.ToString().Length > 0);
 
             foreach (IRuleTemplate RuleTemplate in context.RuleTemplateList)
                 if (RuleTemplate.NodeType.IsAssignableFrom(Source.GetType()))
