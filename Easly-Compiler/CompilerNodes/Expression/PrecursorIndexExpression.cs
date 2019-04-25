@@ -144,11 +144,8 @@ namespace CompilerNode
         #endregion
 
         #region Compiler
-        /// <summary>
-        /// Compares two expressions.
-        /// </summary>
-        /// <param name="expression1">The first expression.</param>
-        /// <param name="expression2">The second expression.</param>
+        /*
+         * Two precursor index expressions cannot be compared because it happens only when comparing different features, and there can be only one indexer.
         public static bool IsExpressionEqual(IPrecursorIndexExpression expression1, IPrecursorIndexExpression expression2)
         {
             bool Result = true;
@@ -169,6 +166,7 @@ namespace CompilerNode
 
             return Result;
         }
+        */
         #endregion
 
         #region Debugging

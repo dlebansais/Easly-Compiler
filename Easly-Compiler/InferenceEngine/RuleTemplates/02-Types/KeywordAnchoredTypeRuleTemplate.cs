@@ -23,8 +23,8 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new SealedTableSourceTemplate<IKeywordAnchoredType, ITypeName, IClassType>(nameof(IClass.ResolvedImportedClassTable), TemplateClassStart<IKeywordAnchoredType>.Default),
-                new OnceReferencePropertySourceTemplate<IKeywordAnchoredType, ITypeName>(nameof(IPropertyFeature.ResolvedEntityTypeName)),
-                new OnceReferencePropertySourceTemplate<IKeywordAnchoredType, ICompiledType>(nameof(IPropertyFeature.ResolvedEntityType)),
+                new OnceReferenceResultSourceTemplate<IKeywordAnchoredType, ITypeName>(nameof(INodeWithResult.ResolvedResultTypeName)),
+                new OnceReferenceResultSourceTemplate<IKeywordAnchoredType, ICompiledType>(nameof(INodeWithResult.ResolvedResultType)),
                 new OnceReferenceSourceTemplate<IKeywordAnchoredType, ITypeName>(nameof(IClass.ResolvedClassTypeName), TemplateClassStart<IKeywordAnchoredType>.Default),
                 new OnceReferenceSourceTemplate<IKeywordAnchoredType, IClassType>(nameof(IClass.ResolvedClassType), TemplateClassStart<IKeywordAnchoredType>.Default),
             };

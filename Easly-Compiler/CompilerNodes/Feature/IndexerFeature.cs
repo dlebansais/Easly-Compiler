@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IIndexerFeature.
     /// </summary>
-    public interface IIndexerFeature : BaseNode.IIndexerFeature, IFeature, INodeWithReplicatedBlocks, ICompiledFeature, IGetterSetterScopeHolder
+    public interface IIndexerFeature : BaseNode.IIndexerFeature, IFeature, INodeWithReplicatedBlocks, ICompiledFeature, IGetterSetterScopeHolder, INodeWithResult
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.IndexerFeature.IndexParameterBlocks"/>.
@@ -290,6 +290,16 @@ namespace CompilerNode
         /// Table of resolved parameters.
         /// </summary>
         public IHashtableEx<string, IScopeAttributeFeature> IndexerParameterTable { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+
+        /// <summary>
+        /// The name of the resolved result type.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedResultTypeName { get { return ResolvedEntityTypeName; } }
+
+        /// <summary>
+        /// The resolved result type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedResultType { get { return ResolvedEntityType; } }
         #endregion
 
         #region Debugging

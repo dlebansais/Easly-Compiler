@@ -116,24 +116,20 @@ namespace CompilerNode
         /// <param name="list2">The second list.</param>
         public static bool IsAssertionListEqual(IList<IAssertion> list1, IList<IAssertion> list2)
         {
-            if (list1.Count != list2.Count)
-                return false;
+            bool Result = true;
+
+            Result &= list1.Count == list2.Count;
 
             foreach (IAssertion Assertion1 in list1)
             {
                 bool Found = false;
                 foreach (IAssertion Assertion2 in list2)
-                    if (IsAssertionEqual(Assertion1, Assertion2))
-                    {
-                        Found = true;
-                        break;
-                    }
+                    Found |= IsAssertionEqual(Assertion1, Assertion2);
 
-                if (!Found)
-                    return false;
+                Result &= Found;
             }
 
-            return true;
+            return Result;
         }
 
         /// <summary>
@@ -141,7 +137,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="assertion1">The first assertion.</param>
         /// <param name="assertion2">The second assertion.</param>
-        public static bool IsAssertionEqual(IAssertion assertion1, IAssertion assertion2)
+        private static bool IsAssertionEqual(IAssertion assertion1, IAssertion assertion2)
         {
             return Expression.IsExpressionEqual((IExpression)assertion1.BooleanExpression, (IExpression)assertion2.BooleanExpression);
         }

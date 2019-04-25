@@ -594,7 +594,7 @@
 
             bool AllParametersEqual = true;
             for (int i = 0; i < indexParameterList.Count; i++)
-                if (indexParameterList[i].ResolvedEntityType.Item != indexerType.IndexParameterList[i].ResolvedEntityType.Item)
+                if (indexParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item != indexerType.IndexParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item)
                 {
                     AllParametersEqual = false;
                     break;

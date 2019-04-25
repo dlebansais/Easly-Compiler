@@ -5,19 +5,19 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is an assigned <see cref="IOnceReference"/> in a property.
+    /// The source is an assigned <see cref="IOnceReference"/> in a node that can have a result.
     /// </summary>
-    public interface IOnceReferencePropertySourceTemplate : ISourceTemplate
+    public interface IOnceReferenceResultSourceTemplate : ISourceTemplate
     {
     }
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is an assigned <see cref="OnceReference{Tref}"/> in a property.
+    /// The source is an assigned <see cref="OnceReference{Tref}"/> in a node that can have a result.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TRef">Type of the reference.</typeparam>
-    public interface IOnceReferencePropertySourceTemplate<TSource, TRef> : ISourceTemplate<TSource, OnceReference<TRef>>
+    public interface IOnceReferenceResultSourceTemplate<TSource, TRef> : ISourceTemplate<TSource, OnceReference<TRef>>
         where TSource : ISource
         where TRef : class
     {
@@ -25,21 +25,21 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is an assigned <see cref="OnceReference{Tref}"/> in a property.
+    /// The source is an assigned <see cref="OnceReference{Tref}"/> in a node that can have a result.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TRef">Type of the reference.</typeparam>
-    public class OnceReferencePropertySourceTemplate<TSource, TRef> : SourceTemplate<TSource, OnceReference<TRef>>, IOnceReferencePropertySourceTemplate<TSource, TRef>, IOnceReferencePropertySourceTemplate
+    public class OnceReferenceResultSourceTemplate<TSource, TRef> : SourceTemplate<TSource, OnceReference<TRef>>, IOnceReferenceResultSourceTemplate<TSource, TRef>, IOnceReferenceResultSourceTemplate
         where TSource : ISource
         where TRef : class
     {
         #region Init
         /// <summary>
-        /// Initializes a new instance of the <see cref="OnceReferencePropertySourceTemplate{TSource, TRef}"/> class.
+        /// Initializes a new instance of the <see cref="OnceReferenceResultSourceTemplate{TSource, TRef}"/> class.
         /// </summary>
         /// <param name="path">Path to the source object.</param>
-        public OnceReferencePropertySourceTemplate(string path)
-            : base(path, TemplatePropertyStart<TSource>.Default)
+        public OnceReferenceResultSourceTemplate(string path)
+            : base(path, TemplateResultStart<TSource>.Default)
         {
         }
         #endregion
@@ -55,9 +55,18 @@
             data = null;
             bool Result = false;
 
+            INodeWithResult EmbeddingNode = null;
+
             if (node.EmbeddingFeature is IPropertyFeature AsPropertyFeature)
+                EmbeddingNode = AsPropertyFeature;
+            else if (node.EmbeddingFeature is IIndexerFeature AsIndexerFeature)
+                EmbeddingNode = AsIndexerFeature;
+            else if (node.EmbeddingOverload is IQueryOverload AsQueryOverload)
+                EmbeddingNode = AsQueryOverload;
+
+            if (EmbeddingNode != null)
             {
-                OnceReference<TRef> Value = TemplateHelper.GetPropertyPathValue<IPropertyFeature, OnceReference<TRef>>(AsPropertyFeature, TemplateNodeStart<IPropertyFeature>.Default, PropertyPath, out bool IsInterrupted);
+                OnceReference<TRef> Value = TemplateHelper.GetPropertyPathValue<INodeWithResult, OnceReference<TRef>>(EmbeddingNode, TemplateNodeStart<INodeWithResult>.Default, PropertyPath, out bool IsInterrupted);
                 if (!IsInterrupted && Value.IsAssigned)
                 {
                     data = Value.Item;

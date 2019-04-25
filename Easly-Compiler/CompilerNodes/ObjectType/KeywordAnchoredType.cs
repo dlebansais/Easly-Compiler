@@ -173,7 +173,7 @@ namespace CompilerNode
         /// <summary>
         /// Gets a string representation of the expression.
         /// </summary>
-        public string TypeToString { get { return $"{Anchor}†"; } }
+        public string TypeToString { get { return $"like {Anchor}†"; } }
 
         /// <summary></summary>
         public override string ToString()

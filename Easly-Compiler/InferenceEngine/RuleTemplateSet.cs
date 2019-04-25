@@ -114,6 +114,7 @@
             new ProcedureTypeRuleTemplate(),
             new PropertyFeatureRuleTemplate(),
             new PropertyTypeRuleTemplate(),
+            new QueryOverloadResultRuleTemplate(),
             new QueryOverloadRuleTemplate(),
             new QueryOverloadTypeRuleTemplate(),
             new RaiseEventInstructionRuleTemplate(),

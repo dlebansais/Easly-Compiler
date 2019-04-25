@@ -23,15 +23,13 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceCollectionSourceTemplate<IQueryOverload, IEntityDeclaration, IScopeAttributeFeature>(nameof(IQueryOverload.ParameterList), nameof(IEntityDeclaration.ValidEntity)),
-                new OnceReferenceCollectionSourceTemplate<IQueryOverload, IEntityDeclaration, IScopeAttributeFeature>(nameof(IQueryOverload.ResultList), nameof(IEntityDeclaration.ValidEntity)),
+                new SealedListSourceTemplate<IQueryOverload, IParameter>(nameof(IQueryOverload.ParameterTable)),
+                new SealedListSourceTemplate<IQueryOverload, IParameter>(nameof(IQueryOverload.ResultTable)),
                 new SealedTableSourceTemplate<IQueryOverload, string, IScopeAttributeFeature>(nameof(IQueryOverload.QueryBody) + Dot + nameof(IBody.LocalScope)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new UnsealedListDestinationTemplate<IQueryOverload, IParameter>(nameof(IQueryOverload.ParameterTable)),
-                new UnsealedListDestinationTemplate<IQueryOverload, IParameter>(nameof(IQueryOverload.ResultTable)),
                 new UnsealedTableDestinationTemplate<IQueryOverload, string, IScopeAttributeFeature>(nameof(IQueryOverload.LocalScope)),
             };
         }
@@ -51,48 +49,35 @@
             data = null;
 
             IHashtableEx<string, IScopeAttributeFeature> CheckedScope = new HashtableEx<string, IScopeAttributeFeature>();
-            ListTableEx<IParameter> ParameterTable = new ListTableEx<IParameter>();
-            ListTableEx<IParameter> ResultTable = new ListTableEx<IParameter>();
 
-            foreach (IEntityDeclaration Item in node.ParameterList)
+            Debug.Assert(node.ParameterTable.Count == node.ParameterList.Count);
+            for (int i = 0; i < node.ParameterTable.Count; i++)
             {
-                IName SourceName = (IName)Item.EntityName;
+                IParameter Parameter = node.ParameterTable[i];
+                IEntityDeclaration EntityDeclaration = node.ParameterList[i];
 
-                Debug.Assert(SourceName.ValidText.IsAssigned);
-                string ValidName = SourceName.ValidText.Item;
-
-                if (CheckedScope.ContainsKey(ValidName))
+                if (CheckedScope.ContainsKey(Parameter.Name))
                 {
-                    AddSourceError(new ErrorDuplicateName(SourceName, ValidName));
+                    AddSourceError(new ErrorDuplicateName(EntityDeclaration, Parameter.Name));
                     Success = false;
                 }
                 else
-                {
-                    CheckedScope.Add(ValidName, Item.ValidEntity.Item);
-                    ParameterTable.Add(new Parameter(ValidName, Item.ValidEntity.Item));
-                }
+                    CheckedScope.Add(Parameter.Name, EntityDeclaration.ValidEntity.Item);
             }
 
-            // Ensured since the root is valid.
-            Debug.Assert(node.ResultList.Count > 0);
-
-            foreach (IEntityDeclaration Item in node.ResultList)
+            Debug.Assert(node.ResultTable.Count == node.ResultList.Count);
+            for (int i = 0; i < node.ResultTable.Count; i++)
             {
-                IName SourceName = (IName)Item.EntityName;
+                IParameter Result = node.ResultTable[i];
+                IEntityDeclaration EntityDeclaration = node.ResultList[i];
 
-                Debug.Assert(SourceName.ValidText.IsAssigned);
-                string ValidName = SourceName.ValidText.Item;
-
-                if (CheckedScope.ContainsKey(ValidName))
+                if (CheckedScope.ContainsKey(Result.Name))
                 {
-                    AddSourceError(new ErrorDuplicateName(SourceName, ValidName));
+                    AddSourceError(new ErrorDuplicateName(EntityDeclaration, Result.Name));
                     Success = false;
                 }
                 else
-                {
-                    CheckedScope.Add(ValidName, Item.ValidEntity.Item);
-                    ResultTable.Add(new Parameter(ValidName, Item.ValidEntity.Item));
-                }
+                    CheckedScope.Add(Result.Name, EntityDeclaration.ValidEntity.Item);
             }
 
             IList<string> ConflictList = new List<string>();
@@ -123,7 +108,7 @@
             }
 
             if (Success)
-                data = new Tuple<IHashtableEx<string, IScopeAttributeFeature>, ListTableEx<IParameter>, ListTableEx<IParameter>>(CheckedScope, ParameterTable, ResultTable);
+                data = CheckedScope;
 
             return Success;
         }
@@ -138,23 +123,7 @@
             IClass EmbeddingClass = node.EmbeddingClass;
             IFeature EmbeddingFeature = node.EmbeddingFeature;
 
-            IHashtableEx<string, IScopeAttributeFeature> CheckedScope = ((Tuple<IHashtableEx<string, IScopeAttributeFeature>, ListTableEx<IParameter>, ListTableEx<IParameter>>)data).Item1;
-            ListTableEx<IParameter> ParameterTable = ((Tuple<IHashtableEx<string, IScopeAttributeFeature>, ListTableEx<IParameter>, ListTableEx<IParameter>>)data).Item2;
-            ListTableEx<IParameter> ResultTable = ((Tuple<IHashtableEx<string, IScopeAttributeFeature>, ListTableEx<IParameter>, ListTableEx<IParameter>>)data).Item3;
-
-            node.ParameterTable.AddRange(ParameterTable);
-            node.ParameterTable.Seal();
-            node.ResultTable.AddRange(ResultTable);
-            node.ResultTable.Seal();
-
-            IBody QueryBody = (IBody)node.QueryBody;
-            IQueryOverloadType AssociatedType = new QueryOverloadType(node.ParameterList, node.ParameterEnd, node.ResultList, QueryBody.RequireList, QueryBody.EnsureList, QueryBody.ExceptionIdentifierList);
-            AssociatedType.ParameterTable.AddRange(ParameterTable);
-            AssociatedType.ParameterTable.Seal();
-            AssociatedType.ResultTable.AddRange(ResultTable);
-            AssociatedType.ResultTable.Seal();
-
-            node.ResolvedAssociatedType.Item = AssociatedType;
+            IHashtableEx<string, IScopeAttributeFeature> CheckedScope = (IHashtableEx<string, IScopeAttributeFeature>)data;
 
             node.LocalScope.Merge(CheckedScope);
             node.LocalScope.Seal();

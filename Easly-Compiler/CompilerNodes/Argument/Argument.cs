@@ -47,7 +47,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="argument1">The first argument.</param>
         /// <param name="argument2">The second argument.</param>
-        public static bool IsArgumentEqual(IArgument argument1, IArgument argument2)
+        private static bool IsArgumentEqual(IArgument argument1, IArgument argument2)
         {
             bool Result = false;
             bool IsHandled = false;

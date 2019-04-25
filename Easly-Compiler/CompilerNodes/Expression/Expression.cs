@@ -119,11 +119,13 @@ namespace CompilerNode
                     IsHandled = true;
                     break;
 
+                /*
+                 * Two precursor index expressions cannot be compared because it happens only when comparing different features, and there can be only one indexer.
                 case IPrecursorIndexExpression AsPrecursorIndexExpression:
                     Result = PrecursorIndexExpression.IsExpressionEqual(expression1 as IPrecursorIndexExpression, expression2 as IPrecursorIndexExpression);
                     IsHandled = true;
                     break;
-
+                */
                 case IQueryExpression AsQueryExpression:
                     Result = QueryExpression.IsExpressionEqual(expression1 as IQueryExpression, expression2 as IQueryExpression);
                     IsHandled = true;

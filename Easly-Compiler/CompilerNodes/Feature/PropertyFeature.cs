@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IPropertyFeature.
     /// </summary>
-    public interface IPropertyFeature : BaseNode.IPropertyFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IGetterSetterScopeHolder
+    public interface IPropertyFeature : BaseNode.IPropertyFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IGetterSetterScopeHolder, INodeWithResult
     {
         /// <summary>
         /// The name of the resolved property type.
@@ -264,6 +264,16 @@ namespace CompilerNode
         /// The resolved property type.
         /// </summary>
         public OnceReference<ICompiledType> ResolvedEntityType { get; private set; } = new OnceReference<ICompiledType>();
+
+        /// <summary>
+        /// The name of the resolved result type.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedResultTypeName { get { return ResolvedEntityTypeName; } }
+
+        /// <summary>
+        /// The resolved result type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedResultType { get { return ResolvedEntityType; } }
         #endregion
 
         #region Debugging

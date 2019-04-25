@@ -323,6 +323,11 @@
 
             foreach (IRuleTemplate Rule in RuleTemplateList)
             {
+                /*if (Rule is IQueryOverloadRuleTemplate AsRuleTemplate)
+                {
+
+                }*/
+
                 foreach (ISource Source in unresolvedSourceList)
                 {
                     if (!Rule.NodeType.IsAssignableFrom(Source.GetType()))

@@ -63,7 +63,9 @@
 
             node.ResolvedDefinedTypeName.Item = DefinedTypeName;
             node.ResolvedDefinedType.Item = DefinedType;
-            DefinedType.OriginatingTypedef.Item = node;
+
+            if (!DefinedType.OriginatingTypedef.IsAssigned)
+                DefinedType.OriginatingTypedef.Item = node;
         }
         #endregion
     }

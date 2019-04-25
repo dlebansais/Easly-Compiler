@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IQueryOverload.
     /// </summary>
-    public interface IQueryOverload : BaseNode.IQueryOverload, INode, INodeWithReplicatedBlocks, ISource, IScopeHolder
+    public interface IQueryOverload : BaseNode.IQueryOverload, INode, INodeWithReplicatedBlocks, ISource, IScopeHolder, INodeWithResult
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.QueryOverload.ParameterBlocks"/>.
@@ -200,8 +200,10 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 IsResolved = LocalScope.IsSealed;
-                Debug.Assert(ParameterTable.IsSealed == IsResolved);
-                Debug.Assert(ResultTable.IsSealed == IsResolved);
+                Debug.Assert(ParameterTable.IsSealed || !IsResolved);
+                Debug.Assert(ResultTable.IsSealed || !IsResolved);
+                Debug.Assert(ResolvedResultTypeName.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedResultType.IsAssigned || !IsResolved);
                 IsHandled = true;
             }
 
@@ -257,6 +259,16 @@ namespace CompilerNode
         /// The resolved associated type.
         /// </summary>
         public OnceReference<IQueryOverloadType> ResolvedAssociatedType { get; private set; } = new OnceReference<IQueryOverloadType>();
+
+        /// <summary>
+        /// The name of the resolved result type.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedResultTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The resolved result type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedResultType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
     }
 }
