@@ -176,6 +176,8 @@ namespace CompilerNode
                 ParameterTable = new ListTableEx<IParameter>();
                 ResultTable = new ListTableEx<IParameter>();
                 ResolvedAssociatedType = new OnceReference<IQueryOverloadType>();
+                ResolvedResultTypeName = new OnceReference<ITypeName>();
+                ResolvedResultType = new OnceReference<ICompiledType>();
                 IsHandled = true;
             }
 
