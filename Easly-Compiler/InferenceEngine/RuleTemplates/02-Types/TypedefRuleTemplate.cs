@@ -91,8 +91,26 @@
             }
             else if (node.DefinedType is IKeywordAnchoredType AsKeywordAnchoredType)
             {
-                AddSourceError(new ErrorInvalidAnchoredType(AsKeywordAnchoredType));
-                Success = false;
+                bool IsAllowed;
+                switch (AsKeywordAnchoredType.Anchor)
+                {
+                    case BaseNode.Keyword.True:
+                    case BaseNode.Keyword.False:
+                    case BaseNode.Keyword.Retry:
+                    case BaseNode.Keyword.Exception:
+                        IsAllowed = true;
+                        break;
+
+                    default:
+                        IsAllowed = false;
+                        break;
+                }
+
+                if (!IsAllowed)
+                {
+                    AddSourceError(new ErrorInvalidAnchoredType(AsKeywordAnchoredType));
+                    Success = false;
+                }
             }
 
             return Success;

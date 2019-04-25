@@ -71,7 +71,7 @@
             foreach (KeyValuePair<string, IScopeAttributeFeature> Item in CheckedScope)
                 if (ConflictList.Contains(Item.Key))
                 {
-                    AddSourceError(new ErrorVariableAlreadyDefined(Item.Value, Item.Key));
+                    AddSourceError(new ErrorVariableAlreadyDefined(Item.Value.Location, Item.Key));
                     Success = false;
                 }
 

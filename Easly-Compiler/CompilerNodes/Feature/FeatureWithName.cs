@@ -1,11 +1,9 @@
 ﻿namespace CompilerNode
 {
-    using EaslyCompiler;
-
     /// <summary>
     /// Compiler IFeature for all but indexers.
     /// </summary>
-    public interface IFeatureWithName : IFeature
+    public interface IFeatureWithName
     {
         /// <summary>
         /// The feature name.

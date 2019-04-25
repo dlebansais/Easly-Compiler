@@ -39,6 +39,10 @@ namespace CompilerNode
         /// </summary>
         public ProcedureType()
         {
+            FeatureTable.Seal();
+            DiscreteTable.Seal();
+            ConformanceTable.Seal();
+            ExportTable.Seal();
         }
 
         /// <summary>
@@ -48,6 +52,7 @@ namespace CompilerNode
         /// <param name="baseType">The resolved base type.</param>
         /// <param name="overloadList">The list of resolved overloads.</param>
         public ProcedureType(ITypeName baseTypeName, IClassType baseType, IList<ICommandOverloadType> overloadList)
+            : this()
         {
             ResolvedBaseTypeName.Item = baseTypeName;
             ResolvedBaseType.Item = baseType;

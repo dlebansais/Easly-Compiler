@@ -323,7 +323,7 @@
 
             foreach (IRuleTemplate Rule in RuleTemplateList)
             {
-                /*if (Rule is IQueryOverloadRuleTemplate AsRuleTemplate)
+                /*if (Rule is IConstraintRuleTemplate AsRuleTemplate)
                 {
 
                 }*/

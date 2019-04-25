@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IFunctionFeature.
     /// </summary>
-    public interface IFunctionFeature : BaseNode.IFunctionFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature
+    public interface IFunctionFeature : BaseNode.IFunctionFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.FunctionFeature.OverloadBlocks"/>.

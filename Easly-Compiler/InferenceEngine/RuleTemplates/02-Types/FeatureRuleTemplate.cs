@@ -19,7 +19,7 @@
     /// </summary>
     /// <typeparam name="TFeature">One of the <see cref="IFeature"/> descendants.</typeparam>
     public class FeatureRuleTemplate<TFeature> : RuleTemplate<TFeature, FeatureRuleTemplate<TFeature>>, IFeatureRuleTemplate<TFeature>
-        where TFeature : IFeatureWithName, ICompiledFeature
+        where TFeature : IFeature, IFeatureWithName, ICompiledFeature
     {
         #region Init
         static FeatureRuleTemplate()

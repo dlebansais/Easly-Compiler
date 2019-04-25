@@ -207,17 +207,21 @@ namespace CompilerNode
         {
             resultTypeName = null;
             resultType = null;
+            bool Result = false;
 
-            IPropertyFeature EmbeddingProperty = source.EmbeddingFeature as IPropertyFeature;
-            if (EmbeddingProperty == null)
+            if (source.EmbeddingFeature is IPropertyFeature AsPropertyFeature)
             {
-                errorList.Add(new ErrorUnavailableValue(source));
-                return false;
-            }
+                Debug.Assert(AsPropertyFeature.ResolvedEntityTypeName.IsAssigned);
+                Debug.Assert(AsPropertyFeature.ResolvedEntityType.IsAssigned);
 
-            resultTypeName = EmbeddingProperty.ResolvedEntityTypeName.Item;
-            resultType = EmbeddingProperty.ResolvedEntityType.Item;
-            return true;
+                resultTypeName = AsPropertyFeature.ResolvedEntityTypeName.Item;
+                resultType = AsPropertyFeature.ResolvedEntityType.Item;
+                Result = true;
+            }
+            else
+                errorList.Add(new ErrorUnavailableValue(source));
+
+            return Result;
         }
 
         private static bool IsWithinGetter(ISource source, IList<IError> errorList, out ITypeName resultTypeName, out ICompiledType resultType)
@@ -245,8 +249,9 @@ namespace CompilerNode
                     return true;
                 }
             }
+            else
+                errorList.Add(new ErrorUnavailableResult(source));
 
-            errorList.Add(new ErrorUnavailableResult(source));
             return false;
         }
 

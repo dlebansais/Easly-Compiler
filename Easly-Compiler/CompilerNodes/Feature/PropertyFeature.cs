@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IPropertyFeature.
     /// </summary>
-    public interface IPropertyFeature : BaseNode.IPropertyFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IGetterSetterScopeHolder, INodeWithResult
+    public interface IPropertyFeature : BaseNode.IPropertyFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IGetterSetterScopeHolder, INodeWithResult
     {
         /// <summary>
         /// The name of the resolved property type.

@@ -8,7 +8,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IConstantFeature.
     /// </summary>
-    public interface IConstantFeature : BaseNode.IConstantFeature, IFeatureWithName, ICompiledFeature
+    public interface IConstantFeature : BaseNode.IConstantFeature, IFeature, IFeatureWithName, ICompiledFeature
     {
         /// <summary>
         /// The name of the resolved constant type.

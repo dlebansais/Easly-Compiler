@@ -96,12 +96,12 @@
 
                     if (ObjectType.TypeConformToBase(ParameterType1, ParameterType2, SubstitutionTypeTable, CheckErrorList, location, false))
                     {
-                        errorList.Add(new ErrorMoreBasicParameter(Parameter2.ResolvedParameter));
+                        errorList.Add(new ErrorMoreBasicParameter(Parameter2.ResolvedParameter.Location));
                         Exit = true;
                     }
                     else if (ObjectType.TypeConformToBase(ParameterType2, ParameterType1, SubstitutionTypeTable, CheckErrorList, location, false))
                     {
-                        errorList.Add(new ErrorMoreBasicParameter(Parameter1.ResolvedParameter));
+                        errorList.Add(new ErrorMoreBasicParameter(Parameter1.ResolvedParameter.Location));
                         Exit = true;
                     }
                 }

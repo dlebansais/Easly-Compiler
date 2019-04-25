@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IAttributeFeature.
     /// </summary>
-    public interface IAttributeFeature : BaseNode.IAttributeFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature
+    public interface IAttributeFeature : BaseNode.IAttributeFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature
     {
         /// <summary>
         /// The name of the resolved attribute type.

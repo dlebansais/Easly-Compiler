@@ -8,12 +8,43 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IScopeAttributeFeature.
     /// </summary>
-    public interface IScopeAttributeFeature : IFeatureWithName, ICompiledFeature
+    public interface IScopeAttributeFeature : IFeatureWithName // ,ICompiledFeature
     {
+        /// <summary>
+        /// The source used to create this attribute.
+        /// </summary>
+        ISource Location { get; }
+
+        /// <summary>
+        /// The parent overload, null if none.
+        /// </summary>
+        IQueryOverload EmbeddingOverload { get; }
+
+        /// <summary>
+        /// The resolved feature name.
+        /// </summary>
+        OnceReference<IFeatureName> ValidFeatureName { get; }
+
+        /*
+        /// <summary>
+        /// The resolved feature.
+        /// </summary>
+        OnceReference<ICompiledFeature> ResolvedFeature { get; }*/
+
         /// <summary>
         /// The default value, if any.
         /// </summary>
         IOptionalReference<IExpression> DefaultValue { get; }
+
+        /// <summary>
+        /// Name of the associated type.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedFeatureTypeName { get; }
+
+        /// <summary>
+        /// Associated type.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedFeatureType { get; }
     }
 
     /// <summary>
@@ -113,17 +144,15 @@ namespace CompilerNode
         /// <param name="initialDefaultValue">Default value, if any.</param>
         public ScopeAttributeFeature(ISource location, string attributeName, ITypeName attributeTypeName, ICompiledType attributeType, IExpression initialDefaultValue)
         {
-            EmbeddingClass = location.EmbeddingClass;
-            EmbeddingFeature = location.EmbeddingFeature;
+            Location = location;
             EmbeddingOverload = location.EmbeddingOverload;
-            EmbeddingBody = location.EmbeddingBody;
-            EmbeddingAssertion = location.EmbeddingAssertion;
-            ParentSource = location.ParentSource;
 
             EntityName = new Name(location, attributeName);
 
+            /*
             ResolvedFeature = new OnceReference<ICompiledFeature>();
             ResolvedFeature.Item = this;
+            */
             ExportIdentifier = new ExportIdentifier();
             Export = BaseNode.ExportStatus.Exported;
             Documentation = BaseNodeHelper.NodeHelper.CreateEmptyDocumentation();
@@ -198,103 +227,17 @@ namespace CompilerNode
         }
         #endregion
 
-        #region Implementation of ISource
+        #region Properties
         /// <summary>
-        /// The parent node, null if root.
+        /// The source used to create this name.
         /// </summary>
-        public ISource ParentSource { get; private set; }
-
-        /// <summary>
-        /// The parent class, null if none.
-        /// </summary>
-        public IClass EmbeddingClass { get; private set; }
-
-        /// <summary>
-        /// The parent feature, null if none.
-        /// </summary>
-        public IFeature EmbeddingFeature { get; private set; }
+        public ISource Location { get; }
 
         /// <summary>
         /// The parent overload, null if none.
         /// </summary>
-        public IQueryOverload EmbeddingOverload { get; private set; }
+        public IQueryOverload EmbeddingOverload { get; }
 
-        /// <summary>
-        /// The parent body, null if none.
-        /// </summary>
-        public IBody EmbeddingBody { get; private set; }
-
-        /// <summary>
-        /// The parent assertion, null if none.
-        /// </summary>
-        public IAssertion EmbeddingAssertion { get; private set; }
-
-        /// <summary>
-        /// Initializes parents based on the provided <paramref name="parentSource"/> node.
-        /// </summary>
-        /// <param name="parentSource">The parent node.</param>
-        public virtual void InitializeSource(ISource parentSource)
-        {
-            ParentSource = parentSource;
-
-            EmbeddingClass = parentSource is IClass AsClass ? AsClass : parentSource?.EmbeddingClass;
-            EmbeddingFeature = parentSource is IFeature AsFeature ? AsFeature : parentSource?.EmbeddingFeature;
-            EmbeddingOverload = parentSource is IQueryOverload AsOverload ? AsOverload : parentSource?.EmbeddingOverload;
-            EmbeddingBody = parentSource is IBody AsBody ? AsBody : parentSource?.EmbeddingBody;
-            EmbeddingAssertion = parentSource is IAssertion AsAssertion ? AsAssertion : parentSource?.EmbeddingAssertion;
-        }
-
-        /// <summary>
-        /// Reset some intermediate results.
-        /// </summary>
-        /// <param name="ruleTemplateList">The list of rule templates that would read the properties to reset.</param>
-        public void Reset(IList<IRuleTemplate> ruleTemplateList)
-        {
-            bool IsHandled = false;
-
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
-            {
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Types)
-            {
-                ResolvedFeatureTypeName = new OnceReference<ITypeName>();
-                ResolvedFeatureType = new OnceReference<ICompiledType>();
-                ValidFeatureName = new OnceReference<IFeatureName>();
-                ResolvedFeature = new OnceReference<ICompiledFeature>();
-                IsHandled = true;
-            }
-
-            Debug.Assert(IsHandled);
-        }
-
-        /// <summary>
-        /// Checks if a rule is resolved for this source.
-        /// </summary>
-        /// <param name="ruleTemplateList">The list of rule templates that would read the properties to check.</param>
-        public virtual bool IsResolved(IList<IRuleTemplate> ruleTemplateList)
-        {
-            bool IsResolved = false;
-
-            bool IsHandled = false;
-
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
-            {
-                IsResolved = false;
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Types)
-            {
-                IsResolved = false;
-                IsHandled = true;
-            }
-
-            Debug.Assert(IsHandled);
-            return IsResolved;
-        }
-        #endregion
-
-        #region Properties
         /// <summary>
         /// Fake export identifier.
         /// </summary>
@@ -354,18 +297,11 @@ namespace CompilerNode
         /// </summary>
         public OnceReference<IFeatureName> ValidFeatureName { get; private set; } = new OnceReference<IFeatureName>();
 
+        /*
         /// <summary>
         /// The resolved feature.
         /// </summary>
-        public OnceReference<ICompiledFeature> ResolvedFeature { get; private set; } = new OnceReference<ICompiledFeature>();
-        #endregion
-
-        #region Debugging
-        /// <summary></summary>
-        public override string ToString()
-        {
-            return $"(Scope) Attribute '{EntityName.Text}'";
-        }
+        public OnceReference<ICompiledFeature> ResolvedFeature { get; private set; } = new OnceReference<ICompiledFeature>();*/
         #endregion
     }
 }
