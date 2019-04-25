@@ -1,5 +1,6 @@
 ﻿namespace CompilerNode
 {
+    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
     using Easly;
@@ -161,6 +162,24 @@
 
                 return Result;
             }
+        }
+
+        /// <summary>
+        /// Gets a string representation of a list of qualified names.
+        /// </summary>
+        /// <param name="qualifiedNameList">The list of qualified names.</param>
+        public static string QualifiedNameListToString(IEnumerable qualifiedNameList)
+        {
+            string Result = string.Empty;
+
+            foreach (IQualifiedName QualifiedName in qualifiedNameList)
+            {
+                if (Result.Length > 0)
+                    Result += ", ";
+                Result += QualifiedName.PathToString;
+            }
+
+            return Result;
         }
 
         /// <summary></summary>

@@ -219,5 +219,18 @@ namespace CompilerNode
         /// </summary>
         public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
         #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of the instruction.
+        /// </summary>
+        public string InstructionToString { get { return "for... "; } }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"For Loop Instruction '{InstructionToString}'";
+        }
+        #endregion
     }
 }

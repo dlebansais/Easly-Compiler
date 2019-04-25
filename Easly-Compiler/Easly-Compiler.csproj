@@ -294,6 +294,7 @@
     <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\ManifestNumberTextRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\ManifestCharacterTextRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\IdentifierRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\KeywordAnchoredTypeCurrentRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\WithRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\TypedefSourceRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\TypedefRuleTemplate.cs" />
@@ -388,6 +389,7 @@
     <Compile Include="InferenceEngine\RuleTemplate.cs" />
     <Compile Include="InferenceEngine\InferenceEngine.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\ConditionallyAssignedReferenceSourceTemplate.cs" />
+    <Compile Include="InferenceEngine\SourceTemplates\OnceReferencePropertySourceTemplate.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\SealedListCollectionSourceTemplate.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\OnceReferenceTableSourceTemplate.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\OnceReferenceCollectionSourceTemplate.cs" />
@@ -397,6 +399,7 @@
     <Compile Include="InferenceEngine\SourceTemplates\SealedTableSourceTemplate.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\OnceReferenceSourceTemplate.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\StringSourceTemplate.cs" />
+    <Compile Include="InferenceEngine\StartingPoints\TemplatePropertyStart.cs" />
     <Compile Include="InferenceEngine\StartingPoints\TemplateGenericStart.cs" />
     <Compile Include="InferenceEngine\StartingPoints\TemplateGenericTypeStart.cs" />
     <Compile Include="InferenceEngine\StartingPoints\TemplateClassStart.cs" />

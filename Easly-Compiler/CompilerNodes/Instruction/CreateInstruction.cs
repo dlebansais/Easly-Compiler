@@ -163,5 +163,25 @@ namespace CompilerNode
         /// </summary>
         public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
         #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of the instruction.
+        /// </summary>
+        public string InstructionToString
+        {
+            get
+            {
+                string ProcessorString = Processor.IsAssigned ? $" processor: {((IQualifiedName)Processor.Item).PathToString}" : string.Empty;
+                return $"create {EntityIdentifier.Text} with {CreationRoutineIdentifier.Text}({Argument.ArgumentListToString(ArgumentList)}){ProcessorString}";
+            }
+        }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Create Instruction '{InstructionToString}'";
+        }
+        #endregion
     }
 }

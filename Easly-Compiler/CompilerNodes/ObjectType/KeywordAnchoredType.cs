@@ -10,6 +10,25 @@ namespace CompilerNode
     /// </summary>
     public interface IKeywordAnchoredType : BaseNode.IKeywordAnchoredType, IObjectType
     {
+        /// <summary>
+        /// The resolved type name if the anchor is Current.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedCurrentTypeName { get; }
+
+        /// <summary>
+        /// The resolved type if the anchor is Current.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedCurrentType { get; }
+
+        /// <summary>
+        /// The resolved type name if the anchor is not Current.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedOtherTypeName { get; }
+
+        /// <summary>
+        /// The resolved type if the anchor is not Current.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedOtherType { get; }
     }
 
     /// <summary>
@@ -79,6 +98,10 @@ namespace CompilerNode
             {
                 ResolvedTypeName = new OnceReference<ITypeName>();
                 ResolvedType = new OnceReference<ICompiledType>();
+                ResolvedCurrentTypeName = new OnceReference<ITypeName>();
+                ResolvedCurrentType = new OnceReference<ICompiledType>();
+                ResolvedOtherTypeName = new OnceReference<ITypeName>();
+                ResolvedOtherType = new OnceReference<ICompiledType>();
                 IsHandled = true;
             }
 
@@ -122,6 +145,28 @@ namespace CompilerNode
         /// The resolved type.
         /// </summary>
         public OnceReference<ICompiledType> ResolvedType { get; private set; } = new OnceReference<ICompiledType>();
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// The resolved type name if the anchor is Current.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedCurrentTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The resolved type if the anchor is Current.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedCurrentType { get; private set; } = new OnceReference<ICompiledType>();
+
+        /// <summary>
+        /// The resolved type name if the anchor is not Current.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedOtherTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The resolved type if the anchor is not Current.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedOtherType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
 
         #region Debugging

@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using CompilerNode;
+    using Easly;
 
     /// <summary>
     /// A rule to process <see cref="IKeywordAnchoredType"/>.
@@ -21,14 +22,17 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
+                new SealedTableSourceTemplate<IKeywordAnchoredType, ITypeName, IClassType>(nameof(IClass.ResolvedImportedClassTable), TemplateClassStart<IKeywordAnchoredType>.Default),
+                new OnceReferencePropertySourceTemplate<IKeywordAnchoredType, ITypeName>(nameof(IPropertyFeature.ResolvedEntityTypeName)),
+                new OnceReferencePropertySourceTemplate<IKeywordAnchoredType, ICompiledType>(nameof(IPropertyFeature.ResolvedEntityType)),
                 new OnceReferenceSourceTemplate<IKeywordAnchoredType, ITypeName>(nameof(IClass.ResolvedClassTypeName), TemplateClassStart<IKeywordAnchoredType>.Default),
                 new OnceReferenceSourceTemplate<IKeywordAnchoredType, IClassType>(nameof(IClass.ResolvedClassType), TemplateClassStart<IKeywordAnchoredType>.Default),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IKeywordAnchoredType, ITypeName>(nameof(IKeywordAnchoredType.ResolvedTypeName)),
-                new OnceReferenceDestinationTemplate<IKeywordAnchoredType, ICompiledType>(nameof(IKeywordAnchoredType.ResolvedType)),
+                new OnceReferenceDestinationTemplate<IKeywordAnchoredType, ITypeName>(nameof(IKeywordAnchoredType.ResolvedOtherTypeName)),
+                new OnceReferenceDestinationTemplate<IKeywordAnchoredType, ICompiledType>(nameof(IKeywordAnchoredType.ResolvedOtherType)),
             };
         }
         #endregion
@@ -46,15 +50,20 @@
             bool Success = true;
             data = null;
 
-            IClass EmbeddingClass = node.EmbeddingClass;
-            IList<IError> CheckErrorList = new List<IError>();
-            if (!KeywordExpression.IsKeywordAvailable(node, node.Anchor, CheckErrorList, out ITypeName ResultTypeName, out ICompiledType ResultType))
+            if (node.Anchor != BaseNode.Keyword.Current)
             {
-                AddSourceErrorList(CheckErrorList);
-                Success = false;
+                IClass EmbeddingClass = node.EmbeddingClass;
+                IList<IError> CheckErrorList = new List<IError>();
+                if (!KeywordExpression.IsKeywordAvailable(node, node.Anchor, CheckErrorList, out ITypeName ResultTypeName, out ICompiledType ResultType))
+                {
+                    AddSourceErrorList(CheckErrorList);
+                    Success = false;
+                }
+                else
+                    data = new Tuple<ITypeName, ICompiledType>(ResultTypeName, ResultType);
             }
             else
-                data = new Tuple<ITypeName, ICompiledType>(ResultTypeName, ResultType);
+                data = new Tuple<ITypeName, ICompiledType>(Class.ClassAny.ResolvedClassTypeName.Item, Class.ClassAny.ResolvedClassType.Item);
 
             return Success;
         }
@@ -66,8 +75,23 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IKeywordAnchoredType node, object data)
         {
-            node.ResolvedTypeName.Item = ((Tuple<ITypeName, ICompiledType>)data).Item1;
-            node.ResolvedType.Item = ((Tuple<ITypeName, ICompiledType>)data).Item2;
+            ITypeName ResultTypeName = ((Tuple<ITypeName, ICompiledType>)data).Item1;
+            ICompiledType ResultType = ((Tuple<ITypeName, ICompiledType>)data).Item2;
+
+            node.ResolvedOtherTypeName.Item = ResultTypeName;
+            node.ResolvedOtherType.Item = ResultType;
+
+            if (node.Anchor != BaseNode.Keyword.Current)
+            {
+                node.ResolvedTypeName.Item = ResultTypeName;
+                node.ResolvedType.Item = ResultType;
+
+                if (!node.ResolvedCurrentTypeName.IsAssigned && !node.ResolvedCurrentType.IsAssigned)
+                {
+                    node.ResolvedCurrentTypeName.Item = Class.ClassAny.ResolvedClassTypeName.Item;
+                    node.ResolvedCurrentType.Item = Class.ClassAny.ResolvedClassType.Item;
+                }
+            }
         }
         #endregion
     }

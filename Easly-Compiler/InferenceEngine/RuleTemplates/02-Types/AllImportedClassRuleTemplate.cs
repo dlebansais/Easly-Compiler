@@ -1,6 +1,8 @@
 ﻿namespace EaslyCompiler
 {
+    using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
     using Easly;
 
@@ -27,7 +29,6 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new UnsealedTableDestinationTemplate<IClass, ITypeName, ICompiledType>(nameof(IClass.TypeTable)),
                 new UnsealedTableDestinationTemplate<IClass, ITypeName, IClassType>(nameof(IClass.ResolvedImportedClassTable)),
             };
         }
@@ -68,6 +69,24 @@
             }
 
             node.ResolvedImportedClassTable.Seal();
+
+            Dictionary<Guid, Tuple<ITypeName, IClassType>> ImportedLanguageTypeTable = node.ImportedLanguageTypeTable;
+            Debug.Assert(ImportedLanguageTypeTable.Count == 0);
+
+            ICollection<Guid> GuidValues = LanguageClasses.NameToGuid.Values;
+
+            foreach (KeyValuePair<ITypeName, IClassType> Item in node.ResolvedImportedClassTable)
+            {
+                IClass BaseClass = Item.Value.BaseClass;
+                Guid BaseClassGuid = BaseClass.ClassGuid;
+
+                if (GuidValues.Contains(BaseClassGuid))
+                {
+                    Debug.Assert(!ImportedLanguageTypeTable.ContainsKey(BaseClassGuid));
+                    Tuple<ITypeName, IClassType> ImportedLanguageEntry = new Tuple<ITypeName, IClassType>(Item.Key, Item.Value);
+                    ImportedLanguageTypeTable.Add(BaseClassGuid, ImportedLanguageEntry);
+                }
+            }
         }
         #endregion
     }

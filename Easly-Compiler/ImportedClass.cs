@@ -163,12 +163,12 @@
         /// <summary>
         /// The resolved class type name.
         /// </summary>
-        public OnceReference<ITypeName> ResolvedClassTypeName { get; } = new OnceReference<ITypeName>();
+        public OnceReference<ITypeName> ResolvedClassTypeName { get { return Item.ResolvedClassTypeName; } }
 
         /// <summary>
         /// The resolved class type.
         /// </summary>
-        public OnceReference<IClassType> ResolvedClassType { get; } = new OnceReference<IClassType>();
+        public OnceReference<IClassType> ResolvedClassType { get { return Item.ResolvedClassType; } }
         #endregion
 
         #region Client Interface

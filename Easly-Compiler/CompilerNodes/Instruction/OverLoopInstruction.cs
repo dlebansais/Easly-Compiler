@@ -190,5 +190,18 @@ namespace CompilerNode
         /// </summary>
         public IHashtableEx<string, IScopeAttributeFeature> InnerLoopScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
         #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of the instruction.
+        /// </summary>
+        public string InstructionToString { get { return $"over ({((IExpression)OverList).ExpressionToString})..."; } }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Over Loop Instruction '{InstructionToString}'";
+        }
+        #endregion
     }
 }

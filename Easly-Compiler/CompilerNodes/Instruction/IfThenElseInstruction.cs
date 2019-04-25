@@ -163,5 +163,18 @@ namespace CompilerNode
         /// </summary>
         public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
         #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of the instruction.
+        /// </summary>
+        public string InstructionToString { get { return $"if {ConditionalList.Count} conditional(s)"; } }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"If Then Else Instruction '{InstructionToString}'";
+        }
+        #endregion
     }
 }

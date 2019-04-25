@@ -69,24 +69,6 @@
             node.NamespaceTable.Add("Feature", node.FeatureTable);
 
             node.NamespaceTable.Seal();
-
-            Dictionary<Guid, Tuple<ITypeName, IClassType>> ImportedLanguageTypeTable = node.ImportedLanguageTypeTable;
-            Debug.Assert(ImportedLanguageTypeTable.Count == 0);
-
-            ICollection<Guid> GuidValues = LanguageClasses.NameToGuid.Values;
-
-            foreach (KeyValuePair<ITypeName, IClassType> Item in node.ResolvedImportedClassTable)
-            {
-                IClass BaseClass = Item.Value.BaseClass;
-                Guid BaseClassGuid = BaseClass.ClassGuid;
-
-                if (GuidValues.Contains(BaseClassGuid))
-                {
-                    Debug.Assert(!ImportedLanguageTypeTable.ContainsKey(BaseClassGuid));
-                    Tuple<ITypeName, IClassType> ImportedLanguageEntry = new Tuple<ITypeName, IClassType>(Item.Key, Item.Value);
-                    ImportedLanguageTypeTable.Add(BaseClassGuid, ImportedLanguageEntry);
-                }
-            }
         }
         #endregion
     }

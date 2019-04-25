@@ -1,4 +1,4 @@
-namespace CompilerNode
+﻿namespace CompilerNode
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -162,6 +162,19 @@ namespace CompilerNode
         /// All reachable entities.
         /// </summary>
         public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of the instruction.
+        /// </summary>
+        public string InstructionToString { get { return $"{((IQualifiedName)Destination).PathToString}[{Argument.ArgumentListToString(ArgumentList)}] ← {((IExpression)Source).ExpressionToString}"; } }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Index Assignment Instruction '{InstructionToString}'";
+        }
         #endregion
     }
 }

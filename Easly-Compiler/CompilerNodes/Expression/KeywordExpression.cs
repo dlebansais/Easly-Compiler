@@ -185,17 +185,22 @@ namespace CompilerNode
             resultType = null;
 
             IClass EmbeddingClass = source.EmbeddingClass;
-
-            if (!EmbeddingClass.ImportedLanguageTypeTable.ContainsKey(guid))
+            bool Found = false;
+            foreach (KeyValuePair<Guid, Tuple<ITypeName, IClassType>> Entry in EmbeddingClass.ImportedLanguageTypeTable)
             {
-                errorList.Add(new ErrorBooleanTypeMissing(source));
-                return false;
+                if (Entry.Key == guid)
+                {
+                    resultTypeName = Entry.Value.Item1;
+                    resultType = Entry.Value.Item2;
+                    Found = true;
+                    break;
+                }
             }
 
-            Tuple<ITypeName, IClassType> ImportedLanguageType = EmbeddingClass.ImportedLanguageTypeTable[guid];
-            resultTypeName = ImportedLanguageType.Item1;
-            resultType = ImportedLanguageType.Item2;
-            return true;
+            if (!Found)
+                errorList.Add(new ErrorBooleanTypeMissing(source));
+
+            return Found;
         }
 
         private static bool IsWithinProperty(ISource source, IList<IError> errorList, out ITypeName resultTypeName, out ICompiledType resultType)
