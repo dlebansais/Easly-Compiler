@@ -18,7 +18,7 @@ namespace CompilerNode
         /// <summary>
         /// The parent overload, null if none.
         /// </summary>
-        IQueryOverload EmbeddingOverload { get; }
+        IOverload EmbeddingOverload { get; }
 
         /// <summary>
         /// The resolved feature name.
@@ -236,7 +236,7 @@ namespace CompilerNode
         /// <summary>
         /// The parent overload, null if none.
         /// </summary>
-        public IQueryOverload EmbeddingOverload { get; }
+        public IOverload EmbeddingOverload { get; }
 
         /// <summary>
         /// Fake export identifier.

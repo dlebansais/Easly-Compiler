@@ -1,4 +1,4 @@
-namespace CompilerNode
+﻿namespace CompilerNode
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IQueryOverload.
     /// </summary>
-    public interface IQueryOverload : BaseNode.IQueryOverload, INode, INodeWithReplicatedBlocks, ISource, IScopeHolder, INodeWithResult
+    public interface IQueryOverload : BaseNode.IQueryOverload, INode, INodeWithReplicatedBlocks, IOverload, IScopeHolder, INodeWithResult
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.QueryOverload.ParameterBlocks"/>.
@@ -129,7 +129,7 @@ namespace CompilerNode
         /// <summary>
         /// The parent overload, null if none.
         /// </summary>
-        public IQueryOverload EmbeddingOverload { get; private set; }
+        public IOverload EmbeddingOverload { get; private set; }
 
         /// <summary>
         /// The parent body, null if none.
@@ -151,7 +151,7 @@ namespace CompilerNode
 
             EmbeddingClass = parentSource is IClass AsClass ? AsClass : parentSource?.EmbeddingClass;
             EmbeddingFeature = parentSource is IFeature AsFeature ? AsFeature : parentSource?.EmbeddingFeature;
-            EmbeddingOverload = parentSource is IQueryOverload AsOverload ? AsOverload : parentSource?.EmbeddingOverload;
+            EmbeddingOverload = parentSource is IOverload AsOverload ? AsOverload : parentSource?.EmbeddingOverload;
             EmbeddingBody = parentSource is IBody AsBody ? AsBody : parentSource?.EmbeddingBody;
             EmbeddingAssertion = parentSource is IAssertion AsAssertion ? AsAssertion : parentSource?.EmbeddingAssertion;
         }
@@ -271,6 +271,32 @@ namespace CompilerNode
         /// The resolved result type.
         /// </summary>
         public OnceReference<ICompiledType> ResolvedResultType { get; private set; } = new OnceReference<ICompiledType>();
+        #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of the overload.
+        /// </summary>
+        public string QueryOverloadToString
+        {
+            get
+            {
+                string ParameterString = $"{EntityDeclaration.EntityDeclarationListToString(ParameterList)}";
+                if (ParameterEnd == BaseNode.ParameterEndStatus.Open)
+                    ParameterString += ", ...";
+
+                string ResultString = $"{EntityDeclaration.EntityDeclarationListToString(ResultList)}";
+                string BodyString = QueryBody.GetType().Name;
+
+                return $"({ResultString}) ← ({ParameterString}) {{{BodyString}}}";
+            }
+        }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Query Overload '{QueryOverloadToString}'";
+        }
         #endregion
     }
 }

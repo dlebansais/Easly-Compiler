@@ -184,6 +184,7 @@
     <Compile Include="CompilerNodes\ObjectType\PropertyType.cs" />
     <Compile Include="CompilerNodes\ObjectType\SimpleType.cs" />
     <Compile Include="CompilerNodes\ObjectType\TupleType.cs" />
+    <Compile Include="CompilerNodes\Overload.cs" />
     <Compile Include="CompilerNodes\Pattern.cs" />
     <Compile Include="CompilerNodes\QualifiedName.cs" />
     <Compile Include="CompilerNodes\QueryOverload.cs" />

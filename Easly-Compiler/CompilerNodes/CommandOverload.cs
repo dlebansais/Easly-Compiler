@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler ICommandOverload.
     /// </summary>
-    public interface ICommandOverload : BaseNode.ICommandOverload, INode, INodeWithReplicatedBlocks, ISource, IScopeHolder
+    public interface ICommandOverload : BaseNode.ICommandOverload, INode, INodeWithReplicatedBlocks, IOverload, IScopeHolder
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.CommandOverload.ParameterBlocks"/>.
@@ -96,7 +96,7 @@ namespace CompilerNode
         /// <summary>
         /// The parent overload, null if none.
         /// </summary>
-        public IQueryOverload EmbeddingOverload { get; private set; }
+        public IOverload EmbeddingOverload { get; private set; }
 
         /// <summary>
         /// The parent body, null if none.
@@ -118,7 +118,7 @@ namespace CompilerNode
 
             EmbeddingClass = parentSource is IClass AsClass ? AsClass : parentSource?.EmbeddingClass;
             EmbeddingFeature = parentSource is IFeature AsFeature ? AsFeature : parentSource?.EmbeddingFeature;
-            EmbeddingOverload = parentSource is IQueryOverload AsOverload ? AsOverload : parentSource?.EmbeddingOverload;
+            EmbeddingOverload = parentSource is IOverload AsOverload ? AsOverload : parentSource?.EmbeddingOverload;
             EmbeddingBody = parentSource is IBody AsBody ? AsBody : parentSource?.EmbeddingBody;
             EmbeddingAssertion = parentSource is IAssertion AsAssertion ? AsAssertion : parentSource?.EmbeddingAssertion;
         }
@@ -217,6 +217,31 @@ namespace CompilerNode
         /// The resolved associated type.
         /// </summary>
         public OnceReference<ICommandOverloadType> ResolvedAssociatedType { get; private set; } = new OnceReference<ICommandOverloadType>();
+        #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Gets a string representation of the overload.
+        /// </summary>
+        public string CommandOverloadToString
+        {
+            get
+            {
+                string ParameterString = $"{EntityDeclaration.EntityDeclarationListToString(ParameterList)}";
+                if (ParameterEnd == BaseNode.ParameterEndStatus.Open)
+                    ParameterString += ", ...";
+
+                string BodyString = CommandBody.GetType().Name;
+
+                return $"({ParameterString}) {{{BodyString}}}";
+            }
+        }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Command Overload '{CommandOverloadToString}'";
+        }
         #endregion
     }
 }

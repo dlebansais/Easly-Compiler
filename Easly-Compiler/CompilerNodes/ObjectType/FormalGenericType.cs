@@ -70,7 +70,7 @@
         /// <summary>
         /// The parent overload, null if none.
         /// </summary>
-        public IQueryOverload EmbeddingOverload { get; private set; }
+        public IOverload EmbeddingOverload { get; private set; }
 
         /// <summary>
         /// The parent body, null if none.

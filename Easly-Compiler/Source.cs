@@ -26,7 +26,7 @@
         /// <summary>
         /// The parent overload, null if none.
         /// </summary>
-        IQueryOverload EmbeddingOverload { get; }
+        IOverload EmbeddingOverload { get; }
 
         /// <summary>
         /// The parent body, null if none.

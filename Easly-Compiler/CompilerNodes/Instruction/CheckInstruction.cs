@@ -36,7 +36,7 @@ namespace CompilerNode
         /// <summary>
         /// The parent overload, null if none.
         /// </summary>
-        public IQueryOverload EmbeddingOverload { get; private set; }
+        public IOverload EmbeddingOverload { get; private set; }
 
         /// <summary>
         /// The parent body, null if none.
@@ -58,7 +58,7 @@ namespace CompilerNode
 
             EmbeddingClass = parentSource is IClass AsClass ? AsClass : parentSource?.EmbeddingClass;
             EmbeddingFeature = parentSource is IFeature AsFeature ? AsFeature : parentSource?.EmbeddingFeature;
-            EmbeddingOverload = parentSource is IQueryOverload AsOverload ? AsOverload : parentSource?.EmbeddingOverload;
+            EmbeddingOverload = parentSource is IOverload AsOverload ? AsOverload : parentSource?.EmbeddingOverload;
             EmbeddingBody = parentSource is IBody AsBody ? AsBody : parentSource?.EmbeddingBody;
             EmbeddingAssertion = parentSource is IAssertion AsAssertion ? AsAssertion : parentSource?.EmbeddingAssertion;
         }
