@@ -147,18 +147,18 @@ namespace CompilerNode
             Location = location;
             EmbeddingOverload = location.EmbeddingOverload;
 
-            EntityName = new Name(location, attributeName);
+            EntityName = new Name(Location, attributeName);
 
             /*
             ResolvedFeature = new OnceReference<ICompiledFeature>();
             ResolvedFeature.Item = this;
-            */
+
             ExportIdentifier = new ExportIdentifier();
             Export = BaseNode.ExportStatus.Exported;
             Documentation = BaseNodeHelper.NodeHelper.CreateEmptyDocumentation();
-
+            */
             ValidFeatureName = new OnceReference<IFeatureName>();
-            ValidFeatureName.Item = new FeatureName(attributeName);
+            ValidFeatureName.Item = new FeatureName(EntityName.Text);
 
             ResolvedFeatureTypeName = new OnceReference<ITypeName>();
             if (attributeTypeName != null)
@@ -169,10 +169,12 @@ namespace CompilerNode
                 ResolvedFeatureType.Item = attributeType;
 
             if (initialDefaultValue != null)
+            {
                 DefaultValue = BaseNodeHelper.OptionalReferenceHelper<IExpression>.CreateReference(initialDefaultValue);
+                DefaultValue.Assign();
+            }
             else
-                DefaultValue = BaseNodeHelper.OptionalReferenceHelper<IExpression>.CreateReference(new ManifestNumberExpression());
-            DefaultValue.Unassign();
+                DefaultValue = BaseNodeHelper.OptionalReferenceHelper<IExpression>.CreateEmptyReference();
         }
 
         private static bool CheckGroupAssigned(ICompiledType attributeType, string attributeName, bool isSingleClassAllowed, ISource location, IList<IError> errorList)
@@ -181,20 +183,28 @@ namespace CompilerNode
 
             if (attributeType is IClassType AsClassType)
             {
-                SingleClassGroup Group = AsClassType.BaseClass.ClassGroup.Item;
+                if (AsClassType.BaseClass.ClassGroup.IsAssigned)
+                {
+                    SingleClassGroup Group = AsClassType.BaseClass.ClassGroup.Item;
 
-                if (Group.IsAssigned)
-                {
-                    errorList.Add(new ErrorSingleInstanceConflict(location, attributeName));
-                    Result = false;
+                    if (location.EmbeddingClass != null && location.EmbeddingClass.EntityName.Text.StartsWith("Coverage"))
+                    {
+
+                    }
+
+                    if (Group.IsAssigned)
+                    {
+                        errorList.Add(new ErrorSingleInstanceConflict(location, attributeName));
+                        Result = false;
+                    }
+                    else if (!isSingleClassAllowed && AsClassType.BaseClass.Cloneable == BaseNode.CloneableStatus.Single)
+                    {
+                        errorList.Add(new ErrorSingleTypeNotAllowed(location, attributeName));
+                        Result = false;
+                    }
+                    else
+                        Group.SetAssigned();
                 }
-                else if (!isSingleClassAllowed && AsClassType.BaseClass.Cloneable == BaseNode.CloneableStatus.Single)
-                {
-                    errorList.Add(new ErrorSingleTypeNotAllowed(location, attributeName));
-                    Result = false;
-                }
-                else
-                    Group.SetAssigned();
             }
 
             return Result;
@@ -237,7 +247,7 @@ namespace CompilerNode
         /// The parent overload, null if none.
         /// </summary>
         public IOverload EmbeddingOverload { get; }
-
+/*
         /// <summary>
         /// Fake export identifier.
         /// </summary>
@@ -252,7 +262,7 @@ namespace CompilerNode
         /// Fake documentation.
         /// </summary>
         public BaseNode.IDocument Documentation { get; }
-
+*/
         /// <summary>
         /// The generated attribute name.
         /// </summary>
@@ -265,6 +275,7 @@ namespace CompilerNode
         #endregion
 
         #region Implementation of ICompiledFeature
+/*
         /// <summary>
         /// Indicates if the feature is deferred in another class.
         /// </summary>
@@ -279,7 +290,7 @@ namespace CompilerNode
         /// True if the feature contains precursor bodies in its overloads.
         /// </summary>
         public bool HasPrecursorBody { get { return false; } }
-
+*/
         /// <summary>
         /// Name of the associated type.
         /// </summary>

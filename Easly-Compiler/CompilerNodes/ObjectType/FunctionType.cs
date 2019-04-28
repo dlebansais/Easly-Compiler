@@ -49,6 +49,10 @@ namespace CompilerNode
         /// </summary>
         public FunctionType()
         {
+            FeatureTable.Seal();
+            DiscreteTable.Seal();
+            ConformanceTable.Seal();
+            ExportTable.Seal();
         }
 
         /// <summary>
@@ -58,6 +62,7 @@ namespace CompilerNode
         /// <param name="baseType">The resolved base type.</param>
         /// <param name="overloadList">The list of resolved overloads.</param>
         public FunctionType(ITypeName baseTypeName, IClassType baseType, IList<IQueryOverloadType> overloadList)
+            : this()
         {
             ResolvedBaseTypeName.Item = baseTypeName;
             ResolvedBaseType.Item = baseType;

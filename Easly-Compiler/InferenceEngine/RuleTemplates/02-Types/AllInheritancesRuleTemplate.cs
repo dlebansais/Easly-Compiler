@@ -59,8 +59,8 @@
                         ClassGroup.Item = InheritedClass.ClassGroup.Item;
                     else
                     {
-                        foreach (IClass Class in InheritedClass.ClassGroup.Item.ClassList)
-                            ClassGroup.Item.ClassList.Add(Class);
+                        foreach (IClass Class in InheritedClass.ClassGroup.Item.GroupClassList)
+                            ClassGroup.Item.GroupClassList.Add(Class);
 
                         InheritedClass.ClassGroup.Item = ClassGroup.Item;
                     }
@@ -75,8 +75,8 @@
                 }
                 else
                 {
-                    foreach (IClass Class in node.ClassGroup.Item.ClassList)
-                        ClassGroup.Item.ClassList.Add(Class);
+                    foreach (IClass Class in node.ClassGroup.Item.GroupClassList)
+                        ClassGroup.Item.GroupClassList.Add(Class);
 
                     node.ClassGroup.Item = ClassGroup.Item;
                 }

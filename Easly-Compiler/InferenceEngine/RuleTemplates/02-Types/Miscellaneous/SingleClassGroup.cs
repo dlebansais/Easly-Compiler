@@ -14,8 +14,8 @@
         /// <param name="firstClass">First class of the group.</param>
         public SingleClassGroup(IClass firstClass)
         {
-            ClassList = new List<IClass>();
-            ClassList.Add(firstClass);
+            GroupClassList = new List<IClass>();
+            GroupClassList.Add(firstClass);
         }
 
         /// <summary>
@@ -23,14 +23,14 @@
         /// </summary>
         public void SetAssigned()
         {
-            if (ClassList.Count > 1)
+            if (GroupClassList.Count > 1)
                 IsAssigned = true;
         }
 
         /// <summary>
         /// List of classes in the group.
         /// </summary>
-        public IList<IClass> ClassList { get; }
+        public IList<IClass> GroupClassList { get; }
 
         /// <summary>
         /// Indicates that the group doesn't accept more classes.
