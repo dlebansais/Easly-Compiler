@@ -395,13 +395,11 @@ namespace CompilerNode
 
             for (int i = 0; i < type1.EntityDeclarationList.Count && i < type2.EntityDeclarationList.Count; i++)
             {
-                //TODO: fix that
-                if (type1.EntityDeclarationList[i].ResolvedEntityType.IsAssigned && type2.EntityDeclarationList[i].ResolvedEntityType.IsAssigned)
-                {
-                    Debug.Assert(type1.EntityDeclarationList[i].ResolvedEntityType.IsAssigned);
-                    Debug.Assert(type2.EntityDeclarationList[i].ResolvedEntityType.IsAssigned);
-                    IsIdentical &= ObjectType.TypesHaveIdenticalSignature(type1.EntityDeclarationList[i].ResolvedEntityType.Item, type2.EntityDeclarationList[i].ResolvedEntityType.Item);
-                }
+                Debug.Assert(type1.EntityDeclarationList[i].ValidEntity.IsAssigned);
+                Debug.Assert(type1.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                Debug.Assert(type2.EntityDeclarationList[i].ValidEntity.IsAssigned);
+                Debug.Assert(type2.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                IsIdentical &= ObjectType.TypesHaveIdenticalSignature(type1.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.Item, type2.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.Item);
             }
 
             return IsIdentical;

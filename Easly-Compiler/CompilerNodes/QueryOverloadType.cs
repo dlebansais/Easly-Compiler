@@ -369,24 +369,20 @@
 
             for (int i = 0; i < overload1.ParameterList.Count && i < overload2.ParameterList.Count; i++)
             {
-                //TODO: fix that
-                if (overload1.ParameterList[i].ResolvedEntityType.IsAssigned && overload2.ParameterList[i].ResolvedEntityType.IsAssigned)
-                {
-                    Debug.Assert(overload1.ParameterList[i].ResolvedEntityType.IsAssigned);
-                    Debug.Assert(overload2.ParameterList[i].ResolvedEntityType.IsAssigned);
-                    IsIdentical &= ObjectType.TypesHaveIdenticalSignature(overload1.ParameterList[i].ResolvedEntityType.Item, overload2.ParameterList[i].ResolvedEntityType.Item);
-                }
+                Debug.Assert(overload1.ParameterList[i].ValidEntity.IsAssigned);
+                Debug.Assert(overload1.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                Debug.Assert(overload2.ParameterList[i].ValidEntity.IsAssigned);
+                Debug.Assert(overload2.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                IsIdentical &= ObjectType.TypesHaveIdenticalSignature(overload1.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item, overload2.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item);
             }
 
             for (int i = 0; i < overload1.ResultList.Count && i < overload2.ResultList.Count; i++)
             {
-                //TODO: fix that
-                if (overload1.ResultList[i].ResolvedEntityType.IsAssigned && overload2.ResultList[i].ResolvedEntityType.IsAssigned)
-                {
-                    Debug.Assert(overload1.ResultList[i].ResolvedEntityType.IsAssigned);
-                    Debug.Assert(overload2.ResultList[i].ResolvedEntityType.IsAssigned);
-                    IsIdentical &= ObjectType.TypesHaveIdenticalSignature(overload1.ResultList[i].ResolvedEntityType.Item, overload2.ResultList[i].ResolvedEntityType.Item);
-                }
+                Debug.Assert(overload1.ResultList[i].ValidEntity.IsAssigned);
+                Debug.Assert(overload1.ResultList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                Debug.Assert(overload2.ResultList[i].ValidEntity.IsAssigned);
+                Debug.Assert(overload2.ResultList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                IsIdentical &= ObjectType.TypesHaveIdenticalSignature(overload1.ResultList[i].ValidEntity.Item.ResolvedFeatureType.Item, overload2.ResultList[i].ValidEntity.Item.ResolvedFeatureType.Item);
             }
 
             IsIdentical &= Assertion.IsAssertionListEqual(overload1.RequireList, overload2.RequireList);

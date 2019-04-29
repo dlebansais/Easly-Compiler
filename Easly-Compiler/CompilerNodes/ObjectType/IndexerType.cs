@@ -677,13 +677,11 @@
 
             for (int i = 0; i < type1.IndexParameterList.Count && i < type2.IndexParameterList.Count; i++)
             {
-                //TODO: fix that
-                if (type1.IndexParameterList[i].ResolvedEntityType.IsAssigned && type2.IndexParameterList[i].ResolvedEntityType.IsAssigned)
-                {
-                    Debug.Assert(type1.IndexParameterList[i].ResolvedEntityType.IsAssigned);
-                    Debug.Assert(type2.IndexParameterList[i].ResolvedEntityType.IsAssigned);
-                    IsIdentical &= ObjectType.TypesHaveIdenticalSignature(type1.IndexParameterList[i].ResolvedEntityType.Item, type2.IndexParameterList[i].ResolvedEntityType.Item);
-                }
+                Debug.Assert(type1.IndexParameterList[i].ValidEntity.IsAssigned);
+                Debug.Assert(type1.IndexParameterList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                Debug.Assert(type2.IndexParameterList[i].ValidEntity.IsAssigned);
+                Debug.Assert(type2.IndexParameterList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                IsIdentical &= ObjectType.TypesHaveIdenticalSignature(type1.IndexParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item, type2.IndexParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item);
             }
 
             IsIdentical &= Assertion.IsAssertionListEqual(type1.GetRequireList, type2.GetRequireList);
