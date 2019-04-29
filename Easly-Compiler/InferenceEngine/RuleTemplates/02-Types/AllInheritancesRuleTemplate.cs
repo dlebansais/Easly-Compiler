@@ -45,44 +45,6 @@
             bool Success = true;
             data = null;
 
-            /*
-            IHashtableEx<IClassType, IObjectType> InheritedClassTypeTable = node.InheritedClassTypeTable;
-            StableReference<SingleClassGroup> ClassGroup = new StableReference<SingleClassGroup>();
-
-            foreach (KeyValuePair<IClassType, IObjectType> Entry in InheritedClassTypeTable)
-            {
-                IClassType InheritedClassType = Entry.Key;
-                IClass InheritedClass = InheritedClassType.BaseClass;
-
-                if (InheritedClass.Cloneable == BaseNode.CloneableStatus.Single)
-                {
-                    if (!ClassGroup.IsAssigned)
-                        ClassGroup.Item = InheritedClass.ClassGroup.Item;
-                    else
-                    {
-                        foreach (IClass Class in InheritedClass.ClassGroup.Item.GroupClassList)
-                            ClassGroup.Item.GroupClassList.Add(Class);
-
-                        InheritedClass.ClassGroup.Item = ClassGroup.Item;
-                    }
-                }
-            }
-
-            if (ClassGroup.IsAssigned)
-                if (node.Cloneable == BaseNode.CloneableStatus.Cloneable)
-                {
-                    AddSourceError(new ErrorCloneableClass(node));
-                    Success = false;
-                }
-                else
-                {
-                    foreach (IClass Class in node.ClassGroup.Item.GroupClassList)
-                        ClassGroup.Item.GroupClassList.Add(Class);
-
-                    node.ClassGroup.Item = ClassGroup.Item;
-                }
-                */
-
             return Success;
         }
 

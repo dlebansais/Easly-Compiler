@@ -198,11 +198,11 @@ namespace CompilerNode
             if (ResolvedFeatureType.IsAssigned && ResolvedFeatureType.Item is IClassType AsClassType)
             {
                 IClass BaseClass = AsClassType.BaseClass;
-                Debug.Assert(BaseClass.ClassGroup2.IsAssigned);
+                Debug.Assert(BaseClass.ClassGroup.IsAssigned);
 
                 if (BaseClass.Cloneable == BaseNode.CloneableStatus.Single)
                 {
-                    SingleClassGroup Group = AsClassType.BaseClass.ClassGroup2.Item;
+                    SingleClassGroup Group = AsClassType.BaseClass.ClassGroup.Item;
                     foreach (IClass GroupClass in Group.GroupClassList)
                         if (assignedSingleClassList.Contains(GroupClass))
                         {

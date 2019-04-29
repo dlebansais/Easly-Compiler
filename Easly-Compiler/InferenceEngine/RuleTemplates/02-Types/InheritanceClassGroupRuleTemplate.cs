@@ -27,7 +27,7 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IInheritance, IClass>(nameof(IInheritance.ClassGroup2)),
+                new OnceReferenceDestinationTemplate<IInheritance, IClass>(nameof(IInheritance.ClassGroup)),
             };
         }
         #endregion
@@ -94,7 +94,7 @@
             IClass BaseClass = data as IClass;
 
             if (BaseClass != null)
-                node.ClassGroup2.Item = BaseClass;
+                node.ClassGroup.Item = BaseClass;
         }
         #endregion
     }

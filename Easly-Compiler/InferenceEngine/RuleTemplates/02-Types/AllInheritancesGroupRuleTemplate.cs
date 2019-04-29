@@ -22,13 +22,13 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new SealedListSourceTemplate<IClass, IClass>(nameof(IClass.ClassGroupList2)),
-                new SealedListCollectionSourceTemplate<IClass, IClass, IClass>(nameof(IClass.ClassGroupList2), nameof(IClass.ClassGroupList2)),
+                new SealedListSourceTemplate<IClass, IClass>(nameof(IClass.ClassGroupList)),
+                new SealedListCollectionSourceTemplate<IClass, IClass, IClass>(nameof(IClass.ClassGroupList), nameof(IClass.ClassGroupList)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IClass, SingleClassGroup>(nameof(IClass.ClassGroup2)),
+                new OnceReferenceDestinationTemplate<IClass, SingleClassGroup>(nameof(IClass.ClassGroup)),
             };
         }
         #endregion
@@ -48,15 +48,15 @@
 
             IList<IClass> SingleClassList = new List<IClass>();
 
-            foreach (IClass InheritedClass in node.ClassGroupList2)
+            foreach (IClass InheritedClass in node.ClassGroupList)
             {
-                Debug.Assert(InheritedClass.ClassGroupList2.IsSealed);
+                Debug.Assert(InheritedClass.ClassGroupList.IsSealed);
 
                 if (InheritedClass.Cloneable == BaseNode.CloneableStatus.Single)
                 {
                     SingleClassList.Add(InheritedClass);
 
-                    foreach (IClass Class in InheritedClass.ClassGroupList2)
+                    foreach (IClass Class in InheritedClass.ClassGroupList)
                         SingleClassList.Add(Class);
                 }
             }
@@ -96,7 +96,7 @@
         {
             IList<IClass> SingleClassList = (IList<IClass>)data;
 
-            node.ClassGroup2.Item = new SingleClassGroup(node);
+            node.ClassGroup.Item = new SingleClassGroup(node);
             node.UpdateClassGroup(SingleClassList);
         }
         #endregion

@@ -22,12 +22,12 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, IClass>(nameof(IClass.InheritanceList), nameof(IInheritance.ClassGroup2)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, IClass>(nameof(IClass.InheritanceList), nameof(IInheritance.ClassGroup)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new UnsealedListDestinationTemplate<IClass, IClass>(nameof(IClass.ClassGroupList2)),
+                new UnsealedListDestinationTemplate<IClass, IClass>(nameof(IClass.ClassGroupList)),
             };
         }
         #endregion
@@ -57,13 +57,13 @@
         {
             foreach (IInheritance Inheritance in node.InheritanceList)
             {
-                Debug.Assert(Inheritance.ClassGroup2.IsAssigned);
-                IClass BaseClass = Inheritance.ClassGroup2.Item;
+                Debug.Assert(Inheritance.ClassGroup.IsAssigned);
+                IClass BaseClass = Inheritance.ClassGroup.Item;
 
-                node.ClassGroupList2.Add(BaseClass);
+                node.ClassGroupList.Add(BaseClass);
             }
 
-            node.ClassGroupList2.Seal();
+            node.ClassGroupList.Seal();
         }
         #endregion
     }

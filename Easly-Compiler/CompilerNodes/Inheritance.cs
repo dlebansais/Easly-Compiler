@@ -86,7 +86,10 @@ namespace CompilerNode
         /// </summary>
         OnceReference<IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>> ExportTable { get; }
 
-        OnceReference<IClass> ClassGroup2 { get; }
+        /// <summary>
+        /// The class inherited, if not cloneable.
+        /// </summary>
+        OnceReference<IClass> ClassGroup { get; }
     }
 
     /// <summary>
@@ -230,7 +233,7 @@ namespace CompilerNode
                 TypedefTable = new OnceReference<IHashtableEx<IFeatureName, ITypedefType>>();
                 FeatureTable = new OnceReference<IHashtableEx<IFeatureName, IFeatureInstance>>();
                 ExportTable = new OnceReference<IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>>();
-                ClassGroup2 = new OnceReference<IClass>();
+                ClassGroup = new OnceReference<IClass>();
                 IsHandled = true;
             }
 
@@ -319,7 +322,10 @@ namespace CompilerNode
         /// </summary>
         public OnceReference<IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>> ExportTable { get; private set; } = new OnceReference<IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>>();
 
-        public OnceReference<IClass> ClassGroup2 { get; private set; } = new OnceReference<IClass>();
+        /// <summary>
+        /// The class inherited, if not cloneable.
+        /// </summary>
+        public OnceReference<IClass> ClassGroup { get; private set; } = new OnceReference<IClass>();
         #endregion
     }
 }

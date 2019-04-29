@@ -50,7 +50,10 @@
         /// </summary>
         OnceReference<IClassType> ResolvedClassType { get; }
 
-        OnceReference<SingleClassGroup> ClassGroup2 { get; }
+        /// <summary>
+        /// The group of classes the imported class belongs to.
+        /// </summary>
+        OnceReference<SingleClassGroup> ClassGroup { get; }
 
         /// <summary>
         /// Sets the parent source.
@@ -173,7 +176,10 @@
         /// </summary>
         public OnceReference<IClassType> ResolvedClassType { get { return Item.ResolvedClassType; } }
 
-        public OnceReference<SingleClassGroup> ClassGroup2 { get { return Item.ClassGroup2; } }
+        /// <summary>
+        /// The group of classes the imported class belongs to.
+        /// </summary>
+        public OnceReference<SingleClassGroup> ClassGroup { get { return Item.ClassGroup; } }
         #endregion
 
         #region Client Interface
