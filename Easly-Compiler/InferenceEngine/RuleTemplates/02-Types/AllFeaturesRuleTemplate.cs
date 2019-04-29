@@ -67,6 +67,11 @@
                 Success = false;
             else
             {
+                if (node.EntityName.Text.StartsWith("Coverage Function Type"))
+                {
+
+                }
+
                 MergeInheritedFeatures(node, ByNameTable, out MergedFeatureTable);
                 Success &= ClassType.MergeConformingParentTypes(node, node.ResolvedClassType.Item, ErrorList);
             }

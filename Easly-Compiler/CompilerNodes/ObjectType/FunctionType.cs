@@ -323,8 +323,7 @@ namespace CompilerNode
             ICompiledType InstancedBaseType = ResolvedBaseType.Item;
             Success &= InstancedBaseType.InstanciateType(instancingClassType, ref InstancedBaseTypeName, ref InstancedBaseType, errorList);
 
-            if (InstancedBaseType != ResolvedBaseType.Item)
-                IsNewInstance = true;
+            IsNewInstance |= InstancedBaseType != ResolvedBaseType.Item;
 
             IList<IQueryOverloadType> InstancedOverloadList = new List<IQueryOverloadType>();
             foreach (IQueryOverloadType Overload in OverloadList)
@@ -333,9 +332,7 @@ namespace CompilerNode
                 QueryOverloadType.InstanciateQueryOverloadType(instancingClassType, ref InstancedOverload, errorList);
 
                 InstancedOverloadList.Add(InstancedOverload);
-
-                if (InstancedOverload != Overload)
-                    IsNewInstance = true;
+                IsNewInstance |= InstancedOverload != Overload;
             }
 
             if (IsNewInstance)
@@ -409,76 +406,56 @@ namespace CompilerNode
         /// <param name="overloadList">The list of other overloads in the candidate function type.</param>
         public static bool IsQueryOverloadMatching(IHashtableEx<ITypeName, ICompiledType> typeTable, IQueryOverloadType overload, IList<IQueryOverloadType> overloadList)
         {
-            foreach (IQueryOverloadType Item in overloadList)
+            bool IsMatching = false;
+
+            for (int i = 0; i < overloadList.Count && !IsMatching; i++)
             {
-                if (!IsParametersMatching(overload, Item))
-                    continue;
+                IQueryOverloadType Item = overloadList[i];
 
-                if (!IsResultsMatching(overload, Item))
-                    continue;
-
-                if (!Assertion.IsAssertionListEqual(overload.RequireList, Item.RequireList))
-                    continue;
-
-                if (!Assertion.IsAssertionListEqual(overload.EnsureList, Item.EnsureList))
-                    continue;
-
-                if (!ExceptionHandler.IdenticalExceptionSignature(overload.ExceptionIdentifierList, Item.ExceptionIdentifierList))
-                    continue;
-
-                return true;
+                IsMatching = true;
+                IsMatching &= IsParametersMatching(overload, Item);
+                IsMatching &= IsResultsMatching(overload, Item);
+                IsMatching &= Assertion.IsAssertionListEqual(overload.RequireList, Item.RequireList);
+                IsMatching &= Assertion.IsAssertionListEqual(overload.EnsureList, Item.EnsureList);
+                IsMatching &= ExceptionHandler.IdenticalExceptionSignature(overload.ExceptionIdentifierList, Item.ExceptionIdentifierList);
             }
 
-            return false;
+            return IsMatching;
         }
 
-        private static bool IsParametersMatching(IQueryOverloadType overload, IQueryOverloadType otherOverload)
+        private static bool IsParametersMatching(IQueryOverloadType overload1, IQueryOverloadType overload2)
         {
-            if (overload.ParameterList.Count != otherOverload.ParameterList.Count)
-                return false;
+            bool IsMatching = true;
 
-            bool AllParametersMatch = true;
-            for (int i = 0; i < overload.ParameterList.Count; i++)
+            IsMatching &= overload1.ParameterList.Count == overload2.ParameterList.Count;
+            IsMatching &= overload1.ParameterEnd == overload2.ParameterEnd;
+
+            for (int i = 0; i < overload1.ParameterList.Count && i < overload2.ParameterList.Count; i++)
             {
-                IScopeAttributeFeature OverloadAttribute = overload.ParameterList[i].ValidEntity.Item;
-                IScopeAttributeFeature ItemAttribute = otherOverload.ParameterList[i].ValidEntity.Item;
+                IScopeAttributeFeature OverloadAttribute1 = overload1.ParameterList[i].ValidEntity.Item;
+                IScopeAttributeFeature OverloadAttribute2 = overload2.ParameterList[i].ValidEntity.Item;
 
-                if (OverloadAttribute.ResolvedFeatureType.Item != ItemAttribute.ResolvedFeatureType.Item)
-                {
-                    AllParametersMatch = false;
-                    break;
-                }
+                IsMatching &= OverloadAttribute1.ResolvedFeatureType.Item == OverloadAttribute2.ResolvedFeatureType.Item;
             }
-            if (!AllParametersMatch)
-                return false;
 
-            if (overload.ParameterEnd != otherOverload.ParameterEnd)
-                return false;
-
-            return true;
+            return IsMatching;
         }
 
-        private static bool IsResultsMatching(IQueryOverloadType overload, IQueryOverloadType otherOverload)
+        private static bool IsResultsMatching(IQueryOverloadType overload1, IQueryOverloadType overload2)
         {
-            if (overload.ResultList.Count != otherOverload.ResultList.Count)
-                return false;
+            bool IsMatching = true;
 
-            bool AllResultsMatch = true;
-            for (int i = 0; i < overload.ResultList.Count; i++)
+            IsMatching &= overload1.ResultList.Count == overload2.ResultList.Count;
+
+            for (int i = 0; i < overload1.ResultList.Count && i < overload2.ResultList.Count; i++)
             {
-                IScopeAttributeFeature OverloadAttribute = overload.ResultList[i].ValidEntity.Item;
-                IScopeAttributeFeature ItemAttribute = otherOverload.ResultList[i].ValidEntity.Item;
+                IScopeAttributeFeature OverloadAttribute1 = overload1.ResultList[i].ValidEntity.Item;
+                IScopeAttributeFeature OverloadAttribute2 = overload2.ResultList[i].ValidEntity.Item;
 
-                if (OverloadAttribute.ResolvedFeatureType.Item != ItemAttribute.ResolvedFeatureType.Item)
-                {
-                    AllResultsMatch = false;
-                    break;
-                }
+                IsMatching &= OverloadAttribute1.ResolvedFeatureType.Item == OverloadAttribute2.ResolvedFeatureType.Item;
             }
-            if (!AllResultsMatch)
-                return false;
 
-            return true;
+            return IsMatching;
         }
 
         /// <summary>

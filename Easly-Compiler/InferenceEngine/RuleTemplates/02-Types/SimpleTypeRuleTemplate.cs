@@ -85,7 +85,7 @@
                 IImportedClass Imported = ImportedClassTable[ValidIdentifier];
                 IClass BaseClass = Imported.Item;
                 Success &= CheckValidityAsClass(BaseClass, node, out ValidTypeName, out ValidType);
-                Debug.Assert(ValidType is IClassType);
+                Debug.Assert(!Success || ValidType is IClassType);
             }
             else if (LocalGenericTable.ContainsKey(ValidIdentifier))
             {
