@@ -216,6 +216,10 @@ namespace CompilerNode
         /// </summary>
         StableReference<SingleClassGroup> ClassGroup { get; }
 
+        ListTableEx<IClass> ClassGroupList2 { get; }
+        OnceReference<SingleClassGroup> ClassGroup2 { get; }
+        void UpdateClassGroup(IList<IClass> inheritedSingleClassList);
+
         /// <summary>
         /// Table of inherited types.
         /// </summary>
@@ -281,6 +285,8 @@ namespace CompilerNode
             BaseClass.CopySpecification = copySpecification;
             BaseClass.ValidClassName = className;
             BaseClass.ClassGroup.Item = new SingleClassGroup(BaseClass);
+            BaseClass.ClassGroupList2.Seal();
+            BaseClass.ClassGroup2.Item = new SingleClassGroup(BaseClass);
             BaseClass.DiscreteTable.Seal();
             BaseClass.FeatureTable.Seal();
             BaseClass.FullClassPath = string.Empty; // TODO
@@ -536,6 +542,8 @@ namespace CompilerNode
                 TypeTable = new HashtableEx<ITypeName, ICompiledType>();
                 ClassGroup = new StableReference<SingleClassGroup>();
                 ClassGroup.Item = new SingleClassGroup(this);
+                ClassGroupList2 = new ListTableEx<IClass>();
+                ClassGroup2 = new OnceReference<SingleClassGroup>();
                 InheritanceTable = new HashtableEx<ITypeName, ICompiledType>();
                 ResolvedImportedClassTable = new HashtableEx<ITypeName, IClassType>();
                 ResolvedAsCompiledType = new OnceReference<ICompiledType>();
@@ -951,6 +959,20 @@ namespace CompilerNode
         /// The group this class belongs to.
         /// </summary>
         public StableReference<SingleClassGroup> ClassGroup { get; private set; } = new StableReference<SingleClassGroup>();
+
+        public ListTableEx<IClass> ClassGroupList2 { get; private set; } = new ListTableEx<IClass>();
+        public OnceReference<SingleClassGroup> ClassGroup2 { get; private set; } = new OnceReference<SingleClassGroup>();
+
+        public void UpdateClassGroup(IList<IClass> inheritedSingleClassList)
+        {
+            bool IsUpdated = false;
+            foreach (IClass GroupClass in inheritedSingleClassList)
+                ClassGroup2.Item.AddClass(GroupClass, ref IsUpdated);
+
+            if (IsUpdated)
+                foreach (IClass GroupClass in ClassGroup2.Item.GroupClassList)
+                    GroupClass.UpdateClassGroup(inheritedSingleClassList);
+        }
 
         /// <summary>
         /// Table of inherited types.

@@ -45,6 +45,7 @@
             bool Success = true;
             data = null;
 
+            /*
             IHashtableEx<IClassType, IObjectType> InheritedClassTypeTable = node.InheritedClassTypeTable;
             StableReference<SingleClassGroup> ClassGroup = new StableReference<SingleClassGroup>();
 
@@ -80,6 +81,7 @@
 
                     node.ClassGroup.Item = ClassGroup.Item;
                 }
+                */
 
             return Success;
         }

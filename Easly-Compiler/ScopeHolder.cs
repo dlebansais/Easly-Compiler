@@ -56,12 +56,35 @@
             foreach (IScopeHolder Item in innerScopeList)
             {
                 foreach (KeyValuePair<string, IScopeAttributeFeature> ScopeNameItem in source)
+                {
                     if (Item.FullScope.ContainsKey(ScopeNameItem.Key))
                         if (!conflictList.Contains(ScopeNameItem.Key))
                             conflictList.Add(ScopeNameItem.Key);
+                }
 
                 RecursiveCheck(source, Item.InnerScopes, conflictList);
             }
+        }
+
+        /// <summary>
+        /// Finds all single class attributes in conflict with others already defined in embedding scopes.
+        /// </summary>
+        /// <param name="scope">The scope where the check is performed.</param>
+        /// <param name="innerScopeList">The list of inner scopes.</param>
+        /// <param name="assignedSingleClassList">The list of assigned single class attributes.</param>
+        /// <param name="source">The location where to report errors.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        public static bool HasConflictingSingleAttributes(IHashtableEx<string, IScopeAttributeFeature> scope, IList<IScopeHolder> innerScopeList, IList<IClass> assignedSingleClassList, ISource source, IList<IError> errorList)
+        {
+            bool IsAssigned = false;
+
+            foreach (KeyValuePair<string, IScopeAttributeFeature> ScopeNameItem in scope)
+                IsAssigned |= ScopeNameItem.Value.IsGroupAssigned(assignedSingleClassList, source, errorList);
+
+            foreach (IScopeHolder Item in innerScopeList)
+                IsAssigned |= HasConflictingSingleAttributes(scope, Item.InnerScopes, assignedSingleClassList, source, errorList);
+
+            return IsAssigned;
         }
 
         /// <summary>

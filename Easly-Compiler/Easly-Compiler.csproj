@@ -295,6 +295,9 @@
     <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\ManifestNumberTextRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\ManifestCharacterTextRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\01-Identifiers\IdentifierRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllInheritancesGroupRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllInheritancesClassGroupRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\InheritanceClassGroupRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\KeywordAnchoredTypeCurrentRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\QueryOverloadResultRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\WithRuleTemplate.cs" />

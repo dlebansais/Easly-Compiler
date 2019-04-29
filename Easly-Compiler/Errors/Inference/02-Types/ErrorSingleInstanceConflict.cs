@@ -6,9 +6,9 @@
     public interface IErrorSingleInstanceConflict : IError
     {
         /// <summary>
-        /// The entity name.
+        /// The class name.
         /// </summary>
-        string EntityName { get; }
+        string ClassName { get; }
     }
 
     /// <summary>
@@ -21,24 +21,24 @@
         /// Initializes a new instance of the <see cref="ErrorSingleInstanceConflict"/> class.
         /// </summary>
         /// <param name="source">The error location.</param>
-        /// <param name="entityName">The entity name</param>
-        public ErrorSingleInstanceConflict(ISource source, string entityName)
+        /// <param name="className">The class name.</param>
+        public ErrorSingleInstanceConflict(ISource source, string className)
             : base(source)
         {
-            EntityName = entityName;
+            ClassName = className;
         }
         #endregion
 
         #region Properties
         /// <summary>
-        /// The entity name.
+        /// The class name.
         /// </summary>
-        public string EntityName { get; }
+        public string ClassName { get; }
 
         /// <summary>
         /// The error message.
         /// </summary>
-        public override string Message { get { return $"Entity '{EntityName}' declared but another instance of a related class already exists."; } }
+        public override string Message { get { return $"Class '{ClassName}' used but another instance of a related class already exists."; } }
         #endregion
     }
 }

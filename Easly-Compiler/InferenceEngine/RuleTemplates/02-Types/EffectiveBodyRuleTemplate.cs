@@ -80,6 +80,14 @@
                 }
             }
 
+            IList<IClass> AssignedSingleClassList = new List<IClass>();
+            IList<IError> CheckErrorList = new List<IError>();
+            if (ScopeHolder.HasConflictingSingleAttributes(CheckedScope, node.InnerScopes, AssignedSingleClassList, node, CheckErrorList))
+            {
+                AddSourceErrorList(CheckErrorList);
+                Success = false;
+            }
+
             if (Success)
                 data = CheckedScope;
 

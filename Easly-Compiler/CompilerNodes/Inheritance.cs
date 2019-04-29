@@ -85,6 +85,8 @@ namespace CompilerNode
         /// Table of association of export names to their instance.
         /// </summary>
         OnceReference<IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>> ExportTable { get; }
+
+        OnceReference<IClass> ClassGroup2 { get; }
     }
 
     /// <summary>
@@ -228,6 +230,7 @@ namespace CompilerNode
                 TypedefTable = new OnceReference<IHashtableEx<IFeatureName, ITypedefType>>();
                 FeatureTable = new OnceReference<IHashtableEx<IFeatureName, IFeatureInstance>>();
                 ExportTable = new OnceReference<IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>>();
+                ClassGroup2 = new OnceReference<IClass>();
                 IsHandled = true;
             }
 
@@ -315,6 +318,8 @@ namespace CompilerNode
         /// Table of association of export names to their instance.
         /// </summary>
         public OnceReference<IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>> ExportTable { get; private set; } = new OnceReference<IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>>();
+
+        public OnceReference<IClass> ClassGroup2 { get; private set; } = new OnceReference<IClass>();
         #endregion
     }
 }

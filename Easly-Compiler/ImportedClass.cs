@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
     using Easly;
@@ -48,6 +49,8 @@
         /// The resolved class type.
         /// </summary>
         OnceReference<IClassType> ResolvedClassType { get; }
+
+        OnceReference<SingleClassGroup> ClassGroup2 { get; }
 
         /// <summary>
         /// Sets the parent source.
@@ -169,6 +172,8 @@
         /// The resolved class type.
         /// </summary>
         public OnceReference<IClassType> ResolvedClassType { get { return Item.ResolvedClassType; } }
+
+        public OnceReference<SingleClassGroup> ClassGroup2 { get { return Item.ClassGroup2; } }
         #endregion
 
         #region Client Interface

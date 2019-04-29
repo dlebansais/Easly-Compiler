@@ -45,6 +45,14 @@ namespace CompilerNode
         /// Associated type.
         /// </summary>
         OnceReference<ICompiledType> ResolvedFeatureType { get; }
+
+        /// <summary>
+        /// Checks if this attribute conflicts with another from the same class group.
+        /// </summary>
+        /// <param name="assignedSingleClassList">The list of already single class attributes.</param>
+        /// <param name="source">The location where to report errors.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        bool IsGroupAssigned(IList<IClass> assignedSingleClassList, ISource source, IList<IError> errorList);
     }
 
     /// <summary>
@@ -177,33 +185,51 @@ namespace CompilerNode
                 DefaultValue = BaseNodeHelper.OptionalReferenceHelper<IExpression>.CreateEmptyReference();
         }
 
+        /// <summary>
+        /// Checks if this attribute conflicts with another from the same class group.
+        /// </summary>
+        /// <param name="assignedSingleClassList">The list of already single class attributes.</param>
+        /// <param name="source">The location where to report errors.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        public bool IsGroupAssigned(IList<IClass> assignedSingleClassList, ISource source, IList<IError> errorList)
+        {
+            bool IsAssigned = false;
+
+            if (ResolvedFeatureType.IsAssigned && ResolvedFeatureType.Item is IClassType AsClassType)
+            {
+                IClass BaseClass = AsClassType.BaseClass;
+                Debug.Assert(BaseClass.ClassGroup2.IsAssigned);
+
+                if (BaseClass.Cloneable == BaseNode.CloneableStatus.Single)
+                {
+                    SingleClassGroup Group = AsClassType.BaseClass.ClassGroup2.Item;
+                    foreach (IClass GroupClass in Group.GroupClassList)
+                        if (assignedSingleClassList.Contains(GroupClass))
+                        {
+                            IName EntityName = (IName)BaseClass.EntityName;
+                            errorList.Add(new ErrorSingleInstanceConflict(source, EntityName.ValidText.Item));
+                            IsAssigned = true;
+                            break;
+                        }
+
+                    if (!IsAssigned)
+                        assignedSingleClassList.Add(BaseClass);
+                }
+            }
+
+            return IsAssigned;
+        }
+
         private static bool CheckGroupAssigned(ICompiledType attributeType, string attributeName, bool isSingleClassAllowed, ISource location, IList<IError> errorList)
         {
             bool Result = true;
 
             if (attributeType is IClassType AsClassType)
             {
-                if (AsClassType.BaseClass.ClassGroup.IsAssigned)
+                if (!isSingleClassAllowed && AsClassType.BaseClass.Cloneable == BaseNode.CloneableStatus.Single)
                 {
-                    SingleClassGroup Group = AsClassType.BaseClass.ClassGroup.Item;
-
-                    if (location.EmbeddingClass != null && location.EmbeddingClass.EntityName.Text.StartsWith("Coverage"))
-                    {
-
-                    }
-
-                    if (Group.IsAssigned)
-                    {
-                        errorList.Add(new ErrorSingleInstanceConflict(location, attributeName));
-                        Result = false;
-                    }
-                    else if (!isSingleClassAllowed && AsClassType.BaseClass.Cloneable == BaseNode.CloneableStatus.Single)
-                    {
-                        errorList.Add(new ErrorSingleTypeNotAllowed(location, attributeName));
-                        Result = false;
-                    }
-                    else
-                        Group.SetAssigned();
+                    errorList.Add(new ErrorSingleTypeNotAllowed(location, attributeName));
+                    Result = false;
                 }
             }
 

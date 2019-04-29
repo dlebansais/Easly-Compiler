@@ -20,6 +20,8 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
+                new SealedTableSourceTemplate<IEntityDeclaration, string, IImportedClass>(nameof(IClass.ImportedClassTable), TemplateClassStart<IEntityDeclaration>.Default),
+                new OnceReferenceTableSourceTemplate<IEntityDeclaration, string, IImportedClass, SingleClassGroup>(nameof(IClass.ImportedClassTable), nameof(IImportedClass.ClassGroup2), TemplateClassStart<IEntityDeclaration>.Default),
                 new OnceReferenceSourceTemplate<IEntityDeclaration, ITypeName>(nameof(IEntityDeclaration.EntityType) + Dot + nameof(IObjectType.ResolvedTypeName)),
                 new OnceReferenceSourceTemplate<IEntityDeclaration, ICompiledType>(nameof(IEntityDeclaration.EntityType) + Dot + nameof(IObjectType.ResolvedType)),
             };

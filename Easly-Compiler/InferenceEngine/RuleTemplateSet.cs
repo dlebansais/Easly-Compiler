@@ -128,6 +128,10 @@
             new TypedefRuleTemplate(),
             new TypedefSourceRuleTemplate(),
             new WithRuleTemplate(),
+
+            new AllInheritancesClassGroupRuleTemplate(),
+            new AllInheritancesGroupRuleTemplate(),
+            new InheritanceClassGroupRuleTemplate(),
         };
     }
 }
