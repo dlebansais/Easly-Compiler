@@ -95,6 +95,8 @@
 
             if (BaseClass != null)
                 node.ClassGroup.Item = BaseClass;
+            else
+                node.ClassGroup.Item = Class.ClassAny;
         }
         #endregion
     }

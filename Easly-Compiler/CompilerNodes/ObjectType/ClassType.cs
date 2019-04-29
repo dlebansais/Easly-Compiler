@@ -480,11 +480,10 @@
         /// <param name="type2">The second type.</param>
         public static bool TypesHaveIdenticalSignature(IClassType type1, IClassType type2)
         {
-            if (type1.BaseClass != type2.BaseClass)
-                return false;
+            bool IsIdentical = true;
 
-            if (type1.TypeArgumentTable.Count != type2.TypeArgumentTable.Count)
-                return false;
+            IsIdentical &= type1.BaseClass == type2.BaseClass;
+            IsIdentical &= type1.TypeArgumentTable.Count == type2.TypeArgumentTable.Count;
 
             IList<ICompiledType> TypeArgumentList1 = new List<ICompiledType>();
             IList<ICompiledType> TypeArgumentList2 = new List<ICompiledType>();
@@ -502,10 +501,9 @@
             }
 
             for (int i = 0; i < TypeArgumentList1.Count && i < TypeArgumentList2.Count; i++)
-                if (!ObjectType.TypesHaveIdenticalSignature(TypeArgumentList1[i], TypeArgumentList2[i]))
-                    return false;
+                IsIdentical &= ObjectType.TypesHaveIdenticalSignature(TypeArgumentList1[i], TypeArgumentList2[i]);
 
-            return true;
+            return IsIdentical;
         }
 
         /// <summary>

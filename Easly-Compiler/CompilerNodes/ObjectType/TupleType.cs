@@ -391,11 +391,20 @@ namespace CompilerNode
         /// <param name="type2">The second type.</param>
         public static bool TypesHaveIdenticalSignature(ITupleType type1, ITupleType type2)
         {
-            for (int i = 0; i < type1.EntityDeclarationList.Count && i < type2.EntityDeclarationList.Count; i++)
-                if (!ObjectType.TypesHaveIdenticalSignature(type1.EntityDeclarationList[i].ResolvedEntityType.Item, type2.EntityDeclarationList[i].ResolvedEntityType.Item))
-                    return false;
+            bool IsIdentical = true;
 
-            return true;
+            for (int i = 0; i < type1.EntityDeclarationList.Count && i < type2.EntityDeclarationList.Count; i++)
+            {
+                //TODO: fix that
+                if (type1.EntityDeclarationList[i].ResolvedEntityType.IsAssigned && type2.EntityDeclarationList[i].ResolvedEntityType.IsAssigned)
+                {
+                    Debug.Assert(type1.EntityDeclarationList[i].ResolvedEntityType.IsAssigned);
+                    Debug.Assert(type2.EntityDeclarationList[i].ResolvedEntityType.IsAssigned);
+                    IsIdentical &= ObjectType.TypesHaveIdenticalSignature(type1.EntityDeclarationList[i].ResolvedEntityType.Item, type2.EntityDeclarationList[i].ResolvedEntityType.Item);
+                }
+            }
+
+            return IsIdentical;
         }
 
         /// <summary>

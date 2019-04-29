@@ -67,11 +67,6 @@
                 Success = false;
             else
             {
-                if (node.EntityName.Text.StartsWith("Coverage Function Type"))
-                {
-
-                }
-
                 MergeInheritedFeatures(node, ByNameTable, out MergedFeatureTable);
                 Success &= ClassType.MergeConformingParentTypes(node, node.ResolvedClassType.Item, ErrorList);
             }
@@ -307,12 +302,16 @@
                 {
                     InstanceNameInfo ThisInstance = InstanceList[i];
 
-                    if (importedInstance.IsKept != ThisInstance.Instance.IsKept ||
-                        importedInstance.IsDiscontinued != ThisInstance.Instance.IsDiscontinued ||
-                        !ObjectType.TypesHaveIdenticalSignature(FeatureType, ThisInstance.Instance.Feature.Item.ResolvedFeatureType.Item))
+                    Result &= importedInstance.IsKept == ThisInstance.Instance.IsKept;
+                    Result &= importedInstance.IsDiscontinued == ThisInstance.Instance.IsDiscontinued;
+                    Result &= ObjectType.TypesHaveIdenticalSignature(FeatureType, ThisInstance.Instance.Feature.Item.ResolvedFeatureType.Item);
+
+                    if (!Result)
                     {
-                        errorList.Add(new ErrorInheritanceConflict(ThisInstance.Location, ThisInstance.Name.Name));
-                        Result = false;
+                        if (FeatureType is IIndexerType)
+                            errorList.Add(new ErrorIndexerInheritanceConflict(ThisInstance.Location));
+                        else
+                            errorList.Add(new ErrorInheritanceConflict(ThisInstance.Location, ThisInstance.Name.Name));
                         break;
                     }
                 }

@@ -507,28 +507,17 @@
         /// <param name="type2">The second type.</param>
         public static bool TypesHaveIdenticalSignature(IPropertyType type1, IPropertyType type2)
         {
-            if (!ObjectType.TypesHaveIdenticalSignature(type1.ResolvedBaseType.Item, type2.ResolvedBaseType.Item))
-                return false;
+            bool IsIdentical = true;
 
-            if (!ObjectType.TypesHaveIdenticalSignature(type1.ResolvedEntityType.Item, type2.ResolvedEntityType.Item))
-                return false;
+            IsIdentical &= ObjectType.TypesHaveIdenticalSignature(type1.ResolvedBaseType.Item, type2.ResolvedBaseType.Item);
+            IsIdentical &= ObjectType.TypesHaveIdenticalSignature(type1.ResolvedEntityType.Item, type2.ResolvedEntityType.Item);
+            IsIdentical &= type1.PropertyKind == type2.PropertyKind;
+            IsIdentical &= Assertion.IsAssertionListEqual(type1.GetEnsureList, type2.GetEnsureList);
+            IsIdentical &= ExceptionHandler.IdenticalExceptionSignature(type1.GetExceptionIdentifierList, type2.GetExceptionIdentifierList);
+            IsIdentical &= Assertion.IsAssertionListEqual(type1.SetRequireList, type2.SetRequireList);
+            IsIdentical &= ExceptionHandler.IdenticalExceptionSignature(type1.SetExceptionIdentifierList, type2.SetExceptionIdentifierList);
 
-            if (type1.PropertyKind != type2.PropertyKind)
-                return false;
-
-            if (!Assertion.IsAssertionListEqual(type1.GetEnsureList, type2.GetEnsureList))
-                return false;
-
-            if (!ExceptionHandler.IdenticalExceptionSignature(type1.GetExceptionIdentifierList, type2.GetExceptionIdentifierList))
-                return false;
-
-            if (!Assertion.IsAssertionListEqual(type1.SetRequireList, type2.SetRequireList))
-                return false;
-
-            if (!ExceptionHandler.IdenticalExceptionSignature(type1.SetExceptionIdentifierList, type2.SetExceptionIdentifierList))
-                return false;
-
-            return true;
+            return IsIdentical;
         }
         #endregion
 

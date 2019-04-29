@@ -453,28 +453,22 @@ namespace CompilerNode
         /// <param name="type2">The second type.</param>
         public static bool TypesHaveIdenticalSignature(IProcedureType type1, IProcedureType type2)
         {
-            if (!ObjectType.TypesHaveIdenticalSignature(type1.ResolvedBaseType.Item, type2.ResolvedBaseType.Item))
-                return false;
+            bool IsIdentical = true;
 
-            if (type1.OverloadList.Count != type2.OverloadList.Count)
-                return false;
+            IsIdentical &= ObjectType.TypesHaveIdenticalSignature(type1.ResolvedBaseType.Item, type2.ResolvedBaseType.Item);
+            IsIdentical &= type1.OverloadList.Count == type2.OverloadList.Count;
 
             foreach (ICommandOverloadType Overload1 in type1.OverloadList)
             {
                 bool MatchingOverload = false;
 
                 foreach (ICommandOverloadType Overload2 in type2.OverloadList)
-                    if (CommandOverloadType.CommandOverloadsHaveIdenticalSignature(Overload1, Overload2))
-                    {
-                        MatchingOverload = true;
-                        break;
-                    }
+                    MatchingOverload |= CommandOverloadType.CommandOverloadsHaveIdenticalSignature(Overload1, Overload2);
 
-                if (!MatchingOverload)
-                    return false;
+                IsIdentical &= MatchingOverload;
             }
 
-            return true;
+            return IsIdentical;
         }
         #endregion
 

@@ -667,41 +667,33 @@
         /// <param name="type2">The second type.</param>
         public static bool TypesHaveIdenticalSignature(IIndexerType type1, IIndexerType type2)
         {
-            if (!ObjectType.TypesHaveIdenticalSignature(type1.ResolvedBaseType.Item, type2.ResolvedBaseType.Item))
-                return false;
+            bool IsIdentical = true;
 
-            if (!ObjectType.TypesHaveIdenticalSignature(type1.ResolvedEntityType.Item, type2.ResolvedEntityType.Item))
-                return false;
-
-            if (type1.IndexerKind != type2.IndexerKind)
-                return false;
-
-            if (type1.IndexParameterList.Count != type2.IndexParameterList.Count || type1.ParameterEnd != type2.ParameterEnd)
-                return false;
+            IsIdentical &= ObjectType.TypesHaveIdenticalSignature(type1.ResolvedBaseType.Item, type2.ResolvedBaseType.Item);
+            IsIdentical &= ObjectType.TypesHaveIdenticalSignature(type1.ResolvedEntityType.Item, type2.ResolvedEntityType.Item);
+            IsIdentical &= type1.IndexerKind == type2.IndexerKind;
+            IsIdentical &= type1.IndexParameterList.Count == type2.IndexParameterList.Count;
+            IsIdentical &= type1.ParameterEnd == type2.ParameterEnd;
 
             for (int i = 0; i < type1.IndexParameterList.Count && i < type2.IndexParameterList.Count; i++)
-                if (!ObjectType.TypesHaveIdenticalSignature(type1.IndexParameterList[i].ResolvedEntityType.Item, type2.IndexParameterList[i].ResolvedEntityType.Item))
-                    return false;
+            {
+                //TODO: fix that
+                if (type1.IndexParameterList[i].ResolvedEntityType.IsAssigned && type2.IndexParameterList[i].ResolvedEntityType.IsAssigned)
+                {
+                    Debug.Assert(type1.IndexParameterList[i].ResolvedEntityType.IsAssigned);
+                    Debug.Assert(type2.IndexParameterList[i].ResolvedEntityType.IsAssigned);
+                    IsIdentical &= ObjectType.TypesHaveIdenticalSignature(type1.IndexParameterList[i].ResolvedEntityType.Item, type2.IndexParameterList[i].ResolvedEntityType.Item);
+                }
+            }
 
-            if (!Assertion.IsAssertionListEqual(type1.GetRequireList, type2.GetRequireList))
-                return false;
+            IsIdentical &= Assertion.IsAssertionListEqual(type1.GetRequireList, type2.GetRequireList);
+            IsIdentical &= Assertion.IsAssertionListEqual(type1.GetEnsureList, type2.GetEnsureList);
+            IsIdentical &= ExceptionHandler.IdenticalExceptionSignature(type1.GetExceptionIdentifierList, type2.GetExceptionIdentifierList);
+            IsIdentical &= Assertion.IsAssertionListEqual(type1.SetRequireList, type2.SetRequireList);
+            IsIdentical &= Assertion.IsAssertionListEqual(type1.SetEnsureList, type2.SetEnsureList);
+            IsIdentical &= ExceptionHandler.IdenticalExceptionSignature(type1.SetExceptionIdentifierList, type2.SetExceptionIdentifierList);
 
-            if (!Assertion.IsAssertionListEqual(type1.GetEnsureList, type2.GetEnsureList))
-                return false;
-
-            if (!ExceptionHandler.IdenticalExceptionSignature(type1.GetExceptionIdentifierList, type2.GetExceptionIdentifierList))
-                return false;
-
-            if (!Assertion.IsAssertionListEqual(type1.SetRequireList, type2.SetRequireList))
-                return false;
-
-            if (!Assertion.IsAssertionListEqual(type1.SetEnsureList, type2.SetEnsureList))
-                return false;
-
-            if (!ExceptionHandler.IdenticalExceptionSignature(type1.SetExceptionIdentifierList, type2.SetExceptionIdentifierList))
-                return false;
-
-            return true;
+            return IsIdentical;
         }
         #endregion
 

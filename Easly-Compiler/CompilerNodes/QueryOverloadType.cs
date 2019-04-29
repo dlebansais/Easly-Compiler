@@ -361,30 +361,39 @@
         /// <param name="overload2">The second overload.</param>
         public static bool QueryOverloadsHaveIdenticalSignature(IQueryOverloadType overload1, IQueryOverloadType overload2)
         {
-            if (overload1.ParameterList.Count != overload2.ParameterList.Count || overload1.ParameterEnd != overload2.ParameterEnd)
-                return false;
+            bool IsIdentical = true;
+
+            IsIdentical &= overload1.ParameterList.Count == overload2.ParameterList.Count;
+            IsIdentical &= overload1.ParameterEnd == overload2.ParameterEnd;
+            IsIdentical &= overload1.ResultList.Count != overload2.ResultList.Count;
 
             for (int i = 0; i < overload1.ParameterList.Count && i < overload2.ParameterList.Count; i++)
-                if (!ObjectType.TypesHaveIdenticalSignature(overload1.ParameterList[i].ResolvedEntityType.Item, overload2.ParameterList[i].ResolvedEntityType.Item))
-                    return false;
-
-            if (overload1.ResultList.Count != overload2.ResultList.Count)
-                return false;
+            {
+                //TODO: fix that
+                if (overload1.ParameterList[i].ResolvedEntityType.IsAssigned && overload2.ParameterList[i].ResolvedEntityType.IsAssigned)
+                {
+                    Debug.Assert(overload1.ParameterList[i].ResolvedEntityType.IsAssigned);
+                    Debug.Assert(overload2.ParameterList[i].ResolvedEntityType.IsAssigned);
+                    IsIdentical &= ObjectType.TypesHaveIdenticalSignature(overload1.ParameterList[i].ResolvedEntityType.Item, overload2.ParameterList[i].ResolvedEntityType.Item);
+                }
+            }
 
             for (int i = 0; i < overload1.ResultList.Count && i < overload2.ResultList.Count; i++)
-                if (!ObjectType.TypesHaveIdenticalSignature(overload1.ResultList[i].ResolvedEntityType.Item, overload2.ResultList[i].ResolvedEntityType.Item))
-                    return false;
+            {
+                //TODO: fix that
+                if (overload1.ResultList[i].ResolvedEntityType.IsAssigned && overload2.ResultList[i].ResolvedEntityType.IsAssigned)
+                {
+                    Debug.Assert(overload1.ResultList[i].ResolvedEntityType.IsAssigned);
+                    Debug.Assert(overload2.ResultList[i].ResolvedEntityType.IsAssigned);
+                    IsIdentical &= ObjectType.TypesHaveIdenticalSignature(overload1.ResultList[i].ResolvedEntityType.Item, overload2.ResultList[i].ResolvedEntityType.Item);
+                }
+            }
 
-            if (!Assertion.IsAssertionListEqual(overload1.RequireList, overload2.RequireList))
-                return false;
+            IsIdentical &= Assertion.IsAssertionListEqual(overload1.RequireList, overload2.RequireList);
+            IsIdentical &= Assertion.IsAssertionListEqual(overload1.EnsureList, overload2.EnsureList);
+            IsIdentical &= ExceptionHandler.IdenticalExceptionSignature(overload1.ExceptionIdentifierList, overload2.ExceptionIdentifierList);
 
-            if (!Assertion.IsAssertionListEqual(overload1.EnsureList, overload2.EnsureList))
-                return false;
-
-            if (!ExceptionHandler.IdenticalExceptionSignature(overload1.ExceptionIdentifierList, overload2.ExceptionIdentifierList))
-                return false;
-
-            return true;
+            return IsIdentical;
         }
         #endregion
     }

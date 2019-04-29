@@ -60,7 +60,8 @@
                 Debug.Assert(Inheritance.ClassGroup.IsAssigned);
                 IClass BaseClass = Inheritance.ClassGroup.Item;
 
-                node.ClassGroupList.Add(BaseClass);
+                if (BaseClass != Class.ClassAny)
+                    node.ClassGroupList.Add(BaseClass);
             }
 
             node.ClassGroupList.Seal();
