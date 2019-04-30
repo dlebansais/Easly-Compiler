@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
     using Easly;
 
@@ -166,6 +167,12 @@
             }
 
             PropertyType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType, EntityTypeName, EntityType, node.PropertyKind, GetEnsureList, GetExceptionIdentifierList, SetRequireList, SetExceptionIdentifierList, out ITypeName ResolvedPropertyTypeName, out ICompiledType ResolvedPropertyType);
+
+#if DEBUG
+            // TODO: remove this code, for code coverage purpose only.
+            Debug.Assert(!ResolvedPropertyType.IsReference);
+            Debug.Assert(ResolvedPropertyType.IsValue);
+#endif
 
             node.ResolvedEntityTypeName.Item = EntityTypeName;
             node.ResolvedEntityType.Item = EntityType;

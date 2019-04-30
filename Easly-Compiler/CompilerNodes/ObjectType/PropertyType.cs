@@ -89,11 +89,11 @@
             ResolvedBaseType.Item = baseType;
             ResolvedEntityTypeName.Item = entityTypeName;
             ResolvedEntityType.Item = entityType;
-            PropertyKind = PropertyKind;
-            GetEnsureList = GetEnsureList;
-            GetExceptionIdentifierList = GetExceptionIdentifierList;
-            SetRequireList = SetRequireList;
-            SetExceptionIdentifierList = SetExceptionIdentifierList;
+            PropertyKind = propertyKind;
+            GetEnsureList = getEnsureList;
+            GetExceptionIdentifierList = getExceptionIdentifierList;
+            SetRequireList = setRequireList;
+            SetExceptionIdentifierList = setExceptionIdentifierList;
         }
         #endregion
 
