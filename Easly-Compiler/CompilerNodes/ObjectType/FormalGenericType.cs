@@ -96,15 +96,17 @@
         {
             get
             {
-                if (FormalGeneric.ResolvedConformanceTable.IsSealed)
-                    foreach (KeyValuePair<ITypeName, ICompiledType> Entry in FormalGeneric.ResolvedConformanceTable)
-                    {
-                        ICompiledType ConformanceType = Entry.Value;
-                        if (ConformanceType.IsReference)
-                            return true;
-                    }
+                bool Result = false;
 
-                return false;
+                Debug.Assert(FormalGeneric.ResolvedConformanceTable.IsSealed);
+
+                foreach (KeyValuePair<ITypeName, ICompiledType> Entry in FormalGeneric.ResolvedConformanceTable)
+                {
+                    ICompiledType ConformanceType = Entry.Value;
+                    Result |= ConformanceType.IsReference;
+                }
+
+                return Result;
             }
         }
 
@@ -115,15 +117,17 @@
         {
             get
             {
-                if (FormalGeneric.ResolvedConformanceTable.IsSealed)
-                    foreach (KeyValuePair<ITypeName, ICompiledType> Entry in FormalGeneric.ResolvedConformanceTable)
-                    {
-                        ICompiledType ConformanceType = Entry.Value;
-                        if (ConformanceType.IsValue)
-                            return true;
-                    }
+                bool Result = false;
 
-                return false;
+                Debug.Assert(FormalGeneric.ResolvedConformanceTable.IsSealed);
+
+                foreach (KeyValuePair<ITypeName, ICompiledType> Entry in FormalGeneric.ResolvedConformanceTable)
+                {
+                    ICompiledType ConformanceType = Entry.Value;
+                    Result |= ConformanceType.IsValue;
+                }
+
+                return Result;
             }
         }
 

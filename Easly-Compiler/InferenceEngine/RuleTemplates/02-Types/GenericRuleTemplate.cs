@@ -93,6 +93,11 @@
             TypeName ResolvedTypeName = new TypeName(ValidText);
             IFormalGenericType GenericFormalType = new FormalGenericType(node, ResolvedTypeName);
 
+#if DEBUG
+            // TODO: remove this code, for code coverage purpose only.
+            string TypeString = GenericFormalType.ToString();
+#endif
+
             Debug.Assert(!node.ResolvedGenericTypeName.IsAssigned);
             Debug.Assert(!node.ResolvedGenericType.IsAssigned);
 

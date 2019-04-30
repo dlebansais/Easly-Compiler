@@ -270,7 +270,7 @@ namespace CompilerNode
                     ImportedClassTable.Add(ValidClassIdentifier, Imported);
 
 #if DEBUG
-                    // For code coverage purpose
+                    // TODO: remove this code, for code coverage purpose only.
                     string ImportString = Imported.ToString();
 #endif
                 }

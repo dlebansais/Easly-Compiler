@@ -104,13 +104,16 @@
         /// <param name="setExceptionIdentifierList">The list of known exceptions thrown for the setter.</param>
         public IndexerType(ITypeName baseTypeName, IClassType baseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType indexerKind, IList<IEntityDeclaration> indexParameterList, BaseNode.ParameterEndStatus parameterEnd, IList<IAssertion> getRequireList, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IAssertion> setEnsureList, IList<IIdentifier> setExceptionIdentifierList)
         {
+            BaseType = baseType;
+            EntityType = null;
+            ParameterEnd = parameterEnd;
+            IndexerKind = indexerKind;
+
             ResolvedBaseTypeName.Item = baseTypeName;
             ResolvedBaseType.Item = baseType;
             ResolvedEntityTypeName.Item = entityTypeName;
             ResolvedEntityType.Item = entityType;
-            IndexerKind = indexerKind;
             IndexParameterList = indexParameterList;
-            ParameterEnd = parameterEnd;
             GetRequireList = getRequireList;
             GetEnsureList = getEnsureList;
             GetExceptionIdentifierList = getExceptionIdentifierList;
@@ -654,6 +657,13 @@
         {
             IIndexerType ResolvedIndexerType = new IndexerType(baseTypeName, (IClassType)baseType, entityTypeName, entityType, indexerKind, indexParameterList, parameterEnd, getRequireList, getEnsureList, getExceptionIdentifierList, setRequireList, setEnsureList, setExceptionIdentifierList);
 
+#if DEBUG
+            // TODO: remove this code, for code coverage purpose only.
+            string TypeString = ResolvedIndexerType.ToString();
+            Debug.Assert(!ResolvedIndexerType.IsReference);
+            Debug.Assert(ResolvedIndexerType.IsValue);
+#endif
+
             resolvedTypeName = new TypeName(ResolvedIndexerType.TypeFriendlyName);
             resolvedType = ResolvedIndexerType;
         }
@@ -699,7 +709,16 @@
         /// <summary>
         /// Gets a string representation of the expression.
         /// </summary>
-        public string TypeToString { get { return $"indexer {{{((IObjectType)BaseType).TypeToString}}}"; } }
+        public string TypeToString
+        {
+            get
+            {
+                if (EntityType != null)
+                    return $"indexer {{{((IObjectType)BaseType).TypeToString}}}";
+                else
+                    return $"indexer {{{ResolvedBaseType.Item.BaseClass.EntityName.Text}}}";
+            }
+        }
 
         /// <summary></summary>
         public override string ToString()

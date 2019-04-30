@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
     using Easly;
 
@@ -49,6 +50,9 @@
 
             BaseNode.CopySemantic CopyConstraint = BaseNode.CopySemantic.Any;
 
+            foreach (IConstraint ConstraintItem in node.ConstraintList)
+                Success &= CheckConstraintConsistency(node, ConstraintItem, ref CopyConstraint);
+
             if (node.DefaultValue.IsAssigned)
             {
                 if (node.ResolvedDefaultType.Item.IsReference && CopyConstraint == BaseNode.CopySemantic.Value)
@@ -64,21 +68,12 @@
             }
 
             if (Success)
-            {
-                BaseNode.CopySemantic InducedConstraint = CopyConstraint;
-
-                foreach (IConstraint ConstraintItem in node.ConstraintList)
-                {
-                    Success = CheckConstraintConsistency(node, ConstraintItem, ref InducedConstraint);
-                    if (!Success)
-                        break;
-                }
-            }
+                data = CopyConstraint;
 
             return Success;
         }
 
-        private bool CheckConstraintConsistency(IGeneric node, IConstraint constraintItem, ref BaseNode.CopySemantic inducedConstraint)
+        private bool CheckConstraintConsistency(IGeneric node, IConstraint constraintItem, ref BaseNode.CopySemantic copyConstraint)
         {
             bool Success = true;
 
@@ -93,28 +88,28 @@
                 Success = false;
             }
 
-            if (inducedConstraint == BaseNode.CopySemantic.Reference)
+            if (copyConstraint == BaseNode.CopySemantic.Reference)
             {
                 if (BaseType.IsValue)
                 {
-                    AddSourceError(new ErrorReferenceValueConstraintConformance(node, node.ResolvedDefaultType.Item, inducedConstraint));
+                    AddSourceError(new ErrorReferenceValueConstraintConformance(node, node.ResolvedDefaultType.Item, copyConstraint));
                     Success = false;
                 }
             }
-            else if (inducedConstraint == BaseNode.CopySemantic.Value)
+            else if (copyConstraint == BaseNode.CopySemantic.Value)
             {
                 if (BaseType.IsReference)
                 {
-                    AddSourceError(new ErrorReferenceValueConstraintConformance(node, node.ResolvedDefaultType.Item, inducedConstraint));
+                    AddSourceError(new ErrorReferenceValueConstraintConformance(node, node.ResolvedDefaultType.Item, copyConstraint));
                     Success = false;
                 }
             }
             else
             {
                 if (BaseType.IsReference)
-                    inducedConstraint = BaseNode.CopySemantic.Reference;
+                    copyConstraint = BaseNode.CopySemantic.Reference;
                 else if (BaseType.IsValue)
-                    inducedConstraint = BaseNode.CopySemantic.Value;
+                    copyConstraint = BaseNode.CopySemantic.Value;
             }
 
             return Success;
@@ -128,6 +123,26 @@
         public override void Apply(IGeneric node, object data)
         {
             node.ResolvedConformanceTable.Seal();
+
+            Debug.Assert(node.ResolvedGenericType.IsAssigned);
+            IFormalGenericType GenericType = node.ResolvedGenericType.Item;
+
+            BaseNode.CopySemantic CopyConstraint = (BaseNode.CopySemantic)data;
+
+            switch (CopyConstraint)
+            {
+                case BaseNode.CopySemantic.Any:
+                    Debug.Assert(!GenericType.IsReference && !GenericType.IsValue);
+                    break;
+
+                case BaseNode.CopySemantic.Reference:
+                    Debug.Assert(GenericType.IsReference && !GenericType.IsValue);
+                    break;
+
+                case BaseNode.CopySemantic.Value:
+                    Debug.Assert(!GenericType.IsReference && GenericType.IsValue);
+                    break;
+            }
         }
         #endregion
     }

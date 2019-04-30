@@ -766,7 +766,7 @@ namespace CompilerNode
                 ImportedClassTable.Add(ValidClassName, SelfImport);
 
 #if DEBUG
-                // For code coverage purpose
+                // TODO: remove this code, for code coverage purpose only.
                 string ImportString = SelfImport.ToString();
 #endif
             }

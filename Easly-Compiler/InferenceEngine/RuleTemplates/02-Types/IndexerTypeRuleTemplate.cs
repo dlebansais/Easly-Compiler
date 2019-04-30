@@ -96,6 +96,13 @@
             ITypeName EntityTypeName = EntityTypeItem.ResolvedTypeName.Item;
             ICompiledType EntityType = EntityTypeItem.ResolvedType.Item;
 
+#if DEBUG
+            // TODO: remove this code, for code coverage purpose only.
+            string TypeString = node.ToString();
+            Debug.Assert(!node.IsReference);
+            Debug.Assert(node.IsValue);
+#endif
+
             IndexerType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType, EntityTypeName, EntityType, node.IndexerKind, node.IndexParameterList, node.ParameterEnd, node.GetRequireList, node.GetEnsureList, node.GetExceptionIdentifierList, node.SetRequireList, node.SetEnsureList, node.SetExceptionIdentifierList, out ITypeName ResolvedTypeName, out ICompiledType ResolvedType);
 
             node.ResolvedTypeName.Item = ResolvedTypeName;
