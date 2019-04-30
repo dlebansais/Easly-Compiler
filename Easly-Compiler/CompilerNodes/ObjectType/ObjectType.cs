@@ -1292,10 +1292,12 @@
                 IEntityDeclaration BaseField = baseType.EntityDeclarationList[i];
                 IEntityDeclaration DerivedField = derivedType.EntityDeclarationList[i];
 
-                if (!DerivedField.ResolvedEntityType.IsAssigned || !BaseField.ResolvedEntityType.IsAssigned)
-                    return false;
+                Debug.Assert(DerivedField.ValidEntity.IsAssigned);
+                Debug.Assert(DerivedField.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                Debug.Assert(BaseField.ValidEntity.IsAssigned);
+                Debug.Assert(BaseField.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                if (!TypeConformToBase(DerivedField.ResolvedEntityType.Item, BaseField.ResolvedEntityType.Item, substitutionTypeTable, errorList, sourceLocation, reportError))
+                if (!TypeConformToBase(DerivedField.ValidEntity.Item.ResolvedFeatureType.Item, BaseField.ValidEntity.Item.ResolvedFeatureType.Item, substitutionTypeTable, errorList, sourceLocation, reportError))
                     return false;
             }
 

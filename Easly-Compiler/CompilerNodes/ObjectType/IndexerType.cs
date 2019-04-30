@@ -84,6 +84,10 @@
         /// </summary>
         public IndexerType()
         {
+            FeatureTable.Seal();
+            DiscreteTable.Seal();
+            ConformanceTable.Seal();
+            ExportTable.Seal();
         }
 
         /// <summary>
@@ -103,6 +107,7 @@
         /// <param name="setEnsureList">The list of ensure assertions for the setter.</param>
         /// <param name="setExceptionIdentifierList">The list of known exceptions thrown for the setter.</param>
         public IndexerType(ITypeName baseTypeName, IClassType baseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType indexerKind, IList<IEntityDeclaration> indexParameterList, BaseNode.ParameterEndStatus parameterEnd, IList<IAssertion> getRequireList, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IAssertion> setEnsureList, IList<IIdentifier> setExceptionIdentifierList)
+            : this()
         {
             BaseType = baseType;
             EntityType = null;
@@ -558,19 +563,20 @@
             foreach (KeyValuePair<ITypeName, ICompiledType> Entry in typeTable)
                 if (Entry.Value is IIndexerType AsIndexerType)
                 {
-                    if (!IsSameTypes(AsIndexerType, baseType, entityType, indexerKind))
-                        continue;
+                    bool IsSameIndexer = true;
 
-                    if (!IsSameParameters(AsIndexerType, indexParameterList, parameterEnd))
-                        continue;
+                    IsSameIndexer &= IsSameTypes(AsIndexerType, baseType, entityType, indexerKind);
+                    IsSameIndexer &= IsSameParameters(AsIndexerType, indexParameterList, parameterEnd);
+                    IsSameIndexer &= IsSameContract(AsIndexerType, getRequireList, getEnsureList, getExceptionIdentifierList, setRequireList, setEnsureList, setExceptionIdentifierList);
 
-                    if (!IsSameContract(AsIndexerType, getRequireList, getEnsureList, getExceptionIdentifierList, setRequireList, setEnsureList, setExceptionIdentifierList))
-                        continue;
+                    if (IsSameIndexer)
+                    {
+                        Debug.Assert(!Result);
 
-                    resolvedTypeName = Entry.Key;
-                    resolvedType = AsIndexerType;
-                    Result = true;
-                    break;
+                        resolvedTypeName = Entry.Key;
+                        resolvedType = AsIndexerType;
+                        Result = true;
+                    }
                 }
 
             return Result;
@@ -578,61 +584,41 @@
 
         private static bool IsSameTypes(IIndexerType indexerType, ICompiledType baseType, ICompiledType entityType, BaseNode.UtilityType indexerKind)
         {
-            if (indexerType.ResolvedBaseType.Item != baseType)
-                return false;
+            bool IsSame = true;
 
-            if (indexerType.ResolvedEntityType.Item != entityType)
-                return false;
+            IsSame &= indexerType.ResolvedBaseType.Item == baseType;
+            IsSame &= indexerType.ResolvedEntityType.Item == entityType;
+            IsSame &= indexerType.IndexerKind == indexerKind;
 
-            if (indexerType.IndexerKind != indexerKind)
-                return false;
-
-            return true;
+            return IsSame;
         }
 
         private static bool IsSameParameters(IIndexerType indexerType, IList<IEntityDeclaration> indexParameterList, BaseNode.ParameterEndStatus parameterEnd)
         {
-            if (indexerType.IndexParameterList.Count != indexParameterList.Count)
-                return false;
+            bool IsSame = true;
 
-            bool AllParametersEqual = true;
-            for (int i = 0; i < indexParameterList.Count; i++)
-                if (indexParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item != indexerType.IndexParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item)
-                {
-                    AllParametersEqual = false;
-                    break;
-                }
+            IsSame &= indexerType.IndexParameterList.Count == indexParameterList.Count;
 
-            if (!AllParametersEqual)
-                return false;
+            for (int i = 0; i < indexerType.IndexParameterList.Count && i < indexParameterList.Count; i++)
+                IsSame &= indexParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item == indexerType.IndexParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item;
 
-            if (indexerType.ParameterEnd != parameterEnd)
-                return false;
+            IsSame &= indexerType.ParameterEnd == parameterEnd;
 
-            return true;
+            return IsSame;
         }
 
         private static bool IsSameContract(IIndexerType indexerType, IList<IAssertion> getRequireList, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IAssertion> setEnsureList, IList<IIdentifier> setExceptionIdentifierList)
         {
-            if (!Assertion.IsAssertionListEqual(indexerType.GetRequireList, getRequireList))
-                return false;
+            bool IsSame = true;
 
-            if (!Assertion.IsAssertionListEqual(indexerType.GetEnsureList, getEnsureList))
-                return false;
+            IsSame &= Assertion.IsAssertionListEqual(indexerType.GetRequireList, getRequireList);
+            IsSame &= Assertion.IsAssertionListEqual(indexerType.GetEnsureList, getEnsureList);
+            IsSame &= ExceptionHandler.IdenticalExceptionSignature(indexerType.GetExceptionIdentifierList, getExceptionIdentifierList);
+            IsSame &= Assertion.IsAssertionListEqual(indexerType.SetRequireList, setRequireList);
+            IsSame &= Assertion.IsAssertionListEqual(indexerType.SetEnsureList, setEnsureList);
+            IsSame &= ExceptionHandler.IdenticalExceptionSignature(indexerType.SetExceptionIdentifierList, setExceptionIdentifierList);
 
-            if (!ExceptionHandler.IdenticalExceptionSignature(indexerType.GetExceptionIdentifierList, getExceptionIdentifierList))
-                return false;
-
-            if (!Assertion.IsAssertionListEqual(indexerType.SetRequireList, setRequireList))
-                return false;
-
-            if (!Assertion.IsAssertionListEqual(indexerType.SetEnsureList, setEnsureList))
-                return false;
-
-            if (!ExceptionHandler.IdenticalExceptionSignature(indexerType.SetExceptionIdentifierList, setExceptionIdentifierList))
-                return false;
-
-            return true;
+            return IsSame;
         }
 
         /// <summary>

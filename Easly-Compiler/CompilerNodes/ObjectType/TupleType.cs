@@ -40,6 +40,10 @@ namespace CompilerNode
         /// </summary>
         public TupleType()
         {
+            FeatureTable.Seal();
+            DiscreteTable.Seal();
+            ConformanceTable.Seal();
+            ExportTable.Seal();
         }
 
         /// <summary>
@@ -47,10 +51,17 @@ namespace CompilerNode
         /// </summary>
         /// <param name="entityDeclarationList">The resolved list of fields.</param>
         /// <param name="sharing">The type sharing.</param>
-        public TupleType(IList<IEntityDeclaration> entityDeclarationList, BaseNode.SharingType sharing)
+        /// <param name="renamedFieldTable">The list of fields to rename.</param>
+        public TupleType(IList<IEntityDeclaration> entityDeclarationList, BaseNode.SharingType sharing, IHashtableEx<IFeatureName, IFeatureInstance> renamedFieldTable)
         {
             EntityDeclarationList = entityDeclarationList;
             Sharing = sharing;
+
+            FeatureTable.Merge(renamedFieldTable);
+            FeatureTable.Seal();
+            DiscreteTable.Seal();
+            ConformanceTable.Seal();
+            ExportTable.Seal();
         }
         #endregion
 
@@ -285,8 +296,13 @@ namespace CompilerNode
             IList<IEntityDeclaration> InstancedFieldList = new List<IEntityDeclaration>();
             foreach (IEntityDeclaration Field in EntityDeclarationList)
             {
-                ITypeName InstancedFieldTypeName = Field.ResolvedEntityTypeName.Item;
-                ICompiledType InstancedFieldType = Field.ResolvedEntityType.Item;
+                Debug.Assert(Field.ValidEntity.IsAssigned);
+                Debug.Assert(Field.ValidEntity.Item.ResolvedFeatureTypeName.IsAssigned);
+                Debug.Assert(Field.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+
+                ITypeName InstancedFieldTypeName = Field.ValidEntity.Item.ResolvedFeatureTypeName.Item;
+                ICompiledType InstancedFieldType = Field.ValidEntity.Item.ResolvedFeatureType.Item;
+
                 Success &= InstancedFieldType.InstanciateType(instancingClassType, ref InstancedFieldTypeName, ref InstancedFieldType, errorList);
 
                 IEntityDeclaration InstancedField = new EntityDeclaration();
@@ -295,7 +311,7 @@ namespace CompilerNode
 
                 InstancedFieldList.Add(InstancedField);
 
-                if (InstancedFieldType != Field.ResolvedEntityType.Item)
+                if (InstancedFieldType != Field.ValidEntity.Item.ResolvedFeatureType.Item)
                     IsNewInstance = true;
             }
 
@@ -344,18 +360,22 @@ namespace CompilerNode
                     {
                         bool AllFieldsEqual = true;
                         for (int i = 0; i < entityDeclarationList.Count; i++)
-                            if (entityDeclarationList[i].ResolvedEntityType.Item != AsTupleType.EntityDeclarationList[i].ResolvedEntityType.Item)
-                            {
-                                AllFieldsEqual = false;
-                                break;
-                            }
+                        {
+                            Debug.Assert(entityDeclarationList[i].ValidEntity.IsAssigned);
+                            Debug.Assert(entityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                            Debug.Assert(AsTupleType.EntityDeclarationList[i].ValidEntity.IsAssigned);
+                            Debug.Assert(AsTupleType.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+
+                            AllFieldsEqual &= entityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.Item == AsTupleType.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.Item;
+                        }
 
                         if (AllFieldsEqual)
                         {
+                            Debug.Assert(!Result);
+
                             resolvedTypeName = Entry.Key;
                             resolvedType = AsTupleType;
                             Result = true;
-                            break;
                         }
                     }
 
@@ -371,7 +391,7 @@ namespace CompilerNode
         /// <param name="resolvedType">The type upon return.</param>
         public static void BuildType(IList<IEntityDeclaration> entityDeclarationList, BaseNode.SharingType sharing, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
-            ITupleType ResolvedTupleType = new TupleType(entityDeclarationList, sharing);
+            ITupleType ResolvedTupleType = new TupleType(entityDeclarationList, sharing, new HashtableEx<IFeatureName, IFeatureInstance>());
 
             resolvedTypeName = new TypeName(ResolvedTupleType.TypeFriendlyName);
             resolvedType = ResolvedTupleType;
@@ -411,11 +431,10 @@ namespace CompilerNode
         /// <param name="renamedFieldTable">The rename table for fields.</param>
         public ITupleType CloneWithRenames(IHashtableEx<IFeatureName, IFeatureInstance> renamedFieldTable)
         {
-            ITupleType ClonedTupleType = new TupleType(EntityDeclarationList, Sharing);
-            ClonedTupleType.ResolvedTypeName.Item = new TypeName(ResolvedTypeName.Item.Name);
-            ClonedTupleType.ResolvedType.Item = ResolvedType.Item;
-            ClonedTupleType.FeatureTable.Merge(renamedFieldTable);
-            ClonedTupleType.FeatureTable.Seal();
+            ITupleType ClonedTupleType = new TupleType(EntityDeclarationList, Sharing, renamedFieldTable);
+
+            //ClonedTupleType.ResolvedTypeName.Item = new TypeName(ResolvedTypeName.Item.Name);
+            //ClonedTupleType.ResolvedType.Item = ResolvedType.Item;
 
             return ClonedTupleType;
         }

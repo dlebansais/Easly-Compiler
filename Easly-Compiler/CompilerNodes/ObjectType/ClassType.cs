@@ -404,19 +404,16 @@
                             ICompiledType TypeArgument = TypeArgumentEntry.Value;
                             ICompiledType ResolvedTypeArgument = ResolvedTypeArgumentTable[GenericName];
 
-                            if (TypeArgument != ResolvedTypeArgument)
-                            {
-                                AllArgumentsEqual = false;
-                                break;
-                            }
+                            AllArgumentsEqual &= TypeArgument == ResolvedTypeArgument;
                         }
 
                         if (AllArgumentsEqual)
                         {
+                            Debug.Assert(!Result);
+
                             resolvedTypeName = Entry.Key;
                             resolvedType = AsClassType;
                             Result = true;
-                            break;
                         }
                     }
 

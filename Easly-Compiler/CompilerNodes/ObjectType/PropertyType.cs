@@ -64,6 +64,10 @@
         /// </summary>
         public PropertyType()
         {
+            FeatureTable.Seal();
+            DiscreteTable.Seal();
+            ConformanceTable.Seal();
+            ExportTable.Seal();
         }
 
         /// <summary>
@@ -79,6 +83,7 @@
         /// <param name="setRequireList">The list of require assertions for the setter.</param>
         /// <param name="setExceptionIdentifierList">The list of known exceptions thrown for the setter.</param>
         public PropertyType(ITypeName baseTypeName, IClassType baseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType propertyKind, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IIdentifier> setExceptionIdentifierList)
+            : this()
         {
             ResolvedBaseTypeName.Item = baseTypeName;
             ResolvedBaseType.Item = baseType;
@@ -446,31 +451,24 @@
             foreach (KeyValuePair<ITypeName, ICompiledType> Entry in typeTable)
                 if (Entry.Value is IPropertyType AsPropertyType)
                 {
-                    if (AsPropertyType.ResolvedBaseType.Item != baseType)
-                        continue;
+                    bool IsSame = true;
 
-                    if (AsPropertyType.ResolvedEntityType.Item != entityType)
-                        continue;
+                    IsSame &= AsPropertyType.ResolvedBaseType.Item == baseType;
+                    IsSame &= AsPropertyType.ResolvedEntityType.Item == entityType;
+                    IsSame &= AsPropertyType.PropertyKind == propertyKind;
+                    IsSame &= Assertion.IsAssertionListEqual(AsPropertyType.GetEnsureList, getEnsureList);
+                    IsSame &= ExceptionHandler.IdenticalExceptionSignature(AsPropertyType.GetExceptionIdentifierList, getExceptionIdentifierList);
+                    IsSame &= Assertion.IsAssertionListEqual(AsPropertyType.SetRequireList, setRequireList);
+                    IsSame &= ExceptionHandler.IdenticalExceptionSignature(AsPropertyType.SetExceptionIdentifierList, setExceptionIdentifierList);
 
-                    if (AsPropertyType.PropertyKind != propertyKind)
-                        continue;
+                    if (IsSame)
+                    {
+                        Debug.Assert(!Result);
 
-                    if (!Assertion.IsAssertionListEqual(AsPropertyType.GetEnsureList, getEnsureList))
-                        continue;
-
-                    if (!ExceptionHandler.IdenticalExceptionSignature(AsPropertyType.GetExceptionIdentifierList, getExceptionIdentifierList))
-                        continue;
-
-                    if (!Assertion.IsAssertionListEqual(AsPropertyType.SetRequireList, setRequireList))
-                        continue;
-
-                    if (!ExceptionHandler.IdenticalExceptionSignature(AsPropertyType.SetExceptionIdentifierList, setExceptionIdentifierList))
-                        continue;
-
-                    resolvedTypeName = Entry.Key;
-                    resolvedType = AsPropertyType;
-                    Result = true;
-                    break;
+                        resolvedTypeName = Entry.Key;
+                        resolvedType = AsPropertyType;
+                        Result = true;
+                    }
                 }
 
             return Result;

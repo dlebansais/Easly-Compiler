@@ -359,18 +359,15 @@ namespace CompilerNode
                     {
                         bool AllOverloadsEqual = true;
                         foreach (ICommandOverloadType OverloadItem in overloadList)
-                            if (!IsCommandOverloadMatching(typeTable, OverloadItem, AsProcedureType.OverloadList))
-                            {
-                                AllOverloadsEqual = false;
-                                break;
-                            }
+                            AllOverloadsEqual &= IsCommandOverloadMatching(typeTable, OverloadItem, AsProcedureType.OverloadList);
 
                         if (AllOverloadsEqual)
                         {
+                            Debug.Assert(!Result);
+
                             resolvedTypeName = Entry.Key;
                             resolvedType = AsProcedureType;
                             Result = true;
-                            break;
                         }
                     }
 
@@ -385,47 +382,36 @@ namespace CompilerNode
         /// <param name="overloadList">The list of other overloads in the candidate procedure type.</param>
         public static bool IsCommandOverloadMatching(IHashtableEx<ITypeName, ICompiledType> typeTable, ICommandOverloadType overload, IList<ICommandOverloadType> overloadList)
         {
+            bool IsOverloadFound = false;
+
             foreach (ICommandOverloadType Item in overloadList)
             {
-                if (overload.ParameterList.Count != Item.ParameterList.Count)
-                    continue;
+                bool IsMatching = true;
 
-                bool AllParametersMatch = true;
-                for (int i = 0; i < overload.ParameterList.Count; i++)
+                IsMatching &= overload.ParameterList.Count == Item.ParameterList.Count;
+
+                for (int i = 0; i < overload.ParameterList.Count && i < Item.ParameterList.Count; i++)
                 {
-                    if (overload.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item != Item.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item)
-                    {
-                        AllParametersMatch = false;
-                        break;
-                    }
+                    IsMatching &= overload.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item == Item.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item;
 
                     IName overloadName = (IName)overload.ParameterList[i].EntityName;
                     IName ItemName = (IName)Item.ParameterList[i].EntityName;
-                    if (overloadName != null && ItemName != null && overloadName.ValidText.Item != ItemName.ValidText.Item)
-                    {
-                        AllParametersMatch = false;
-                        break;
-                    }
+
+                    Debug.Assert(overloadName != null);
+                    Debug.Assert(ItemName != null);
+
+                    IsMatching &= overloadName.ValidText.Item == ItemName.ValidText.Item;
                 }
-                if (!AllParametersMatch)
-                    continue;
 
-                if (overload.ParameterEnd != Item.ParameterEnd)
-                    continue;
+                IsMatching &= overload.ParameterEnd == Item.ParameterEnd;
+                IsMatching &= Assertion.IsAssertionListEqual(overload.RequireList, Item.RequireList);
+                IsMatching &= Assertion.IsAssertionListEqual(overload.EnsureList, Item.EnsureList);
+                IsMatching &= ExceptionHandler.IdenticalExceptionSignature(overload.ExceptionIdentifierList, Item.ExceptionIdentifierList);
 
-                if (!Assertion.IsAssertionListEqual(overload.RequireList, Item.RequireList))
-                    continue;
-
-                if (!Assertion.IsAssertionListEqual(overload.EnsureList, Item.EnsureList))
-                    continue;
-
-                if (!ExceptionHandler.IdenticalExceptionSignature(overload.ExceptionIdentifierList, Item.ExceptionIdentifierList))
-                    continue;
-
-                return true;
+                IsOverloadFound |= IsMatching;
             }
 
-            return false;
+            return IsOverloadFound;
         }
 
         /// <summary>

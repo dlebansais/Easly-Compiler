@@ -381,11 +381,7 @@ namespace CompilerNode
                     {
                         bool AllOverloadsEqual = true;
                         foreach (IQueryOverloadType OverloadItem in overloadList)
-                            if (!IsQueryOverloadMatching(typeTable, OverloadItem, AsFunctionType.OverloadList))
-                            {
-                                AllOverloadsEqual = false;
-                                break;
-                            }
+                            AllOverloadsEqual &= IsQueryOverloadMatching(typeTable, OverloadItem, AsFunctionType.OverloadList);
 
                         if (AllOverloadsEqual)
                         {
