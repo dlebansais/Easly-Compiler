@@ -466,14 +466,12 @@
             ITypeName InstancedBaseTypeName = ResolvedBaseTypeName.Item;
             ICompiledType InstancedBaseType = ResolvedBaseType.Item;
             Success &= InstancedBaseType.InstanciateType(instancingClassType, ref InstancedBaseTypeName, ref InstancedBaseType, errorList);
-            if (InstancedBaseType != ResolvedBaseType.Item)
-                IsNewInstance = true;
+            IsNewInstance |= InstancedBaseType != ResolvedBaseType.Item;
 
             ITypeName InstancedEntityTypeName = ResolvedEntityTypeName.Item;
             ICompiledType InstancedEntityType = ResolvedEntityType.Item;
             Success &= InstancedEntityType.InstanciateType(instancingClassType, ref InstancedEntityTypeName, ref InstancedEntityType, errorList);
-            if (InstancedEntityType != ResolvedEntityType.Item)
-                IsNewInstance = true;
+            IsNewInstance |= InstancedEntityType != ResolvedEntityType.Item;
 
             IList<IEntityDeclaration> InstancedIndexParameterList = new List<IEntityDeclaration>();
             foreach (IEntityDeclaration Parameter in IndexParameterList)
@@ -493,12 +491,11 @@
                     Success &= ScopeAttributeFeature.Create(Parameter, ParameterName.ValidText.Item, InstancedParameterTypeName, InstancedParameterType, (IExpression)Parameter.DefaultValue.Item, errorList, out NewEntity);
                 else
                     Success &= ScopeAttributeFeature.Create(Parameter, ParameterName.ValidText.Item, InstancedParameterTypeName, InstancedParameterType, errorList, out NewEntity);
-                InstancedParameter.ValidEntity.Item = NewEntity;
+                IsNewInstance |= InstancedParameterType != Parameter.ValidEntity.Item.ResolvedFeatureType.Item;
 
+                InstancedParameter.ValidEntity.Item = NewEntity;
                 InstancedIndexParameterList.Add(InstancedParameter);
 
-                if (InstancedParameterType != Parameter.ValidEntity.Item.ResolvedFeatureType.Item)
-                    IsNewInstance = true;
             }
 
             if (IsNewInstance)
@@ -699,17 +696,28 @@
         {
             get
             {
-                if (EntityType != null)
-                    return $"indexer {{{((IObjectType)BaseType).TypeToString}}}";
-                else
-                    return $"indexer {{{ResolvedBaseType.Item.BaseClass.EntityName.Text}}}";
+                string Result = null;
+
+                switch (BaseType)
+                {
+                    case IObjectType AsObjectType:
+                        Result = $"indexer {{{AsObjectType.TypeToString}}}";
+                        break;
+
+                    case IClassType AsClassType:
+                        Result = $"indexer {{{AsClassType.BaseClass.EntityName.Text}}}";
+                        break;
+                }
+
+                Debug.Assert(Result != null);
+                return Result;
             }
         }
 
         /// <summary></summary>
         public override string ToString()
         {
-            return $"Function Type '{TypeToString}'";
+            return $"Indexer Type '{TypeToString}'";
         }
         #endregion
     }

@@ -144,7 +144,7 @@
         private void CheckValidityAsTypedef(ITypedefType definedType, out ITypeName validTypeName, out ICompiledType validType)
         {
             validTypeName = definedType.ReferencedTypeName.Item;
-            validType = definedType.ReferencedType.Item;
+            validType = definedType.ReferencedType2.Item;
         }
 
         /// <summary>

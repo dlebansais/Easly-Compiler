@@ -437,6 +437,11 @@
             if (!Create(baseClass, typeArgumentTable, instancingClassType, errorList, out IClassType ResolvedClassType))
                 return false;
 
+#if DEBUG
+            // TODO: remove this code, for code coverage purpose only.
+            string TypeString = ResolvedClassType.ToString();
+#endif
+
             resolvedTypeName = new TypeName(ResolvedClassType.TypeFriendlyName);
             resolvedType = ResolvedClassType;
 

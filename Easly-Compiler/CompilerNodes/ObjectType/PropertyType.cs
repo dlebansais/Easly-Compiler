@@ -85,11 +85,14 @@
         public PropertyType(ITypeName baseTypeName, IClassType baseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType propertyKind, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IIdentifier> setExceptionIdentifierList)
             : this()
         {
+            BaseType = baseType;
+            EntityType = null;
+            PropertyKind = propertyKind;
+
             ResolvedBaseTypeName.Item = baseTypeName;
             ResolvedBaseType.Item = baseType;
             ResolvedEntityTypeName.Item = entityTypeName;
             ResolvedEntityType.Item = entityType;
-            PropertyKind = propertyKind;
             GetEnsureList = getEnsureList;
             GetExceptionIdentifierList = getExceptionIdentifierList;
             SetRequireList = setRequireList;
@@ -388,14 +391,12 @@
             ITypeName InstancedBaseTypeName = ResolvedBaseTypeName.Item;
             ICompiledType InstancedBaseType = ResolvedBaseType.Item;
             Success &= InstancedBaseType.InstanciateType(instancingClassType, ref InstancedBaseTypeName, ref InstancedBaseType, errorList);
-            if (InstancedBaseType != ResolvedBaseType.Item)
-                IsNewInstance = true;
+            IsNewInstance |= InstancedBaseType != ResolvedBaseType.Item;
 
             ITypeName InstancedEntityTypeName = ResolvedEntityTypeName.Item;
             ICompiledType InstancedEntityType = ResolvedEntityType.Item;
             Success &= InstancedEntityType.InstanciateType(instancingClassType, ref InstancedEntityTypeName, ref InstancedEntityType, errorList);
-            if (InstancedEntityType != ResolvedEntityType.Item)
-                IsNewInstance = true;
+            IsNewInstance |= InstancedEntityType != ResolvedEntityType.Item;
 
             if (IsNewInstance)
                 ResolveType(instancingClassType.BaseClass.TypeTable, InstancedBaseTypeName, InstancedBaseType, InstancedEntityTypeName, InstancedEntityType, PropertyKind, GetEnsureList, GetExceptionIdentifierList, SetRequireList, SetExceptionIdentifierList, out resolvedTypeName, out resolvedType);
@@ -523,7 +524,27 @@
         /// <summary>
         /// Gets a string representation of the expression.
         /// </summary>
-        public string TypeToString { get { return $"property {{{((IObjectType)BaseType).TypeToString}}}"; } }
+        public string TypeToString
+        {
+            get
+            {
+                string Result = null;
+
+                switch (BaseType)
+                {
+                    case IObjectType AsObjectType:
+                        Result = $"property {{{AsObjectType.TypeToString}}}";
+                        break;
+
+                    case IClassType AsClassType:
+                        Result = $"property {{{AsClassType.BaseClass.EntityName.Text}}}";
+                        break;
+                }
+
+                Debug.Assert(Result != null);
+                return Result;
+            }
+        }
 
         /// <summary></summary>
         public override string ToString()

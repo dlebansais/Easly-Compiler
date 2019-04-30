@@ -203,6 +203,11 @@
             ScopeHolder.RecursiveAdd(node.FullSetScope, node.InnerSetScopes);
 
             node.ResolvedFeature.Item = node;
+
+#if DEBUG
+            // TODO: remove this code, for code coverage purpose only.
+            string TypeString = ResolvedPropertyType.ToString();
+#endif
         }
         #endregion
     }

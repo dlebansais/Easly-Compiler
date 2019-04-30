@@ -304,15 +304,13 @@ namespace CompilerNode
                 ICompiledType InstancedFieldType = Field.ValidEntity.Item.ResolvedFeatureType.Item;
 
                 Success &= InstancedFieldType.InstanciateType(instancingClassType, ref InstancedFieldTypeName, ref InstancedFieldType, errorList);
+                IsNewInstance |= InstancedFieldType != Field.ValidEntity.Item.ResolvedFeatureType.Item;
 
                 IEntityDeclaration InstancedField = new EntityDeclaration();
                 InstancedField.ResolvedEntityTypeName.Item = InstancedFieldTypeName;
                 InstancedField.ResolvedEntityType.Item = InstancedFieldType;
 
                 InstancedFieldList.Add(InstancedField);
-
-                if (InstancedFieldType != Field.ValidEntity.Item.ResolvedFeatureType.Item)
-                    IsNewInstance = true;
             }
 
             if (IsNewInstance)

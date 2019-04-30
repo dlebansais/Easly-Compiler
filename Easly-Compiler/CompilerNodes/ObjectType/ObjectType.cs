@@ -133,12 +133,13 @@
             {
                 if (DerivedClassType.BaseClass.InheritanceTable.Count == 0)
                 {
-                    if (DerivedClassType.BaseClass.CopySpecification == BaseNode.CopySemantic.Reference && (baseType == ClassType.ClassAnyReferenceType || baseType == ClassType.ClassAnyType))
-                        return true;
-                    else if (DerivedClassType.BaseClass.CopySpecification == BaseNode.CopySemantic.Value && (baseType == ClassType.ClassAnyValueType || baseType == ClassType.ClassAnyType))
-                        return true;
-                    else if (DerivedClassType.BaseClass.CopySpecification == BaseNode.CopySemantic.Any && baseType == ClassType.ClassAnyType)
-                        return true;
+                    bool IsConforming = false;
+
+                    IsConforming |= DerivedClassType.BaseClass.CopySpecification == BaseNode.CopySemantic.Reference && (baseType == ClassType.ClassAnyReferenceType || baseType == ClassType.ClassAnyType);
+                    IsConforming |= DerivedClassType.BaseClass.CopySpecification == BaseNode.CopySemantic.Value && (baseType == ClassType.ClassAnyValueType || baseType == ClassType.ClassAnyType);
+                    IsConforming |= DerivedClassType.BaseClass.CopySpecification == BaseNode.CopySemantic.Any && baseType == ClassType.ClassAnyType;
+
+                    return IsConforming;
                 }
             }
 

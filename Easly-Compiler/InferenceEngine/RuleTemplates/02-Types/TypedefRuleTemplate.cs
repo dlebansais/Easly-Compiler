@@ -129,16 +129,16 @@
             Debug.Assert(EntityName.ValidText.IsAssigned);
             string ValidText = EntityName.ValidText.Item;
 
-            IFeatureName TypedefEntityName = new FeatureName(ValidText);
+            IFeatureName ResolvedTypedefTypeName = new FeatureName(ValidText);
+            ITypedefType ResolvedTypedefType = new TypedefType();
 
-            ITypedefType ResolvedTypedefType;
-            if (node.ResolvedDefinedTypeName.IsAssigned && node.ResolvedDefinedType.IsAssigned)
-                ResolvedTypedefType = new TypedefType(node.ResolvedDefinedTypeName.Item, node.ResolvedDefinedType.Item);
-            else
-                ResolvedTypedefType = new TypedefType();
+            EmbeddingClass.LocalTypedefTable.Add(ResolvedTypedefTypeName, ResolvedTypedefType);
+            node.ValidTypedefName.Item = ResolvedTypedefTypeName;
 
-            EmbeddingClass.LocalTypedefTable.Add(TypedefEntityName, ResolvedTypedefType);
-            node.ValidTypedefName.Item = TypedefEntityName;
+#if DEBUG
+            // TODO: remove this code, for code coverage purpose only.
+            string TypeString = ResolvedTypedefType.ToString();
+#endif
         }
         #endregion
     }

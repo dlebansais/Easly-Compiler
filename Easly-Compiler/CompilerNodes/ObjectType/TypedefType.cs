@@ -18,7 +18,7 @@
         /// <summary>
         /// Resolved type of the source.
         /// </summary>
-        OnceReference<ICompiledType> ReferencedType { get; }
+        OnceReference<ICompiledType> ReferencedType2 { get; }
     }
 
     /// <summary>
@@ -26,27 +26,6 @@
     /// </summary>
     public class TypedefType : BaseNode.ObjectType, ITypedefType
     {
-        #region Init
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TypedefType"/> class.
-        /// This constructor is required for deserialization.
-        /// </summary>
-        public TypedefType()
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TypedefType"/> class.
-        /// </summary>
-        /// <param name="typeName">Resolved type name of the source.</param>
-        /// <param name="type">Resolved type of the source.</param>
-        public TypedefType(ITypeName typeName, ICompiledType type)
-        {
-            ReferencedTypeName.Item = typeName;
-            ReferencedType.Item = type;
-        }
-        #endregion
-
         #region Compiler
         /// <summary>
         /// Resolved type name of the source.
@@ -56,7 +35,7 @@
         /// <summary>
         /// Resolved type of the source.
         /// </summary>
-        public OnceReference<ICompiledType> ReferencedType { get; private set; } = new OnceReference<ICompiledType>();
+        public OnceReference<ICompiledType> ReferencedType2 { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
 
         #region Debugging
@@ -67,8 +46,9 @@
         {
             get
             {
-                string TypeString = ReferencedType.Item is IObjectType AsObjectType ? $" = {AsObjectType.TypeToString}" : string.Empty;
-                return $"typedef {ReferencedTypeName.Item.Name}{TypeString}";
+                string NameString = ReferencedTypeName.IsAssigned ? $" {ReferencedTypeName.Item.Name}" : string.Empty;
+                string TypeString = ReferencedType2.IsAssigned && ReferencedType2.Item is IObjectType AsObjectType ? $" = {AsObjectType.TypeToString}" : string.Empty;
+                return $"typedef{NameString}{TypeString}";
             }
         }
 

@@ -146,6 +146,11 @@
             node.MostCommonType.Item = MostCommonType;
 
             node.ResolvedFeature.Item = node;
+
+#if DEBUG
+            // TODO: remove this code, for code coverage purpose only.
+            string TypeString = ResolvedFunctionType.ToString();
+#endif
         }
         #endregion
     }

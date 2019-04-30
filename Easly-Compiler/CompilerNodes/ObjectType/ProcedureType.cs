@@ -54,6 +54,8 @@ namespace CompilerNode
         public ProcedureType(ITypeName baseTypeName, IClassType baseType, IList<ICommandOverloadType> overloadList)
             : this()
         {
+            BaseType = baseType;
+
             ResolvedBaseTypeName.Item = baseTypeName;
             ResolvedBaseType.Item = baseType;
             OverloadList = overloadList;
@@ -250,7 +252,7 @@ namespace CompilerNode
         {
             get
             {
-                string Result = BaseType != null ? ((IObjectType)BaseType).ResolvedTypeName.Item.Name : ResolvedBaseType.Item.TypeFriendlyName;
+                string Result = ResolvedBaseType.Item.TypeFriendlyName;
 
                 for (int i = 0; i < OverloadList.Count; i++)
                 {
@@ -298,19 +300,16 @@ namespace CompilerNode
             ITypeName InstancedBaseTypeName = ResolvedBaseTypeName.Item;
             ICompiledType InstancedBaseType = ResolvedBaseType.Item;
             Success &= InstancedBaseType.InstanciateType(instancingClassType, ref InstancedBaseTypeName, ref InstancedBaseType, errorList);
-            if (InstancedBaseType != ResolvedBaseType.Item)
-                IsNewInstance = true;
+            IsNewInstance |= InstancedBaseType != ResolvedBaseType.Item;
 
             IList<ICommandOverloadType> InstancedOverloadList = new List<ICommandOverloadType>();
             foreach (ICommandOverloadType Overload in OverloadList)
             {
                 ICommandOverloadType InstancedOverload = Overload;
                 Success &= CommandOverloadType.InstanciateCommandOverloadType(instancingClassType, ref InstancedOverload, errorList);
+                IsNewInstance |= InstancedOverload != Overload;
 
                 InstancedOverloadList.Add(InstancedOverload);
-
-                if (InstancedOverload != Overload)
-                    IsNewInstance = true;
             }
 
             if (IsNewInstance)
@@ -462,7 +461,27 @@ namespace CompilerNode
         /// <summary>
         /// Gets a string representation of the expression.
         /// </summary>
-        public string TypeToString { get { return $"procedure {{{((IObjectType)BaseType).TypeToString}}}"; } }
+        public string TypeToString
+        {
+            get
+            {
+                string Result = null;
+
+                switch (BaseType)
+                {
+                    case IObjectType AsObjectType:
+                        Result = $"procedure {{{AsObjectType.TypeToString}}}";
+                        break;
+
+                    case IClassType AsClassType:
+                        Result = $"procedure {{{AsClassType.BaseClass.EntityName.Text}}}";
+                        break;
+                }
+
+                Debug.Assert(Result != null);
+                return Result;
+            }
+        }
 
         /// <summary></summary>
         public override string ToString()

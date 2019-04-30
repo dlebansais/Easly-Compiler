@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -66,6 +67,23 @@
 
             if (!DefinedType.OriginatingTypedef.IsAssigned)
                 DefinedType.OriginatingTypedef.Item = node;
+
+            IName EntityName = (IName)node.EntityName;
+            IClass EmbeddingClass = node.EmbeddingClass;
+
+            Debug.Assert(EntityName.ValidText.IsAssigned);
+            string ValidText = EntityName.ValidText.Item;
+
+            bool IsFound = FeatureName.TableContain(EmbeddingClass.LocalTypedefTable, ValidText, out IFeatureName Key, out ITypedefType ResolvedTypedefType);
+            Debug.Assert(IsFound && ResolvedTypedefType != null);
+
+            ResolvedTypedefType.ReferencedTypeName.Item = DefinedTypeName;
+            ResolvedTypedefType.ReferencedType2.Item = DefinedType;
+
+#if DEBUG
+            // TODO: remove this code, for code coverage purpose only.
+            string TypeString = ResolvedTypedefType.ToString();
+#endif
         }
         #endregion
     }

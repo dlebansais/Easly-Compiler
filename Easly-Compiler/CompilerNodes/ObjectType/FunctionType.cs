@@ -64,6 +64,8 @@ namespace CompilerNode
         public FunctionType(ITypeName baseTypeName, IClassType baseType, IList<IQueryOverloadType> overloadList)
             : this()
         {
+            BaseType = baseType;
+
             ResolvedBaseTypeName.Item = baseTypeName;
             ResolvedBaseType.Item = baseType;
             OverloadList = overloadList;
@@ -274,7 +276,7 @@ namespace CompilerNode
         {
             get
             {
-                string Result = BaseType != null ? ((IObjectType)BaseType).ResolvedTypeName.Item.Name : ResolvedBaseType.Item.TypeFriendlyName;
+                string Result = ResolvedBaseType.Item.TypeFriendlyName;
 
                 for (int i = 0; i < OverloadList.Count; i++)
                 {
@@ -513,7 +515,27 @@ namespace CompilerNode
         /// <summary>
         /// Gets a string representation of the expression.
         /// </summary>
-        public string TypeToString { get { return $"function {{{((IObjectType)BaseType).TypeToString}}}"; } }
+        public string TypeToString
+        {
+            get
+            {
+                string Result = null;
+
+                switch (BaseType)
+                {
+                    case IObjectType AsObjectType:
+                        Result = $"function {{{AsObjectType.TypeToString}}}";
+                        break;
+
+                    case IClassType AsClassType:
+                        Result = $"function {{{AsClassType.BaseClass.EntityName.Text}}}";
+                        break;
+                }
+
+                Debug.Assert(Result != null);
+                return Result;
+            }
+        }
 
         /// <summary></summary>
         public override string ToString()
