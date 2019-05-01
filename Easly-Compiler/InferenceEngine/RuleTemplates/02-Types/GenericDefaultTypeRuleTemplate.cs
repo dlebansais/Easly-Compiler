@@ -6,17 +6,17 @@
     /// <summary>
     /// A rule to process <see cref="IGeneric"/>.
     /// </summary>
-    public interface IGenericDefaultTypeRule : IRuleTemplate
+    public interface IGenericDefaultTypeRuleTemplate : IRuleTemplate
     {
     }
 
     /// <summary>
     /// A rule to process <see cref="IGeneric"/>.
     /// </summary>
-    public class GenericDefaultTypeRule : RuleTemplate<IGeneric, GenericDefaultTypeRule>, IGenericDefaultTypeRule
+    public class GenericDefaultTypeRuleTemplate : RuleTemplate<IGeneric, GenericDefaultTypeRuleTemplate>, IGenericDefaultTypeRuleTemplate
     {
         #region Init
-        static GenericDefaultTypeRule()
+        static GenericDefaultTypeRuleTemplate()
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
@@ -59,7 +59,7 @@
                 node.ResolvedDefaultType.Item = TypeToResolve.ResolvedType.Item;
             }
             else
-                node.ResolvedDefaultType.Item = Class.ClassAny.ResolvedClassType.Item;
+                node.ResolvedDefaultType.Item = ClassType.ClassAnyType;
         }
         #endregion
     }

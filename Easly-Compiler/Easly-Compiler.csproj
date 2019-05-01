@@ -338,7 +338,7 @@
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\IfThenElseInstructionRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\GenericTypeRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\GenericTypeArgumentsRuleTemplate.cs" />
-    <Compile Include="InferenceEngine\RuleTemplates\02-Types\GenericDefaultTypeRule.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\GenericDefaultTypeRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\GenericConstraintsRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\FunctionTypeRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\FunctionFeatureRuleTemplate.cs" />

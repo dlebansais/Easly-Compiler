@@ -158,12 +158,16 @@
             IList<IClass> UnresolvedClassList = new List<IClass>(ClassList);
             IList<ISource> UnresolvedSourceList = new List<ISource>(SourceList);
             bool Success = true;
+            int LoopCount = 0;
 
             Debug.Assert(IsNoDestinationSet());
 
             bool Exit = false;
             while (UnresolvedClassList.Count > 0 && Success && !Exit)
             {
+                //Debug.WriteLine($"Loop count: {LoopCount}");
+                LoopCount++;
+
                 Exit = true;
                 Success = InferTemplates(ref Exit, UnresolvedSourceList, errorList);
                 if (Success)
@@ -211,8 +215,10 @@
             bool Success = true;
             List<ISource> FailedSourceList = new List<ISource>();
 
-            foreach (IRuleTemplate Rule in RuleTemplateList)
+            for (int i = 0; i < RuleTemplateList.Count; i++)
             {
+                IRuleTemplate Rule = RuleTemplateList[i];
+
                 foreach (ISource Source in unresolvedSourceList)
                 {
                     if (!Rule.NodeType.IsAssignableFrom(Source.GetType()))
@@ -230,6 +236,8 @@
 
                         if (AreAllSourcesReady && NoError)
                         {
+                            //Debug.WriteLine($"Rule {Rule} on {Source}");
+
                             if (Rule.CheckConsistency(Source, DataList, out object data))
                             {
                                 Debug.Assert(Rule.ErrorList.Count == 0);
