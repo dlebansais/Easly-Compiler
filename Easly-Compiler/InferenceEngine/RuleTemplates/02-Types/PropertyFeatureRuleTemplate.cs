@@ -57,69 +57,66 @@
             IClass EmbeddingClass = node.EmbeddingClass;
             IObjectType TypeToResolve = (IObjectType)node.EntityType;
 
-            Success &= ScopeAttributeFeature.CreateResultFeature(TypeToResolve, EmbeddingClass, node, ErrorList, out IScopeAttributeFeature Result);
-            Success &= ScopeAttributeFeature.CreateValueFeature(TypeToResolve, EmbeddingClass, node, ErrorList, out IScopeAttributeFeature Value);
+            IScopeAttributeFeature Result = ScopeAttributeFeature.CreateResultFeature(TypeToResolve, EmbeddingClass, node);
+            IScopeAttributeFeature Value = ScopeAttributeFeature.CreateValueFeature(TypeToResolve, EmbeddingClass, node);
 
-            if (Success)
+            string NameResult = Result.ValidFeatureName.Item.Name;
+            string NameValue = Value.ValidFeatureName.Item.Name;
+
+            IHashtableEx<string, IScopeAttributeFeature> CheckedGetScope = new HashtableEx<string, IScopeAttributeFeature>();
+            CheckedGetScope.Add(NameResult, Result);
+            IHashtableEx<string, IScopeAttributeFeature> CheckedSetScope = new HashtableEx<string, IScopeAttributeFeature>();
+            CheckedSetScope.Add(NameValue, Value);
+
+            IList<string> ConflictList = new List<string>();
+            ScopeHolder.RecursiveCheck(CheckedGetScope, node.InnerScopes, ConflictList);
+            ScopeHolder.RecursiveCheck(CheckedSetScope, node.InnerScopes, ConflictList);
+
+            if (ConflictList.Contains(NameResult))
             {
-                string NameResult = Result.ValidFeatureName.Item.Name;
-                string NameValue = Value.ValidFeatureName.Item.Name;
+                AddSourceError(new ErrorNameResultNotAllowed(node));
+                Success = false;
+            }
 
-                IHashtableEx<string, IScopeAttributeFeature> CheckedGetScope = new HashtableEx<string, IScopeAttributeFeature>();
-                CheckedGetScope.Add(NameResult, Result);
-                IHashtableEx<string, IScopeAttributeFeature> CheckedSetScope = new HashtableEx<string, IScopeAttributeFeature>();
-                CheckedSetScope.Add(NameValue, Value);
+            if (ConflictList.Contains(NameValue))
+            {
+                AddSourceError(new ErrorNameValueNotAllowed(node));
+                Success = false;
+            }
 
-                IList<string> ConflictList = new List<string>();
-                ScopeHolder.RecursiveCheck(CheckedGetScope, node.InnerScopes, ConflictList);
-                ScopeHolder.RecursiveCheck(CheckedSetScope, node.InnerScopes, ConflictList);
+            IName PropertyName = (IName)((IFeatureWithName)node).EntityName;
 
-                if (ConflictList.Contains(NameResult))
+            if (node.GetterBody.IsAssigned && node.SetterBody.IsAssigned)
+            {
+                ICompiledBody AsCompiledGetter = (ICompiledBody)node.GetterBody.Item;
+                ICompiledBody AsCompiledSetter = (ICompiledBody)node.SetterBody.Item;
+
+                if (AsCompiledGetter.IsDeferredBody != AsCompiledSetter.IsDeferredBody)
                 {
-                    AddSourceError(new ErrorNameResultNotAllowed(node));
+                    AddSourceError(new ErrorBodyTypeMismatch(node, PropertyName.ValidText.Item));
                     Success = false;
                 }
 
-                if (ConflictList.Contains(NameValue))
+                if (node.PropertyKind != BaseNode.UtilityType.ReadWrite)
                 {
-                    AddSourceError(new ErrorNameValueNotAllowed(node));
+                    AddSourceError(new ErrorBodyTypeMismatch(node, PropertyName.ValidText.Item));
                     Success = false;
                 }
-
-                IName PropertyName = (IName)((IFeatureWithName)node).EntityName;
-
-                if (node.GetterBody.IsAssigned && node.SetterBody.IsAssigned)
+            }
+            else if (node.GetterBody.IsAssigned)
+            {
+                if (node.PropertyKind == BaseNode.UtilityType.WriteOnly)
                 {
-                    ICompiledBody AsCompiledGetter = (ICompiledBody)node.GetterBody.Item;
-                    ICompiledBody AsCompiledSetter = (ICompiledBody)node.SetterBody.Item;
-
-                    if (AsCompiledGetter.IsDeferredBody != AsCompiledSetter.IsDeferredBody)
-                    {
-                        AddSourceError(new ErrorBodyTypeMismatch(node, PropertyName.ValidText.Item));
-                        Success = false;
-                    }
-
-                    if (node.PropertyKind != BaseNode.UtilityType.ReadWrite)
-                    {
-                        AddSourceError(new ErrorBodyTypeMismatch(node, PropertyName.ValidText.Item));
-                        Success = false;
-                    }
+                    AddSourceError(new ErrorBodyTypeMismatch(node, PropertyName.ValidText.Item));
+                    Success = false;
                 }
-                else if (node.GetterBody.IsAssigned)
+            }
+            else if (node.SetterBody.IsAssigned)
+            {
+                if (node.PropertyKind == BaseNode.UtilityType.ReadOnly)
                 {
-                    if (node.PropertyKind == BaseNode.UtilityType.WriteOnly)
-                    {
-                        AddSourceError(new ErrorBodyTypeMismatch(node, PropertyName.ValidText.Item));
-                        Success = false;
-                    }
-                }
-                else if (node.SetterBody.IsAssigned)
-                {
-                    if (node.PropertyKind == BaseNode.UtilityType.ReadOnly)
-                    {
-                        AddSourceError(new ErrorBodyTypeMismatch(node, PropertyName.ValidText.Item));
-                        Success = false;
-                    }
+                    AddSourceError(new ErrorBodyTypeMismatch(node, PropertyName.ValidText.Item));
+                    Success = false;
                 }
             }
 

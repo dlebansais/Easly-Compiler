@@ -33,9 +33,7 @@
         /// <param name="renamedDiscreteTable">The rename table for discretes.</param>
         /// <param name="renamedFeatureTable">The rename table for features.</param>
         /// <param name="instancingClassType">The type that is requesting cloning.</param>
-        /// <param name="errorList">The list of errors found.</param>
-        /// <param name="clonedType">The cloned type, if successful.</param>
-        bool CloneWithRenames(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> renamedExportTable, IHashtableEx<IFeatureName, ITypedefType> renamedTypedefTable, IHashtableEx<IFeatureName, IDiscrete> renamedDiscreteTable, IHashtableEx<IFeatureName, IFeatureInstance> renamedFeatureTable, IClassType instancingClassType, IList<IError> errorList, out IClassType clonedType);
+        IClassType CloneWithRenames(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> renamedExportTable, IHashtableEx<IFeatureName, ITypedefType> renamedTypedefTable, IHashtableEx<IFeatureName, IDiscrete> renamedDiscreteTable, IHashtableEx<IFeatureName, IFeatureInstance> renamedFeatureTable, IClassType instancingClassType);
     }
 
     /// <summary>
@@ -103,14 +101,9 @@
         /// <param name="baseClass">The class used to instanciate this type.</param>
         /// <param name="typeArgumentTable">Arguments if the class is generic.</param>
         /// <param name="instancingClassType">The class type if this instance is a derivation (such as renaming).</param>
-        /// <param name="errorList">The list of errors found.</param>
-        /// <param name="classType">The class type, if successful.</param>
-        public static bool Create(IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, IList<IError> errorList, out IClassType classType)
+        public static IClassType Create(IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType)
         {
-            classType = null;
-
             IHashtableEx<ITypeName, ICompiledType> ConformanceTable = new HashtableEx<ITypeName, ICompiledType>();
-            bool Success = true;
 
             if (baseClass.ResolvedClassType.IsAssigned)
             {
@@ -123,7 +116,7 @@
                         {
                             ITypeName ParentTypeName = InheritanceItem.ResolvedParentTypeName.Item;
                             ICompiledType ParentType = InheritanceItem.ResolvedParentType.Item;
-                            Success &= ParentType.InstanciateType(instancingClassType, ref ParentTypeName, ref ParentType, errorList);
+                            ParentType.InstanciateType(instancingClassType, ref ParentTypeName, ref ParentType);
                             ConformanceTable.Add(ParentTypeName, ParentType);
                         }
 
@@ -131,10 +124,8 @@
                 }
             }
 
-            if (Success)
-                classType = new ClassType(baseClass, typeArgumentTable, instancingClassType, ConformanceTable);
-
-            return Success;
+            IClassType ClassType = new ClassType(baseClass, typeArgumentTable, instancingClassType, ConformanceTable);
+            return ClassType;
         }
 
         /// <summary>
@@ -272,11 +263,8 @@
         /// </summary>
         /// <param name="baseClass">The class with inheritance to merge.</param>
         /// <param name="resolvedClassType">The type from the class.</param>
-        /// <param name="errorList">The list of errors found.</param>
-        public static bool MergeConformingParentTypes(IClass baseClass, IClassType resolvedClassType, IList<IError> errorList)
+        public static void MergeConformingParentTypes(IClass baseClass, IClassType resolvedClassType)
         {
-            bool Success = true;
-
             foreach (IInheritance InheritanceItem in baseClass.InheritanceList)
                 if (InheritanceItem.Conformance == BaseNode.ConformanceType.Conformant)
                 {
@@ -293,7 +281,7 @@
                 ITypeName ResolvedTypeName = Record.ResolvedTypeName;
                 ICompiledType ResolvedType = Record.ResolvedType;
 
-                Success &= ResolvedType.InstanciateType(InstancingClassType, ref ResolvedTypeName, ref ResolvedType, errorList);
+                ResolvedType.InstanciateType(InstancingClassType, ref ResolvedTypeName, ref ResolvedType);
                 Record.ResolvedTypeName = ResolvedTypeName;
                 Record.ResolvedType = ResolvedType;
 
@@ -306,7 +294,7 @@
                         {
                             ITypeName ParentTypeName = InheritanceItem.ResolvedParentTypeName.Item;
                             ICompiledType ParentType = InheritanceItem.ResolvedParentType.Item;
-                            Success &= ParentType.InstanciateType(ResolvedInstancingClassType, ref ParentTypeName, ref ParentType, errorList);
+                            ParentType.InstanciateType(ResolvedInstancingClassType, ref ParentTypeName, ref ParentType);
 
                             Record.ResolvedType.ConformanceTable.Add(ParentTypeName, ParentType);
                         }
@@ -314,8 +302,6 @@
                     Record.ResolvedType.ConformanceTable.Seal();
                 }
             }
-
-            return Success;
         }
 
         /// <summary>
@@ -324,10 +310,8 @@
         /// <param name="instancingClassType">The class type to instanciate.</param>
         /// <param name="resolvedTypeName">The proposed type instance name.</param>
         /// <param name="resolvedType">The proposed type instance.</param>
-        /// <param name="errorList">The list of errors found.</param>
-        public bool InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType, IList<IError> errorList)
+        public void InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType)
         {
-            bool Success = true;
             bool IsNewInstance = false;
 
             IHashtableEx<string, ICompiledType> InstancedTypeArgumentTable = new HashtableEx<string, ICompiledType>();
@@ -335,7 +319,7 @@
             {
                 ITypeName InstancedTypeArgumentName = null;
                 ICompiledType InstancedTypeArgument = TypeArgument.Value;
-                Success &= InstancedTypeArgument.InstanciateType(instancingClassType, ref InstancedTypeArgumentName, ref InstancedTypeArgument, errorList);
+                InstancedTypeArgument.InstanciateType(instancingClassType, ref InstancedTypeArgumentName, ref InstancedTypeArgument);
 
                 InstancedTypeArgumentTable.Add(TypeArgument.Key, InstancedTypeArgument);
 
@@ -344,9 +328,7 @@
             }
 
             if (IsNewInstance)
-                Success &= ResolveType(instancingClassType.BaseClass.TypeTable, BaseClass, InstancedTypeArgumentTable, instancingClassType, errorList, out resolvedTypeName, out resolvedType);
-
-            return Success;
+                ResolveType(instancingClassType.BaseClass.TypeTable, BaseClass, InstancedTypeArgumentTable, instancingClassType, out resolvedTypeName, out resolvedType);
         }
         #endregion
 
@@ -358,23 +340,18 @@
         /// <param name="baseClass">The class this is from.</param>
         /// <param name="typeArgumentTable">The generic arguments used when creating the class type.</param>
         /// <param name="instancingClassType">The class type to instanciate.</param>
-        /// <param name="errorList">The list of errors found.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static bool ResolveType(IHashtableEx<ITypeName, ICompiledType> typeTable, IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, IList<IError> errorList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void ResolveType(IHashtableEx<ITypeName, ICompiledType> typeTable, IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
             resolvedTypeName = null;
             resolvedType = null;
-            bool Success = true;
 
             if (!TypeTableContaining(typeTable, baseClass, typeArgumentTable, out resolvedTypeName, out resolvedType))
             {
-                Success &= BuildType(baseClass, typeArgumentTable, instancingClassType, errorList, out resolvedTypeName, out resolvedType);
-                if (Success)
-                    typeTable.Add(resolvedTypeName, resolvedType);
+                BuildType(baseClass, typeArgumentTable, instancingClassType, out resolvedTypeName, out resolvedType);
+                typeTable.Add(resolvedTypeName, resolvedType);
             }
-
-            return Success;
         }
 
         /// <summary>
@@ -426,16 +403,14 @@
         /// <param name="baseClass">The class this is from.</param>
         /// <param name="typeArgumentTable">The generic arguments used when creating the class type.</param>
         /// <param name="instancingClassType">The class type to instanciate.</param>
-        /// <param name="errorList">The list of errors found.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static bool BuildType(IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, IList<IError> errorList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void BuildType(IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
             resolvedTypeName = null;
             resolvedType = null;
 
-            if (!Create(baseClass, typeArgumentTable, instancingClassType, errorList, out IClassType ResolvedClassType))
-                return false;
+            IClassType ResolvedClassType = Create(baseClass, typeArgumentTable, instancingClassType);
 
 #if DEBUG
             // TODO: remove this code, for code coverage purpose only.
@@ -470,7 +445,6 @@
             }
 
             baseClass.GenericInstanceList.Add(ResolvedClassType);
-            return true;
         }
         #endregion
 
@@ -516,26 +490,20 @@
         /// <param name="renamedDiscreteTable">The rename table for discretes.</param>
         /// <param name="renamedFeatureTable">The rename table for features.</param>
         /// <param name="instancingClassType">The type that is requesting cloning.</param>
-        /// <param name="errorList">The list of errors found.</param>
-        /// <param name="clonedType">The cloned type, if successful.</param>
-        public bool CloneWithRenames(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> renamedExportTable, IHashtableEx<IFeatureName, ITypedefType> renamedTypedefTable, IHashtableEx<IFeatureName, IDiscrete> renamedDiscreteTable, IHashtableEx<IFeatureName, IFeatureInstance> renamedFeatureTable, IClassType instancingClassType, IList<IError> errorList, out IClassType clonedType)
+        public IClassType CloneWithRenames(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> renamedExportTable, IHashtableEx<IFeatureName, ITypedefType> renamedTypedefTable, IHashtableEx<IFeatureName, IDiscrete> renamedDiscreteTable, IHashtableEx<IFeatureName, IFeatureInstance> renamedFeatureTable, IClassType instancingClassType)
         {
-            bool Success = false;
+            IClassType ClonedType = Create(BaseClass, TypeArgumentTable, instancingClassType);
 
-            if (Create(BaseClass, TypeArgumentTable, instancingClassType, errorList, out clonedType))
-            {
-                clonedType.ExportTable.Merge(renamedExportTable);
-                clonedType.ExportTable.Seal();
-                clonedType.TypedefTable.Merge(renamedTypedefTable);
-                clonedType.TypedefTable.Seal();
-                clonedType.DiscreteTable.Merge(renamedDiscreteTable);
-                clonedType.DiscreteTable.Seal();
-                clonedType.FeatureTable.Merge(renamedFeatureTable);
-                clonedType.FeatureTable.Seal();
-                Success = true;
-            }
+            ClonedType.ExportTable.Merge(renamedExportTable);
+            ClonedType.ExportTable.Seal();
+            ClonedType.TypedefTable.Merge(renamedTypedefTable);
+            ClonedType.TypedefTable.Seal();
+            ClonedType.DiscreteTable.Merge(renamedDiscreteTable);
+            ClonedType.DiscreteTable.Seal();
+            ClonedType.FeatureTable.Merge(renamedFeatureTable);
+            ClonedType.FeatureTable.Seal();
 
-            return Success;
+            return ClonedType;
         }
         #endregion
 

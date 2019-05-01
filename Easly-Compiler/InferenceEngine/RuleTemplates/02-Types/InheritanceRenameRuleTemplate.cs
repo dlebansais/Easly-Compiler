@@ -86,18 +86,16 @@
                 if (Success)
                 {
                     IClass EmbeddingClass = node.EmbeddingClass;
-                    Success &= ClassType.Create(ResolvedParent.BaseClass, ResolvedParent.TypeArgumentTable, EmbeddingClass.ResolvedClassType.Item, ErrorList, out ParentTypeWithRename);
-                    if (Success)
-                    {
-                        ParentTypeWithRename.ExportTable.Merge(RenamedExportTable);
-                        ParentTypeWithRename.ExportTable.Seal();
-                        ParentTypeWithRename.TypedefTable.Merge(RenamedTypedefTable);
-                        ParentTypeWithRename.TypedefTable.Seal();
-                        ParentTypeWithRename.DiscreteTable.Merge(RenamedDiscreteTable);
-                        ParentTypeWithRename.DiscreteTable.Seal();
-                        ParentTypeWithRename.FeatureTable.Merge(RenamedFeatureTable);
-                        ParentTypeWithRename.FeatureTable.Seal();
-                    }
+
+                    ParentTypeWithRename = ClassType.Create(ResolvedParent.BaseClass, ResolvedParent.TypeArgumentTable, EmbeddingClass.ResolvedClassType.Item);
+                    ParentTypeWithRename.ExportTable.Merge(RenamedExportTable);
+                    ParentTypeWithRename.ExportTable.Seal();
+                    ParentTypeWithRename.TypedefTable.Merge(RenamedTypedefTable);
+                    ParentTypeWithRename.TypedefTable.Seal();
+                    ParentTypeWithRename.DiscreteTable.Merge(RenamedDiscreteTable);
+                    ParentTypeWithRename.DiscreteTable.Seal();
+                    ParentTypeWithRename.FeatureTable.Merge(RenamedFeatureTable);
+                    ParentTypeWithRename.FeatureTable.Seal();
                 }
             }
 

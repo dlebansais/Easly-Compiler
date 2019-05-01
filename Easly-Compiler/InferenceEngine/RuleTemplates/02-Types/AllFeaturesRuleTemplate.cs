@@ -68,7 +68,7 @@
             else
             {
                 MergeInheritedFeatures(node, ByNameTable, out MergedFeatureTable);
-                Success &= ClassType.MergeConformingParentTypes(node, node.ResolvedClassType.Item, ErrorList);
+                ClassType.MergeConformingParentTypes(node, node.ResolvedClassType.Item);
             }
 
             if (Success)

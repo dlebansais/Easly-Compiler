@@ -100,12 +100,10 @@
 
             if (AllRenameValid)
             {
-                if (classType.CloneWithRenames(RenamedExportTable, RenamedTypedefTable, RenamedDiscreteTable, RenamedFeatureTable, EmbeddingClass.ResolvedClassType.Item, ErrorList, out IClassType ClonedType))
-                {
-                    destinationType = ClonedType;
-                    destinationTypeName = new TypeName(destinationType.TypeFriendlyName);
-                    Success = true;
-                }
+                IClassType ClonedType = classType.CloneWithRenames(RenamedExportTable, RenamedTypedefTable, RenamedDiscreteTable, RenamedFeatureTable, EmbeddingClass.ResolvedClassType.Item);
+                destinationType = ClonedType;
+                destinationTypeName = new TypeName(destinationType.TypeFriendlyName);
+                Success = true;
             }
 
             return Success;

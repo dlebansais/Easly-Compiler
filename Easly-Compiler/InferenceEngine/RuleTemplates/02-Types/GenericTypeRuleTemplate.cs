@@ -107,9 +107,8 @@
 
                     if (Success)
                     {
-                        Success &= ClassType.ResolveType(EmbeddingClass.TypeTable, BaseClass, ResolvedTable, EmbeddingClass.ResolvedClassType.Item, ErrorList, out ITypeName ValidResolvedTypeName, out ICompiledType ValidResolvedType);
-                        if (Success)
-                            data = new Tuple<IClass, TypeArgumentStyles, IHashtableEx<string, ICompiledType>, IHashtableEx<string, IObjectType>, ITypeName, ICompiledType>(BaseClass, ArgumentStyle, ResolvedTable, LocationTable, ValidResolvedTypeName, ValidResolvedType);
+                        ClassType.ResolveType(EmbeddingClass.TypeTable, BaseClass, ResolvedTable, EmbeddingClass.ResolvedClassType.Item, out ITypeName ValidResolvedTypeName, out ICompiledType ValidResolvedType);
+                        data = new Tuple<IClass, TypeArgumentStyles, IHashtableEx<string, ICompiledType>, IHashtableEx<string, IObjectType>, ITypeName, ICompiledType>(BaseClass, ArgumentStyle, ResolvedTable, LocationTable, ValidResolvedTypeName, ValidResolvedType);
                     }
                 }
             }

@@ -56,11 +56,10 @@
             IClass EmbeddingClass = node.EmbeddingClass;
             IObjectType TypeToResolve = (IObjectType)node.EntityType;
 
-            Success &= ScopeAttributeFeature.CreateResultFeature(TypeToResolve, EmbeddingClass, node, ErrorList, out IScopeAttributeFeature ResultFeature);
-            Success &= ScopeAttributeFeature.CreateValueFeature(TypeToResolve, EmbeddingClass, node, ErrorList, out IScopeAttributeFeature ValueFeature);
+            IScopeAttributeFeature ResultFeature = ScopeAttributeFeature.CreateResultFeature(TypeToResolve, EmbeddingClass, node);
+            IScopeAttributeFeature ValueFeature = ScopeAttributeFeature.CreateValueFeature(TypeToResolve, EmbeddingClass, node);
 
-            if (Success)
-                Success = CheckResultValueConsistency(node, dataList, ResultFeature, ValueFeature, out data);
+            Success = CheckResultValueConsistency(node, dataList, ResultFeature, ValueFeature, out data);
 
             return Success;
         }

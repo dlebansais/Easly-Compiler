@@ -382,26 +382,22 @@
         /// <param name="instancingClassType">The class type to instanciate.</param>
         /// <param name="resolvedTypeName">The proposed type instance name.</param>
         /// <param name="resolvedType">The proposed type instance.</param>
-        /// <param name="errorList">The list of errors found.</param>
-        public bool InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType, IList<IError> errorList)
+        public void InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType)
         {
-            bool Success = true;
             bool IsNewInstance = false;
 
             ITypeName InstancedBaseTypeName = ResolvedBaseTypeName.Item;
             ICompiledType InstancedBaseType = ResolvedBaseType.Item;
-            Success &= InstancedBaseType.InstanciateType(instancingClassType, ref InstancedBaseTypeName, ref InstancedBaseType, errorList);
+            InstancedBaseType.InstanciateType(instancingClassType, ref InstancedBaseTypeName, ref InstancedBaseType);
             IsNewInstance |= InstancedBaseType != ResolvedBaseType.Item;
 
             ITypeName InstancedEntityTypeName = ResolvedEntityTypeName.Item;
             ICompiledType InstancedEntityType = ResolvedEntityType.Item;
-            Success &= InstancedEntityType.InstanciateType(instancingClassType, ref InstancedEntityTypeName, ref InstancedEntityType, errorList);
+            InstancedEntityType.InstanciateType(instancingClassType, ref InstancedEntityTypeName, ref InstancedEntityType);
             IsNewInstance |= InstancedEntityType != ResolvedEntityType.Item;
 
             if (IsNewInstance)
                 ResolveType(instancingClassType.BaseClass.TypeTable, InstancedBaseTypeName, InstancedBaseType, InstancedEntityTypeName, InstancedEntityType, PropertyKind, GetEnsureList, GetExceptionIdentifierList, SetRequireList, SetExceptionIdentifierList, out resolvedTypeName, out resolvedType);
-
-            return Success;
         }
         #endregion
 

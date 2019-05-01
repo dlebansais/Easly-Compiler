@@ -88,20 +88,9 @@ namespace CompilerNode
         /// <param name="attributeName">The attribute name.</param>
         /// <param name="attributeTypeName">Resolved type name of the attribute.</param>
         /// <param name="attributeType">Resolved type of the attribute.</param>
-        /// <param name="errorList">List of errors found.</param>
-        /// <param name="feature">The created feature if successful.</param>
-        public static bool Create(ISource location, string attributeName, ITypeName attributeTypeName, ICompiledType attributeType, IList<IError> errorList, out IScopeAttributeFeature feature)
+        public static IScopeAttributeFeature Create(ISource location, string attributeName, ITypeName attributeTypeName, ICompiledType attributeType)
         {
-            feature = null;
-            bool Result = false;
-
-            if (CheckGroupAssigned(attributeType, attributeName, true, location, errorList))
-            {
-                feature = new ScopeAttributeFeature(location, attributeName, attributeTypeName, attributeType);
-                Result = true;
-            }
-
-            return Result;
+            return new ScopeAttributeFeature(location, attributeName, attributeTypeName, attributeType);
         }
 
         /// <summary>
@@ -133,7 +122,9 @@ namespace CompilerNode
             feature = null;
             bool Result = false;
 
-            if (CheckGroupAssigned(attributeType, attributeName, false, location, errorList))
+            if (attributeType is IClassType AsClassType && AsClassType.BaseClass.Cloneable == BaseNode.CloneableStatus.Single)
+                errorList.Add(new ErrorSingleTypeNotAllowed(location, attributeName));
+            else
             {
                 feature = new ScopeAttributeFeature(location, attributeName, attributeTypeName, attributeType, initialDefaultValue);
                 Result = true;
@@ -220,33 +211,15 @@ namespace CompilerNode
             return IsAssigned;
         }
 
-        private static bool CheckGroupAssigned(ICompiledType attributeType, string attributeName, bool isSingleClassAllowed, ISource location, IList<IError> errorList)
-        {
-            bool Result = true;
-
-            if (attributeType is IClassType AsClassType)
-            {
-                if (!isSingleClassAllowed && AsClassType.BaseClass.Cloneable == BaseNode.CloneableStatus.Single)
-                {
-                    errorList.Add(new ErrorSingleTypeNotAllowed(location, attributeName));
-                    Result = false;
-                }
-            }
-
-            return Result;
-        }
-
         /// <summary>
         /// Creates a feature called 'Result' with the provided type.
         /// </summary>
         /// <param name="resultType">The feature type.</param>
         /// <param name="embeddingClass">The class where the feature is created.</param>
         /// <param name="location">The location to use when reporting errors.</param>
-        /// <param name="errorList">The list of errors found.</param>
-        /// <param name="feature">The created feature upon return is successful.</param>
-        public static bool CreateResultFeature(IObjectType resultType, IClass embeddingClass, ISource location, IList<IError> errorList, out IScopeAttributeFeature feature)
+        public static IScopeAttributeFeature CreateResultFeature(IObjectType resultType, IClass embeddingClass, ISource location)
         {
-            return Create(location, BaseNode.Keyword.Result.ToString(), resultType.ResolvedTypeName.Item, resultType.ResolvedType.Item, errorList, out feature);
+            return Create(location, BaseNode.Keyword.Result.ToString(), resultType.ResolvedTypeName.Item, resultType.ResolvedType.Item);
         }
 
         /// <summary>
@@ -255,11 +228,9 @@ namespace CompilerNode
         /// <param name="resultType">The feature type.</param>
         /// <param name="embeddingClass">The class where the feature is created.</param>
         /// <param name="location">The location to use when reporting errors.</param>
-        /// <param name="errorList">The list of errors found.</param>
-        /// <param name="feature">The created feature upon return is successful.</param>
-        public static bool CreateValueFeature(IObjectType resultType, IClass embeddingClass, ISource location, IList<IError> errorList, out IScopeAttributeFeature feature)
+        public static IScopeAttributeFeature CreateValueFeature(IObjectType resultType, IClass embeddingClass, ISource location)
         {
-            return Create(location, BaseNode.Keyword.Value.ToString(), resultType.ResolvedTypeName.Item, resultType.ResolvedType.Item, errorList, out feature);
+            return Create(location, BaseNode.Keyword.Value.ToString(), resultType.ResolvedTypeName.Item, resultType.ResolvedType.Item);
         }
         #endregion
 

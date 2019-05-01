@@ -46,17 +46,13 @@
         /// <returns>True if an error occured.</returns>
         public override bool CheckConsistency(IAttributeFeature node, IDictionary<ISourceTemplate, object> dataList, out object data)
         {
-            data = null;
-            bool Success = true;
-
             IObjectType TypeToResolve = (IObjectType)node.EntityType;
             IClass EmbeddingClass = node.EmbeddingClass;
 
-            Success &= ScopeAttributeFeature.CreateResultFeature(TypeToResolve, EmbeddingClass, node, ErrorList, out IScopeAttributeFeature resultFeature);
-            if (Success)
-                data = resultFeature;
+            IScopeAttributeFeature ResultFeature = ScopeAttributeFeature.CreateResultFeature(TypeToResolve, EmbeddingClass, node);
+            data = ResultFeature;
 
-            return Success;
+            return true;
         }
 
         /// <summary>

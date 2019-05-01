@@ -59,7 +59,7 @@
             if (node.DefaultValue.IsAssigned)
                 Success = ScopeAttributeFeature.Create(node, ValidText, FieldType.ResolvedTypeName.Item, FieldType.ResolvedType.Item, (IExpression)node.DefaultValue.Item, ErrorList, out NewEntity);
             else
-                Success = ScopeAttributeFeature.Create(node, ValidText, FieldType.ResolvedTypeName.Item, FieldType.ResolvedType.Item, ErrorList, out NewEntity);
+                NewEntity = ScopeAttributeFeature.Create(node, ValidText, FieldType.ResolvedTypeName.Item, FieldType.ResolvedType.Item);
 
             if (Success)
                 data = NewEntity;

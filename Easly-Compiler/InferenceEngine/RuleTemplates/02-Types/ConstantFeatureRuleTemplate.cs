@@ -64,9 +64,8 @@
 
             if (Success)
             {
-                Success = ScopeAttributeFeature.CreateResultFeature(TypeToResolve, EmbeddingClass, node, ErrorList, out IScopeAttributeFeature NewEntity);
-                if (Success)
-                    data = NewEntity;
+                IScopeAttributeFeature NewEntity = ScopeAttributeFeature.CreateResultFeature(TypeToResolve, EmbeddingClass, node);
+                data = NewEntity;
             }
 
             return Success;

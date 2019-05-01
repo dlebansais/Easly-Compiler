@@ -135,9 +135,9 @@
                 {
                     bool IsConforming = false;
 
-                    IsConforming |= DerivedClassType.BaseClass.CopySpecification == BaseNode.CopySemantic.Reference && (baseType == ClassType.ClassAnyReferenceType || baseType == ClassType.ClassAnyType);
-                    IsConforming |= DerivedClassType.BaseClass.CopySpecification == BaseNode.CopySemantic.Value && (baseType == ClassType.ClassAnyValueType || baseType == ClassType.ClassAnyType);
-                    IsConforming |= DerivedClassType.BaseClass.CopySpecification == BaseNode.CopySemantic.Any && baseType == ClassType.ClassAnyType;
+                    IsConforming |= (baseType == ClassType.ClassAnyReferenceType || baseType == ClassType.ClassAnyType) && DerivedClassType.BaseClass.CopySpecification == BaseNode.CopySemantic.Reference;
+                    IsConforming |= (baseType == ClassType.ClassAnyValueType || baseType == ClassType.ClassAnyType) && DerivedClassType.BaseClass.CopySpecification == BaseNode.CopySemantic.Value;
+                    IsConforming |= baseType == ClassType.ClassAnyType && DerivedClassType.BaseClass.CopySpecification == BaseNode.CopySemantic.Any;
 
                     return IsConforming;
                 }

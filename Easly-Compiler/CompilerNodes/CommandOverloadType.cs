@@ -241,10 +241,8 @@
         /// </summary>
         /// <param name="instancingClassType">The type attempting to find the overload type.</param>
         /// <param name="instancedOverload">The new overload type upon return if not found.</param>
-        /// <param name="errorList">The list of errors.</param>
-        public static bool InstanciateCommandOverloadType(IClassType instancingClassType, ref ICommandOverloadType instancedOverload, IList<IError> errorList)
+        public static void InstanciateCommandOverloadType(IClassType instancingClassType, ref ICommandOverloadType instancedOverload)
         {
-            bool Success = true;
             bool IsNewInstance = false;
 
             IList<IEntityDeclaration> InstancedParameterList = new List<IEntityDeclaration>();
@@ -252,16 +250,22 @@
             {
                 ITypeName InstancedParameterTypeName = Parameter.ValidEntity.Item.ResolvedFeatureTypeName.Item;
                 ICompiledType InstancedParameterType = Parameter.ValidEntity.Item.ResolvedFeatureType.Item;
-                Success &= InstancedParameterType.InstanciateType(instancingClassType, ref InstancedParameterTypeName, ref InstancedParameterType, errorList);
+                InstancedParameterType.InstanciateType(instancingClassType, ref InstancedParameterTypeName, ref InstancedParameterType);
 
                 IEntityDeclaration InstancedParameter = new EntityDeclaration(InstancedParameterTypeName, InstancedParameterType);
                 IName ParameterName = (IName)Parameter.EntityName;
 
                 IScopeAttributeFeature NewEntity;
                 if (Parameter.DefaultValue.IsAssigned)
-                    Success &= ScopeAttributeFeature.Create(Parameter, ParameterName.ValidText.Item, InstancedParameterTypeName, InstancedParameterType, (IExpression)Parameter.DefaultValue.Item, errorList, out NewEntity);
+                {
+                    // The default value has already been checked and validated.
+                    List<IError> FakeErrorList = new List<IError>();
+                    bool IsCreated = ScopeAttributeFeature.Create(Parameter, ParameterName.ValidText.Item, InstancedParameterTypeName, InstancedParameterType, (IExpression)Parameter.DefaultValue.Item, FakeErrorList, out NewEntity);
+                    Debug.Assert(IsCreated);
+                }
                 else
-                    Success &= ScopeAttributeFeature.Create(Parameter, ParameterName.ValidText.Item, InstancedParameterTypeName, InstancedParameterType, errorList, out NewEntity);
+                    NewEntity = ScopeAttributeFeature.Create(Parameter, ParameterName.ValidText.Item, InstancedParameterTypeName, InstancedParameterType);
+
                 InstancedParameter.ValidEntity.Item = NewEntity;
 
                 InstancedParameterList.Add(InstancedParameter);
@@ -282,8 +286,6 @@
 
                 instancedOverload = NewOverloadInstance;
             }
-
-            return Success;
         }
 
         /// <summary>

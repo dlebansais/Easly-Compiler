@@ -315,15 +315,13 @@ namespace CompilerNode
         /// <param name="instancingClassType">The class type to instanciate.</param>
         /// <param name="resolvedTypeName">The proposed type instance name.</param>
         /// <param name="resolvedType">The proposed type instance.</param>
-        /// <param name="errorList">The list of errors found.</param>
-        public bool InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType, IList<IError> errorList)
+        public void InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType)
         {
-            bool Success = true;
             bool IsNewInstance = false;
 
             ITypeName InstancedBaseTypeName = ResolvedBaseTypeName.Item;
             ICompiledType InstancedBaseType = ResolvedBaseType.Item;
-            Success &= InstancedBaseType.InstanciateType(instancingClassType, ref InstancedBaseTypeName, ref InstancedBaseType, errorList);
+            InstancedBaseType.InstanciateType(instancingClassType, ref InstancedBaseTypeName, ref InstancedBaseType);
 
             IsNewInstance |= InstancedBaseType != ResolvedBaseType.Item;
 
@@ -331,7 +329,7 @@ namespace CompilerNode
             foreach (IQueryOverloadType Overload in OverloadList)
             {
                 IQueryOverloadType InstancedOverload = Overload;
-                QueryOverloadType.InstanciateQueryOverloadType(instancingClassType, ref InstancedOverload, errorList);
+                QueryOverloadType.InstanciateQueryOverloadType(instancingClassType, ref InstancedOverload);
 
                 InstancedOverloadList.Add(InstancedOverload);
                 IsNewInstance |= InstancedOverload != Overload;
@@ -339,8 +337,6 @@ namespace CompilerNode
 
             if (IsNewInstance)
                 ResolveType(instancingClassType.BaseClass.TypeTable, InstancedBaseTypeName, InstancedBaseType, InstancedOverloadList, out resolvedTypeName, out resolvedType);
-
-            return Success;
         }
         #endregion
 

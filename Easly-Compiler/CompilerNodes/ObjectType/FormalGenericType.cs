@@ -142,8 +142,7 @@
         /// <param name="instancingClassType">The class type to instanciate.</param>
         /// <param name="resolvedTypeName">The proposed type instance name.</param>
         /// <param name="resolvedType">The proposed type instance.</param>
-        /// <param name="errorList">The list of errors found.</param>
-        public bool InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType, IList<IError> errorList)
+        public void InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType)
         {
             foreach (KeyValuePair<string, ICompiledType> TypeArgument in instancingClassType.TypeArgumentTable)
                 if (TypeArgument.Key == TypeFriendlyName)
@@ -151,8 +150,6 @@
                     resolvedType = TypeArgument.Value;
                     break;
                 }
-
-            return true;
         }
         #endregion
 
