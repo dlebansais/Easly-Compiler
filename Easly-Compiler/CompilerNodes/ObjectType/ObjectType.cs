@@ -166,14 +166,18 @@
             if (ConformToBaseAny(derivedType, baseType))
                 return true;
             else
-                foreach (KeyValuePair<ITypeName, ICompiledType> Entry in derivedType.BaseClass.InheritanceTable)
-                    if (Entry.Value is IClassType Parent)
+            {
+                foreach (IInheritance Inheritance in derivedType.BaseClass.InheritanceList)
+                {
+                    if (Inheritance.ResolvedParentType.IsAssigned && Inheritance.ResolvedParentType.Item is IClassType Parent)
                     {
                         if (TypeConformDirectlyToBase(Parent, baseType, substitutionTypeTable, errorList, sourceLocation, false))
                             return true;
                         else if (IsDirectClassDescendantOf(Parent, baseType, substitutionTypeTable, sourceLocation))
                             return true;
                     }
+                }
+            }
 
             return false;
         }
