@@ -62,5 +62,15 @@
             return ParentGeneric;
         }
         #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Returns a string representing this instance.
+        /// </summary>
+        public override string ToString()
+        {
+            return "/generic type";
+        }
+        #endregion
     }
 }

@@ -299,6 +299,7 @@ namespace CompilerNode
             BaseClass.GenericTable.Seal();
             BaseClass.InheritanceTable.Seal();
             BaseClass.InheritedClassTypeTable.Seal();
+            BaseClass.ExportTable.Seal();
             BaseClass.TypedefTable.Seal();
             BaseClass.ValidSourceName = string.Empty;
 

@@ -8,14 +8,14 @@ namespace Test
 {
     class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
             Compiler c = new Compiler();
             //c.InferenceRetries = 3;
 
             c.Compile(@"C:\Users\DLB\AppData\Local\Temp\root.easly");
             //c.Compile("../../../coverage/coverage.easly");
-            //c.Compile("../../../coverage/coverage invalid 00-05.easly");
+            //c.Compile("../../../coverage/coverage invalid 03-11.easly");
             //c.Compile("../../../test.easly");
             //c.Compile("../../../root.easly");
             //c.Compile("../../../coverage/coverage replication.easly");
@@ -23,6 +23,8 @@ namespace Test
             Debug.WriteLine($"{c.ErrorList.Count} error(s).");
             foreach (IError Error in c.ErrorList)
                 Debug.WriteLine($"  {Error.Message} ({Error}) [{Error.Location}].");
+
+            return -c.ErrorList.Count;
         }
 
         static void DebugOutputLanguage()

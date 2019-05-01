@@ -23,6 +23,7 @@ Global
 		{033D72D0-BD54-47FA-BA81-F5EE7A9FE0EB}.Debug|x64.ActiveCfg = Debug|x64
 		{033D72D0-BD54-47FA-BA81-F5EE7A9FE0EB}.Debug|x64.Build.0 = Debug|x64
 		{033D72D0-BD54-47FA-BA81-F5EE7A9FE0EB}.Release|x64.ActiveCfg = Release|x64
+		{033D72D0-BD54-47FA-BA81-F5EE7A9FE0EB}.Release|x64.Build.0 = Release|x64
 		{033D72D0-BD54-47FA-BA81-F5EE7A9FE0EB}.Travis|x64.ActiveCfg = Travis|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution

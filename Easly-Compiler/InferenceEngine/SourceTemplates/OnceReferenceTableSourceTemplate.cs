@@ -97,5 +97,15 @@
             return Result;
         }
         #endregion
+
+        #region Debugging
+        /// <summary>
+        /// Returns a string representing this instance.
+        /// </summary>
+        public override string ToString()
+        {
+            return $"{Path} * {ItemProperty.Name}, from {StartingPoint}";
+        }
+        #endregion
     }
 }
