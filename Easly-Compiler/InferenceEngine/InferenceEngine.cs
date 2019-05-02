@@ -113,7 +113,7 @@
             bool? LastTryResult = null;
 
             foreach (IRuleTemplate Rule in RuleTemplateList)
-                Rule.ErrorList.Clear();
+                Rule.ErrorList.ClearErrors();
 
             for (;;)
             {
@@ -121,8 +121,7 @@
                 bool TryResult = SolveWithRetry(TryErrorList);
                 if (Retries == 0)
                 {
-                    foreach (IError Error in TryErrorList)
-                        errorList.Add(Error);
+                    errorList.AddErrors(TryErrorList);
                     Success = TryResult;
                     break;
                 }
@@ -143,7 +142,7 @@
                 Retries--;
             }
 
-            Debug.Assert(Success || errorList.Count > 0);
+            Debug.Assert(Success || !errorList.IsEmpty);
             return Success;
         }
 
@@ -182,11 +181,11 @@
                 foreach (IClass Class in UnresolvedClassList)
                     NameList.Add(Class.ValidClassName);
 
-                errorList.Add(new ErrorCyclicDependency(NameList));
+                errorList.AddError(new ErrorCyclicDependency(NameList));
                 Success = false;
             }
 
-            Debug.Assert(Success || errorList.Count > 0);
+            Debug.Assert(Success || !errorList.IsEmpty);
             return Success;
         }
 
@@ -229,7 +228,7 @@
                     if (IsNoDestinationSet)
                     {
                         bool AreAllSourcesReady = Rule.AreAllSourcesReady(Source, out IDictionary<ISourceTemplate, object> DataList);
-                        bool NoError = Rule.ErrorList.Count == 0;
+                        bool NoError = Rule.ErrorList.IsEmpty;
 
                         if (!AreAllSourcesReady && !FailedSourceList.Contains(Source))
                             FailedSourceList.Add(Source);
@@ -240,7 +239,7 @@
 
                             if (Rule.CheckConsistency(Source, DataList, out object data))
                             {
-                                Debug.Assert(Rule.ErrorList.Count == 0);
+                                Debug.Assert(Rule.ErrorList.IsEmpty);
                                 Rule.Apply(Source, data);
                                 Debug.Assert(Rule.AreAllDestinationsSet(Source));
 
@@ -248,9 +247,8 @@
                             }
                             else
                             {
-                                Debug.Assert(Rule.ErrorList.Count > 0);
-                                foreach (IError Error in Rule.ErrorList)
-                                    errorList.Add(Error);
+                                Debug.Assert(!Rule.ErrorList.IsEmpty);
+                                errorList.AddErrors(Rule.ErrorList);
 
                                 Success = false;
                             }

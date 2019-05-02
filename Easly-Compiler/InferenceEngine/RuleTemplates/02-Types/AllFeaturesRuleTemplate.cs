@@ -251,7 +251,7 @@
                     if (!Item.SameIsKept || !Item.SameIsDiscontinued)
                     {
                         // C inherit f from A and B, effectively or not, but keep or discontinue flags don't match.
-                        errorList.Add(new ErrorInheritanceConflict(Item.Location, Item.Name.Name));
+                        errorList.AddError(new ErrorInheritanceConflict(Item.Location, Item.Name.Name));
                         IsConsistent = false;
                         break;
                     }
@@ -276,7 +276,7 @@
                             ImportedInstance.EffectiveInstance.Item = Item;
                         else
                         {
-                            errorList.Add(new ErrorMultipleEffectiveFeature(Item.Location, Item.Name.Name));
+                            errorList.AddError(new ErrorMultipleEffectiveFeature(Item.Location, Item.Name.Name));
                             IsSingle = false;
                             break;
                         }
@@ -309,9 +309,9 @@
                     if (!Result)
                     {
                         if (FeatureType is IIndexerType)
-                            errorList.Add(new ErrorIndexerInheritanceConflict(ThisInstance.Location));
+                            errorList.AddError(new ErrorIndexerInheritanceConflict(ThisInstance.Location));
                         else
-                            errorList.Add(new ErrorInheritanceConflict(ThisInstance.Location, ThisInstance.Name.Name));
+                            errorList.AddError(new ErrorInheritanceConflict(ThisInstance.Location, ThisInstance.Name.Name));
                         break;
                     }
                 }
@@ -343,7 +343,7 @@
 
                     if (!ObjectType.TypeConformToBase(DescendantFeatureType, AncestorFeatureType, SubstitutionTypeTable, errorList, (ISource)importedInstance.EffectiveInstance.Item.Instance.Feature.Item, true))
                     {
-                        errorList.Add(new ErrorInheritanceConflict(Item.Location, Item.Name.Name));
+                        errorList.AddError(new ErrorInheritanceConflict(Item.Location, Item.Name.Name));
                         Result = false;
                     }
                 }
@@ -375,7 +375,7 @@
                             foreach (InstanceNameInfo Item in CorrespondingInstance.PrecursorInstanceList)
                                 if (Item.Instance.IsKept)
                                 {
-                                    errorList.Add(new ErrorInheritanceConflict(Item.Location, Item.Name.Name));
+                                    errorList.AddError(new ErrorInheritanceConflict(Item.Location, Item.Name.Name));
                                     break;
                                 }
                         }
@@ -391,7 +391,7 @@
 
                         foreach (InstanceNameInfo Item in CorrespondingInstance.PrecursorInstanceList)
                         {
-                            errorList.Add(new ErrorMissingSelectedPrecursor(Item.Location, Item.Name.Name));
+                            errorList.AddError(new ErrorMissingSelectedPrecursor(Item.Location, Item.Name.Name));
                             break;
                         }
 
@@ -476,7 +476,7 @@
                             IFeature AsFeature = EffectiveFeature as IFeature;
                             Debug.Assert(AsFeature != null);
 
-                            errorList.Add(new ErrorMissingAncestor(AsFeature, Item.Name.Name));
+                            errorList.AddError(new ErrorMissingAncestor(AsFeature, Item.Name.Name));
                             return false;
                         }
                     }

@@ -64,7 +64,7 @@
 
             if (!Success)
             {
-                Debug.Assert(CheckErrorList.Count > 0);
+                Debug.Assert(!CheckErrorList.IsEmpty);
                 AddSourceErrorList(CheckErrorList);
             }
 

@@ -291,7 +291,7 @@
         /// <param name="error">The error to add.</param>
         protected virtual void AddSourceError(IError error)
         {
-            ErrorList.Add(error);
+            ErrorList.AddError(error);
         }
 
         /// <summary>
@@ -300,8 +300,7 @@
         /// <param name="sourceErrorList">The list of errors to add.</param>
         protected virtual void AddSourceErrorList(IErrorList sourceErrorList)
         {
-            foreach (IError Error in sourceErrorList)
-                ErrorList.Add(Error);
+            ErrorList.AddErrors(sourceErrorList);
         }
         #endregion
     }

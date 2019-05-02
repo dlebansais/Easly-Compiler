@@ -166,7 +166,7 @@
 
             if (!SourceTable.IsAssigned)
             {
-                ErrorList.Add(new ErrorUnknownIdentifier(SourceIdentifier, SourceIdentifier.Text));
+                ErrorList.AddError(new ErrorUnknownIdentifier(SourceIdentifier, SourceIdentifier.Text));
                 return false;
             }
 
@@ -178,7 +178,7 @@
                     string ValidName = key2String(EntryKey);
                     if (ValidName == DestinationIdentifier.Text)
                     {
-                        ErrorList.Add(new ErrorIdentifierAlreadyListed(DestinationIdentifier, DestinationIdentifier.Text));
+                        ErrorList.AddError(new ErrorIdentifierAlreadyListed(DestinationIdentifier, DestinationIdentifier.Text));
                         return false;
                     }
                 }

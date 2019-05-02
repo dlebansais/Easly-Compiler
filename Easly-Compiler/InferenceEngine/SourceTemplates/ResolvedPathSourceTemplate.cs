@@ -140,7 +140,7 @@
             // Check that the name is known in the table of features for the current step.
             if (!FeatureName.TableContain(featureTable, Text, out IFeatureName ItemName, out IFeatureInstance ItemInstance))
             {
-                errorList.Add(new ErrorUnknownIdentifier(item, Text));
+                errorList.AddError(new ErrorUnknownIdentifier(item, Text));
                 return true;
             }
 
@@ -168,7 +168,7 @@
                 // Creation and procedure features don't return anything.
                 case ICreationFeature AsCreationFeature:
                 case IProcedureFeature AsProcedureFeature:
-                    errorList.Add(new ErrorUnknownIdentifier(nextItem, NextItemText));
+                    errorList.AddError(new ErrorUnknownIdentifier(nextItem, NextItemText));
                     return true;
 
                 case IFunctionFeature AsFunctionFeature:
@@ -191,7 +191,7 @@
 
             if (ItemType == null)
             {
-                errorList.Add(new ErrorUnknownIdentifier(nextItem, NextItemText));
+                errorList.AddError(new ErrorUnknownIdentifier(nextItem, NextItemText));
                 return true;
             }
 
@@ -220,7 +220,7 @@
 
             if (!FeatureName.TableContain(featureTable, Text, out IFeatureName ItemName, out IFeatureInstance ItemInstance))
             {
-                errorList.Add(new ErrorUnknownIdentifier(item, Text));
+                errorList.AddError(new ErrorUnknownIdentifier(item, Text));
                 return false;
             }
 
@@ -242,7 +242,7 @@
 
                 case ICreationFeature AsCreationFeature:
                 case IProcedureFeature AsProcedureFeature:
-                    errorList.Add(new ErrorNotAnchor(item, Text));
+                    errorList.AddError(new ErrorNotAnchor(item, Text));
                     return true;
 
                 case IFunctionFeature AsFunctionFeature:

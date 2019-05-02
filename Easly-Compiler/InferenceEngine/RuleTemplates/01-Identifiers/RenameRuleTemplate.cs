@@ -54,7 +54,7 @@
 
             if (SourceIdentifier.ValidText.Item == DestinationIdentifier.ValidText.Item)
             {
-                ErrorList.Add(new ErrorNameUnchanged(node, SourceIdentifier.ValidText.Item));
+                ErrorList.AddError(new ErrorNameUnchanged(node, SourceIdentifier.ValidText.Item));
                 Success = false;
             }
 

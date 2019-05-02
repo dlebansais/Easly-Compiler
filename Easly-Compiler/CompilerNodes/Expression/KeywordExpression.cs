@@ -198,7 +198,7 @@ namespace CompilerNode
             }
 
             if (!Found)
-                errorList.Add(new ErrorBooleanTypeMissing(source));
+                errorList.AddError(new ErrorBooleanTypeMissing(source));
 
             return Found;
         }
@@ -219,7 +219,7 @@ namespace CompilerNode
                 Result = true;
             }
             else
-                errorList.Add(new ErrorUnavailableValue(source));
+                errorList.AddError(new ErrorUnavailableValue(source));
 
             return Result;
         }
@@ -250,7 +250,7 @@ namespace CompilerNode
                 }
             }
             else
-                errorList.Add(new ErrorUnavailableResult(source));
+                errorList.AddError(new ErrorUnavailableResult(source));
 
             return false;
         }
@@ -271,7 +271,7 @@ namespace CompilerNode
                 }
 
             if (!Success)
-                errorList.Add(new ErrorResultNotReturned(source));
+                errorList.AddError(new ErrorResultNotReturned(source));
 
             return Success;
         }
@@ -284,7 +284,7 @@ namespace CompilerNode
                     return true;
             }
 
-            errorList.Add(new ErrorResultUsedOutsideGetter(source));
+            errorList.AddError(new ErrorResultUsedOutsideGetter(source));
             return false;
         }
         #endregion

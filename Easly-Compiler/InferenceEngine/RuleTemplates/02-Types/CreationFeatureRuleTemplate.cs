@@ -62,7 +62,7 @@
 
                 if (ThisOverloadBody.IsDeferredBody != FirstOverloadBody.IsDeferredBody)
                 {
-                    ErrorList.Add(new ErrorBodyTypeMismatch(node, EntityName.ValidText.Item));
+                    ErrorList.AddError(new ErrorBodyTypeMismatch(node, EntityName.ValidText.Item));
                     Success = false;
                     break;
                 }
@@ -75,7 +75,7 @@
             IErrorList CheckErrorList = new ErrorList();
             if (!Feature.DisjoinedParameterCheck(OverloadTypeList, node, CheckErrorList))
             {
-                Debug.Assert(CheckErrorList.Count > 0);
+                Debug.Assert(!CheckErrorList.IsEmpty);
 
                 AddSourceErrorList(CheckErrorList);
                 Success = false;

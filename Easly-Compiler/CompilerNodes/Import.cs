@@ -180,14 +180,14 @@ namespace CompilerNode
 
             if (!StringValidation.IsValidIdentifier(ImportLibraryIdentifier, LibraryIdentifier.Text, out string ValidLibraryIdentifier, out StringError))
             {
-                errorList.Add(StringError);
+                errorList.AddError(StringError);
                 return false;
             }
 
             // Match the library name and source name.
             if (!libraryTable.ContainsKey(ValidLibraryIdentifier))
             {
-                errorList.Add(new ErrorUnknownIdentifier(ImportLibraryIdentifier, ValidLibraryIdentifier));
+                errorList.AddError(new ErrorUnknownIdentifier(ImportLibraryIdentifier, ValidLibraryIdentifier));
                 return false;
             }
 
@@ -199,7 +199,7 @@ namespace CompilerNode
 
                 if (!StringValidation.IsValidIdentifier(ImportFromIdentifier, FromIdentifier.Item.Text, out ValidFromIdentifier, out StringError))
                 {
-                    errorList.Add(StringError);
+                    errorList.AddError(StringError);
                     return false;
                 }
             }
@@ -208,7 +208,7 @@ namespace CompilerNode
 
             if (!SourceNameTable.ContainsKey(ValidFromIdentifier))
             {
-                errorList.Add(new ErrorUnknownIdentifier(ImportLibraryIdentifier, ValidLibraryIdentifier));
+                errorList.AddError(new ErrorUnknownIdentifier(ImportLibraryIdentifier, ValidLibraryIdentifier));
                 return false;
             }
 
@@ -237,7 +237,7 @@ namespace CompilerNode
                     importedClassTable.ChangeKey(Entry.Key, Entry.Value);
             }
 
-            Debug.Assert(Success || errorList.Count > 0);
+            Debug.Assert(Success || !errorList.IsEmpty);
             return Success;
         }
         #endregion

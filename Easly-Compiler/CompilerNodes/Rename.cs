@@ -164,33 +164,33 @@ namespace CompilerNode
             // Validate source and destination strings.
             if (!StringValidation.IsValidIdentifier(RenameSourceIdentifier, SourceIdentifier.Text, out string ValidSourceIdentifier, out IErrorStringValidity StringError))
             {
-                errorList.Add(StringError);
+                errorList.AddError(StringError);
                 return false;
             }
 
             if (!StringValidation.IsValidIdentifier(RenameDestinationIdentifier, DestinationIdentifier.Text, out string ValidDestinationIdentifier, out StringError))
             {
-                errorList.Add(StringError);
+                errorList.AddError(StringError);
                 return false;
             }
 
             // Reject identity.
             if (ValidSourceIdentifier == ValidDestinationIdentifier)
             {
-                errorList.Add(new ErrorNameUnchanged(this, ValidSourceIdentifier));
+                errorList.AddError(new ErrorNameUnchanged(this, ValidSourceIdentifier));
                 return false;
             }
 
             // Reject duplicates.
             if (sourceIdentifierTable.ContainsKey(ValidSourceIdentifier))
             {
-                errorList.Add(new ErrorIdentifierAlreadyListed(RenameSourceIdentifier, ValidSourceIdentifier));
+                errorList.AddError(new ErrorIdentifierAlreadyListed(RenameSourceIdentifier, ValidSourceIdentifier));
                 return false;
             }
 
             if (destinationIdentifierTable.ContainsKey(ValidSourceIdentifier))
             {
-                errorList.Add(new ErrorDoubleRename(RenameSourceIdentifier, destinationIdentifierTable[ValidSourceIdentifier], ValidSourceIdentifier));
+                errorList.AddError(new ErrorDoubleRename(RenameSourceIdentifier, destinationIdentifierTable[ValidSourceIdentifier], ValidSourceIdentifier));
                 return false;
             }
 
@@ -216,14 +216,14 @@ namespace CompilerNode
 
             if (!SourceTable.IsAssigned)
             {
-                errorList.Add(new ErrorUnknownIdentifier(RenameSourceIdentifier, ValidSourceIdentifier));
+                errorList.AddError(new ErrorUnknownIdentifier(RenameSourceIdentifier, ValidSourceIdentifier));
                 return false;
             }
 
             // Check that no other rename uses this destination.
             if (destinationIdentifierTable.ContainsKey(ValidDestinationIdentifier))
             {
-                errorList.Add(new ErrorIdentifierAlreadyListed(RenameDestinationIdentifier, ValidDestinationIdentifier));
+                errorList.AddError(new ErrorIdentifierAlreadyListed(RenameDestinationIdentifier, ValidDestinationIdentifier));
                 return false;
             }
 

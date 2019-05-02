@@ -198,7 +198,7 @@ namespace CompilerNode
             {
                 if (!StringValidation.IsValidIdentifier(NodeExportIdentifier, ExportIdentifier.Text, out string ValidIdentifier, out StringError))
                 {
-                    errorList.Add(StringError);
+                    errorList.AddError(StringError);
                     return false;
                 }
 
@@ -217,7 +217,7 @@ namespace CompilerNode
                 {
                     if (ListedExportTable.ContainsKey(ValidIdentifier))
                     {
-                        errorList.Add(new ErrorIdentifierAlreadyListed(IdentifierItem, ValidIdentifier));
+                        errorList.AddError(new ErrorIdentifierAlreadyListed(IdentifierItem, ValidIdentifier));
                         InvalidExportChange = true;
                     }
                     else
@@ -227,7 +227,7 @@ namespace CompilerNode
                 {
                     if (ListedExportTable.ContainsKey(ValidIdentifier))
                     {
-                        errorList.Add(new ErrorIdentifierAlreadyListed(IdentifierItem, ValidIdentifier));
+                        errorList.AddError(new ErrorIdentifierAlreadyListed(IdentifierItem, ValidIdentifier));
                         InvalidExportChange = true;
                     }
                     else
@@ -235,7 +235,7 @@ namespace CompilerNode
                 }
                 else if (ValidIdentifier.ToLower() != LanguageClasses.Any.Name.ToLower())
                 {
-                    errorList.Add(new ErrorUnknownIdentifier(IdentifierItem, ValidIdentifier));
+                    errorList.AddError(new ErrorUnknownIdentifier(IdentifierItem, ValidIdentifier));
                     InvalidExportChange = true;
                 }
             }
@@ -257,7 +257,7 @@ namespace CompilerNode
 
             if (!StringValidation.IsValidIdentifier(NodeExportIdentifier, ExportIdentifier.Text, out string ValidIdentifier, out IErrorStringValidity StringError))
             {
-                errorList.Add(StringError);
+                errorList.AddError(StringError);
                 return false;
             }
 
@@ -274,7 +274,7 @@ namespace CompilerNode
 
             if (currentExportName == null || currentClassTable == null)
             {
-                errorList.Add(new ErrorUnknownIdentifier((IIdentifier)ExportIdentifier, ValidIdentifier));
+                errorList.AddError(new ErrorUnknownIdentifier((IIdentifier)ExportIdentifier, ValidIdentifier));
                 return false;
             }
 

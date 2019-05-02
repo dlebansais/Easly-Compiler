@@ -157,14 +157,13 @@
 
         private static bool DisjoinedParameterCheck(IParameter derivedParameter, IParameter baseParameter, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, ISource location, IErrorList errorList)
         {
-            IErrorList FakeErrorList = new ErrorList();
             ICompiledType DerivedType = derivedParameter.ResolvedParameter.ResolvedFeatureType.Item;
             ICompiledType BaseType = baseParameter.ResolvedParameter.ResolvedFeatureType.Item;
             bool Success = true;
 
-            if (ObjectType.TypeConformToBase(DerivedType, BaseType, substitutionTypeTable, FakeErrorList, location, false))
+            if (ObjectType.TypeConformToBase(DerivedType, BaseType, substitutionTypeTable, ErrorList.Ignored, location, false))
             {
-                errorList.Add(new ErrorMoreBasicParameter(baseParameter.ResolvedParameter.EmbeddingOverload));
+                errorList.AddError(new ErrorMoreBasicParameter(baseParameter.ResolvedParameter.EmbeddingOverload));
                 Success = false;
             }
 
@@ -206,7 +205,6 @@
             }
 
             IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-            IErrorList FakeErrorList = new ErrorList();
             ISource FakeLocation = overloadList[0];
 
             IParameter SelectedParameter = SameIndexList[0];
@@ -219,7 +217,7 @@
                 ITypeName CurrentParameterTypeName = CurrentParameter.ResolvedParameter.ResolvedFeatureTypeName.Item;
                 ICompiledType CurrentParameterType = CurrentParameter.ResolvedParameter.ResolvedFeatureType.Item;
 
-                if (ObjectType.TypeConformToBase(SelectedParameterType, CurrentParameterType, SubstitutionTypeTable, FakeErrorList, FakeLocation, false))
+                if (ObjectType.TypeConformToBase(SelectedParameterType, CurrentParameterType, SubstitutionTypeTable, ErrorList.Ignored, FakeLocation, false))
                 {
                     SelectedParameter = CurrentParameter;
                     SelectedParameterTypeName = CurrentParameterTypeName;
@@ -252,16 +250,15 @@
             }
 
             IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-            IErrorList FakeErrorList = new ErrorList();
 
             for (int i = 0; i < SameIndexList.Count; i++)
             {
                 IParameter CurrentParameter = SameIndexList[i];
                 ICompiledType CurrentParameterType = CurrentParameter.ResolvedParameter.ResolvedFeatureType.Item;
 
-                if (!ObjectType.TypeConformToBase(CurrentParameterType, baseType, SubstitutionTypeTable, FakeErrorList, location, false))
+                if (!ObjectType.TypeConformToBase(CurrentParameterType, baseType, SubstitutionTypeTable, ErrorList.Ignored, location, false))
                 {
-                    errorList.Add(new ErrorNonConformingType(location));
+                    errorList.AddError(new ErrorNonConformingType(location));
                     Success = false;
                 }
             }

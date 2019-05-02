@@ -62,7 +62,7 @@
         public virtual void Compile(string fileName)
         {
             FileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
-            ErrorList.Clear();
+            ErrorList.ClearErrors();
 
             if (File.Exists(FileName))
             {
@@ -75,11 +75,11 @@
                 }
                 catch (Exception e)
                 {
-                    ErrorList.Add(new ErrorInputFileInvalid(e));
+                    ErrorList.AddError(new ErrorInputFileInvalid(e));
                 }
             }
             else
-                ErrorList.Add(new ErrorInputFileNotFound(FileName));
+                ErrorList.AddError(new ErrorInputFileNotFound(FileName));
         }
 
         /// <summary>
@@ -89,7 +89,7 @@
         public virtual void Compile(BaseNode.IRoot root)
         {
             Root = root ?? throw new ArgumentNullException(nameof(root));
-            ErrorList.Clear();
+            ErrorList.ClearErrors();
 
             using (MemoryStream ms = new MemoryStream())
             {
@@ -109,7 +109,7 @@
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            ErrorList.Clear();
+            ErrorList.ClearErrors();
             IRoot LoadedRoot;
 
             try
@@ -119,7 +119,7 @@
             }
             catch (Exception e)
             {
-                ErrorList.Add(new ErrorInputFileInvalid(e));
+                ErrorList.AddError(new ErrorInputFileInvalid(e));
                 return;
             }
 
@@ -129,7 +129,7 @@
             }
             catch (Exception e)
             {
-                ErrorList.Add(new ErrorInternal(e));
+                ErrorList.AddError(new ErrorInternal(e));
             }
         }
         #endregion
@@ -246,11 +246,11 @@
 
             if (!NodeTreeDiagnostic.IsValid(root, assertValid: false))
             {
-                ErrorList.Add(new ErrorInputRootInvalid());
+                ErrorList.AddError(new ErrorInputRootInvalid());
                 Success = false;
             }
 
-            Debug.Assert(Success || ErrorList.Count > 0);
+            Debug.Assert(Success || !ErrorList.IsEmpty);
             return Success;
         }
         #endregion
@@ -259,7 +259,7 @@
         /// <summary></summary>
         protected virtual void ReplacePhase1Macroes(IRoot root)
         {
-            Debug.Assert(ErrorList.Count == 0);
+            Debug.Assert(ErrorList.IsEmpty);
 
             GenerateCompilationDateTime();
             GenerateCompilationUID();
@@ -427,18 +427,18 @@
         #region Block Replication
         private bool ReplicateAllBlocks(IRoot root)
         {
-            Debug.Assert(ErrorList.Count == 0);
+            Debug.Assert(ErrorList.IsEmpty);
 
             foreach (IBlock<BaseNode.IClass, BaseNode.Class> Block in root.ClassBlocks.NodeBlockList)
                 foreach (IClass Item in Block.NodeList)
                     if (string.IsNullOrEmpty(Item.ClassPath))
-                        ErrorList.Add(new ErrorEmptyClassPath(Item));
+                        ErrorList.AddError(new ErrorEmptyClassPath(Item));
 
             ReplicationContext Replication = new ReplicationContext();
             IWalkCallbacks<ReplicationContext> Callbacks = new WalkCallbacks<ReplicationContext>() { HandlerNode = OnNodeIgnoreReplicates, HandlerBlockList = OnBlockListReplicate, HandlerString = OnStringReplicateText };
             NodeTreeWalk<ReplicationContext>.Walk(root, Callbacks, Replication);
 
-            return ErrorList.Count == 0;
+            return ErrorList.IsEmpty;
         }
 
         private bool OnNodeIgnoreReplicates(BaseNode.INode node, BaseNode.INode parentNode, string propertyName, IWalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
@@ -448,12 +448,12 @@
             else if (node is IRoot AsRoot)
             {
                 ProcessGlobalReplicates(AsRoot, context);
-                return ErrorList.Count == 0;
+                return ErrorList.IsEmpty;
             }
             else if (node is IClass AsClass)
             {
                 ProcessClassReplicates(AsClass, callbacks, context);
-                return ErrorList.Count == 0;
+                return ErrorList.IsEmpty;
             }
             else
                 return parentNode == null || NodeTreeWalk<ReplicationContext>.Walk(node, callbacks, context);
@@ -514,11 +514,11 @@
                 string ReplicateNameText = ReplicateName.Text;
 
                 if (!StringValidation.IsValidIdentifier(ReplicateName, ReplicateNameText, out string ValidReplicateName, out IErrorStringValidity StringError))
-                    ErrorList.Add(StringError);
+                    ErrorList.AddError(StringError);
                 else
                 {
                     if (context.ReplicateTable.ContainsKey(ValidReplicateName))
-                        ErrorList.Add(new ErrorDuplicateName(ReplicateName, ValidReplicateName));
+                        ErrorList.AddError(new ErrorDuplicateName(ReplicateName, ValidReplicateName));
                     else
                     {
                         // If 0, the whole root would not have passed validity check.
@@ -531,7 +531,7 @@
                             string PatternText = Pattern.Text;
 
                             if (!StringValidation.IsValidIdentifier(Pattern, PatternText, out string ValidPatternText, out StringError))
-                                ErrorList.Add(StringError);
+                                ErrorList.AddError(StringError);
                             else
                                 ValidPatternList.Add(ValidPatternText);
                         }
@@ -571,7 +571,7 @@
 
             if (!StringValidation.IsValidIdentifier(ReplicationPattern, ReplicationPatternText, out string ValidReplicationPattern, out StringError))
             {
-                ErrorList.Add(StringError);
+                ErrorList.AddError(StringError);
                 return false;
             }
             else
@@ -580,17 +580,17 @@
 
                 if (!StringValidation.IsValidIdentifier(SourceIdentifier, SourceIdentifierText, out string ValidSourceIdentifier, out StringError))
                 {
-                    ErrorList.Add(StringError);
+                    ErrorList.AddError(StringError);
                     return false;
                 }
                 else if (!context.ReplicateTable.ContainsKey(ValidSourceIdentifier))
                 {
-                    ErrorList.Add(new ErrorUnknownIdentifier(SourceIdentifier, ValidSourceIdentifier));
+                    ErrorList.AddError(new ErrorUnknownIdentifier(SourceIdentifier, ValidSourceIdentifier));
                     return false;
                 }
                 else if (context.PatternTable.ContainsKey(ValidReplicationPattern))
                 {
-                    ErrorList.Add(new ErrorPatternAlreadyUsed(ReplicationPattern, ValidReplicationPattern));
+                    ErrorList.AddError(new ErrorPatternAlreadyUsed(ReplicationPattern, ValidReplicationPattern));
                     return false;
                 }
                 else
@@ -699,7 +699,7 @@
         /// <summary></summary>
         protected virtual void ReplacePhase2Macroes(IRoot root)
         {
-            Debug.Assert(ErrorList.Count == 0);
+            Debug.Assert(ErrorList.IsEmpty);
 
             bool Success = NodeTreeWalk<ReplacePhase2MacroContext>.Walk(root, new WalkCallbacks<ReplacePhase2MacroContext>() { HandlerNode = ReplacePhase2Macro, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() }, new ReplacePhase2MacroContext());
             Debug.Assert(Success);
@@ -777,7 +777,7 @@
         /// <summary></summary>
         protected virtual void InitializeSources(IRoot root)
         {
-            Debug.Assert(ErrorList.Count == 0);
+            Debug.Assert(ErrorList.IsEmpty);
 
             bool Success = NodeTreeWalk<object>.Walk(root, new WalkCallbacks<object>() { HandlerNode = InitializeSource, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() }, null);
             Debug.Assert(Success);
@@ -829,7 +829,7 @@
             if (!CheckClassesConsistency(root))
                 return false;
 
-            Debug.Assert(ErrorList.Count == 0);
+            Debug.Assert(ErrorList.IsEmpty);
             return true;
         }
 
@@ -859,11 +859,11 @@
                     IsClassNamesValid = false;
 
                     foreach (IClass Item in DuplicateClassList)
-                        ErrorList.Add(new ErrorSourceRequired((IName)Item.EntityName));
+                        ErrorList.AddError(new ErrorSourceRequired((IName)Item.EntityName));
                 }
             }
 
-            Debug.Assert(IsClassNamesValid || ErrorList.Count > 0);
+            Debug.Assert(IsClassNamesValid || !ErrorList.IsEmpty);
             return IsClassNamesValid;
         }
 
@@ -893,11 +893,11 @@
                     IsLibraryNamesValid = false;
 
                     foreach (ILibrary Item in DuplicateLibraryList)
-                        ErrorList.Add(new ErrorSourceRequired((IName)Item.EntityName));
+                        ErrorList.AddError(new ErrorSourceRequired((IName)Item.EntityName));
                 }
             }
 
-            Debug.Assert(IsLibraryNamesValid || ErrorList.Count > 0);
+            Debug.Assert(IsLibraryNamesValid || !ErrorList.IsEmpty);
             return IsLibraryNamesValid;
         }
 
@@ -909,7 +909,7 @@
             foreach (ILibrary Library in root.LibraryList)
                 Success &= Library.InitLibraryTables(ClassTable, ErrorList);
 
-            Debug.Assert(Success || ErrorList.Count > 0);
+            Debug.Assert(Success || !ErrorList.IsEmpty);
             return Success;
         }
 
@@ -941,10 +941,10 @@
                 foreach (ILibrary Library in UnresolvedLibraryList)
                     NameList.Add(Library.ValidLibraryName);
 
-                ErrorList.Add(new ErrorCyclicDependency(NameList));
+                ErrorList.AddError(new ErrorCyclicDependency(NameList));
             }
 
-            Debug.Assert(Success || ErrorList.Count > 0);
+            Debug.Assert(Success || !ErrorList.IsEmpty);
             return Success;
         }
 
@@ -977,7 +977,7 @@
             foreach (IClass Class in root.ClassList)
                 Success &= Class.CheckClassConsistency(LibraryTable, ClassTable, ErrorList);
 
-            Debug.Assert(Success || ErrorList.Count > 0);
+            Debug.Assert(Success || !ErrorList.IsEmpty);
             return Success;
         }
 
@@ -1003,7 +1003,7 @@
 
             bool Success = Engine.Solve(ErrorList);
 
-            Debug.Assert(Success || ErrorList.Count > 0);
+            Debug.Assert(Success || !ErrorList.IsEmpty);
             return Success;
         }
 
@@ -1047,7 +1047,7 @@
 
             bool Success = Engine.Solve(ErrorList);
 
-            Debug.Assert(Success || ErrorList.Count > 0);
+            Debug.Assert(Success || !ErrorList.IsEmpty);
             return Success;
         }
 

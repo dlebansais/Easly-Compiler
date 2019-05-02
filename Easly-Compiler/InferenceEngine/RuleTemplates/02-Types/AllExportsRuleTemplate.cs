@@ -218,7 +218,7 @@
         {
             if (classTable.ContainsKey(validClassIdentifier))
             {
-                errorList.Add(new ErrorIdentifierAlreadyListed(source, validClassIdentifier));
+                errorList.AddError(new ErrorIdentifierAlreadyListed(source, validClassIdentifier));
                 return false;
             }
 

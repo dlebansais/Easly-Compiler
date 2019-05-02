@@ -56,7 +56,7 @@
             Tuple<IErrorList, ITypeName, ICompiledType> SourceData = dataList[SourceTemplateList[0]] as Tuple<IErrorList, ITypeName, ICompiledType>;
             Debug.Assert(SourceData != null);
 
-            if (SourceData.Item1.Count > 0)
+            if (!SourceData.Item1.IsEmpty)
             {
                 AddSourceErrorList(SourceData.Item1);
                 Success = false;

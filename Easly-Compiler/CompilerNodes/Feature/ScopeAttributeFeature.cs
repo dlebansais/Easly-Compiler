@@ -123,7 +123,7 @@ namespace CompilerNode
             bool Result = false;
 
             if (attributeType is IClassType AsClassType && AsClassType.BaseClass.Cloneable == BaseNode.CloneableStatus.Single)
-                errorList.Add(new ErrorSingleTypeNotAllowed(location, attributeName));
+                errorList.AddError(new ErrorSingleTypeNotAllowed(location, attributeName));
             else
             {
                 feature = new ScopeAttributeFeature(location, attributeName, attributeTypeName, attributeType, initialDefaultValue);
@@ -198,7 +198,7 @@ namespace CompilerNode
                         if (assignedSingleClassList.Contains(GroupClass))
                         {
                             IName EntityName = (IName)BaseClass.EntityName;
-                            errorList.Add(new ErrorSingleInstanceConflict(source, EntityName.ValidText.Item));
+                            errorList.AddError(new ErrorSingleInstanceConflict(source, EntityName.ValidText.Item));
                             IsAssigned = true;
                             break;
                         }

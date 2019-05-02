@@ -646,7 +646,7 @@ namespace CompilerNode
             // Verify the class name is a valid string.
             if (!StringValidation.IsValidIdentifier(ClassEntityName, EntityName.Text, out string ValidEntityName, out IErrorStringValidity StringError))
             {
-                errorList.Add(StringError);
+                errorList.AddError(StringError);
                 return false;
             }
 
@@ -659,7 +659,7 @@ namespace CompilerNode
 
                 if (!StringValidation.IsValidIdentifier(ClassFromIdentifier, FromIdentifier.Item.Text, out string ValidFromIdentifier, out StringError))
                 {
-                    errorList.Add(StringError);
+                    errorList.AddError(StringError);
                     return false;
                 }
 
@@ -680,7 +680,7 @@ namespace CompilerNode
                     // Report a source name collision if the class has one.
                     if (FromIdentifier.IsAssigned)
                     {
-                        errorList.Add(new ErrorDuplicateName(ClassEntityName, ValidClassName));
+                        errorList.AddError(new ErrorDuplicateName(ClassEntityName, ValidClassName));
                         return false;
                     }
                 }
@@ -723,7 +723,7 @@ namespace CompilerNode
                 if (ImportedLibraryList.Contains(MatchingLibrary))
                 {
                     Success = false;
-                    errorList.Add(new ErrorDuplicateImport((IIdentifier)ImportItem.LibraryIdentifier, MatchingLibrary.ValidLibraryName, MatchingLibrary.ValidSourceName));
+                    errorList.AddError(new ErrorDuplicateImport((IIdentifier)ImportItem.LibraryIdentifier, MatchingLibrary.ValidLibraryName, MatchingLibrary.ValidSourceName));
                     continue;
                 }
 
@@ -747,13 +747,13 @@ namespace CompilerNode
                     if (NewName != ValidClassName)
                     {
                         Success = false;
-                        errorList.Add(new ErrorNameChanged(Imported.ImportLocation, ValidClassName, NewName));
+                        errorList.AddError(new ErrorNameChanged(Imported.ImportLocation, ValidClassName, NewName));
                     }
 
                     if (Imported.IsTypeAssigned && Imported.ImportType != BaseNode.ImportType.Latest)
                     {
                         Success = false;
-                        errorList.Add(new ErrorImportTypeConflict(Imported.ImportLocation, ValidClassName));
+                        errorList.AddError(new ErrorImportTypeConflict(Imported.ImportLocation, ValidClassName));
                     }
 
                     break;
@@ -780,7 +780,7 @@ namespace CompilerNode
 
             ImportedClassTable.Seal();
 
-            Debug.Assert(Success || errorList.Count > 0);
+            Debug.Assert(Success || !errorList.IsEmpty);
             return Success;
         }
 
@@ -806,7 +806,7 @@ namespace CompilerNode
                 // We can assume we use mergedImportType after this.
                 if (MergedClassItem.IsTypeAssigned && MergedClassItem.ImportType != mergedImportType)
                 {
-                    errorList.Add(new ErrorImportTypeConflict(importLocation, ClassName));
+                    errorList.AddError(new ErrorImportTypeConflict(importLocation, ClassName));
                     Success = false;
                 }
 
@@ -817,7 +817,7 @@ namespace CompilerNode
                     IImportedClass ClassItem = importedClassTable[ClassName];
                     if (ClassItem.Item != MergedClassItem.Item)
                     {
-                        errorList.Add(new ErrorNameAlreadyUsed(importLocation, ClassName));
+                        errorList.AddError(new ErrorNameAlreadyUsed(importLocation, ClassName));
                         Success = false;
                         continue;
                     }
@@ -827,7 +827,7 @@ namespace CompilerNode
                     {
                         if (ClassItem.ImportType != mergedImportType)
                         {
-                            errorList.Add(new ErrorImportTypeConflict(importLocation, ClassName));
+                            errorList.AddError(new ErrorImportTypeConflict(importLocation, ClassName));
                             Success = false;
                             continue;
                         }
@@ -846,7 +846,7 @@ namespace CompilerNode
                 }
             }
 
-            Debug.Assert(Success || errorList.Count > 0);
+            Debug.Assert(Success || !errorList.IsEmpty);
             return Success;
         }
 
@@ -860,7 +860,7 @@ namespace CompilerNode
                 if (ClassItem.Item == mergedClassItem.Item)
                 {
                     string OldName = ImportedEntry.Key;
-                    errorList.Add(new ErrorClassAlreadyImported(importLocation, OldName, className));
+                    errorList.AddError(new ErrorClassAlreadyImported(importLocation, OldName, className));
                     Success = false;
                     break;
                 }

@@ -66,12 +66,12 @@
 
                 if (SourceToDestinationTable.ContainsKey(ValidSourceIdentifier))
                 {
-                    ErrorList.Add(new ErrorIdentifierAlreadyListed(SourceIdentifier, ValidSourceIdentifier));
+                    ErrorList.AddError(new ErrorIdentifierAlreadyListed(SourceIdentifier, ValidSourceIdentifier));
                     Success = false;
                 }
                 else if (DestinationToSourceTable.ContainsKey(ValidDestinationIdentifier))
                 {
-                    ErrorList.Add(new ErrorDoubleRename(Item, DestinationToSourceTable[ValidDestinationIdentifier], ValidDestinationIdentifier));
+                    ErrorList.AddError(new ErrorDoubleRename(Item, DestinationToSourceTable[ValidDestinationIdentifier], ValidDestinationIdentifier));
                     Success = false;
                 }
                 else

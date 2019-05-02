@@ -310,8 +310,7 @@
                 if (Parameter.DefaultValue.IsAssigned)
                 {
                     // The default value has already been checked and validated.
-                    IErrorList FakeErrorList = new ErrorList();
-                    bool IsCreated = ScopeAttributeFeature.Create(Parameter, ParameterName.ValidText.Item, InstancedParameterTypeName, InstancedParameterType, (IExpression)Parameter.DefaultValue.Item, FakeErrorList, out NewEntity);
+                    bool IsCreated = ScopeAttributeFeature.Create(Parameter, ParameterName.ValidText.Item, InstancedParameterTypeName, InstancedParameterType, (IExpression)Parameter.DefaultValue.Item, ErrorList.Ignored, out NewEntity);
                     Debug.Assert(IsCreated);
                 }
                 else
@@ -339,8 +338,7 @@
                 if (Result.DefaultValue.IsAssigned)
                 {
                     // The default value has already been checked and validated.
-                    IErrorList FakeErrorList = new ErrorList();
-                    bool IsCreated = ScopeAttributeFeature.Create(Result, ResultName.ValidText.Item, InstancedResultTypeName, InstancedResultType, (IExpression)Result.DefaultValue.Item, FakeErrorList, out NewEntity);
+                    bool IsCreated = ScopeAttributeFeature.Create(Result, ResultName.ValidText.Item, InstancedResultTypeName, InstancedResultType, (IExpression)Result.DefaultValue.Item, ErrorList.Ignored, out NewEntity);
                     Debug.Assert(IsCreated);
                 }
                 else

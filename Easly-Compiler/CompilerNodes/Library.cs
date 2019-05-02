@@ -159,7 +159,7 @@ namespace CompilerNode
             // Verify the library name is a valid string.
             if (!StringValidation.IsValidIdentifier(LibraryEntityName, EntityName.Text, out string ValidEntityName, out StringError))
             {
-                errorList.Add(StringError);
+                errorList.AddError(StringError);
                 return false;
             }
 
@@ -172,7 +172,7 @@ namespace CompilerNode
 
                 if (!StringValidation.IsValidIdentifier(LibraryFromIdentifier, FromIdentifier.Item.Text, out string ValidFromIdentifier, out StringError))
                 {
-                    errorList.Add(StringError);
+                    errorList.AddError(StringError);
                     return false;
                 }
 
@@ -193,7 +193,7 @@ namespace CompilerNode
                     // Report a source name collision if the class has one.
                     if (FromIdentifier.IsAssigned)
                     {
-                        errorList.Add(new ErrorDuplicateName(LibraryEntityName, ValidLibraryName));
+                        errorList.AddError(new ErrorDuplicateName(LibraryEntityName, ValidLibraryName));
                         return false;
                     }
                 }
@@ -229,7 +229,7 @@ namespace CompilerNode
                 if (!StringValidation.IsValidIdentifier(ClassIdentifier, ClassIdentifier.Text, out string ValidClassIdentifier, out IErrorStringValidity StringError))
                 {
                     Success = false;
-                    errorList.Add(StringError);
+                    errorList.AddError(StringError);
                     continue;
                 }
 
@@ -243,7 +243,7 @@ namespace CompilerNode
                     if (!classTable.ContainsKey(ValidClassIdentifier))
                     {
                         Success = false;
-                        errorList.Add(new ErrorUnknownIdentifier(ClassIdentifier, ValidClassIdentifier));
+                        errorList.AddError(new ErrorUnknownIdentifier(ClassIdentifier, ValidClassIdentifier));
                         continue;
                     }
 
@@ -253,7 +253,7 @@ namespace CompilerNode
                     if (!SourceNameTable.ContainsKey(ValidSourceName))
                     {
                         Success = false;
-                        errorList.Add(new ErrorUnknownIdentifier(ClassIdentifier, ValidClassIdentifier));
+                        errorList.AddError(new ErrorUnknownIdentifier(ClassIdentifier, ValidClassIdentifier));
                         continue;
                     }
 
@@ -261,7 +261,7 @@ namespace CompilerNode
                     if (ImportedClassTable.ContainsKey(ValidClassIdentifier))
                     {
                         Success = false;
-                        errorList.Add(new ErrorIdentifierAlreadyListed(ClassIdentifier, ValidClassIdentifier));
+                        errorList.AddError(new ErrorIdentifierAlreadyListed(ClassIdentifier, ValidClassIdentifier));
                         continue;
                     }
 
@@ -276,7 +276,7 @@ namespace CompilerNode
                 }
             }
 
-            Debug.Assert(Success || errorList.Count > 0);
+            Debug.Assert(Success || !errorList.IsEmpty);
             return Success;
         }
 
@@ -306,7 +306,7 @@ namespace CompilerNode
                 if (ImportedLibraryList.Contains(MatchingLibrary))
                 {
                     Success = false;
-                    errorList.Add(new ErrorDuplicateImport((IIdentifier)ImportItem.LibraryIdentifier, MatchingLibrary.ValidLibraryName, MatchingLibrary.ValidSourceName));
+                    errorList.AddError(new ErrorDuplicateImport((IIdentifier)ImportItem.LibraryIdentifier, MatchingLibrary.ValidLibraryName, MatchingLibrary.ValidSourceName));
                     continue;
                 }
 
@@ -329,7 +329,7 @@ namespace CompilerNode
             foreach (IImport ImportItem in ToRemove)
                 ImportList.Remove(ImportItem);
 
-            Debug.Assert(Success || errorList.Count > 0);
+            Debug.Assert(Success || !errorList.IsEmpty);
             return Success;
         }
 

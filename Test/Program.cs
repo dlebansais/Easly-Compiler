@@ -13,18 +13,16 @@ namespace Test
             Compiler c = new Compiler();
             //c.InferenceRetries = 3;
 
-            c.Compile(@"C:\Users\DLB\AppData\Local\Temp\root.easly");
-            //c.Compile("../../../coverage/coverage.easly");
+            //c.Compile(@"C:\Users\DLB\AppData\Local\Temp\root.easly");
+            c.Compile("../../../coverage/coverage.easly");
             //c.Compile("../../../coverage/coverage invalid 03-11.easly");
             //c.Compile("../../../test.easly");
             //c.Compile("../../../root.easly");
             //c.Compile("../../../coverage/coverage replication.easly");
 
-            Debug.WriteLine($"{c.ErrorList.Count} error(s).");
-            foreach (IError Error in c.ErrorList)
-                Debug.WriteLine($"  {Error.Message} ({Error}) [{Error.Location}].");
+            Debug.WriteLine(c.ErrorList.ToString());
 
-            return -c.ErrorList.Count;
+            return c.ErrorList.IsEmpty ? 0 : -1;
         }
 
         static void DebugOutputLanguage()

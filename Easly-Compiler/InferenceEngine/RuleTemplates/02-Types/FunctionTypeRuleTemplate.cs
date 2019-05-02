@@ -54,7 +54,7 @@
             IErrorList CheckErrorList = new ErrorList();
             if (!Feature.DisjoinedParameterCheck(node.OverloadList, node, CheckErrorList))
             {
-                Debug.Assert(CheckErrorList.Count > 0);
+                Debug.Assert(!CheckErrorList.IsEmpty);
                 AddSourceErrorList(CheckErrorList);
                 Success = false;
             }
