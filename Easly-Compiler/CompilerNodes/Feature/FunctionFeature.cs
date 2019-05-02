@@ -153,9 +153,9 @@ namespace CompilerNode
             {
                 Debug.Assert(MostCommonTypeName.IsAssigned == MostCommonType.IsAssigned);
                 Debug.Assert(ResolvedFeatureTypeName.IsAssigned == ResolvedFeatureType.IsAssigned);
-                IsResolved = ResolvedFeature.IsAssigned;
-                Debug.Assert(MostCommonType.IsAssigned == IsResolved);
-                Debug.Assert(ResolvedFeatureType.IsAssigned == IsResolved);
+                IsResolved = MostCommonType.IsAssigned;
+                Debug.Assert(ResolvedFeature.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedFeatureType.IsAssigned || !IsResolved);
                 IsHandled = true;
             }
 

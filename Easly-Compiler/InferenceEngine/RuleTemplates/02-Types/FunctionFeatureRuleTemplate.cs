@@ -85,24 +85,6 @@
                 AddSourceErrorList(CheckErrorList);
                 Success = false;
             }
-            else
-            {
-                CommonResults = Feature.CommonResultType(OverloadTypeList);
-
-                bool JoinSuccess = true;
-                for (int i = 0; i < CommonResults.Count; i++)
-                    JoinSuccess &= Feature.JoinedResultCheck(OverloadTypeList, i, CommonResults[i].ValueType, node, CheckErrorList);
-
-                if (!JoinSuccess)
-                {
-                    Debug.Assert(CheckErrorList.Count > 0);
-                    AddSourceErrorList(CheckErrorList);
-                    Success = false;
-                }
-            }
-
-            if (Success)
-                data = CommonResults;
 
             return Success;
         }
@@ -132,19 +114,6 @@
 
             node.ResolvedFeatureTypeName.Item = ResolvedFunctionTypeName;
             node.ResolvedFeatureType.Item = ResolvedFunctionType;
-
-            ITypeName MostCommonTypeName = null;
-            ICompiledType MostCommonType = null;
-            foreach (IExpressionType Item in CommonResults)
-                if (MostCommonType == null || Item.Name == nameof(BaseNode.Keyword.Result))
-                {
-                    MostCommonTypeName = Item.ValueTypeName;
-                    MostCommonType = Item.ValueType;
-                }
-
-            node.MostCommonTypeName.Item = MostCommonTypeName;
-            node.MostCommonType.Item = MostCommonType;
-
             node.ResolvedFeature.Item = node;
 
 #if DEBUG

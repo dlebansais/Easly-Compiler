@@ -199,8 +199,8 @@ namespace CompilerNode
             {
                 Debug.Assert(ResolvedTypeName.IsAssigned == ResolvedType.IsAssigned);
                 Debug.Assert(MostCommonTypeName.IsAssigned == MostCommonType.IsAssigned);
-                IsResolved = ResolvedType.IsAssigned;
-                Debug.Assert(MostCommonType.IsAssigned == IsResolved);
+                IsResolved = MostCommonType.IsAssigned;
+                Debug.Assert(ResolvedType.IsAssigned || !IsResolved);
                 IsHandled = true;
             }
 

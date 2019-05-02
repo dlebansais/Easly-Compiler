@@ -7,30 +7,28 @@
     /// <summary>
     /// A rule to process <see cref="IFunctionType"/>.
     /// </summary>
-    public interface IFunctionTypeRuleTemplate : IRuleTemplate
+    public interface IFunctionTypeResultRuleTemplate : IRuleTemplate
     {
     }
 
     /// <summary>
     /// A rule to process <see cref="IFunctionType"/>.
     /// </summary>
-    public class FunctionTypeRuleTemplate : RuleTemplate<IFunctionType, FunctionTypeRuleTemplate>, IFunctionTypeRuleTemplate
+    public class FunctionTypeResultRuleTemplate : RuleTemplate<IFunctionType, FunctionTypeResultRuleTemplate>, IFunctionTypeResultRuleTemplate
     {
         #region Init
-        static FunctionTypeRuleTemplate()
+        static FunctionTypeResultRuleTemplate()
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceSourceTemplate<IFunctionType, ITypeName>(nameof(IFunctionType.BaseType) + Dot + nameof(IObjectType.ResolvedTypeName)),
-                new OnceReferenceSourceTemplate<IFunctionType, ICompiledType>(nameof(IFunctionType.BaseType) + Dot + nameof(IObjectType.ResolvedType)),
-                new SealedListCollectionSourceTemplate<IFunctionType, IQueryOverloadType, IParameter>(nameof(IFunctionType.OverloadList), nameof(IQueryOverloadType.ParameterTable)),
-                new SealedListCollectionSourceTemplate<IFunctionType, IQueryOverloadType, IParameter>(nameof(IFunctionType.OverloadList), nameof(IQueryOverloadType.ResultTable)),
+                new OnceReferenceSourceTemplate<IFunctionType, ITypeName>(nameof(IFunctionType.ResolvedTypeName)),
+                new OnceReferenceSourceTemplate<IFunctionType, ICompiledType>(nameof(IFunctionType.ResolvedType)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IFunctionType, ITypeName>(nameof(IFunctionType.ResolvedTypeName)),
-                new OnceReferenceDestinationTemplate<IFunctionType, ICompiledType>(nameof(IFunctionType.ResolvedType)),
+                new OnceReferenceDestinationTemplate<IFunctionType, ITypeName>(nameof(IFunctionType.MostCommonTypeName)),
+                new OnceReferenceDestinationTemplate<IFunctionType, ICompiledType>(nameof(IFunctionType.MostCommonType)),
             };
         }
         #endregion
@@ -51,13 +49,20 @@
             // This is ensured because the root node is valid.
             Debug.Assert(node.OverloadList.Count > 0);
 
+            IList<IExpressionType> CommonResults = Feature.CommonResultType(node.OverloadList);
+
             IList<IError> CheckErrorList = new List<IError>();
-            if (!Feature.DisjoinedParameterCheck(node.OverloadList, node, CheckErrorList))
+            for (int i = 0; i < CommonResults.Count; i++)
+                Success &= Feature.JoinedResultCheck(node.OverloadList, i, CommonResults[i].ValueType, node, CheckErrorList);
+
+            if (!Success)
             {
                 Debug.Assert(CheckErrorList.Count > 0);
                 AddSourceErrorList(CheckErrorList);
-                Success = false;
             }
+
+            if (Success)
+                data = CommonResults;
 
             return Success;
         }
@@ -71,15 +76,17 @@
         {
             IList<IExpressionType> CommonResults = (IList<IExpressionType>)data;
 
-            IClass EmbeddingClass = node.EmbeddingClass;
-            IObjectType BaseTypeItem = (IObjectType)node.BaseType;
-            ITypeName BaseTypeName = BaseTypeItem.ResolvedTypeName.Item;
-            ICompiledType BaseType = BaseTypeItem.ResolvedType.Item;
+            ITypeName MostCommonTypeName = null;
+            ICompiledType MostCommonType = null;
+            foreach (IExpressionType Item in CommonResults)
+                if (MostCommonType == null || Item.Name == nameof(BaseNode.Keyword.Result))
+                {
+                    MostCommonTypeName = Item.ValueTypeName;
+                    MostCommonType = Item.ValueType;
+                }
 
-            FunctionType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType, node.OverloadList, out ITypeName ResolvedTypeName, out ICompiledType ResolvedType);
-
-            node.ResolvedTypeName.Item = ResolvedTypeName;
-            node.ResolvedType.Item = ResolvedType;
+            node.MostCommonTypeName.Item = MostCommonTypeName;
+            node.MostCommonType.Item = MostCommonType;
         }
         #endregion
     }
