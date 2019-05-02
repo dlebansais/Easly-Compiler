@@ -98,30 +98,47 @@
         /// <param name="reportError">True if the checked type must conform to the base type; False if just exploring alternatives.</param>
         public static bool TypeConformToBase(ICompiledType derivedType, ICompiledType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
         {
+            bool Result;
+
             if (derivedType.ConformanceTable.IsSealed)
             {
-                if (ConformToBaseAny(derivedType, baseType))
-                    return true;
-
-                IList<IError> DirectConformanceErrorList = new List<IError>();
-                if (TypeConformDirectlyToBase(derivedType, baseType, substitutionTypeTable, DirectConformanceErrorList, sourceLocation, reportError))
-                    return true;
-
-                IList<IError> FakeErrorList = new List<IError>();
-                foreach (KeyValuePair<ITypeName, ICompiledType> Entry in derivedType.ConformanceTable)
-                {
-                    ICompiledType Conformance = Entry.Value;
-                    if (TypeConformToBase(Conformance, baseType, substitutionTypeTable, FakeErrorList, sourceLocation, reportError))
-                        return true;
-                }
-
-                if (reportError)
-                    foreach (IError Error in DirectConformanceErrorList)
-                        errorList.Add(Error);
-
-                return false;
+                Result = TypeConformToBaseWithTable(derivedType, baseType, substitutionTypeTable, errorList, sourceLocation, reportError);
+                Debug.Assert(Result == TypeConformToBaseWithoutTable(derivedType, baseType, substitutionTypeTable, errorList, sourceLocation, reportError));
             }
-            else if (IsDirectDescendantOf(derivedType, baseType, substitutionTypeTable, sourceLocation))
+            else
+                Result = TypeConformToBaseWithoutTable(derivedType, baseType, substitutionTypeTable, errorList, sourceLocation, reportError);
+
+            return Result;
+        }
+
+        private static bool TypeConformToBaseWithTable(ICompiledType derivedType, ICompiledType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        {
+            bool IsConforming = false;
+
+            Debug.Assert(derivedType.ConformanceTable.IsSealed);
+
+            IsConforming |= ConformToBaseAny(derivedType, baseType);
+
+            IList<IError> DirectConformanceErrorList = new List<IError>();
+            IsConforming |= TypeConformDirectlyToBase(derivedType, baseType, substitutionTypeTable, DirectConformanceErrorList, sourceLocation, reportError);
+
+            IList<IError> FakeErrorList = new List<IError>();
+            foreach (KeyValuePair<ITypeName, ICompiledType> Entry in derivedType.ConformanceTable)
+            {
+                ICompiledType Conformance = Entry.Value;
+                IsConforming |= TypeConformToBase(Conformance, baseType, substitutionTypeTable, FakeErrorList, sourceLocation, reportError);
+            }
+
+            if (!IsConforming && reportError)
+                foreach (IError Error in DirectConformanceErrorList)
+                    errorList.Add(Error);
+
+            return IsConforming;
+        }
+
+        private static bool TypeConformToBaseWithoutTable(ICompiledType derivedType, ICompiledType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        {
+            if (IsDirectDescendantOf(derivedType, baseType, substitutionTypeTable, sourceLocation))
                 return true;
             else
                 return TypeConformDirectlyToBase(derivedType, baseType, substitutionTypeTable, errorList, sourceLocation, reportError);

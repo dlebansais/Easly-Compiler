@@ -48,6 +48,19 @@
             bool Success = true;
             data = null;
 
+            return Success;
+        }
+
+        /// <summary>
+        /// Applies the rule.
+        /// </summary>
+        /// <param name="node">The node instance to modify.</param>
+        /// <param name="data">Private data from CheckConsistency().</param>
+        public override void Apply(IQueryOverload node, object data)
+        {
+            IClass EmbeddingClass = node.EmbeddingClass;
+            IFeature EmbeddingFeature = node.EmbeddingFeature;
+
             ListTableEx<IParameter> ParameterTable = new ListTableEx<IParameter>();
             ListTableEx<IParameter> ResultTable = new ListTableEx<IParameter>();
 
@@ -71,25 +84,6 @@
                 string ValidName = SourceName.ValidText.Item;
                 ResultTable.Add(new Parameter(ValidName, Item.ValidEntity.Item));
             }
-
-            if (Success)
-                data = new Tuple<ListTableEx<IParameter>, ListTableEx<IParameter>>(ParameterTable, ResultTable);
-
-            return Success;
-        }
-
-        /// <summary>
-        /// Applies the rule.
-        /// </summary>
-        /// <param name="node">The node instance to modify.</param>
-        /// <param name="data">Private data from CheckConsistency().</param>
-        public override void Apply(IQueryOverload node, object data)
-        {
-            IClass EmbeddingClass = node.EmbeddingClass;
-            IFeature EmbeddingFeature = node.EmbeddingFeature;
-
-            ListTableEx<IParameter> ParameterTable = ((Tuple<ListTableEx<IParameter>, ListTableEx<IParameter>>)data).Item1;
-            ListTableEx<IParameter> ResultTable = ((Tuple<ListTableEx<IParameter>, ListTableEx<IParameter>>)data).Item2;
 
             node.ParameterTable.AddRange(ParameterTable);
             node.ParameterTable.Seal();
