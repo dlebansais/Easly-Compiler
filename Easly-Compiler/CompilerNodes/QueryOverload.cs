@@ -52,6 +52,11 @@
         ListTableEx<IParameter> ResultTable { get; }
 
         /// <summary>
+        /// List of resolved conformant parameter types.
+        /// </summary>
+        ListTableEx<ICompiledType> ConformantResultTable { get; }
+
+        /// <summary>
         /// The resolved associated type.
         /// </summary>
         OnceReference<IQueryOverloadType> ResolvedAssociatedType { get; }
@@ -175,6 +180,7 @@
                 FullScope = new HashtableEx<string, IScopeAttributeFeature>();
                 ParameterTable = new ListTableEx<IParameter>();
                 ResultTable = new ListTableEx<IParameter>();
+                ConformantResultTable = new ListTableEx<ICompiledType>();
                 ResolvedAssociatedType = new OnceReference<IQueryOverloadType>();
                 ResolvedResultTypeName = new OnceReference<ITypeName>();
                 ResolvedResultType = new OnceReference<ICompiledType>();
@@ -201,7 +207,7 @@
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                IsResolved = LocalScope.IsSealed;
+                IsResolved = LocalScope.IsSealed && ConformantResultTable.IsSealed;
                 Debug.Assert(ParameterTable.IsSealed || !IsResolved);
                 Debug.Assert(ResultTable.IsSealed || !IsResolved);
                 Debug.Assert(ResolvedResultTypeName.IsAssigned || !IsResolved);
@@ -256,6 +262,11 @@
         /// List of resolved parameters.
         /// </summary>
         public ListTableEx<IParameter> ResultTable { get; private set; } = new ListTableEx<IParameter>();
+
+        /// <summary>
+        /// List of resolved conformant parameter types.
+        /// </summary>
+        public ListTableEx<ICompiledType> ConformantResultTable { get; private set; } = new ListTableEx<ICompiledType>();
 
         /// <summary>
         /// The resolved associated type.

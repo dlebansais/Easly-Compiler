@@ -143,6 +143,8 @@
                     Debug.Assert(!GenericType.IsReference && GenericType.IsValue);
                     break;
             }
+
+            GenericType.ConformanceTable.Seal();
         }
         #endregion
     }

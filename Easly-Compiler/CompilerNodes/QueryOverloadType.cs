@@ -52,6 +52,11 @@
         ListTableEx<IParameter> ResultTable { get; }
 
         /// <summary>
+        /// Table of conformant results for this overload.
+        /// </summary>
+        ListTableEx<ICompiledType> ConformantResultTable { get; }
+
+        /// <summary>
         /// List of result types for each results.
         /// </summary>
         IList<IExpressionType> Result { get; }
@@ -220,6 +225,7 @@
                 TypeName = null;
                 ParameterTable = new ListTableEx<IParameter>();
                 ResultTable = new ListTableEx<IParameter>();
+                ConformantResultTable = new ListTableEx<ICompiledType>();
                 Result = new List<IExpressionType>();
                 IsHandled = true;
             }
@@ -244,8 +250,9 @@
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                IsResolved = ParameterTable.IsSealed;
-                Debug.Assert(ResultTable.IsSealed == IsResolved);
+                IsResolved = ConformantResultTable.IsSealed;
+                Debug.Assert(ParameterTable.IsSealed || !IsResolved);
+                Debug.Assert(ResultTable.IsSealed || !IsResolved);
                 IsHandled = true;
             }
 
@@ -269,6 +276,11 @@
         /// Table of results for this overload.
         /// </summary>
         public ListTableEx<IParameter> ResultTable { get; private set; } = new ListTableEx<IParameter>();
+
+        /// <summary>
+        /// Table of conformant results for this overload.
+        /// </summary>
+        public ListTableEx<ICompiledType> ConformantResultTable { get; private set; } = new ListTableEx<ICompiledType>();
 
         /// <summary>
         /// List of result types for each results.

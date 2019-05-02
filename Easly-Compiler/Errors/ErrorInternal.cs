@@ -39,7 +39,7 @@
         /// <summary>
         /// The error message.
         /// </summary>
-        public override string Message { get { return Exception.Message; } }
+        public override string Message { get { return $"{Exception.Message}\n{Exception.StackTrace}"; } }
         #endregion
     }
 }

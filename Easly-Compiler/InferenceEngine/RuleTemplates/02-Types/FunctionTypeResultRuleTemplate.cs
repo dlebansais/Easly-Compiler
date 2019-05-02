@@ -23,6 +23,7 @@
             {
                 new OnceReferenceSourceTemplate<IFunctionType, ITypeName>(nameof(IFunctionType.ResolvedTypeName)),
                 new OnceReferenceSourceTemplate<IFunctionType, ICompiledType>(nameof(IFunctionType.ResolvedType)),
+                new SealedListCollectionSourceTemplate<IFunctionType, IQueryOverloadType, ICompiledType>(nameof(IFunctionType.OverloadList), nameof(IQueryOverloadType.ConformantResultTable)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()

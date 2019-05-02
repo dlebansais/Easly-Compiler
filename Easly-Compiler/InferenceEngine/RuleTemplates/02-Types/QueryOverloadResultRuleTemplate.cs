@@ -90,6 +90,12 @@
             node.ResultTable.AddRange(ResultTable);
             node.ResultTable.Seal();
 
+            foreach (IParameter Parameter in ResultTable)
+            {
+                Debug.Assert(Parameter.ResolvedParameter.ResolvedFeatureType.IsAssigned);
+                node.ConformantResultTable.Add(Parameter.ResolvedParameter.ResolvedFeatureType.Item);
+            }
+
             Debug.Assert(ResultTable.Count > 0);
 
             ITypeName BestResultTypeName = null;
@@ -115,6 +121,12 @@
             AssociatedType.ParameterTable.Seal();
             AssociatedType.ResultTable.AddRange(ResultTable);
             AssociatedType.ResultTable.Seal();
+
+            foreach (IParameter Parameter in ResultTable)
+            {
+                Debug.Assert(Parameter.ResolvedParameter.ResolvedFeatureType.IsAssigned);
+                AssociatedType.ConformantResultTable.Add(Parameter.ResolvedParameter.ResolvedFeatureType.Item);
+            }
 
             node.ResolvedAssociatedType.Item = AssociatedType;
         }

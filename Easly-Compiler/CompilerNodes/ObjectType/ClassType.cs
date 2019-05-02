@@ -70,6 +70,10 @@
             Result.ExportTable.Seal();
             Result.TypedefTable.Seal();
 
+            if (classAny != Class.ClassAny)
+                Result.ConformanceTable.Add(Class.ClassAny.ResolvedClassTypeName.Item, Class.ClassAny.ResolvedClassType.Item);
+            Result.ConformanceTable.Seal();
+
             return Result;
         }
 

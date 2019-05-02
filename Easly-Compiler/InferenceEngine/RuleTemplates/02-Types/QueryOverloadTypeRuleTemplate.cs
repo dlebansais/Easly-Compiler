@@ -113,6 +113,12 @@
 
             node.ResultTable.AddRange(ResultTable);
             node.ResultTable.Seal();
+
+            foreach (IParameter Parameter in ResultTable)
+            {
+                Debug.Assert(Parameter.ResolvedParameter.ResolvedFeatureType.IsAssigned);
+                node.ConformantResultTable.Add(Parameter.ResolvedParameter.ResolvedFeatureType.Item);
+            }
         }
         #endregion
     }
