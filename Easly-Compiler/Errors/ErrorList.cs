@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using CompilerNode;
 
     /// <summary>
     /// A list of errors.
@@ -47,6 +48,11 @@
         /// A list of errors that can be ignored.
         /// </summary>
         public static IErrorList Ignored { get; } = new ErrorList();
+
+        /// <summary>
+        /// A fake location for errors to ignore.
+        /// </summary>
+        public static ISource NoLocation { get; } = new Identifier();
 
         /// <summary>
         /// True if the error list is empty.

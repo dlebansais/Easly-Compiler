@@ -69,7 +69,6 @@
                 }
             }
 
-            IErrorList CheckErrorList = new ErrorList();
             IList<ICommandOverloadType> OverloadTypeList = new List<ICommandOverloadType>();
             foreach (ICommandOverload Overload in node.OverloadList)
             {
@@ -77,10 +76,9 @@
                 OverloadTypeList.Add(Overload.ResolvedAssociatedType.Item);
             }
 
-            if (!Feature.DisjoinedParameterCheck(OverloadTypeList, node, CheckErrorList))
+            if (!Feature.DisjoinedParameterCheck(OverloadTypeList, ErrorList))
             {
-                Debug.Assert(!CheckErrorList.IsEmpty);
-                AddSourceErrorList(CheckErrorList);
+                Debug.Assert(!ErrorList.IsEmpty);
                 Success = false;
             }
 

@@ -30,9 +30,8 @@
         /// TODO include conversions in the check.
         /// </summary>
         /// <param name="overloadList">The list of overloads.</param>
-        /// <param name="location">The location where to report errors.</param>
         /// <param name="errorList">The list of errors found.</param>
-        public static bool DisjoinedParameterCheck(IList<ICommandOverloadType> overloadList, ISource location, IErrorList errorList)
+        public static bool DisjoinedParameterCheck(IList<ICommandOverloadType> overloadList, IErrorList errorList)
         {
             IHashtableEx<int, IList<ICommandOverloadType>> UnmixedOverloadsTable = new HashtableEx<int, IList<ICommandOverloadType>>();
 
@@ -63,13 +62,13 @@
                 IList<ICommandOverloadType> ThisOverloadMix = Entry.Value;
 
                 for (int i = 0; i < Entry.Key; i++)
-                    Success &= DisjoinedParameterCheck(ThisOverloadMix, i, location, errorList);
+                    Success &= DisjoinedParameterCheck(ThisOverloadMix, i, errorList);
             }
 
             return Success;
         }
 
-        private static bool DisjoinedParameterCheck(IList<ICommandOverloadType> overloadList, int index, ISource location, IErrorList errorList)
+        private static bool DisjoinedParameterCheck(IList<ICommandOverloadType> overloadList, int index, IErrorList errorList)
         {
             IList<IParameter> SameIndexList = new List<IParameter>();
 
@@ -93,8 +92,8 @@
                     IParameter Parameter2 = SameIndexList[j];
                     ICompiledType ParameterType2 = Parameter2.ResolvedParameter.ResolvedFeatureType.Item;
 
-                    Success &= DisjoinedParameterCheck(Parameter1, Parameter2, SubstitutionTypeTable, location, errorList);
-                    Success &= DisjoinedParameterCheck(Parameter2, Parameter1, SubstitutionTypeTable, location, errorList);
+                    Success &= DisjoinedParameterCheck(Parameter1, Parameter2, SubstitutionTypeTable, errorList);
+                    Success &= DisjoinedParameterCheck(Parameter2, Parameter1, SubstitutionTypeTable, errorList);
                 }
             }
 
@@ -118,12 +117,12 @@
                     MaxParameter = Overload.ParameterTable.Count;
 
             for (int i = 0; i < MaxParameter; i++)
-                Success &= DisjoinedParameterCheck(overloadList, i, location, errorList);
+                Success &= DisjoinedParameterCheck(overloadList, i, errorList);
 
             return Success;
         }
 
-        private static bool DisjoinedParameterCheck(IList<IQueryOverloadType> overloadList, int index, ISource location, IErrorList errorList)
+        private static bool DisjoinedParameterCheck(IList<IQueryOverloadType> overloadList, int index, IErrorList errorList)
         {
             IList<IParameter> SameIndexList = new List<IParameter>();
 
@@ -147,21 +146,21 @@
                     IParameter Parameter2 = SameIndexList[j];
                     ICompiledType ParameterType2 = Parameter2.ResolvedParameter.ResolvedFeatureType.Item;
 
-                    Success &= DisjoinedParameterCheck(Parameter1, Parameter2, SubstitutionTypeTable, location, errorList);
-                    Success &= DisjoinedParameterCheck(Parameter2, Parameter1, SubstitutionTypeTable, location, errorList);
+                    Success &= DisjoinedParameterCheck(Parameter1, Parameter2, SubstitutionTypeTable, errorList);
+                    Success &= DisjoinedParameterCheck(Parameter2, Parameter1, SubstitutionTypeTable, errorList);
                 }
             }
 
             return Success;
         }
 
-        private static bool DisjoinedParameterCheck(IParameter derivedParameter, IParameter baseParameter, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, ISource location, IErrorList errorList)
+        private static bool DisjoinedParameterCheck(IParameter derivedParameter, IParameter baseParameter, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList)
         {
             ICompiledType DerivedType = derivedParameter.ResolvedParameter.ResolvedFeatureType.Item;
             ICompiledType BaseType = baseParameter.ResolvedParameter.ResolvedFeatureType.Item;
             bool Success = true;
 
-            if (ObjectType.TypeConformToBase(DerivedType, BaseType, substitutionTypeTable, ErrorList.Ignored, location, false))
+            if (ObjectType.TypeConformToBase(DerivedType, BaseType, substitutionTypeTable))
             {
                 errorList.AddError(new ErrorMoreBasicParameter(baseParameter.ResolvedParameter.EmbeddingOverload));
                 Success = false;
@@ -205,7 +204,6 @@
             }
 
             IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-            ISource FakeLocation = overloadList[0];
 
             IParameter SelectedParameter = SameIndexList[0];
             ITypeName SelectedParameterTypeName = SelectedParameter.ResolvedParameter.ResolvedFeatureTypeName.Item;
@@ -217,7 +215,7 @@
                 ITypeName CurrentParameterTypeName = CurrentParameter.ResolvedParameter.ResolvedFeatureTypeName.Item;
                 ICompiledType CurrentParameterType = CurrentParameter.ResolvedParameter.ResolvedFeatureType.Item;
 
-                if (ObjectType.TypeConformToBase(SelectedParameterType, CurrentParameterType, SubstitutionTypeTable, ErrorList.Ignored, FakeLocation, false))
+                if (ObjectType.TypeConformToBase(SelectedParameterType, CurrentParameterType, SubstitutionTypeTable))
                 {
                     SelectedParameter = CurrentParameter;
                     SelectedParameterTypeName = CurrentParameterTypeName;
@@ -256,7 +254,7 @@
                 IParameter CurrentParameter = SameIndexList[i];
                 ICompiledType CurrentParameterType = CurrentParameter.ResolvedParameter.ResolvedFeatureType.Item;
 
-                if (!ObjectType.TypeConformToBase(CurrentParameterType, baseType, SubstitutionTypeTable, ErrorList.Ignored, location, false))
+                if (!ObjectType.TypeConformToBase(CurrentParameterType, baseType, SubstitutionTypeTable))
                 {
                     errorList.AddError(new ErrorNonConformingType(location));
                     Success = false;

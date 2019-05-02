@@ -52,11 +52,9 @@
 
             IList<IExpressionType> CommonResults = new List<IExpressionType>();
 
-            IErrorList CheckErrorList = new ErrorList();
-            if (!Feature.DisjoinedParameterCheck(node.OverloadList, node, CheckErrorList))
+            if (!Feature.DisjoinedParameterCheck(node.OverloadList, ErrorList))
             {
-                Debug.Assert(!CheckErrorList.IsEmpty);
-                AddSourceErrorList(CheckErrorList);
+                Debug.Assert(!ErrorList.IsEmpty);
                 Success = false;
             }
 

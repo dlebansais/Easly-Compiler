@@ -80,13 +80,9 @@
             ITypeName BaseTypeName = constraintItem.ResolvedParentTypeName.Item;
             ICompiledType BaseType = constraintItem.ResolvedParentType.Item;
             IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-            IErrorList ConstraintErrorList = new ErrorList();
 
-            if (node.DefaultValue.IsAssigned && !ObjectType.TypeConformToBase(node.ResolvedDefaultType.Item, BaseType, SubstitutionTypeTable, ConstraintErrorList, (IObjectType)node.DefaultValue.Item, true))
-            {
-                AddSourceErrorList(ConstraintErrorList);
+            if (node.DefaultValue.IsAssigned && !ObjectType.TypeConformToBase(node.ResolvedDefaultType.Item, BaseType, SubstitutionTypeTable, ErrorList, (IObjectType)node.DefaultValue.Item))
                 Success = false;
-            }
 
             if (copyConstraint == BaseNode.CopySemantic.Reference)
             {
