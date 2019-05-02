@@ -16,7 +16,7 @@
         /// <summary>
         /// List of errors found when applying this rule.
         /// </summary>
-        IList<IError> ErrorList { get; }
+        IErrorList ErrorList { get; }
 
         /// <summary>
         /// Checks that no destination value has been set.
@@ -83,7 +83,7 @@
         /// <summary>
         /// List of errors found when applying this rule.
         /// </summary>
-        IList<IError> ErrorList { get; }
+        IErrorList ErrorList { get; }
 
         /// <summary>
         /// Checks that no destination value has been set.
@@ -170,7 +170,7 @@
         /// <summary>
         /// List of errors found when applying this rule.
         /// </summary>
-        public IList<IError> ErrorList { get; } = new List<IError>();
+        public IErrorList ErrorList { get; } = new ErrorList();
         #endregion
 
         #region Client Interface
@@ -298,7 +298,7 @@
         /// Adds several errors.
         /// </summary>
         /// <param name="sourceErrorList">The list of errors to add.</param>
-        protected virtual void AddSourceErrorList(IList<IError> sourceErrorList)
+        protected virtual void AddSourceErrorList(IErrorList sourceErrorList)
         {
             foreach (IError Error in sourceErrorList)
                 ErrorList.Add(Error);

@@ -72,7 +72,7 @@
             foreach (ICommandOverload Overload in node.OverloadList)
                 OverloadTypeList.Add(Overload.ResolvedAssociatedType.Item);
 
-            IList<IError> CheckErrorList = new List<IError>();
+            IErrorList CheckErrorList = new ErrorList();
             if (!Feature.DisjoinedParameterCheck(OverloadTypeList, node, CheckErrorList))
             {
                 Debug.Assert(CheckErrorList.Count > 0);

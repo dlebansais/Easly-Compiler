@@ -80,7 +80,7 @@
             ITypeName BaseTypeName = constraintItem.ResolvedParentTypeName.Item;
             ICompiledType BaseType = constraintItem.ResolvedParentType.Item;
             IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-            IList<IError> ConstraintErrorList = new List<IError>();
+            IErrorList ConstraintErrorList = new ErrorList();
 
             if (node.DefaultValue.IsAssigned && !ObjectType.TypeConformToBase(node.ResolvedDefaultType.Item, BaseType, SubstitutionTypeTable, ConstraintErrorList, (IObjectType)node.DefaultValue.Item, true))
             {

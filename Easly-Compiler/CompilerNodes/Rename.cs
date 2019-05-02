@@ -32,7 +32,7 @@ namespace CompilerNode
         /// <param name="string2Key">Creates a key from a string.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if the rename is valid.</returns>
-        bool CheckGenericRename<TKey>(IHashtableIndex<TKey>[] renamedItemTables, IHashtableEx<string, string> sourceIdentifierTable, IHashtableEx<string, string> destinationIdentifierTable, Func<TKey, string> key2String, Func<string, TKey> string2Key, IList<IError> errorList);
+        bool CheckGenericRename<TKey>(IHashtableIndex<TKey>[] renamedItemTables, IHashtableEx<string, string> sourceIdentifierTable, IHashtableEx<string, string> destinationIdentifierTable, Func<TKey, string> key2String, Func<string, TKey> string2Key, IErrorList errorList);
     }
 
     /// <summary>
@@ -156,7 +156,7 @@ namespace CompilerNode
         /// <param name="string2Key">Creates a key from a string.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if the rename is valid.</returns>
-        public virtual bool CheckGenericRename<TKey>(IHashtableIndex<TKey>[] renamedItemTables, IHashtableEx<string, string> sourceIdentifierTable, IHashtableEx<string, string> destinationIdentifierTable, Func<TKey, string> key2String, Func<string, TKey> string2Key, IList<IError> errorList)
+        public virtual bool CheckGenericRename<TKey>(IHashtableIndex<TKey>[] renamedItemTables, IHashtableEx<string, string> sourceIdentifierTable, IHashtableEx<string, string> destinationIdentifierTable, Func<TKey, string> key2String, Func<string, TKey> string2Key, IErrorList errorList)
         {
             IIdentifier RenameSourceIdentifier = (IIdentifier)SourceIdentifier;
             IIdentifier RenameDestinationIdentifier = (IIdentifier)DestinationIdentifier;

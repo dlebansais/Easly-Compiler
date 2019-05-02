@@ -51,7 +51,7 @@
             // This is ensured because the root node is valid.
             Debug.Assert(node.OverloadList.Count > 0);
 
-            IList<IError> CheckErrorList = new List<IError>();
+            IErrorList CheckErrorList = new ErrorList();
             if (!Feature.DisjoinedParameterCheck(node.OverloadList, node, CheckErrorList))
             {
                 Debug.Assert(CheckErrorList.Count > 0);

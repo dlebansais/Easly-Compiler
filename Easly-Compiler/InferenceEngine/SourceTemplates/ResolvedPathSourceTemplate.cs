@@ -63,10 +63,10 @@
                     Debug.Assert(Identifier.ValidText.IsAssigned);
 
                 IClass Class = node.EmbeddingClass;
-                IList<IError> ErrorList = new List<IError>();
+                IErrorList ErrorList = new ErrorList();
                 if (IsPathReady(Path, Class.LocalFeatureTable, Class.FeatureTable, ErrorList, out ITypeName ResolvedPathTypeName, out ICompiledType ResolvedPathType))
                 {
-                    data = new Tuple<IList<IError>, ITypeName, ICompiledType>(ErrorList, ResolvedPathTypeName, ResolvedPathType);
+                    data = new Tuple<IErrorList, ITypeName, ICompiledType>(ErrorList, ResolvedPathTypeName, ResolvedPathType);
                     Result = true;
                 }
             }
@@ -84,7 +84,7 @@
         /// <param name="resolvedPathTypeName">The target type name upon return.</param>
         /// <param name="resolvedPathType">The target type upon return.</param>
         /// <returns>True if the path could be resolved to the target.</returns>
-        public static bool IsPathReady(IList<IIdentifier> path, IHashtableEx<IFeatureName, IFeatureInstance> startingLocalFeatureTable, IHashtableEx<IFeatureName, IFeatureInstance> startingFeatureTable, IList<IError> errorList, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
+        public static bool IsPathReady(IList<IIdentifier> path, IHashtableEx<IFeatureName, IFeatureInstance> startingLocalFeatureTable, IHashtableEx<IFeatureName, IFeatureInstance> startingFeatureTable, IErrorList errorList, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
         {
             resolvedPathTypeName = null;
             resolvedPathType = null;
@@ -127,7 +127,7 @@
         /// <param name="resolvedPathTypeName">The target type name upon return.</param>
         /// <param name="resolvedPathType">The target type upon return.</param>
         /// <returns>True if there is an error; False to continue with the next step.</returns>
-        public static bool IsPathItemReady(IIdentifier item, IIdentifier nextItem, ref IHashtableEx<IFeatureName, IFeatureInstance> featureTable, IList<IError> errorList, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
+        public static bool IsPathItemReady(IIdentifier item, IIdentifier nextItem, ref IHashtableEx<IFeatureName, IFeatureInstance> featureTable, IErrorList errorList, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
         {
             Debug.Assert(featureTable.IsSealed);
             Debug.Assert(item.ValidText.IsAssigned);
@@ -208,7 +208,7 @@
         /// <param name="resolvedPathTypeName">The target type name upon return.</param>
         /// <param name="resolvedPathType">The target type upon return.</param>
         /// <returns>True if the path step could be resolved, or an error was found.</returns>
-        public static bool IsLastPathItemReady(IIdentifier item, IHashtableEx<IFeatureName, IFeatureInstance> featureTable, IList<IError> errorList, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
+        public static bool IsLastPathItemReady(IIdentifier item, IHashtableEx<IFeatureName, IFeatureInstance> featureTable, IErrorList errorList, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
         {
             Debug.Assert(featureTable.IsSealed);
             Debug.Assert(item.ValidText.IsAssigned);

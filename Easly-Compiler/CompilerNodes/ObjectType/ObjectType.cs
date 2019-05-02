@@ -96,7 +96,7 @@
         /// <param name="errorList">The list of errors found if <paramref name="reportError"/> is set.</param>
         /// <param name="sourceLocation">The location for reporting errors.</param>
         /// <param name="reportError">True if the checked type must conform to the base type; False if just exploring alternatives.</param>
-        public static bool TypeConformToBase(ICompiledType derivedType, ICompiledType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        public static bool TypeConformToBase(ICompiledType derivedType, ICompiledType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result;
 
@@ -111,7 +111,7 @@
             return Result;
         }
 
-        private static bool TypeConformToBaseWithTable(ICompiledType derivedType, ICompiledType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool TypeConformToBaseWithTable(ICompiledType derivedType, ICompiledType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool IsConforming = false;
 
@@ -119,10 +119,10 @@
 
             IsConforming |= ConformToBaseAny(derivedType, baseType);
 
-            IList<IError> DirectConformanceErrorList = new List<IError>();
+            IErrorList DirectConformanceErrorList = new ErrorList();
             IsConforming |= TypeConformDirectlyToBase(derivedType, baseType, substitutionTypeTable, DirectConformanceErrorList, sourceLocation, reportError);
 
-            IList<IError> FakeErrorList = new List<IError>();
+            IErrorList FakeErrorList = new ErrorList();
             foreach (KeyValuePair<ITypeName, ICompiledType> Entry in derivedType.ConformanceTable)
             {
                 ICompiledType Conformance = Entry.Value;
@@ -136,7 +136,7 @@
             return IsConforming;
         }
 
-        private static bool TypeConformToBaseWithoutTable(ICompiledType derivedType, ICompiledType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool TypeConformToBaseWithoutTable(ICompiledType derivedType, ICompiledType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             if (IsDirectDescendantOf(derivedType, baseType, substitutionTypeTable, sourceLocation))
                 return true;
@@ -180,7 +180,7 @@
 
         private static bool IsDirectClassDescendantOf(IClassType derivedType, IClassType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, ISource sourceLocation)
         {
-            IList<IError> FakeErrorList = new List<IError>();
+            IErrorList FakeErrorList = new ErrorList();
             bool Result = false;
 
             Result |= ConformToBaseAny(derivedType, baseType);
@@ -197,7 +197,7 @@
 
         private static bool IsDirectFormalGenericDescendantOf(IFormalGenericType derivedType, IClassType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, ISource sourceLocation)
         {
-            IList<IError> FakeErrorList = new List<IError>();
+            IErrorList FakeErrorList = new ErrorList();
             bool Result = false;
 
             Result |= ConformToBaseAny(derivedType, baseType);
@@ -209,7 +209,7 @@
             return Result;
         }
 
-        private static bool TypeConformDirectlyToBase(ICompiledType derivedType, ICompiledType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool TypeConformDirectlyToBase(ICompiledType derivedType, ICompiledType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             while (substitutionTypeTable.ContainsKey(derivedType))
                 derivedType = substitutionTypeTable[derivedType];
@@ -267,7 +267,7 @@
             }
         }
 
-        private static bool TypeConformToFormalGenericType(ICompiledType derivedType, IFormalGenericType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool TypeConformToFormalGenericType(ICompiledType derivedType, IFormalGenericType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -305,7 +305,7 @@
             return Result;
         }
 
-        private static bool FormalGenericTypeConformToBase(IFormalGenericType derivedType, ICompiledType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool FormalGenericTypeConformToBase(IFormalGenericType derivedType, ICompiledType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -340,14 +340,14 @@
             return Result;
         }
 
-        private static bool FormalGenericTypeConformToBaseWithConformance(IFormalGenericType derivedType, ICompiledType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool FormalGenericTypeConformToBaseWithConformance(IFormalGenericType derivedType, ICompiledType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool ConformantConstraintFound = false;
 
             foreach (KeyValuePair<ITypeName, ICompiledType> ConformingEntry in derivedType.FormalGeneric.ResolvedConformanceTable)
             {
                 ICompiledType ConformingType = ConformingEntry.Value;
-                IList<IError> FakeErrorList = new List<IError>();
+                IErrorList FakeErrorList = new ErrorList();
 
                 ConformantConstraintFound |= TypeConformToBase(ConformingType, baseType, substitutionTypeTable, FakeErrorList, sourceLocation, false);
             }
@@ -361,7 +361,7 @@
             return ConformantConstraintFound;
         }
 
-        private static bool TypeConformToClassType(ICompiledType derivedType, IClassType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool TypeConformToClassType(ICompiledType derivedType, IClassType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result;
 
@@ -378,7 +378,7 @@
             return Result;
         }
 
-        private static bool ClassTypeConformToClassType(IClassType derivedType, IClassType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool ClassTypeConformToClassType(IClassType derivedType, IClassType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             if (derivedType.BaseClass != baseType.BaseClass)
             {
@@ -402,7 +402,7 @@
             return Result;
         }
 
-        private static bool TypeConformToFunctionType(ICompiledType derivedType, IFunctionType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool TypeConformToFunctionType(ICompiledType derivedType, IFunctionType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = false;
             bool IsHandled = false;
@@ -451,7 +451,7 @@
             return Result;
         }
 
-        private static bool FunctionTypeConformToFunctionType(IFunctionType derivedType, IFunctionType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool FunctionTypeConformToFunctionType(IFunctionType derivedType, IFunctionType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -468,7 +468,7 @@
 
             foreach (IQueryOverloadType BaseOverload in baseType.OverloadList)
             {
-                IList<IError> FakeErrorList = new List<IError>();
+                IErrorList FakeErrorList = new ErrorList();
 
                 bool MatchingDerivedOverload = false;
                 foreach (IQueryOverloadType DerivedOverload in derivedType.OverloadList)
@@ -486,7 +486,7 @@
             return Result;
         }
 
-        private static bool QueryOverloadConformToBase(IQueryOverloadType derivedType, IQueryOverloadType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool QueryOverloadConformToBase(IQueryOverloadType derivedType, IQueryOverloadType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -537,7 +537,7 @@
             return Result;
         }
 
-        private static bool PropertyTypeConformToFunctionType(IPropertyType derivedType, IFunctionType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool PropertyTypeConformToFunctionType(IPropertyType derivedType, IFunctionType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -581,7 +581,7 @@
             return Result;
         }
 
-        private static bool IndexerTypeConformToFunctionType(IIndexerType derivedType, IFunctionType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool IndexerTypeConformToFunctionType(IIndexerType derivedType, IFunctionType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -638,7 +638,7 @@
             return Result;
         }
 
-        private static bool TypeConformToProcedureType(ICompiledType derivedType, IProcedureType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool TypeConformToProcedureType(ICompiledType derivedType, IProcedureType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = false;
             bool IsHandled = false;
@@ -687,7 +687,7 @@
             return Result;
         }
 
-        private static bool ProcedureTypeConformToProcedureType(IProcedureType derivedType, IProcedureType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool ProcedureTypeConformToProcedureType(IProcedureType derivedType, IProcedureType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -698,7 +698,7 @@
 
             foreach (ICommandOverloadType BaseOverload in baseType.OverloadList)
             {
-                IList<IError> FakeErrorList = new List<IError>();
+                IErrorList FakeErrorList = new ErrorList();
 
                 bool MatchingDerivedOverload = false;
                 foreach (ICommandOverloadType DerivedOverload in derivedType.OverloadList)
@@ -716,7 +716,7 @@
             return Result;
         }
 
-        private static bool CommandOverloadConformToBase(ICommandOverloadType derivedType, ICommandOverloadType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool CommandOverloadConformToBase(ICommandOverloadType derivedType, ICommandOverloadType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -746,7 +746,7 @@
             return Result;
         }
 
-        private static bool PropertyTypeConformToProcedureType(IPropertyType derivedType, IProcedureType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool PropertyTypeConformToProcedureType(IPropertyType derivedType, IProcedureType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -790,7 +790,7 @@
             return Result;
         }
 
-        private static bool IndexerTypeConformToProcedureType(IIndexerType derivedType, IProcedureType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool IndexerTypeConformToProcedureType(IIndexerType derivedType, IProcedureType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -846,7 +846,7 @@
             return Result;
         }
 
-        private static bool TypeConformToPropertyType(ICompiledType derivedType, IPropertyType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool TypeConformToPropertyType(ICompiledType derivedType, IPropertyType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = false;
             bool IsHandled = false;
@@ -895,7 +895,7 @@
             return Result;
         }
 
-        private static bool FunctionTypeConformToPropertyType(IFunctionType derivedType, IPropertyType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool FunctionTypeConformToPropertyType(IFunctionType derivedType, IPropertyType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -927,12 +927,12 @@
             return Result;
         }
 
-        private static bool QueryOverloadHasPropertyConformingBase(IQueryOverloadType derivedOverload, IPropertyType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError, ref bool matchingOverload)
+        private static bool QueryOverloadHasPropertyConformingBase(IQueryOverloadType derivedOverload, IPropertyType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError, ref bool matchingOverload)
         {
             if (derivedOverload.ParameterList.Count > 0 || derivedOverload.ResultList.Count != 1 || derivedOverload.ParameterEnd != BaseNode.ParameterEndStatus.Closed)
                 return true;
 
-            IList<IError> FakeErrorList = new List<IError>();
+            IErrorList FakeErrorList = new ErrorList();
             IEntityDeclaration OverloadResult = derivedOverload.ResultList[0];
 
             Debug.Assert(baseType.ResolvedEntityType.IsAssigned);
@@ -948,7 +948,7 @@
             return true;
         }
 
-        private static bool ProcedureTypeConformToPropertyType(IProcedureType derivedType, IPropertyType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool ProcedureTypeConformToPropertyType(IProcedureType derivedType, IPropertyType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -980,12 +980,12 @@
             return Result;
         }
 
-        private static bool CommandOverloadHasPropertyConformingBase(ICommandOverloadType derivedOverload, IPropertyType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError, ref bool matchingOverload)
+        private static bool CommandOverloadHasPropertyConformingBase(ICommandOverloadType derivedOverload, IPropertyType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError, ref bool matchingOverload)
         {
             if (derivedOverload.ParameterList.Count != 1 || derivedOverload.ParameterEnd != BaseNode.ParameterEndStatus.Closed)
                 return true;
 
-            IList<IError> FakeErrorList = new List<IError>();
+            IErrorList FakeErrorList = new ErrorList();
 
             IEntityDeclaration OverloadValue = derivedOverload.ParameterList[0];
             if (!OverloadValue.ResolvedEntityType.IsAssigned || !baseType.ResolvedEntityType.IsAssigned)
@@ -1001,7 +1001,7 @@
             return true;
         }
 
-        private static bool PropertyTypeConformToPropertyType(IPropertyType derivedType, IPropertyType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool PropertyTypeConformToPropertyType(IPropertyType derivedType, IPropertyType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -1038,7 +1038,7 @@
             return Result;
         }
 
-        private static bool TypeConformToIndexerType(ICompiledType derivedType, IIndexerType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool TypeConformToIndexerType(ICompiledType derivedType, IIndexerType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = false;
             bool IsHandled = false;
@@ -1086,7 +1086,7 @@
             return Result;
         }
 
-        private static bool FunctionTypeConformToIndexerType(IFunctionType derivedType, IIndexerType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool FunctionTypeConformToIndexerType(IFunctionType derivedType, IIndexerType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -1118,7 +1118,7 @@
             return Result;
         }
 
-        private static bool FunctionTypeConformToIndexerTypeOverloads(IQueryOverloadType derivedOverload, IIndexerType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool FunctionTypeConformToIndexerTypeOverloads(IQueryOverloadType derivedOverload, IIndexerType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -1137,7 +1137,7 @@
                 Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, substitutionTypeTable, errorList, sourceLocation, reportError);
             }
 
-            IList<IError> FakeErrorList = new List<IError>();
+            IErrorList FakeErrorList = new ErrorList();
             IEntityDeclaration OverloadResult = derivedOverload.ResultList[0];
 
             Debug.Assert(baseType.ResolvedEntityType.IsAssigned);
@@ -1149,7 +1149,7 @@
             return Result;
         }
 
-        private static bool ProcedureTypeConformToIndexerType(IProcedureType derivedType, IIndexerType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool ProcedureTypeConformToIndexerType(IProcedureType derivedType, IIndexerType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -1181,7 +1181,7 @@
             return Result;
         }
 
-        private static bool ProcedureTypeConformToIndexerTypeOverloads(ICommandOverloadType derivedOverload, IIndexerType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool ProcedureTypeConformToIndexerTypeOverloads(ICommandOverloadType derivedOverload, IIndexerType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -1200,7 +1200,7 @@
                 Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, substitutionTypeTable, errorList, sourceLocation, reportError);
             }
 
-            IList<IError> FakeErrorList = new List<IError>();
+            IErrorList FakeErrorList = new ErrorList();
             IEntityDeclaration OverloadValue = derivedOverload.ParameterList[baseType.IndexParameterList.Count];
 
             Debug.Assert(OverloadValue.ResolvedEntityType.IsAssigned);
@@ -1212,7 +1212,7 @@
             return Result;
         }
 
-        private static bool IndexerTypeConformToIndexerType(IIndexerType derivedType, IIndexerType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool IndexerTypeConformToIndexerType(IIndexerType derivedType, IIndexerType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -1271,7 +1271,7 @@
             return Result;
         }
 
-        private static bool TypeConformToTupleType(ICompiledType derivedType, ITupleType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool TypeConformToTupleType(ICompiledType derivedType, ITupleType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = false;
             bool IsHandled = false;
@@ -1326,7 +1326,7 @@
             return Result;
         }
 
-        private static bool TupleTypeConformToTupleType(ITupleType derivedType, ITupleType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool TupleTypeConformToTupleType(ITupleType derivedType, ITupleType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -1354,7 +1354,7 @@
             return Result;
         }
 
-        private static bool TypeConformToGeneric(ICompiledType actual, IFormalGenericType formal, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool TypeConformToGeneric(ICompiledType actual, IFormalGenericType formal, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 
@@ -1385,7 +1385,7 @@
             return Result;
         }
 
-        private static bool ExceptionListConformToBase(IList<IIdentifier> derivedExceptionIdentifierList, IList<IIdentifier> baseExceptionIdentifierList, IList<IError> errorList, ISource sourceLocation, bool reportError)
+        private static bool ExceptionListConformToBase(IList<IIdentifier> derivedExceptionIdentifierList, IList<IIdentifier> baseExceptionIdentifierList, IErrorList errorList, ISource sourceLocation, bool reportError)
         {
             bool Result = true;
 

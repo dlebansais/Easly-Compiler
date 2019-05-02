@@ -52,7 +52,7 @@ namespace CompilerNode
         /// <param name="assignedSingleClassList">The list of already single class attributes.</param>
         /// <param name="source">The location where to report errors.</param>
         /// <param name="errorList">The list of errors found.</param>
-        bool IsGroupAssigned(IList<IClass> assignedSingleClassList, ISource source, IList<IError> errorList);
+        bool IsGroupAssigned(IList<IClass> assignedSingleClassList, ISource source, IErrorList errorList);
     }
 
     /// <summary>
@@ -115,7 +115,7 @@ namespace CompilerNode
         /// <param name="initialDefaultValue">Default value, if any.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <param name="feature">The created feature if successful.</param>
-        public static bool Create(ISource location, string attributeName, ITypeName attributeTypeName, ICompiledType attributeType, IExpression initialDefaultValue, IList<IError> errorList, out IScopeAttributeFeature feature)
+        public static bool Create(ISource location, string attributeName, ITypeName attributeTypeName, ICompiledType attributeType, IExpression initialDefaultValue, IErrorList errorList, out IScopeAttributeFeature feature)
         {
             Debug.Assert(initialDefaultValue != null);
 
@@ -182,7 +182,7 @@ namespace CompilerNode
         /// <param name="assignedSingleClassList">The list of already single class attributes.</param>
         /// <param name="source">The location where to report errors.</param>
         /// <param name="errorList">The list of errors found.</param>
-        public bool IsGroupAssigned(IList<IClass> assignedSingleClassList, ISource source, IList<IError> errorList)
+        public bool IsGroupAssigned(IList<IClass> assignedSingleClassList, ISource source, IErrorList errorList)
         {
             bool IsAssigned = false;
 

@@ -23,7 +23,7 @@ namespace CompilerNode
         /// <param name="matchingLibrary">The matching library upon return.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if library names are valid.</returns>
-        bool CheckImportConsistency(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, out ILibrary matchingLibrary, IList<IError> errorList);
+        bool CheckImportConsistency(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, out ILibrary matchingLibrary, IErrorList errorList);
 
         /// <summary>
         /// Check all rename clauses separately.
@@ -31,7 +31,7 @@ namespace CompilerNode
         /// <param name="importedClassTable">Table of imported classes.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if all rename clauses are valid.</returns>
-        bool CheckRenames(IHashtableEx<string, IImportedClass> importedClassTable, IList<IError> errorList);
+        bool CheckRenames(IHashtableEx<string, IImportedClass> importedClassTable, IErrorList errorList);
     }
 
     /// <summary>
@@ -169,7 +169,7 @@ namespace CompilerNode
         /// <param name="matchingLibrary">The matching library upon return.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if library names are valid.</returns>
-        public virtual bool CheckImportConsistency(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, out ILibrary matchingLibrary, IList<IError> errorList)
+        public virtual bool CheckImportConsistency(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, out ILibrary matchingLibrary, IErrorList errorList)
         {
             IErrorStringValidity StringError;
             string ValidFromIdentifier;
@@ -222,7 +222,7 @@ namespace CompilerNode
         /// <param name="importedClassTable">Table of imported classes.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if all rename clauses are valid.</returns>
-        public virtual bool CheckRenames(IHashtableEx<string, IImportedClass> importedClassTable, IList<IError> errorList)
+        public virtual bool CheckRenames(IHashtableEx<string, IImportedClass> importedClassTable, IErrorList errorList)
         {
             IHashtableEx<string, string> SourceIdentifierTable = new HashtableEx<string, string>(); // string (source) -> string (destination)
             IHashtableEx<string, string> DestinationIdentifierTable = new HashtableEx<string, string>(); // string (destination) -> string (source)

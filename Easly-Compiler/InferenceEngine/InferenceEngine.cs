@@ -40,7 +40,7 @@
         /// </summary>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if there is no source left to process.</returns>
-        bool Solve(IList<IError> errorList);
+        bool Solve(IErrorList errorList);
     }
 
     /// <summary>
@@ -107,7 +107,7 @@
         /// </summary>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if there is no source left to process.</returns>
-        public virtual bool Solve(IList<IError> errorList)
+        public virtual bool Solve(IErrorList errorList)
         {
             bool Success;
             bool? LastTryResult = null;
@@ -117,7 +117,7 @@
 
             for (;;)
             {
-                List<IError> TryErrorList = new List<IError>();
+                IErrorList TryErrorList = new ErrorList();
                 bool TryResult = SolveWithRetry(TryErrorList);
                 if (Retries == 0)
                 {
@@ -152,7 +152,7 @@
         /// </summary>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if there is no source left to process.</returns>
-        protected virtual bool SolveWithRetry(IList<IError> errorList)
+        protected virtual bool SolveWithRetry(IErrorList errorList)
         {
             IList<IClass> ResolvedClassList = new List<IClass>();
             IList<IClass> UnresolvedClassList = new List<IClass>(ClassList);
@@ -210,7 +210,7 @@
         }
 
         /// <summary></summary>
-        protected virtual bool InferTemplates(ref bool exit, IList<ISource> unresolvedSourceList, IList<IError> errorList)
+        protected virtual bool InferTemplates(ref bool exit, IList<ISource> unresolvedSourceList, IErrorList errorList)
         {
             bool Success = true;
             List<ISource> FailedSourceList = new List<ISource>();

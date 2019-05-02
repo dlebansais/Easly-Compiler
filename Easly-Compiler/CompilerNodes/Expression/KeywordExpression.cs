@@ -133,7 +133,7 @@ namespace CompilerNode
         /// <param name="errorList">The list of errors found if not available.</param>
         /// <param name="resultTypeName">The resulting type name upon return if available.</param>
         /// <param name="resultType">The resulting type upon return if available.</param>
-        public static bool IsKeywordAvailable(ISource source, BaseNode.Keyword keyword, IList<IError> errorList, out ITypeName resultTypeName, out ICompiledType resultType)
+        public static bool IsKeywordAvailable(ISource source, BaseNode.Keyword keyword, IErrorList errorList, out ITypeName resultTypeName, out ICompiledType resultType)
         {
             resultTypeName = null;
             resultType = null;
@@ -179,7 +179,7 @@ namespace CompilerNode
             return Result;
         }
 
-        private static bool IsLanguageTypeAvailable(ISource source, Guid guid, IList<IError> errorList, out ITypeName resultTypeName, out ICompiledType resultType)
+        private static bool IsLanguageTypeAvailable(ISource source, Guid guid, IErrorList errorList, out ITypeName resultTypeName, out ICompiledType resultType)
         {
             resultTypeName = null;
             resultType = null;
@@ -203,7 +203,7 @@ namespace CompilerNode
             return Found;
         }
 
-        private static bool IsWithinProperty(ISource source, IList<IError> errorList, out ITypeName resultTypeName, out ICompiledType resultType)
+        private static bool IsWithinProperty(ISource source, IErrorList errorList, out ITypeName resultTypeName, out ICompiledType resultType)
         {
             resultTypeName = null;
             resultType = null;
@@ -224,7 +224,7 @@ namespace CompilerNode
             return Result;
         }
 
-        private static bool IsWithinGetter(ISource source, IList<IError> errorList, out ITypeName resultTypeName, out ICompiledType resultType)
+        private static bool IsWithinGetter(ISource source, IErrorList errorList, out ITypeName resultTypeName, out ICompiledType resultType)
         {
             resultTypeName = null;
             resultType = null;
@@ -255,7 +255,7 @@ namespace CompilerNode
             return false;
         }
 
-        private static bool CheckQueryConsistency(ISource source, IQueryOverload innerQueryOverload, IList<IError> errorList, out ITypeName resultTypeName, out ICompiledType resultType)
+        private static bool CheckQueryConsistency(ISource source, IQueryOverload innerQueryOverload, IErrorList errorList, out ITypeName resultTypeName, out ICompiledType resultType)
         {
             resultTypeName = null;
             resultType = null;
@@ -276,7 +276,7 @@ namespace CompilerNode
             return Success;
         }
 
-        private static bool CheckGetterConsistency(ISource source, IOptionalReference<BaseNode.IBody> optionalGetter, IList<IError> errorList)
+        private static bool CheckGetterConsistency(ISource source, IOptionalReference<BaseNode.IBody> optionalGetter, IErrorList errorList)
         {
             if (source.EmbeddingBody is IEffectiveBody AsEffectiveBody)
             {

@@ -214,7 +214,7 @@
             }
         }
 
-        private bool ResolveAsClassIdentifier(string validClassIdentifier, IHashtableEx<string, IImportedClass> importedClassTable, IHashtableEx<string, IClass> classTable, IIdentifier source, IList<IError> errorList)
+        private bool ResolveAsClassIdentifier(string validClassIdentifier, IHashtableEx<string, IImportedClass> importedClassTable, IHashtableEx<string, IClass> classTable, IIdentifier source, IErrorList errorList)
         {
             if (classTable.ContainsKey(validClassIdentifier))
             {

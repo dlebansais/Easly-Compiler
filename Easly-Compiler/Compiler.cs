@@ -46,7 +46,7 @@
         /// <summary>
         /// Errors in last compilation.
         /// </summary>
-        public IList<IError> ErrorList { get; } = new List<IError>();
+        public IErrorList ErrorList { get; } = new ErrorList();
 
         /// <summary>
         /// Number of retries by the inference engine (debug only).

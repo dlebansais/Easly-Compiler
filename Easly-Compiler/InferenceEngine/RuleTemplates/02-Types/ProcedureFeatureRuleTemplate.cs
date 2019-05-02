@@ -69,7 +69,7 @@
                 }
             }
 
-            IList<IError> CheckErrorList = new List<IError>();
+            IErrorList CheckErrorList = new ErrorList();
             IList<ICommandOverloadType> OverloadTypeList = new List<ICommandOverloadType>();
             foreach (ICommandOverload Overload in node.OverloadList)
             {

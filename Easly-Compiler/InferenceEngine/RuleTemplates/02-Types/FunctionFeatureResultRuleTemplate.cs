@@ -58,7 +58,7 @@
 
             IList<IExpressionType> CommonResults = Feature.CommonResultType(OverloadTypeList);
 
-            IList<IError> CheckErrorList = new List<IError>();
+            IErrorList CheckErrorList = new ErrorList();
             for (int i = 0; i < CommonResults.Count; i++)
                 Success &= Feature.JoinedResultCheck(OverloadTypeList, i, CommonResults[i].ValueType, node, CheckErrorList);
 

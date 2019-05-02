@@ -32,7 +32,7 @@
         /// <param name="overloadList">The list of overloads.</param>
         /// <param name="location">The location where to report errors.</param>
         /// <param name="errorList">The list of errors found.</param>
-        public static bool DisjoinedParameterCheck(IList<ICommandOverloadType> overloadList, ISource location, IList<IError> errorList)
+        public static bool DisjoinedParameterCheck(IList<ICommandOverloadType> overloadList, ISource location, IErrorList errorList)
         {
             IHashtableEx<int, IList<ICommandOverloadType>> UnmixedOverloadsTable = new HashtableEx<int, IList<ICommandOverloadType>>();
 
@@ -69,7 +69,7 @@
             return Success;
         }
 
-        private static bool DisjoinedParameterCheck(IList<ICommandOverloadType> overloadList, int index, ISource location, IList<IError> errorList)
+        private static bool DisjoinedParameterCheck(IList<ICommandOverloadType> overloadList, int index, ISource location, IErrorList errorList)
         {
             IList<IParameter> SameIndexList = new List<IParameter>();
 
@@ -81,7 +81,7 @@
             }
 
             IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-            IList<IError> CheckErrorList = new List<IError>();
+            IErrorList CheckErrorList = new ErrorList();
 
             bool Success = true;
             for (int i = 0; i < SameIndexList.Count && Success; i++)
@@ -109,7 +109,7 @@
         /// <param name="overloadList">The list of overloads.</param>
         /// <param name="location">The location where to report errors.</param>
         /// <param name="errorList">The list of errors found.</param>
-        public static bool DisjoinedParameterCheck(IList<IQueryOverloadType> overloadList, ISource location, IList<IError> errorList)
+        public static bool DisjoinedParameterCheck(IList<IQueryOverloadType> overloadList, ISource location, IErrorList errorList)
         {
             bool Success = true;
 
@@ -124,7 +124,7 @@
             return Success;
         }
 
-        private static bool DisjoinedParameterCheck(IList<IQueryOverloadType> overloadList, int index, ISource location, IList<IError> errorList)
+        private static bool DisjoinedParameterCheck(IList<IQueryOverloadType> overloadList, int index, ISource location, IErrorList errorList)
         {
             IList<IParameter> SameIndexList = new List<IParameter>();
 
@@ -136,7 +136,7 @@
             }
 
             IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-            IList<IError> CheckErrorList = new List<IError>();
+            IErrorList CheckErrorList = new ErrorList();
 
             bool Success = true;
             for (int i = 0; i < SameIndexList.Count && Success; i++)
@@ -157,9 +157,9 @@
             return Success;
         }
 
-        private static bool DisjoinedParameterCheck(IParameter derivedParameter, IParameter baseParameter, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, ISource location, IList<IError> errorList)
+        private static bool DisjoinedParameterCheck(IParameter derivedParameter, IParameter baseParameter, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, ISource location, IErrorList errorList)
         {
-            IList<IError> CheckErrorList = new List<IError>();
+            IErrorList CheckErrorList = new ErrorList();
             ICompiledType DerivedType = derivedParameter.ResolvedParameter.ResolvedFeatureType.Item;
             ICompiledType BaseType = baseParameter.ResolvedParameter.ResolvedFeatureType.Item;
             bool Success = true;
@@ -208,7 +208,7 @@
             }
 
             IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-            IList<IError> CheckErrorList = new List<IError>();
+            IErrorList CheckErrorList = new ErrorList();
             ISource FakeLocation = overloadList[0];
 
             IParameter SelectedParameter = SameIndexList[0];
@@ -241,7 +241,7 @@
         /// <param name="baseType">The base type.</param>
         /// <param name="location">The location where to report errors.</param>
         /// <param name="errorList">The list of errors found.</param>
-        public static bool JoinedResultCheck(IList<IQueryOverloadType> overloadList, int index, ICompiledType baseType, ISource location, IList<IError> errorList)
+        public static bool JoinedResultCheck(IList<IQueryOverloadType> overloadList, int index, ICompiledType baseType, ISource location, IErrorList errorList)
         {
             bool Success = true;
             IList<IParameter> SameIndexList = new List<IParameter>();
@@ -254,7 +254,7 @@
             }
 
             IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-            IList<IError> CheckErrorList = new List<IError>();
+            IErrorList CheckErrorList = new ErrorList();
 
             for (int i = 0; i < SameIndexList.Count; i++)
             {

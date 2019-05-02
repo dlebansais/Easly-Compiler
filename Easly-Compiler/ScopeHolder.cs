@@ -74,7 +74,7 @@
         /// <param name="assignedSingleClassList">The list of assigned single class attributes.</param>
         /// <param name="source">The location where to report errors.</param>
         /// <param name="errorList">The list of errors found.</param>
-        public static bool HasConflictingSingleAttributes(IHashtableEx<string, IScopeAttributeFeature> scope, IList<IScopeHolder> innerScopeList, IList<IClass> assignedSingleClassList, ISource source, IList<IError> errorList)
+        public static bool HasConflictingSingleAttributes(IHashtableEx<string, IScopeAttributeFeature> scope, IList<IScopeHolder> innerScopeList, IList<IClass> assignedSingleClassList, ISource source, IErrorList errorList)
         {
             bool IsAssigned = false;
 

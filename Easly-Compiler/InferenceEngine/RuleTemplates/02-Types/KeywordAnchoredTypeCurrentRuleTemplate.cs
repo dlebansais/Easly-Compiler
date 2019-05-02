@@ -51,7 +51,7 @@
             if (node.Anchor == BaseNode.Keyword.Current)
             {
                 IClass EmbeddingClass = node.EmbeddingClass;
-                IList<IError> CheckErrorList = new List<IError>();
+                IErrorList CheckErrorList = new ErrorList();
                 if (!KeywordExpression.IsKeywordAvailable(node, node.Anchor, CheckErrorList, out ITypeName ResultTypeName, out ICompiledType ResultType))
                 {
                     AddSourceErrorList(CheckErrorList);

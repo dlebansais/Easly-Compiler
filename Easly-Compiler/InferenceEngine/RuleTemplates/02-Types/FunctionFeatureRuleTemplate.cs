@@ -71,7 +71,7 @@
                 }
             }
 
-            IList<IError> CheckErrorList = new List<IError>();
+            IErrorList CheckErrorList = new ErrorList();
             IList<IQueryOverloadType> OverloadTypeList = new List<IQueryOverloadType>();
             foreach (IQueryOverload Overload in node.OverloadList)
             {

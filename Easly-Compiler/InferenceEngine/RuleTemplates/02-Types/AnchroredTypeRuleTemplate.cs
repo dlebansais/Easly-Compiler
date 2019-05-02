@@ -53,7 +53,7 @@
 
             Debug.Assert(dataList.Count == 1);
             Debug.Assert(dataList.ContainsKey(SourceTemplateList[0]));
-            Tuple<IList<IError>, ITypeName, ICompiledType> SourceData = dataList[SourceTemplateList[0]] as Tuple<IList<IError>, ITypeName, ICompiledType>;
+            Tuple<IErrorList, ITypeName, ICompiledType> SourceData = dataList[SourceTemplateList[0]] as Tuple<IErrorList, ITypeName, ICompiledType>;
             Debug.Assert(SourceData != null);
 
             if (SourceData.Item1.Count > 0)

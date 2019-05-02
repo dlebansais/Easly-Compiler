@@ -32,7 +32,7 @@ namespace CompilerNode
         /// <param name="importedClassTable">The table of imported classes</param>
         /// <param name="exportTable">The list of exports to change.</param>
         /// <param name="errorList">The list of errors found.</param>
-        bool ApplyChange(IHashtableEx<string, IImportedClass> importedClassTable, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IList<IError> errorList);
+        bool ApplyChange(IHashtableEx<string, IImportedClass> importedClassTable, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IErrorList errorList);
     }
 
     /// <summary>
@@ -182,7 +182,7 @@ namespace CompilerNode
         /// <param name="importedClassTable">The table of imported classes</param>
         /// <param name="exportTable">The list of exports to change.</param>
         /// <param name="errorList">The list of errors found.</param>
-        public virtual bool ApplyChange(IHashtableEx<string, IImportedClass> importedClassTable, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IList<IError> errorList)
+        public virtual bool ApplyChange(IHashtableEx<string, IImportedClass> importedClassTable, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IErrorList errorList)
         {
             if (!IsExportIdentifierFree(exportTable, errorList, out IFeatureName CurrentExportName, out IHashtableEx<string, IClass> CurrentClassTable))
                 return false;
@@ -248,7 +248,7 @@ namespace CompilerNode
             return true;
         }
 
-        private bool IsExportIdentifierFree(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IList<IError> errorList, out IFeatureName currentExportName, out IHashtableEx<string, IClass> currentClassTable)
+        private bool IsExportIdentifierFree(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IErrorList errorList, out IFeatureName currentExportName, out IHashtableEx<string, IClass> currentClassTable)
         {
             currentExportName = null;
             currentClassTable = null;

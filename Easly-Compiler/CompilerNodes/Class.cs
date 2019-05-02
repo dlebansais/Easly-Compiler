@@ -120,7 +120,7 @@ namespace CompilerNode
         /// <param name="validatedClassList">List of classes with valid names, updated upon return.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if class names are valid.</returns>
-        bool CheckClassNames(IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IList<IClass> validatedClassList, IList<IError> errorList);
+        bool CheckClassNames(IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IList<IClass> validatedClassList, IErrorList errorList);
 
         /// <summary>
         /// Validate a class import clauses.
@@ -129,7 +129,7 @@ namespace CompilerNode
         /// <param name="classTable">Imported classes.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if imports are valid.</returns>
-        bool CheckClassConsistency(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IList<IError> errorList);
+        bool CheckClassConsistency(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IErrorList errorList);
 
         /// <summary>
         /// The table of resolved generics arguments for this class.
@@ -639,7 +639,7 @@ namespace CompilerNode
         /// <param name="validatedClassList">List of classes with valid names, updated upon return.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if class names are valid.</returns>
-        public virtual bool CheckClassNames(IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IList<IClass> validatedClassList, IList<IError> errorList)
+        public virtual bool CheckClassNames(IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IList<IClass> validatedClassList, IErrorList errorList)
         {
             IName ClassEntityName = (IName)EntityName;
 
@@ -707,7 +707,7 @@ namespace CompilerNode
         /// <param name="classTable">Imported classes.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if imports are valid.</returns>
-        public virtual bool CheckClassConsistency(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IList<IError> errorList)
+        public virtual bool CheckClassConsistency(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IErrorList errorList)
         {
             bool Success = true;
 
@@ -793,7 +793,7 @@ namespace CompilerNode
         /// <param name="mergedImportType">The import specification for all <paramref name="mergedClassTable"/>.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if the merge is successful.</returns>
-        public static bool MergeClassTables(IHashtableEx<string, IImportedClass> importedClassTable, IHashtableEx<string, IImportedClass> mergedClassTable, IImport importLocation, BaseNode.ImportType mergedImportType, IList<IError> errorList)
+        public static bool MergeClassTables(IHashtableEx<string, IImportedClass> importedClassTable, IHashtableEx<string, IImportedClass> mergedClassTable, IImport importLocation, BaseNode.ImportType mergedImportType, IErrorList errorList)
         {
             bool Success = true;
 
@@ -850,7 +850,7 @@ namespace CompilerNode
             return Success;
         }
 
-        private static bool MergeClassTablesWithNewClass(IHashtableEx<string, IImportedClass> importedClassTable, string className, IImportedClass mergedClassItem, IImport importLocation, BaseNode.ImportType mergedImportType, IList<IError> errorList)
+        private static bool MergeClassTablesWithNewClass(IHashtableEx<string, IImportedClass> importedClassTable, string className, IImportedClass mergedClassItem, IImport importLocation, BaseNode.ImportType mergedImportType, IErrorList errorList)
         {
             bool Success = true;
 

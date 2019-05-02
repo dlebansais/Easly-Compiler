@@ -53,7 +53,7 @@ namespace CompilerNode
         /// <param name="validatedLibraryList">List of classes with valid names, updated upon return.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if library names are valid.</returns>
-        bool CheckLibraryNames(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IList<ILibrary> validatedLibraryList, IList<IError> errorList);
+        bool CheckLibraryNames(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IList<ILibrary> validatedLibraryList, IErrorList errorList);
 
         /// <summary>
         /// Initializes the list of classes belonging to the library.
@@ -61,7 +61,7 @@ namespace CompilerNode
         /// <param name="classTable">Valid class names.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if initialization succeeded.</returns>
-        bool InitLibraryTables(IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IList<IError> errorList);
+        bool InitLibraryTables(IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IErrorList errorList);
 
         /// <summary>
         /// Resolves reference from libraries to classes and other libraries.
@@ -71,7 +71,7 @@ namespace CompilerNode
         /// <param name="importChanged">Indicates that the import specifier has changed.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if the method succeeded.</returns>
-        bool Resolve(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IList<ILibrary> resolvedLibraryList, ref bool importChanged, IList<IError> errorList);
+        bool Resolve(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IList<ILibrary> resolvedLibraryList, ref bool importChanged, IErrorList errorList);
     }
 
     /// <summary>
@@ -151,7 +151,7 @@ namespace CompilerNode
         /// <param name="validatedLibraryList">List of classes with valid names, updated upon return.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if library names are valid.</returns>
-        public virtual bool CheckLibraryNames(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IList<ILibrary> validatedLibraryList, IList<IError> errorList)
+        public virtual bool CheckLibraryNames(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IList<ILibrary> validatedLibraryList, IErrorList errorList)
         {
             IErrorStringValidity StringError;
             IName LibraryEntityName = (IName)EntityName;
@@ -219,7 +219,7 @@ namespace CompilerNode
         /// <param name="classTable">Valid class names.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if initialization succeeded.</returns>
-        public virtual bool InitLibraryTables(IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IList<IError> errorList)
+        public virtual bool InitLibraryTables(IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IErrorList errorList)
         {
             bool Success = true;
 
@@ -288,7 +288,7 @@ namespace CompilerNode
         /// <param name="importChanged">Indicates that the import specifier has changed.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if the method succeeded.</returns>
-        public virtual bool Resolve(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IList<ILibrary> resolvedLibraryList, ref bool importChanged, IList<IError> errorList)
+        public virtual bool Resolve(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IList<ILibrary> resolvedLibraryList, ref bool importChanged, IErrorList errorList)
         {
             List<IImport> ToRemove = new List<IImport>();
             bool Success = true;
@@ -341,7 +341,7 @@ namespace CompilerNode
         /// <param name="matchingLibrary">The library referenced by <paramref name="importItem"/>.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if the merge succeeded.</returns>
-        public static bool MergeImports(IHashtableEx<string, IImportedClass> importedClassTable, IImport importItem, ILibrary matchingLibrary, IList<IError> errorList)
+        public static bool MergeImports(IHashtableEx<string, IImportedClass> importedClassTable, IImport importItem, ILibrary matchingLibrary, IErrorList errorList)
         {
             // Clone imported class objects from the imported library.
             IHashtableEx<string, IImportedClass> MergedClassTable = new HashtableEx<string, IImportedClass>();

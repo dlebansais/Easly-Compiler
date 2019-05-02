@@ -212,7 +212,7 @@
             }
         }
 
-        private bool CheckInheritanceConsistency(IHashtableEx<ICompiledFeature, IList<InstanceNameInfo>> byFeatureTable, IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IClassType localClassType, IList<IError> errorList)
+        private bool CheckInheritanceConsistency(IHashtableEx<ICompiledFeature, IList<InstanceNameInfo>> byFeatureTable, IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IClassType localClassType, IErrorList errorList)
         {
             if (!IsKeepDiscontinueConsistent(byFeatureTable, errorList))
                 return false;
@@ -240,7 +240,7 @@
             return true;
         }
 
-        private bool IsKeepDiscontinueConsistent(IHashtableEx<ICompiledFeature, IList<InstanceNameInfo>> byFeatureTable, IList<IError> errorList)
+        private bool IsKeepDiscontinueConsistent(IHashtableEx<ICompiledFeature, IList<InstanceNameInfo>> byFeatureTable, IErrorList errorList)
         {
             bool IsConsistent = true;
             foreach (KeyValuePair<ICompiledFeature, IList<InstanceNameInfo>> ImportedEntry in byFeatureTable)
@@ -260,7 +260,7 @@
             return IsConsistent;
         }
 
-        private bool IsSingleEffective(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IList<IError> errorList)
+        private bool IsSingleEffective(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IErrorList errorList)
         {
             bool IsSingle = true;
             foreach (KeyValuePair<IFeatureName, InheritedInstanceInfo> ImportedEntry in byNameTable)
@@ -286,7 +286,7 @@
             return IsSingle;
         }
 
-        private bool CompareNonEffectiveFlags(InheritedInstanceInfo importedInstance, IList<IError> errorList)
+        private bool CompareNonEffectiveFlags(InheritedInstanceInfo importedInstance, IErrorList errorList)
         {
             bool Result = true;
 
@@ -320,7 +320,7 @@
             return Result;
         }
 
-        private bool CompareEffectiveFlags(InheritedInstanceInfo importedInstance, IList<IError> errorList, IClassType localClassType)
+        private bool CompareEffectiveFlags(InheritedInstanceInfo importedInstance, IErrorList errorList, IClassType localClassType)
         {
             bool Result = true;
 
@@ -352,7 +352,7 @@
             return Result;
         }
 
-        private bool CheckAllPrecursorSelected(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IList<IError> errorList)
+        private bool CheckAllPrecursorSelected(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IErrorList errorList)
         {
             IList<IHashtableEx<IFeatureName, IList<ICompiledFeature>>> PrecursorSetList = new List<IHashtableEx<IFeatureName, IList<ICompiledFeature>>>(); // FeatureName -> List<ICompiledFeature> (Precursor list)
             CheckAllPrecursorSelectedInNameTable(byNameTable, PrecursorSetList);
@@ -444,7 +444,7 @@
             }
         }
 
-        private bool CheckPrecursorBodiesHaveAncestor(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IList<IError> errorList)
+        private bool CheckPrecursorBodiesHaveAncestor(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IErrorList errorList)
         {
             foreach (KeyValuePair<IFeatureName, InheritedInstanceInfo> ImportedEntry in byNameTable)
             {

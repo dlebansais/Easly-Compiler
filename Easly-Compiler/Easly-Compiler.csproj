@@ -203,6 +203,7 @@
     <Compile Include="CompilerNodes\With.cs" />
     <Compile Include="Errors\Error.cs" />
     <Compile Include="Errors\ErrorInternal.cs" />
+    <Compile Include="Errors\ErrorList.cs" />
     <Compile Include="Errors\ImportConsistency\ErrorClassAlreadyImported.cs" />
     <Compile Include="Errors\ImportConsistency\ErrorNameChanged.cs" />
     <Compile Include="Errors\ImportConsistency\ErrorDoubleRename.cs" />
