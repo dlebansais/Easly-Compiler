@@ -40,7 +40,7 @@
         {
             bool Result = false;
 
-            if (type1.GetType() != type2.GetType())
+            if (type1.GetType() == type2.GetType())
             {
                 bool IsHandled = false;
 
