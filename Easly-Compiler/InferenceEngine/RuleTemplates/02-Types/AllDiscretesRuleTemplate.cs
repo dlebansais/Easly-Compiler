@@ -88,7 +88,7 @@
                         }
                     }
 
-                    if (!ConflictingEntry)
+                    if (!ConflictingEntry && !MergedDiscreteTable.ContainsKey(InstanceName))
                         MergedDiscreteTable.Add(InstanceName, InstanceItem);
                 }
             }

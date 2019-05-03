@@ -218,6 +218,11 @@
             {
                 IRuleTemplate Rule = RuleTemplateList[i];
 
+                if (Rule is IRuleTemplate AsRuleTemplate)
+                {
+
+                }
+
                 foreach (ISource Source in unresolvedSourceList)
                 {
                     if (!Rule.NodeType.IsAssignableFrom(Source.GetType()))

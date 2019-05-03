@@ -231,6 +231,8 @@ namespace CompilerNode
             Debug.Assert(!destinationIdentifierTable.ContainsKey(ValidDestinationIdentifier));
             sourceIdentifierTable.Add(ValidSourceIdentifier, ValidDestinationIdentifier);
             destinationIdentifierTable.Add(ValidDestinationIdentifier, ValidSourceIdentifier);
+
+            SourceTable.Item.ChangeKey(SourceKey, string2Key(ValidDestinationIdentifier));
             return true;
         }
         #endregion

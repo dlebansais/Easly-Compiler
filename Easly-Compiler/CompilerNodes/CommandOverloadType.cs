@@ -309,8 +309,6 @@
                 ICompiledType Type1 = overload1.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item;
                 ICompiledType Type2 = overload2.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item;
 
-                Debug.WriteLine($"Comparing {Type1} vs {Type2}");
-
                 IsIdentical &= ObjectType.TypesHaveIdenticalSignature(Type1, Type2);
             }
 

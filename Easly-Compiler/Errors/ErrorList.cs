@@ -65,6 +65,9 @@
         /// <param name="error">The error to add.</param>
         public void AddError(IError error)
         {
+            Debug.Assert(error != null);
+            Debug.Assert(!string.IsNullOrEmpty(error.ToString()));
+
             if (this != Ignored)
                 Add(error);
         }
@@ -75,10 +78,15 @@
         /// <param name="errorList">Errors to add.</param>
         public void AddErrors(IErrorList errorList)
         {
+            Debug.Assert(errorList is ErrorList);
+
             if (this != Ignored)
             {
-                Debug.Assert(errorList is ErrorList);
-                AddRange((ErrorList)errorList);
+                foreach (IError Error in (ErrorList)errorList)
+                {
+                    Debug.Assert(!string.IsNullOrEmpty(Error.ToString()));
+                    Add(Error);
+                }
             }
         }
 
