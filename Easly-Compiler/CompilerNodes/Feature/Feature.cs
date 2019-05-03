@@ -178,14 +178,21 @@
             IList<IExpressionType> Result = new List<IExpressionType>();
 
             int MaxResult = 0;
-            foreach (IQueryOverloadType Overload in overloadList)
+            int MaxResultIndex = 0;
+            for (int i = 0; i < overloadList.Count; i++)
+            {
+                IQueryOverloadType Overload = overloadList[i];
                 if (MaxResult < Overload.ResultTable.Count)
+                {
                     MaxResult = Overload.ResultTable.Count;
+                    MaxResultIndex = i;
+                }
+            }
 
             for (int i = 0; i < MaxResult; i++)
             {
                 GetCommonResultType(overloadList, i, out ITypeName ResultTypeName, out ICompiledType ResultType);
-                IExpressionType NewExpressionType = new ExpressionType(ResultTypeName, ResultType, overloadList[0].ResultTable[i].Name);
+                IExpressionType NewExpressionType = new ExpressionType(ResultTypeName, ResultType, overloadList[MaxResultIndex].ResultTable[i].Name);
                 Result.Add(NewExpressionType);
             }
 

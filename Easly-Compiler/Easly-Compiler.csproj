@@ -217,6 +217,7 @@
     <Compile Include="Errors\Inference\01-Identifiers\ErrorInvalidManifestChraracter.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorExceptionTypeMissing.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorIndexerInheritanceConflict.cs" />
+    <Compile Include="Errors\Inference\02-Types\ErrorOverloadParameterMismatchConformance.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorResultUsedOutsideGetter.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorResultNotReturned.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorUnavailableResult.cs" />
