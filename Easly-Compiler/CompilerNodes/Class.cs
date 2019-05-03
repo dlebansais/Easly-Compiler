@@ -290,6 +290,10 @@ namespace CompilerNode
         {
             Class BaseClass = new Class();
             BaseClass.CopySpecification = copySpecification;
+            Name BaseClassName = new Name();
+            BaseClassName.Text = className;
+            BaseClassName.ValidText.Item = className;
+            BaseClass.EntityName = BaseClassName;
             BaseClass.ValidClassName = className;
             BaseClass.ClassGroupList.Seal();
             BaseClass.ClassGroup.Item = new SingleClassGroup(BaseClass);

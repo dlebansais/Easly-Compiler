@@ -147,7 +147,7 @@
         /// <param name="conformanceTable">The initialized conformance table.</param>
         private ClassType(IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, IHashtableEx<ITypeName, ICompiledType> conformanceTable)
         {
-            if (baseClass.EntityName != null && baseClass.EntityName.Text.StartsWith("Coverage"))
+            if (baseClass.EntityName.Text.StartsWith("Coverage"))
             {
 
             }

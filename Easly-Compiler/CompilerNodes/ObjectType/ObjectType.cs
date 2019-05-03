@@ -113,7 +113,7 @@
             if (derivedType.ConformanceTable.IsSealed)
             {
                 Result = TypeConformToBaseWithTable(derivedType, baseType, substitutionTypeTable, errorList, sourceLocation);
-                Debug.Assert(Result == TypeConformToBaseWithoutTable(derivedType, baseType, substitutionTypeTable, errorList, sourceLocation));
+                Debug.Assert(Result == TypeConformToBaseWithoutTable(derivedType, baseType, substitutionTypeTable, ErrorList.Ignored, ErrorList.NoLocation));
             }
             else
                 Result = TypeConformToBaseWithoutTable(derivedType, baseType, substitutionTypeTable, errorList, sourceLocation);
@@ -532,10 +532,11 @@
             }
 
             IEntityDeclaration OverloadResult = SingleOverload.ResultList[0];
-            Debug.Assert(OverloadResult.ResolvedEntityType.IsAssigned);
+            Debug.Assert(OverloadResult.ValidEntity.IsAssigned);
+            Debug.Assert(OverloadResult.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
             Debug.Assert(derivedType.ResolvedEntityType.IsAssigned);
 
-            Result &= TypeConformToBase(OverloadResult.ResolvedEntityType.Item, derivedType.ResolvedEntityType.Item, substitutionTypeTable, errorList, sourceLocation);
+            Result &= TypeConformToBase(OverloadResult.ValidEntity.Item.ResolvedFeatureType.Item, derivedType.ResolvedEntityType.Item, substitutionTypeTable, errorList, sourceLocation);
             Result &= ExceptionListConformToBase(derivedType.GetExceptionIdentifierList, SingleOverload.ExceptionIdentifierList, errorList, sourceLocation);
 
             return Result;
@@ -583,10 +584,11 @@
             }
 
             IEntityDeclaration OverloadResult = SingleOverload.ResultList[0];
-            Debug.Assert(OverloadResult.ResolvedEntityType.IsAssigned);
+            Debug.Assert(OverloadResult.ValidEntity.IsAssigned);
+            Debug.Assert(OverloadResult.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
             Debug.Assert(derivedType.ResolvedEntityType.IsAssigned);
 
-            Result &= TypeConformToBase(OverloadResult.ResolvedEntityType.Item, derivedType.ResolvedEntityType.Item, substitutionTypeTable, errorList, sourceLocation);
+            Result &= TypeConformToBase(OverloadResult.ValidEntity.Item.ResolvedFeatureType.Item, derivedType.ResolvedEntityType.Item, substitutionTypeTable, errorList, sourceLocation);
             Result &= ExceptionListConformToBase(derivedType.GetExceptionIdentifierList, SingleOverload.ExceptionIdentifierList, errorList, sourceLocation);
 
             return Result;
@@ -644,14 +646,25 @@
 
             Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, substitutionTypeTable, errorList, sourceLocation);
 
+            IErrorList AllOverloadErrorList = new ErrorList();
             foreach (ICommandOverloadType BaseOverload in baseType.OverloadList)
             {
                 bool MatchingDerivedOverload = false;
                 foreach (ICommandOverloadType DerivedOverload in derivedType.OverloadList)
-                    MatchingDerivedOverload |= CommandOverloadConformToBase(DerivedOverload, BaseOverload, substitutionTypeTable, ErrorList.Ignored, ErrorList.NoLocation);
+                {
+                    IErrorList OverloadErrorList = new ErrorList();
+                    if (!CommandOverloadConformToBase(DerivedOverload, BaseOverload, substitutionTypeTable, OverloadErrorList, DerivedOverload))
+                    {
+                        Debug.Assert(!OverloadErrorList.IsEmpty);
+                        AllOverloadErrorList.AddError(OverloadErrorList.At(0));
+                    }
+                    else
+                        MatchingDerivedOverload = true;
+                }
 
                 if (!MatchingDerivedOverload)
                 {
+                    errorList.AddErrors(AllOverloadErrorList);
                     errorList.AddError(new ErrorOverloadMismatchConformance(sourceLocation, derivedType, baseType));
                     Result = false;
                 }
@@ -716,12 +729,15 @@
                 Result = false;
             }
 
-            IEntityDeclaration OverloadValue = SingleOverload.ParameterList[0];
-            Debug.Assert(derivedType.ResolvedEntityType.IsAssigned);
-            Debug.Assert(OverloadValue.ResolvedEntityType.IsAssigned);
+            if (SingleOverload.ParameterList.Count == 1)
+            {
+                IEntityDeclaration OverloadValue = SingleOverload.ParameterList[0];
+                Debug.Assert(derivedType.ResolvedEntityType.IsAssigned);
+                Debug.Assert(OverloadValue.ResolvedEntityType.IsAssigned);
 
-            Result &= TypeConformToBase(derivedType.ResolvedEntityType.Item, OverloadValue.ResolvedEntityType.Item, substitutionTypeTable, errorList, sourceLocation);
-            Result &= ExceptionListConformToBase(derivedType.SetExceptionIdentifierList, SingleOverload.ExceptionIdentifierList, errorList, sourceLocation);
+                Result &= TypeConformToBase(derivedType.ResolvedEntityType.Item, OverloadValue.ResolvedEntityType.Item, substitutionTypeTable, errorList, sourceLocation);
+                Result &= ExceptionListConformToBase(derivedType.SetExceptionIdentifierList, SingleOverload.ExceptionIdentifierList, errorList, sourceLocation);
+            }
 
             return Result;
         }
@@ -754,7 +770,7 @@
                 Result = false;
             }
 
-            for (int i = 0; i + 1 < SingleOverload.ParameterList.Count && i + 1 < derivedType.IndexParameterList.Count; i++)
+            for (int i = 0; i + 1 < SingleOverload.ParameterList.Count && i < derivedType.IndexParameterList.Count; i++)
             {
                 IEntityDeclaration BaseParameter = SingleOverload.ParameterList[i];
                 IEntityDeclaration DerivedParameter = derivedType.IndexParameterList[i];
@@ -767,11 +783,14 @@
                 Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, substitutionTypeTable, errorList, sourceLocation);
             }
 
-            Debug.Assert(derivedType.ResolvedEntityType.IsAssigned);
-            Debug.Assert(SingleOverload.ParameterList[derivedType.IndexParameterList.Count].ResolvedEntityType.IsAssigned);
+            if (SingleOverload.ParameterList.Count == derivedType.IndexParameterList.Count + 1)
+            {
+                Debug.Assert(derivedType.ResolvedEntityType.IsAssigned);
+                Debug.Assert(SingleOverload.ParameterList[derivedType.IndexParameterList.Count].ResolvedEntityType.IsAssigned);
 
-            Result &= TypeConformToBase(derivedType.ResolvedEntityType.Item, SingleOverload.ParameterList[derivedType.IndexParameterList.Count].ResolvedEntityType.Item, substitutionTypeTable, errorList, sourceLocation);
-            Result &= ExceptionListConformToBase(derivedType.SetExceptionIdentifierList, SingleOverload.ExceptionIdentifierList, errorList, sourceLocation);
+                Result &= TypeConformToBase(derivedType.ResolvedEntityType.Item, SingleOverload.ParameterList[derivedType.IndexParameterList.Count].ResolvedEntityType.Item, substitutionTypeTable, errorList, sourceLocation);
+                Result &= ExceptionListConformToBase(derivedType.SetExceptionIdentifierList, SingleOverload.ExceptionIdentifierList, errorList, sourceLocation);
+            }
 
             return Result;
         }
@@ -855,9 +874,10 @@
             IEntityDeclaration OverloadResult = derivedOverload.ResultList[0];
 
             Debug.Assert(baseType.ResolvedEntityType.IsAssigned);
-            Debug.Assert(OverloadResult.ResolvedEntityType.IsAssigned);
+            Debug.Assert(OverloadResult.ValidEntity.IsAssigned);
+            Debug.Assert(OverloadResult.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-            if (!TypeConformToBase(baseType.ResolvedEntityType.Item, OverloadResult.ResolvedEntityType.Item, substitutionTypeTable, ErrorList.Ignored, ErrorList.NoLocation))
+            if (!TypeConformToBase(baseType.ResolvedEntityType.Item, OverloadResult.ValidEntity.Item.ResolvedFeatureType.Item, substitutionTypeTable, ErrorList.Ignored, ErrorList.NoLocation))
                 return true;
 
             if (!ExceptionListConformToBase(derivedOverload.ExceptionIdentifierList, baseType.GetExceptionIdentifierList, errorList, sourceLocation))
@@ -1042,9 +1062,10 @@
             IEntityDeclaration OverloadResult = derivedOverload.ResultList[0];
 
             Debug.Assert(baseType.ResolvedEntityType.IsAssigned);
-            Debug.Assert(OverloadResult.ResolvedEntityType.IsAssigned);
+            Debug.Assert(OverloadResult.ValidEntity.IsAssigned);
+            Debug.Assert(OverloadResult.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-            Result &= TypeConformToBase(baseType.ResolvedEntityType.Item, OverloadResult.ResolvedEntityType.Item, substitutionTypeTable, ErrorList.Ignored, ErrorList.NoLocation);
+            Result &= TypeConformToBase(baseType.ResolvedEntityType.Item, OverloadResult.ValidEntity.Item.ResolvedFeatureType.Item, substitutionTypeTable, ErrorList.Ignored, ErrorList.NoLocation);
             Result &= ExceptionListConformToBase(derivedOverload.ExceptionIdentifierList, baseType.GetExceptionIdentifierList, errorList, sourceLocation);
 
             return Result;
@@ -1097,13 +1118,16 @@
                 Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, substitutionTypeTable, errorList, sourceLocation);
             }
 
-            IEntityDeclaration OverloadValue = derivedOverload.ParameterList[baseType.IndexParameterList.Count];
+            if (derivedOverload.ParameterList.Count == baseType.IndexParameterList.Count + 1)
+            {
+                IEntityDeclaration OverloadValue = derivedOverload.ParameterList[baseType.IndexParameterList.Count];
 
-            Debug.Assert(OverloadValue.ResolvedEntityType.IsAssigned);
-            Debug.Assert(baseType.ResolvedEntityType.IsAssigned);
+                Debug.Assert(OverloadValue.ResolvedEntityType.IsAssigned);
+                Debug.Assert(baseType.ResolvedEntityType.IsAssigned);
 
-            Result &= TypeConformToBase(OverloadValue.ResolvedEntityType.Item, baseType.ResolvedEntityType.Item, substitutionTypeTable, ErrorList.Ignored, ErrorList.NoLocation);
-            Result &= ExceptionListConformToBase(derivedOverload.ExceptionIdentifierList, baseType.SetExceptionIdentifierList, errorList, sourceLocation);
+                Result &= TypeConformToBase(OverloadValue.ResolvedEntityType.Item, baseType.ResolvedEntityType.Item, substitutionTypeTable, ErrorList.Ignored, ErrorList.NoLocation);
+                Result &= ExceptionListConformToBase(derivedOverload.ExceptionIdentifierList, baseType.SetExceptionIdentifierList, errorList, sourceLocation);
+            }
 
             return Result;
         }
