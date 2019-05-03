@@ -305,7 +305,13 @@
                 Debug.Assert(overload1.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
                 Debug.Assert(overload2.ParameterList[i].ValidEntity.IsAssigned);
                 Debug.Assert(overload2.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
-                IsIdentical &= ObjectType.TypesHaveIdenticalSignature(overload1.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item, overload2.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item);
+
+                ICompiledType Type1 = overload1.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item;
+                ICompiledType Type2 = overload2.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item;
+
+                Debug.WriteLine($"Comparing {Type1} vs {Type2}");
+
+                IsIdentical &= ObjectType.TypesHaveIdenticalSignature(Type1, Type2);
             }
 
             IsIdentical &= Assertion.IsAssertionListEqual(overload1.RequireList, overload2.RequireList);

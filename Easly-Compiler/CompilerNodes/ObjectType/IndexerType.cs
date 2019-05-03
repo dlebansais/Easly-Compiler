@@ -462,6 +462,7 @@
             bool IsNewInstance = false;
 
             ITypeName InstancedBaseTypeName = ResolvedBaseTypeName.Item;
+
             ICompiledType InstancedBaseType = ResolvedBaseType.Item;
             InstancedBaseType.InstanciateType(instancingClassType, ref InstancedBaseTypeName, ref InstancedBaseType);
             IsNewInstance |= InstancedBaseType != ResolvedBaseType.Item;
@@ -501,7 +502,10 @@
             }
 
             if (IsNewInstance)
-                ResolveType(instancingClassType.BaseClass.TypeTable, InstancedBaseTypeName, InstancedBaseType, InstancedEntityTypeName, InstancedEntityType, IndexerKind, InstancedIndexParameterList, ParameterEnd, GetRequireList, GetEnsureList, GetExceptionIdentifierList, SetRequireList, SetEnsureList, SetExceptionIdentifierList, out resolvedTypeName, out resolvedType);
+            {
+                Debug.Assert(InstancedBaseType is IClassType);
+                ResolveType(instancingClassType.BaseClass.TypeTable, InstancedBaseTypeName, (IClassType)InstancedBaseType, InstancedEntityTypeName, InstancedEntityType, IndexerKind, InstancedIndexParameterList, ParameterEnd, GetRequireList, GetEnsureList, GetExceptionIdentifierList, SetRequireList, SetEnsureList, SetExceptionIdentifierList, out resolvedTypeName, out resolvedType);
+            }
         }
         #endregion
 
@@ -525,7 +529,7 @@
         /// <param name="setExceptionIdentifierList">The list of known exceptions thrown for the setter.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void ResolveType(IHashtableEx<ITypeName, ICompiledType> typeTable, ITypeName baseTypeName, ICompiledType baseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType indexerKind, IList<IEntityDeclaration> indexParameterList, BaseNode.ParameterEndStatus parameterEnd, IList<IAssertion> getRequireList, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IAssertion> setEnsureList, IList<IIdentifier> setExceptionIdentifierList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void ResolveType(IHashtableEx<ITypeName, ICompiledType> typeTable, ITypeName baseTypeName, IClassType baseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType indexerKind, IList<IEntityDeclaration> indexParameterList, BaseNode.ParameterEndStatus parameterEnd, IList<IAssertion> getRequireList, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IAssertion> setEnsureList, IList<IIdentifier> setExceptionIdentifierList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
             if (!TypeTableContaining(typeTable, baseType, entityType, indexerKind, indexParameterList, parameterEnd, getRequireList, getEnsureList, getExceptionIdentifierList, setRequireList, setEnsureList, setExceptionIdentifierList, out resolvedTypeName, out resolvedType))
             {
@@ -636,9 +640,9 @@
         /// <param name="setExceptionIdentifierList">The list of known exceptions thrown for the setter.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void BuildType(ITypeName baseTypeName, ICompiledType baseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType indexerKind, IList<IEntityDeclaration> indexParameterList, BaseNode.ParameterEndStatus parameterEnd, IList<IAssertion> getRequireList, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IAssertion> setEnsureList, IList<IIdentifier> setExceptionIdentifierList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void BuildType(ITypeName baseTypeName, IClassType baseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType indexerKind, IList<IEntityDeclaration> indexParameterList, BaseNode.ParameterEndStatus parameterEnd, IList<IAssertion> getRequireList, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IAssertion> setEnsureList, IList<IIdentifier> setExceptionIdentifierList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
-            IIndexerType ResolvedIndexerType = new IndexerType(baseTypeName, (IClassType)baseType, entityTypeName, entityType, indexerKind, indexParameterList, parameterEnd, getRequireList, getEnsureList, getExceptionIdentifierList, setRequireList, setEnsureList, setExceptionIdentifierList);
+            IIndexerType ResolvedIndexerType = new IndexerType(baseTypeName, baseType, entityTypeName, entityType, indexerKind, indexParameterList, parameterEnd, getRequireList, getEnsureList, getExceptionIdentifierList, setRequireList, setEnsureList, setExceptionIdentifierList);
 
 #if DEBUG
             // TODO: remove this code, for code coverage purpose only.

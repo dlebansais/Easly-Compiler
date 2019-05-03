@@ -38,51 +38,52 @@
         /// <param name="type2">The second type.</param>
         public static bool TypesHaveIdenticalSignature(ICompiledType type1, ICompiledType type2)
         {
-            if (type1.GetType() != type2.GetType())
-                return false;
-
-            bool IsHandled = false;
             bool Result = false;
 
-            switch (type1)
+            if (type1.GetType() != type2.GetType())
             {
-                case IFormalGenericType AsFormalGenericType:
-                    Result = FormalGenericType.TypesHaveIdenticalSignature((IFormalGenericType)type1, (IFormalGenericType)type2);
-                    IsHandled = true;
-                    break;
+                bool IsHandled = false;
 
-                case IClassType AsClassType:
-                    Result = ClassType.TypesHaveIdenticalSignature((IClassType)type1, (IClassType)type2);
-                    IsHandled = true;
-                    break;
+                switch (type1)
+                {
+                    case IFormalGenericType AsFormalGenericType:
+                        Result = FormalGenericType.TypesHaveIdenticalSignature((IFormalGenericType)type1, (IFormalGenericType)type2);
+                        IsHandled = true;
+                        break;
 
-                case IFunctionType AsFunctionType:
-                    Result = FunctionType.TypesHaveIdenticalSignature((IFunctionType)type1, (IFunctionType)type2);
-                    IsHandled = true;
-                    break;
+                    case IClassType AsClassType:
+                        Result = ClassType.TypesHaveIdenticalSignature((IClassType)type1, (IClassType)type2);
+                        IsHandled = true;
+                        break;
 
-                case IProcedureType AsProcedureType:
-                    Result = ProcedureType.TypesHaveIdenticalSignature((IProcedureType)type1, (IProcedureType)type2);
-                    IsHandled = true;
-                    break;
+                    case IFunctionType AsFunctionType:
+                        Result = FunctionType.TypesHaveIdenticalSignature((IFunctionType)type1, (IFunctionType)type2);
+                        IsHandled = true;
+                        break;
 
-                case IPropertyType AsPropertyType:
-                    Result = PropertyType.TypesHaveIdenticalSignature((IPropertyType)type1, (IPropertyType)type2);
-                    IsHandled = true;
-                    break;
+                    case IProcedureType AsProcedureType:
+                        Result = ProcedureType.TypesHaveIdenticalSignature((IProcedureType)type1, (IProcedureType)type2);
+                        IsHandled = true;
+                        break;
 
-                case IIndexerType AsIndexerType:
-                    Result = IndexerType.TypesHaveIdenticalSignature((IIndexerType)type1, (IIndexerType)type2);
-                    IsHandled = true;
-                    break;
+                    case IPropertyType AsPropertyType:
+                        Result = PropertyType.TypesHaveIdenticalSignature((IPropertyType)type1, (IPropertyType)type2);
+                        IsHandled = true;
+                        break;
 
-                case ITupleType AsTupleType:
-                    Result = TupleType.TypesHaveIdenticalSignature((ITupleType)type1, (ITupleType)type2);
-                    IsHandled = true;
-                    break;
+                    case IIndexerType AsIndexerType:
+                        Result = IndexerType.TypesHaveIdenticalSignature((IIndexerType)type1, (IIndexerType)type2);
+                        IsHandled = true;
+                        break;
+
+                    case ITupleType AsTupleType:
+                        Result = TupleType.TypesHaveIdenticalSignature((ITupleType)type1, (ITupleType)type2);
+                        IsHandled = true;
+                        break;
+                }
+
+                Debug.Assert(IsHandled);
             }
-
-            Debug.Assert(IsHandled);
 
             return Result;
         }
@@ -212,11 +213,14 @@
 
         private static bool TypeConformDirectlyToBase(ICompiledType derivedType, ICompiledType baseType, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation)
         {
+            /*
+             * TODO: check and completely remove these. Always empty.
             while (substitutionTypeTable.ContainsKey(derivedType))
                 derivedType = substitutionTypeTable[derivedType];
 
             while (substitutionTypeTable.ContainsKey(baseType))
                 baseType = substitutionTypeTable[baseType];
+            */
 
             if (derivedType == baseType)
                 return true;
@@ -928,13 +932,14 @@
             foreach (ICommandOverloadType DerivedOverload in derivedType.OverloadList)
             {
                 IErrorList OverloadErrorList = new ErrorList();
-                if (!CommandOverloadHasPropertyConformingBase(DerivedOverload, baseType, substitutionTypeTable, OverloadErrorList, sourceLocation))
+                bool IsMatching = CommandOverloadHasPropertyConformingBase(DerivedOverload, baseType, substitutionTypeTable, OverloadErrorList, sourceLocation);
+                if (!IsMatching)
                 {
                     Debug.Assert(!OverloadErrorList.IsEmpty);
                     AllOverloadErrorList.AddError(OverloadErrorList.At(0));
                 }
-                else
-                    MatchingDerivedOverload = true;
+
+                MatchingDerivedOverload |= IsMatching;
             }
 
             if (!MatchingDerivedOverload)
@@ -1083,7 +1088,7 @@
 
             Result &= derivedOverload.ParameterList.Count == baseType.IndexParameterList.Count && derivedOverload.ResultList.Count == 1 && derivedOverload.ParameterEnd != BaseNode.ParameterEndStatus.Closed;
 
-            for (int i = 0; i < derivedOverload.ParameterList.Count; i++)
+            for (int i = 0; i < derivedOverload.ParameterList.Count && i < baseType.IndexParameterList.Count; i++)
             {
                 IEntityDeclaration BaseParameter = baseType.IndexParameterList[i];
                 IEntityDeclaration DerivedParameter = derivedOverload.ParameterList[i];
@@ -1291,33 +1296,6 @@
                 Debug.Assert(BaseField.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
                 Result = TypeConformToBase(DerivedField.ValidEntity.Item.ResolvedFeatureType.Item, BaseField.ValidEntity.Item.ResolvedFeatureType.Item, substitutionTypeTable, errorList, sourceLocation);
-            }
-
-            return Result;
-        }
-
-        private static bool TypeConformToGeneric(ICompiledType actual, IFormalGenericType formal, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList, ISource sourceLocation)
-        {
-            bool Result = true;
-
-            Debug.Assert(formal.FormalGeneric.ResolvedConformanceTable.IsSealed);
-
-            foreach (KeyValuePair<ITypeName, ICompiledType> ConformingEntry in formal.FormalGeneric.ResolvedConformanceTable)
-            {
-                ICompiledType ConformingType = ConformingEntry.Value;
-                Result &= TypeConformToBase(actual, ConformingType, substitutionTypeTable, errorList, sourceLocation);
-            }
-
-            if (!actual.IsReference && formal.IsReference)
-            {
-                errorList.AddError(new ErrorReferenceValueConformance(sourceLocation, actual, formal));
-                Result = false;
-            }
-
-            if (!actual.IsValue && formal.IsValue)
-            {
-                errorList.AddError(new ErrorReferenceValueConformance(sourceLocation, actual, formal));
-                Result = false;
             }
 
             return Result;

@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
@@ -50,6 +51,16 @@
             bool Success = true;
             data = null;
 
+            IObjectType BaseTypeItem = (IObjectType)node.BaseType;
+            Debug.Assert(BaseTypeItem.ResolvedType.IsAssigned);
+
+            IClassType BaseType = BaseTypeItem.ResolvedType.Item as IClassType;
+            if (BaseType == null)
+            {
+                AddSourceError(new ErrorClassTypeRequired(node));
+                Success = false;
+            }
+
             ListTableEx<IParameter> ParameterTable = new ListTableEx<IParameter>();
 
             foreach (IEntityDeclaration Item in node.IndexParameterList)
@@ -68,7 +79,7 @@
             }
 
             if (Success)
-                data = ParameterTable;
+                data = new Tuple<IClassType, ListTableEx<IParameter>>(BaseType, ParameterTable);
 
             return Success;
         }
@@ -80,7 +91,8 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IIndexerType node, object data)
         {
-            ListTableEx<IParameter> ParameterTable = (ListTableEx<IParameter>)data;
+            IClassType BaseType = ((Tuple<IClassType, ListTableEx<IParameter>>)data).Item1;
+            ListTableEx<IParameter> ParameterTable = ((Tuple<IClassType, ListTableEx<IParameter>>)data).Item2;
 
             IClass EmbeddingClass = node.EmbeddingClass;
             IObjectType BaseTypeItem = (IObjectType)node.BaseType;
@@ -91,7 +103,6 @@
             node.ParameterTable.Seal();
 
             ITypeName BaseTypeName = BaseTypeItem.ResolvedTypeName.Item;
-            ICompiledType BaseType = BaseTypeItem.ResolvedType.Item;
 
             ITypeName EntityTypeName = EntityTypeItem.ResolvedTypeName.Item;
             ICompiledType EntityType = EntityTypeItem.ResolvedType.Item;
