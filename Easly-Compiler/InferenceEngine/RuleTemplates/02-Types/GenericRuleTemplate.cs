@@ -56,20 +56,35 @@
             IHashtableEx<string, ICompiledType> LocalGenericTable = EmbeddingClass.LocalGenericTable;
 
             if (ValidText.ToLower() == LanguageClasses.Any.Name.ToLower())
+            {
                 AddSourceError(new ErrorReservedName(EntityName, ValidText));
+                Success = false;
+            }
             else if (ImportedClassTable.ContainsKey(ValidText))
+            {
                 AddSourceError(new ErrorDuplicateName(EntityName, ValidText));
+                Success = false;
+            }
             else if (LocalGenericTable.ContainsKey(ValidText))
+            {
                 AddSourceError(new ErrorDuplicateName(EntityName, ValidText));
+                Success = false;
+            }
 
             foreach (IConstraint Constraint in node.ConstraintList)
             {
                 IObjectType ConstraintType = (IObjectType)Constraint.ParentType;
 
                 if (ConstraintType is IAnchoredType AsAnchoredType)
+                {
                     AddSourceError(new ErrorInvalidAnchoredType(AsAnchoredType));
+                    Success = false;
+                }
                 else if (ConstraintType is IKeywordAnchoredType AsKeywordAnchoredType)
+                {
                     AddSourceError(new ErrorInvalidAnchoredType(AsKeywordAnchoredType));
+                    Success = false;
+                }
             }
 
             return Success;

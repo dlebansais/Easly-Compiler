@@ -52,5 +52,12 @@
         /// </summary>
         public abstract string Message { get; }
         #endregion
+
+        #region Debugging
+        public override string ToString()
+        {
+            return $"{GetType().Name}: {Message}";
+        }
+        #endregion
     }
 }

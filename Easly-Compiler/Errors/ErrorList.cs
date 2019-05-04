@@ -66,7 +66,7 @@
         public void AddError(IError error)
         {
             Debug.Assert(error != null);
-            Debug.Assert(!string.IsNullOrEmpty(error.ToString()));
+            Debug.Assert(!string.IsNullOrEmpty(error.Message));
 
             if (this != Ignored)
                 Add(error);
@@ -84,7 +84,7 @@
             {
                 foreach (IError Error in (ErrorList)errorList)
                 {
-                    Debug.Assert(!string.IsNullOrEmpty(Error.ToString()));
+                    Debug.Assert(!string.IsNullOrEmpty(Error.Message));
                     Add(Error);
                 }
             }
@@ -116,7 +116,10 @@
             string Result = $"{Count} error(s).";
 
             foreach (IError Error in this)
-                Result += $"{Environment.NewLine}  {Error.Message} ({Error}) [{Error.Location}].";
+            {
+                Debug.Assert(!string.IsNullOrEmpty(Error.ToString()));
+                Result += $"{Environment.NewLine}  {Error.Message} ({Error.GetType().Name}) [{Error.Location}].";
+            }
 
             return Result;
         }

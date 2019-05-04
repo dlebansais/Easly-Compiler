@@ -70,11 +70,7 @@
                 TypeArgumentStyles ArgumentStyle = TypeArgumentStyles.None;
 
                 foreach (ITypeArgument Item in node.TypeArgumentList)
-                {
                     Success &= IsTypeArgumentValid(Item, ref ArgumentStyle);
-                    if (!Success)
-                        break;
-                }
 
                 IImportedClass Imported = ImportedClassTable[ValidIdentifier];
                 IClass BaseClass = Imported.Item;
@@ -196,6 +192,8 @@
 
         private bool CheckAssignmentTypeArgumentsValidity(IGenericType node, IClass baseClass, IHashtableEx<string, ICompiledType> resolvedTable, IHashtableEx<string, IObjectType> locationTable)
         {
+            bool Result = true;
+
             foreach (IAssignmentTypeArgument Item in node.TypeArgumentList)
             {
                 IIdentifier ParameterIdentifier = (IIdentifier)Item.ParameterIdentifier;
@@ -204,13 +202,13 @@
                 if (resolvedTable.ContainsKey(GenericName))
                 {
                     AddSourceError(new ErrorIdentifierAlreadyListed(ParameterIdentifier, GenericName));
-                    return false;
+                    Result = false;
                 }
 
                 if (!baseClass.LocalGenericTable.ContainsKey(GenericName))
                 {
                     AddSourceError(new ErrorUnknownIdentifier(ParameterIdentifier, GenericName));
-                    return false;
+                    Result = false;
                 }
 
                 ICompiledType ActualArgumentType = Item.ResolvedSourceType.Item;
@@ -226,11 +224,14 @@
                 {
                     FormalGenericType Generic = (FormalGenericType)Entry.Value;
                     if (!Generic.FormalGeneric.DefaultValue.IsAssigned)
+                    {
                         AddSourceError(new ErrorMissingTypeArgument(node, GenericName));
+                        Result = false;
+                    }
                 }
             }
 
-            return true;
+            return Result;
         }
 
         /// <summary>

@@ -45,13 +45,14 @@
         /// <returns>True if an error occured.</returns>
         public override bool CheckConsistency(IClass node, IDictionary<ISourceTemplate, object> dataList, out object data)
         {
-            bool Success = true;
+            bool Success;
             data = null;
 
             Debug.Assert(node.LocalExportTable.IsSealed);
             IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> MergedExportTable = node.LocalExportTable.CloneUnsealed();
 
-            if (!HasConflictingEntry(node, MergedExportTable))
+            Success = !HasConflictingEntry(node, MergedExportTable);
+            if (Success)
                 foreach (IExport Export in node.ExportList)
                     Success &= MergeExportEntry(node, Export, MergedExportTable);
 
@@ -90,19 +91,19 @@
                             {
                                 AddSourceError(new ErrorDuplicateName(Inheritance, LocalName.Name));
                                 ConflictingEntry = true;
+                                Result = true;
                             }
                         }
                         else if (InstanceItem == LocalItem)
                         {
                             AddSourceError(new ErrorExportNameConflict(Inheritance, LocalName.Name, InstanceName.Name));
                             ConflictingEntry = true;
+                            Result = true;
                         }
                     }
 
-                    if (!ConflictingEntry)
+                    if (!ConflictingEntry && !mergedExportTable.ContainsKey(InstanceName))
                         mergedExportTable.Add(InstanceName, InstanceItem);
-                    else
-                        Result = true;
                 }
             }
 

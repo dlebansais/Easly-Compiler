@@ -50,6 +50,11 @@
             bool Success = true;
             data = null;
 
+            if (node.EntityName.Text == "Coverage Invalid 3-43-1")
+            {
+
+            }
+
             IHashtableEx<IFeatureName, IFeatureInstance> MergedFeatureTable = null;
 
             IList<AncestorFeatureInfo> FeatureTableList = new List<AncestorFeatureInfo>();
@@ -360,8 +365,8 @@
             bool MissingKeptFlag = false;
             foreach (IHashtableEx<IFeatureName, IList<ICompiledFeature>> PrecursorSet in PrecursorSetList)
             {
-                if (PrecursorSet.Count == 1)
-                    continue;
+                /*if (PrecursorSet.Count == 1)
+                    continue;*/
 
                 bool IsKept = false;
                 foreach (KeyValuePair<IFeatureName, IList<ICompiledFeature>> SetMemberEntry in PrecursorSet)
@@ -436,10 +441,11 @@
                     if (FoundInSet)
                         break;
                 }
-                if (!FoundInSet)
+                if (!FoundInSet && PrecursorList.Count > 2)
                 {
                     IHashtableEx<IFeatureName, IList<ICompiledFeature>> NewSet = new HashtableEx<IFeatureName, IList<ICompiledFeature>>();
                     NewSet.Add(Key, PrecursorList);
+                    precursorSetList.Add(NewSet);
                 }
             }
         }

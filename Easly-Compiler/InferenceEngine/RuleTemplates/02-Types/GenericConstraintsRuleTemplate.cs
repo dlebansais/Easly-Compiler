@@ -60,7 +60,8 @@
                     AddSourceError(new ErrorReferenceValueConstraintConformance(node, node.ResolvedDefaultType.Item, CopyConstraint));
                     Success = false;
                 }
-                else if (node.ResolvedDefaultType.Item.IsValue && CopyConstraint == BaseNode.CopySemantic.Reference)
+
+                if (node.ResolvedDefaultType.Item.IsValue && CopyConstraint == BaseNode.CopySemantic.Reference)
                 {
                     AddSourceError(new ErrorReferenceValueConstraintConformance(node, node.ResolvedDefaultType.Item, CopyConstraint));
                     Success = false;

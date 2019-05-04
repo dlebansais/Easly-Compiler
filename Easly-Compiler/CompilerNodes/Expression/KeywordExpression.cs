@@ -198,7 +198,22 @@ namespace CompilerNode
             }
 
             if (!Found)
-                errorList.AddError(new ErrorBooleanTypeMissing(source));
+            {
+                bool IsHandled = false;
+
+                if (guid == LanguageClasses.Boolean.Guid)
+                {
+                    errorList.AddError(new ErrorBooleanTypeMissing(source));
+                    IsHandled = true;
+                }
+                else if (guid == LanguageClasses.Exception.Guid)
+                {
+                    errorList.AddError(new ErrorExceptionTypeMissing(source));
+                    IsHandled = true;
+                }
+
+                Debug.Assert(IsHandled);
+            }
 
             return Found;
         }

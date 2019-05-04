@@ -53,7 +53,7 @@
         /// <summary>
         /// The error message.
         /// </summary>
-        public override string Message { get { return "Result Mismatch Conformance Error."; } }
+        public override string Message { get { return $"Result Mismatch Conformance Error, {DerivedResultList.Count} result(s) vs base {BaseResultList.Count} result(s)."; } }
         #endregion
     }
 }

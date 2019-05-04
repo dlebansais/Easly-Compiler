@@ -72,16 +72,18 @@
                             {
                                 AddSourceError(new ErrorDuplicateName(InheritanceItem, LocalName.Name));
                                 ConflictingEntry = true;
+                                Success = false;
                             }
                         }
                         else if (InstanceItem == LocalItem)
                         {
                             AddSourceError(new ErrorTypedefNameConflict(InheritanceItem, LocalName.Name, InstanceName.Name));
                             ConflictingEntry = true;
+                            Success = false;
                         }
                     }
 
-                    if (!ConflictingEntry)
+                    if (!ConflictingEntry && !MergedTypedefTable.ContainsKey(InstanceName))
                         MergedTypedefTable.Add(InstanceName, InstanceItem);
                 }
             }

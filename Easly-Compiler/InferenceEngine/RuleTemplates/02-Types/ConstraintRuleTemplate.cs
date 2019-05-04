@@ -57,15 +57,15 @@
                 Success = ResolveClassTypeRenames(AsClassType, node, out DestinationTypeName, out DestinationType);
             else if (node.ResolvedParentType.Item is ITupleType AsTupleType)
                 Success = ResolveTupleTypeRenames(AsTupleType, node, out DestinationTypeName, out DestinationType);
-            else if (node.RenameTable.Count == 0)
-            {
-                DestinationTypeName = node.ResolvedParentTypeName.Item;
-                DestinationType = node.ResolvedParentType.Item;
-            }
-            else
+            else if (node.RenameTable.Count > 0)
             {
                 AddSourceError(new ErrorRenameNotAllowed(node));
                 Success = false;
+            }
+            else
+            {
+                DestinationTypeName = node.ResolvedParentTypeName.Item;
+                DestinationType = node.ResolvedParentType.Item;
             }
 
             if (Success)

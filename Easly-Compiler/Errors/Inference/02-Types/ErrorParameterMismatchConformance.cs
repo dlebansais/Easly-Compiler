@@ -105,7 +105,7 @@
         /// <summary>
         /// The error message.
         /// </summary>
-        public override string Message { get { return "Parameter Mismatch Conformance Error."; } }
+        public override string Message { get { return $"Parameter Mismatch Conformance Error, {DerivedParameterList.Count} parameter(s), {DerivedParameterEnd} vs base {BaseParameterList.Count} parameter(s), {BaseParameterEnd}."; } }
         #endregion
     }
 }
