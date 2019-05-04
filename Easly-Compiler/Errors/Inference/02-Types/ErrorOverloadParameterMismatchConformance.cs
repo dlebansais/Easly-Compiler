@@ -78,7 +78,7 @@
         /// <summary>
         /// The error message.
         /// </summary>
-        public override string Message { get { return "Overload Parameter Mismatch Conformance Error."; } }
+        public override string Message { get { return $"Overload Parameter Mismatch Conformance Error, {DerivedParameterList.Count} parameter(s), {DerivedParameterEnd} vs base {BaseType.TypeFriendlyName}."; } }
         #endregion
     }
 }

@@ -184,11 +184,8 @@ namespace CompilerNode
         /// <param name="errorList">The list of errors found.</param>
         public virtual bool ApplyChange(IHashtableEx<string, IImportedClass> importedClassTable, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IErrorList errorList)
         {
-            if (!IsExportIdentifierFree(exportTable, errorList, out IFeatureName CurrentExportName, out IHashtableEx<string, IClass> CurrentClassTable))
+            if (!ExportIdentifierExists(exportTable, errorList, out IFeatureName CurrentExportName, out IHashtableEx<string, IClass> CurrentClassTable))
                 return false;
-
-            IIdentifier NodeExportIdentifier = (IIdentifier)ExportIdentifier;
-            IErrorStringValidity StringError;
 
             IHashtableEx<string, IHashtableEx<string, IClass>> ListedExportTable = new HashtableEx<string, IHashtableEx<string, IClass>>(); // string (export name) -> hashtable // string (class name) -> Class
             IHashtableEx<string, IClass> ListedClassTable = new HashtableEx<string, IClass>(); // string (class name) -> Class
@@ -196,42 +193,18 @@ namespace CompilerNode
             bool InvalidExportChange = false;
             foreach (IIdentifier IdentifierItem in IdentifierList)
             {
-                if (!StringValidation.IsValidIdentifier(NodeExportIdentifier, ExportIdentifier.Text, out string ValidIdentifier, out StringError))
-                {
-                    errorList.AddError(StringError);
-                    return false;
-                }
+                Debug.Assert(IdentifierItem.ValidText.IsAssigned);
+                string ValidIdentifier = IdentifierItem.ValidText.Item;
 
-                OnceReference<IHashtableEx<string, IClass>> ListedExport = new OnceReference<IHashtableEx<string, IClass>>();
-                foreach (KeyValuePair<IFeatureName, IHashtableEx<string, IClass>> Entry in exportTable)
+                if (FeatureName.TableContain(exportTable, ValidIdentifier, out IFeatureName EntryName, out IHashtableEx<string, IClass> ListedExport))
                 {
-                    IFeatureName EntryName = Entry.Key;
-                    if (EntryName.Name == ValidIdentifier)
-                    {
-                        ListedExport.Item = Entry.Value;
-                        break;
-                    }
-                }
-
-                if (ListedExport.IsAssigned)
-                {
-                    if (ListedExportTable.ContainsKey(ValidIdentifier))
-                    {
-                        errorList.AddError(new ErrorIdentifierAlreadyListed(IdentifierItem, ValidIdentifier));
-                        InvalidExportChange = true;
-                    }
-                    else
-                        ListedExportTable.Add(ValidIdentifier, ListedExport.Item);
+                    Debug.Assert(!ListedExportTable.ContainsKey(ValidIdentifier));
+                    ListedExportTable.Add(ValidIdentifier, ListedExport);
                 }
                 else if (importedClassTable.ContainsKey(ValidIdentifier))
                 {
-                    if (ListedExportTable.ContainsKey(ValidIdentifier))
-                    {
-                        errorList.AddError(new ErrorIdentifierAlreadyListed(IdentifierItem, ValidIdentifier));
-                        InvalidExportChange = true;
-                    }
-                    else
-                        ListedClassTable.Add(ValidIdentifier, importedClassTable[ValidIdentifier].Item);
+                    Debug.Assert(!ListedClassTable.ContainsKey(ValidIdentifier));
+                    ListedClassTable.Add(ValidIdentifier, importedClassTable[ValidIdentifier].Item);
                 }
                 else if (ValidIdentifier.ToLower() != LanguageClasses.Any.Name.ToLower())
                 {
@@ -248,18 +221,15 @@ namespace CompilerNode
             return true;
         }
 
-        private bool IsExportIdentifierFree(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IErrorList errorList, out IFeatureName currentExportName, out IHashtableEx<string, IClass> currentClassTable)
+        private bool ExportIdentifierExists(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IErrorList errorList, out IFeatureName currentExportName, out IHashtableEx<string, IClass> currentClassTable)
         {
             currentExportName = null;
             currentClassTable = null;
+            bool Found = false;
 
             IIdentifier NodeExportIdentifier = (IIdentifier)ExportIdentifier;
-
-            if (!StringValidation.IsValidIdentifier(NodeExportIdentifier, ExportIdentifier.Text, out string ValidIdentifier, out IErrorStringValidity StringError))
-            {
-                errorList.AddError(StringError);
-                return false;
-            }
+            Debug.Assert(NodeExportIdentifier.ValidText.IsAssigned);
+            string ValidIdentifier = NodeExportIdentifier.ValidText.Item;
 
             foreach (KeyValuePair<IFeatureName, IHashtableEx<string, IClass>> Entry in exportTable)
             {
@@ -268,17 +238,15 @@ namespace CompilerNode
                 {
                     currentExportName = EntryName;
                     currentClassTable = Entry.Value;
+                    Found = true;
                     break;
                 }
             }
 
-            if (currentExportName == null || currentClassTable == null)
-            {
-                errorList.AddError(new ErrorUnknownIdentifier((IIdentifier)ExportIdentifier, ValidIdentifier));
-                return false;
-            }
+            if (!Found)
+                errorList.AddError(new ErrorUnknownIdentifier(NodeExportIdentifier, ValidIdentifier));
 
-            return true;
+            return Found;
         }
 
         private void UpdateTables(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IFeatureName currentExportName, IHashtableEx<string, IClass> currentClassTable, IHashtableEx<string, IHashtableEx<string, IClass>> listedExportTable, IHashtableEx<string, IClass> listedClassTable)

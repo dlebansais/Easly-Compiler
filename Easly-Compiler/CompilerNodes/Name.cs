@@ -13,7 +13,7 @@
         /// <summary>
         /// The source used to create this name.
         /// </summary>
-        ISource Location { get; }
+        //ISource Location { get; }
 
         /// <summary>
         /// The valid value of <see cref="BaseNode.IName.Text"/>.
@@ -33,7 +33,7 @@
         /// </summary>
         public Name()
         {
-            Location = this;
+            //Location = this;
         }
 
         /// <summary>
@@ -43,7 +43,7 @@
         /// <param name="name">The name.</param>
         public Name(ISource location, string name)
         {
-            Location = location;
+            //Location = location;
             EmbeddingClass = location.EmbeddingClass;
             EmbeddingFeature = location.EmbeddingFeature;
             EmbeddingOverload = location.EmbeddingOverload;
@@ -153,7 +153,7 @@
         /// <summary>
         /// The source used to create this name.
         /// </summary>
-        public ISource Location { get; }
+        //public ISource Location { get; }
 
         /// <summary>
         /// The valid value of <see cref="BaseNode.IName.Text"/>.
