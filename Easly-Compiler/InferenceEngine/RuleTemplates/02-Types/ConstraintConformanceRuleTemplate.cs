@@ -60,7 +60,6 @@
                 {
                     AddSourceError(new ErrorTypeAlreadyUsedAsConstraint((IObjectType)node.ParentType));
                     Success = false;
-                    break;
                 }
             }
 

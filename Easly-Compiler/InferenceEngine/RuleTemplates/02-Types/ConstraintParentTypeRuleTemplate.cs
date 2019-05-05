@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -50,18 +51,11 @@
             ITypeName ResolvedTypeName = ParentType.ResolvedTypeName.Item;
             ICompiledType ResolvedType = ParentType.ResolvedType.Item;
 
-            if (ResolvedType is IAnchoredType AsAnchoredType)
-            {
-                AddSourceError(new ErrorInvalidAnchoredType(AsAnchoredType));
-                Success = false;
-            }
-            else if (ResolvedType is IKeywordAnchoredType AsKeywordAnchoredType)
-            {
-                AddSourceError(new ErrorInvalidAnchoredType(AsKeywordAnchoredType));
-                Success = false;
-            }
-            else
-                data = new Tuple<ITypeName, ICompiledType>(ResolvedTypeName, ResolvedType);
+            // This has already been checked.
+            Debug.Assert(!(ResolvedType is IAnchoredType));
+            Debug.Assert(!(ResolvedType is IKeywordAnchoredType));
+
+            data = new Tuple<ITypeName, ICompiledType>(ResolvedTypeName, ResolvedType);
 
             return Success;
         }

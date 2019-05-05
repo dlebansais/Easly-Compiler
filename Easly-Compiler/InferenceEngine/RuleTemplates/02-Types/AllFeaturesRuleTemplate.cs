@@ -50,7 +50,7 @@
             bool Success = true;
             data = null;
 
-            if (node.EntityName.Text == "Coverage Invalid 3-43-1")
+            if (node.EntityName.Text == "Coverage Invalid 3-65-4")
             {
 
             }
@@ -130,6 +130,11 @@
                             if (Value.Feature.Item == ImportedKey)
                             {
                                 OnceReference<InstanceNameInfo> PreviousInstance = new OnceReference<InstanceNameInfo>();
+
+                                if (NameList.Count > 1)
+                                {
+
+                                }
 
                                 int i;
                                 for (i = 0; i < NameList.Count; i++)
@@ -303,7 +308,7 @@
             {
                 ICompiledType FeatureType = InstanceList[0].Instance.Feature.Item.ResolvedFeatureType.Item;
 
-                for (int i = 1; i < InstanceList.Count; i++)
+                for (int i = 1; i < InstanceList.Count && Result; i++)
                 {
                     InstanceNameInfo ThisInstance = InstanceList[i];
 
@@ -317,7 +322,6 @@
                             errorList.AddError(new ErrorIndexerInheritanceConflict(ThisInstance.Location));
                         else
                             errorList.AddError(new ErrorInheritanceConflict(ThisInstance.Location, ThisInstance.Name.Name));
-                        break;
                     }
                 }
             }
@@ -362,54 +366,60 @@
             IList<IHashtableEx<IFeatureName, IList<ICompiledFeature>>> PrecursorSetList = new List<IHashtableEx<IFeatureName, IList<ICompiledFeature>>>(); // FeatureName -> List<ICompiledFeature> (Precursor list)
             CheckAllPrecursorSelectedInNameTable(byNameTable, PrecursorSetList);
 
-            bool MissingKeptFlag = false;
-            foreach (IHashtableEx<IFeatureName, IList<ICompiledFeature>> PrecursorSet in PrecursorSetList)
-            {
-                /*if (PrecursorSet.Count == 1)
-                    continue;*/
+            bool Result = true;
 
-                bool IsKept = false;
-                foreach (KeyValuePair<IFeatureName, IList<ICompiledFeature>> SetMemberEntry in PrecursorSet)
+            foreach (IHashtableEx<IFeatureName, IList<ICompiledFeature>> PrecursorSet in PrecursorSetList)
+                Result &= CheckPrecursorSelected(byNameTable, PrecursorSet, errorList);
+
+            return Result;
+        }
+
+        private bool CheckPrecursorSelected(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IHashtableEx<IFeatureName, IList<ICompiledFeature>> precursorSet, IErrorList errorList)
+        {
+            bool Success = true;
+            bool IsKept = false;
+
+            foreach (KeyValuePair<IFeatureName, IList<ICompiledFeature>> SetMemberEntry in precursorSet)
+            {
+                IFeatureName SetMemberKey = SetMemberEntry.Key;
+                InheritedInstanceInfo CorrespondingInstance = byNameTable[SetMemberKey];
+
+                if (CorrespondingInstance.IsKept)
+                    if (IsKept)
+                    {
+                        foreach (InstanceNameInfo Item in CorrespondingInstance.PrecursorInstanceList)
+                            if (Item.Instance.IsKept)
+                            {
+                                errorList.AddError(new ErrorInheritanceConflict(Item.Location, Item.Name.Name));
+                                Success = false;
+                                break;
+                            }
+                    }
+                    else
+                        IsKept = true;
+            }
+
+            if (!IsKept && precursorSet.Count > 1)
+            {
+                foreach (KeyValuePair<IFeatureName, IList<ICompiledFeature>> SetMemberEntry in precursorSet)
                 {
                     IFeatureName SetMemberKey = SetMemberEntry.Key;
                     InheritedInstanceInfo CorrespondingInstance = byNameTable[SetMemberKey];
 
-                    if (CorrespondingInstance.IsKept)
-                        if (IsKept)
-                        {
-                            foreach (InstanceNameInfo Item in CorrespondingInstance.PrecursorInstanceList)
-                                if (Item.Instance.IsKept)
-                                {
-                                    errorList.AddError(new ErrorInheritanceConflict(Item.Location, Item.Name.Name));
-                                    break;
-                                }
-                        }
-                        else
-                            IsKept = true;
-                }
-                if (!IsKept)
-                {
-                    foreach (KeyValuePair<IFeatureName, IList<ICompiledFeature>> SetMemberEntry in PrecursorSet)
+                    foreach (InstanceNameInfo Item in CorrespondingInstance.PrecursorInstanceList)
                     {
-                        IFeatureName SetMemberKey = SetMemberEntry.Key;
-                        InheritedInstanceInfo CorrespondingInstance = byNameTable[SetMemberKey];
-
-                        foreach (InstanceNameInfo Item in CorrespondingInstance.PrecursorInstanceList)
-                        {
-                            errorList.AddError(new ErrorMissingSelectedPrecursor(Item.Location, Item.Name.Name));
-                            break;
-                        }
-
+                        errorList.AddError(new ErrorMissingSelectedPrecursor(Item.Location, Item.Name.Name));
+                        Success = false;
                         break;
                     }
 
-                    MissingKeptFlag = true;
+                    break;
                 }
-            }
-            if (MissingKeptFlag)
-                return false;
 
-            return true;
+                Debug.Assert(!Success);
+            }
+
+            return Success;
         }
 
         private void CheckAllPrecursorSelectedInNameTable(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IList<IHashtableEx<IFeatureName, IList<ICompiledFeature>>> precursorSetList)
@@ -441,7 +451,8 @@
                     if (FoundInSet)
                         break;
                 }
-                if (!FoundInSet && PrecursorList.Count > 2)
+
+                if (!FoundInSet)
                 {
                     IHashtableEx<IFeatureName, IList<ICompiledFeature>> NewSet = new HashtableEx<IFeatureName, IList<ICompiledFeature>>();
                     NewSet.Add(Key, PrecursorList);
@@ -522,6 +533,7 @@
                     {
                         if (OriginalPrecursor.IsAssigned && OriginalPrecursor.Item != Item.Instance.OriginalPrecursor.Item)
                         {
+
                         }
 
                         OriginalPrecursor.Item = Item.Instance.OriginalPrecursor.Item;

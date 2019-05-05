@@ -54,7 +54,10 @@
             IGenericType ParentGenericType = (IGenericType)node.ParentSource;
 
             if (ParentGenericType.ArgumentIdentifierTable.ContainsKey(ValidText))
+            {
                 AddSourceError(new ErrorIdentifierAlreadyListed(ParameterIdentifier, ValidText));
+                Success = false;
+            }
 
             return Success;
         }
