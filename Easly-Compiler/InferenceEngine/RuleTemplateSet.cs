@@ -133,6 +133,7 @@
             new QueryOverloadResultRuleTemplate(),
             new QueryOverloadRuleTemplate(),
             new QueryOverloadConformanceRuleTemplate(),
+            new QueryOverloadAssociatedTypeConformanceRuleTemplate(),
             new QueryOverloadTypeRuleTemplate(),
             new QueryOverloadTypeConformanceRuleTemplate(),
             new SimpleTypeInheritanceRuleTemplate(),

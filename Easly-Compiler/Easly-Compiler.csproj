@@ -304,6 +304,7 @@
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\FunctionTypeResultRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\InheritanceClassGroupRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\KeywordAnchoredTypeCurrentRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\QueryOverloadAssociatedTypeConformanceRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\QueryOverloadResultRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\QueryOverloadConformanceRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\QueryOverloadTypeConformanceRuleTemplate.cs" />

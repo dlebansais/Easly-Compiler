@@ -144,21 +144,7 @@
                 }
             }
 
-            IList<IFeatureName> ListedIdentifiers = new List<IFeatureName>();
-
-            foreach (KeyValuePair<IFeatureName, IIdentifier> Entry in ListedExportList)
-            {
-                IFeatureName ExportName = Entry.Key;
-                IIdentifier Identifier = Entry.Value;
-
-                if (ListedIdentifiers.Contains(ExportName))
-                {
-                    AddSourceError(new ErrorIdentifierAlreadyListed(Identifier, ExportName.Name));
-                    Success = false;
-                }
-                else
-                    ListedIdentifiers.Add(ExportName);
-            }
+            IList<IFeatureName> ListedIdentifiers = new List<IFeatureName>(ListedExportList.Indexes);
 
             List<IHashtableEx<string, IClass>> OtherClassTableList = new List<IHashtableEx<string, IClass>>();
             foreach (IFeatureName ExportName in ListedIdentifiers)
@@ -172,33 +158,35 @@
             foreach (IHashtableEx<string, IClass> OtherClassTable in OtherClassTableList)
                 ResolveAsExportIdentifier(OtherClassTable, FilledClassTable);
 
-            bool AllClassIdentifiersHandled = true;
             for (int i = 0; i < export.ClassIdentifierList.Count; i++)
             {
                 IIdentifier Identifier = export.ClassIdentifierList[i];
                 string ValidIdentifier = Identifier.ValidText.Item;
 
-                if (ValidIdentifier.ToLower() == LanguageClasses.Any.Name.ToLower() || node.ImportedClassTable.ContainsKey(ValidIdentifier))
-                    if (!ResolveAsClassIdentifier(ValidIdentifier, node.ImportedClassTable, FilledClassTable, Identifier, ErrorList))
+                if (ValidIdentifier.ToLower() != LanguageClasses.Any.Name.ToLower() && node.ImportedClassTable.ContainsKey(ValidIdentifier))
+                {
+                    IImportedClass Imported = node.ImportedClassTable[ValidIdentifier];
+
+                    if (FilledClassTable.ContainsKey(ValidIdentifier))
                     {
-                        AllClassIdentifiersHandled = false;
+                        AddSourceError(new ErrorIdentifierAlreadyListed(Identifier, ValidIdentifier));
                         Success = false;
                     }
-            }
-
-            if (AllClassIdentifiersHandled)
-            {
-                IHashtableEx<string, IClass> ClassTable = node.LocalExportTable[export.ValidExportName.Item];
-                foreach (KeyValuePair<string, IClass> Entry in FilledClassTable)
-                {
-                    string ClassIdentifier = Entry.Key;
-                    IClass ExportClassItem = Entry.Value;
-
-                    ClassTable.Add(ClassIdentifier, ExportClassItem);
+                    else
+                        FilledClassTable.Add(ValidIdentifier, Imported.Item);
                 }
-
-                export.ExportClassTable.Item = FilledClassTable;
             }
+
+            IHashtableEx<string, IClass> ClassTable = node.LocalExportTable[export.ValidExportName.Item];
+            foreach (KeyValuePair<string, IClass> Entry in FilledClassTable)
+            {
+                string ClassIdentifier = Entry.Key;
+                IClass ExportClassItem = Entry.Value;
+
+                ClassTable.Add(ClassIdentifier, ExportClassItem);
+            }
+
+            export.ExportClassTable.Item = FilledClassTable;
 
             return Success;
         }
@@ -213,23 +201,6 @@
                 if (!classTable.ContainsKey(ClassIdentifier))
                     classTable.Add(ClassIdentifier, ClassItem);
             }
-        }
-
-        private bool ResolveAsClassIdentifier(string validClassIdentifier, IHashtableEx<string, IImportedClass> importedClassTable, IHashtableEx<string, IClass> classTable, IIdentifier source, IErrorList errorList)
-        {
-            if (classTable.ContainsKey(validClassIdentifier))
-            {
-                errorList.AddError(new ErrorIdentifierAlreadyListed(source, validClassIdentifier));
-                return false;
-            }
-
-            if (validClassIdentifier.ToLower() != LanguageClasses.Any.Name.ToLower())
-            {
-                IImportedClass Imported = importedClassTable[validClassIdentifier];
-                classTable.Add(validClassIdentifier, Imported.Item);
-            }
-
-            return true;
         }
 
         /// <summary>

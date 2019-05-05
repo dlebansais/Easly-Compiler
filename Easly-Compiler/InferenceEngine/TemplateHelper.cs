@@ -80,7 +80,10 @@
                 {
                     if (IntermediateResult is IOnceReference AsOnceReference)
                         if (!AsOnceReference.IsAssigned)
+                        {
+                            isInterrupted = true;
                             return default;
+                        }
                         else
                             IntermediateResult = AsOnceReference.Reference;
 

@@ -56,7 +56,7 @@
             bool Result = false;
 
             ListTableEx<TValue> Value = GetSourceObject(node, out bool IsInterrupted) as ListTableEx<TValue>;
-            Debug.Assert(Value != null);
+            Debug.Assert(Value != null || IsInterrupted);
 
             if (!IsInterrupted && Value != null && Value.IsSealed)
             {

@@ -60,6 +60,11 @@
         /// The resolved associated type.
         /// </summary>
         OnceReference<IQueryOverloadType> ResolvedAssociatedType { get; }
+
+        /// <summary>
+        /// List of resolved conformant parameter types, both this overload and the associated type.
+        /// </summary>
+        ListTableEx<ICompiledType> CompleteConformantResultTable { get; }
     }
 
     /// <summary>
@@ -182,6 +187,7 @@
                 ResultTable = new ListTableEx<IParameter>();
                 ConformantResultTable = new ListTableEx<ICompiledType>();
                 ResolvedAssociatedType = new OnceReference<IQueryOverloadType>();
+                CompleteConformantResultTable = new ListTableEx<ICompiledType>();
                 ResolvedResultTypeName = new OnceReference<ITypeName>();
                 ResolvedResultType = new OnceReference<ICompiledType>();
                 IsHandled = true;
@@ -207,9 +213,10 @@
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                IsResolved = LocalScope.IsSealed && ConformantResultTable.IsSealed;
+                IsResolved = LocalScope.IsSealed && CompleteConformantResultTable.IsSealed;
                 Debug.Assert(ParameterTable.IsSealed || !IsResolved);
                 Debug.Assert(ResultTable.IsSealed || !IsResolved);
+                Debug.Assert(ConformantResultTable.IsSealed || !IsResolved);
                 Debug.Assert(ResolvedResultTypeName.IsAssigned || !IsResolved);
                 Debug.Assert(ResolvedResultType.IsAssigned || !IsResolved);
                 IsHandled = true;
@@ -272,6 +279,11 @@
         /// The resolved associated type.
         /// </summary>
         public OnceReference<IQueryOverloadType> ResolvedAssociatedType { get; private set; } = new OnceReference<IQueryOverloadType>();
+
+        /// <summary>
+        /// List of resolved conformant parameter types, both this overload and the associated type.
+        /// </summary>
+        public ListTableEx<ICompiledType> CompleteConformantResultTable { get; private set; } = new ListTableEx<ICompiledType>();
 
         /// <summary>
         /// The name of the resolved result type.

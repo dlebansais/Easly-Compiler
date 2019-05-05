@@ -34,23 +34,9 @@
         }
 
         /// <summary>
-        /// Locks the group if it contains more than one class.
-        /// </summary>
-        public void SetAssigned()
-        {
-            if (_GroupClassList.Count > 1)
-                IsAssigned = true;
-        }
-
-        /// <summary>
         /// List of classes in the group.
         /// </summary>
         public IReadOnlyList<IClass> GroupClassList { get { return _GroupClassList; } }
         private List<IClass> _GroupClassList;
-
-        /// <summary>
-        /// Indicates that the group doesn't accept more classes.
-        /// </summary>
-        public bool IsAssigned { get; private set; }
     }
 }

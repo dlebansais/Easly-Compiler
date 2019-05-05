@@ -32,16 +32,6 @@
         /// </summary>
         /// <param name="valueTypeName">The expression type name.</param>
         /// <param name="valueType">The expression type.</param>
-        public ExpressionType(ITypeName valueTypeName, ICompiledType valueType)
-            : this(valueTypeName, valueType, string.Empty)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ExpressionType"/> class.
-        /// </summary>
-        /// <param name="valueTypeName">The expression type name.</param>
-        /// <param name="valueType">The expression type.</param>
         /// <param name="name">Name of the expression value, empty if none.</param>
         public ExpressionType(ITypeName valueTypeName, ICompiledType valueType, string name)
         {

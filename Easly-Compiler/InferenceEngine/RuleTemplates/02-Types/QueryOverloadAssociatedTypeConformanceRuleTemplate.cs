@@ -9,27 +9,26 @@
     /// <summary>
     /// A rule to process <see cref="IQueryOverload"/>.
     /// </summary>
-    public interface IQueryOverloadConformanceRuleTemplate : IRuleTemplate
+    public interface IQueryOverloadAssociatedTypeConformanceRuleTemplate : IRuleTemplate
     {
     }
 
     /// <summary>
     /// A rule to process <see cref="IQueryOverload"/>.
     /// </summary>
-    public class QueryOverloadConformanceRuleTemplate : RuleTemplate<IQueryOverload, QueryOverloadConformanceRuleTemplate>, IQueryOverloadConformanceRuleTemplate
+    public class QueryOverloadAssociatedTypeConformanceRuleTemplate : RuleTemplate<IQueryOverload, QueryOverloadAssociatedTypeConformanceRuleTemplate>, IQueryOverloadAssociatedTypeConformanceRuleTemplate
     {
         #region Init
-        static QueryOverloadConformanceRuleTemplate()
+        static QueryOverloadAssociatedTypeConformanceRuleTemplate()
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new SealedListSourceTemplate<IQueryOverload, IParameter>(nameof(IQueryOverload.ResultTable)),
-                new SealedTableCollectionSourceTemplate<IQueryOverload, ICompiledType, ITypeName, ICompiledType>(nameof(IQueryOverload.ConformantResultTable), nameof(ICompiledType.ConformanceTable)),
+                new SealedListSourceTemplate<IQueryOverload, ICompiledType>(nameof(IQueryOverload.ResolvedAssociatedType) + Dot + nameof(IQueryOverloadType.ConformantResultTable)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new UnsealedListDestinationTemplate<IQueryOverload, ICompiledType>(nameof(IQueryOverload.ConformantResultTable)),
+                new UnsealedListDestinationTemplate<IQueryOverload, ICompiledType>(nameof(IQueryOverload.CompleteConformantResultTable)),
             };
         }
         #endregion
@@ -57,13 +56,13 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IQueryOverload node, object data)
         {
-            node.ConformantResultTable.Seal();
-
             Debug.Assert(node.ResolvedAssociatedType.IsAssigned);
-            IQueryOverloadType AssociatedType = node.ResolvedAssociatedType.Item;
 
-            Debug.Assert(!AssociatedType.ConformantResultTable.IsSealed);
-            AssociatedType.ConformantResultTable.Seal();
+            IQueryOverloadType OverloadType = node.ResolvedAssociatedType.Item;
+
+            Debug.Assert(OverloadType.ConformantResultTable.IsSealed);
+            node.CompleteConformantResultTable.AddRange(OverloadType.ConformantResultTable);
+            node.CompleteConformantResultTable.Seal();
         }
         #endregion
     }

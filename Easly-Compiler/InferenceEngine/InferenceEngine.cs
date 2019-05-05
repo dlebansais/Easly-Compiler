@@ -112,11 +112,11 @@
             bool Success;
             bool? LastTryResult = null;
 
-            foreach (IRuleTemplate Rule in RuleTemplateList)
-                Rule.ErrorList.ClearErrors();
-
             for (;;)
             {
+                foreach (IRuleTemplate Rule in RuleTemplateList)
+                    Rule.ErrorList.ClearErrors();
+
                 IErrorList TryErrorList = new ErrorList();
                 bool TryResult = SolveWithRetry(TryErrorList);
                 if (Retries == 0)
@@ -218,7 +218,7 @@
             {
                 IRuleTemplate Rule = RuleTemplateList[i];
 
-                if (Rule is IRuleTemplate AsRuleTemplate)
+                if (Rule is ISimpleTypeClassRuleTemplate AsRuleTemplate)
                 {
 
                 }
@@ -334,10 +334,10 @@
 
             foreach (IRuleTemplate Rule in RuleTemplateList)
             {
-                /*if (Rule is IInheritanceRenameRuleTemplate AsRuleTemplate)
+                if (Rule is ISimpleTypeClassRuleTemplate AsRuleTemplate)
                 {
 
-                }*/
+                }
 
                 foreach (ISource Source in unresolvedSourceList)
                 {

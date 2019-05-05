@@ -129,6 +129,9 @@
             }
 
             node.ResolvedAssociatedType.Item = AssociatedType;
+
+            Debug.Assert(!node.ConformantResultTable.IsSealed);
+            Debug.Assert(!AssociatedType.ConformantResultTable.IsSealed);
         }
         #endregion
     }

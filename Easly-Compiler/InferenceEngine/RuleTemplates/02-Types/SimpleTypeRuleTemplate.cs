@@ -120,13 +120,13 @@
             IIdentifier ClassIdentifier = (IIdentifier)node.ClassIdentifier;
             string ValidIdentifier = ClassIdentifier.ValidText.Item;
 
-            Debug.Assert(baseClass.ResolvedClassType.IsAssigned && baseClass.GenericTable.IsSealed);
-
             if (baseClass.GenericTable.Count > 0)
             {
                 AddSourceError(new ErrorGenericClass(ClassIdentifier, ValidIdentifier));
                 return false;
             }
+
+            Debug.Assert(baseClass.ResolvedClassType.IsAssigned && baseClass.GenericTable.IsSealed);
 
             validTypeName = baseClass.ResolvedClassTypeName.Item;
             validType = baseClass.ResolvedAsCompiledType.Item;

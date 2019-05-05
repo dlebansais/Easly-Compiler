@@ -23,6 +23,7 @@
             {
                 new OnceReferenceSourceTemplate<IFunctionFeature, ITypeName>(nameof(IFunctionFeature.ResolvedFeatureTypeName)),
                 new OnceReferenceSourceTemplate<IFunctionFeature, ICompiledType>(nameof(IFunctionFeature.ResolvedFeatureType)),
+                new SealedListCollectionSourceTemplate<IFunctionFeature, IQueryOverload, ICompiledType>(nameof(IFunctionFeature.OverloadList), nameof(IQueryOverload.CompleteConformantResultTable)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
@@ -53,7 +54,12 @@
             foreach (IQueryOverload Overload in node.OverloadList)
             {
                 Debug.Assert(Overload.ResolvedAssociatedType.IsAssigned);
-                OverloadTypeList.Add(Overload.ResolvedAssociatedType.Item);
+                IQueryOverloadType OverloadType = Overload.ResolvedAssociatedType.Item;
+
+                Debug.Assert(Overload.ConformantResultTable.IsSealed);
+                Debug.Assert(OverloadType.ConformantResultTable.IsSealed);
+
+                OverloadTypeList.Add(OverloadType);
             }
 
             IList<IExpressionType> CommonResults = Feature.CommonResultType(OverloadTypeList);
