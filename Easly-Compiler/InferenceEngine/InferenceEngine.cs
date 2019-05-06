@@ -117,6 +117,8 @@
                 foreach (IRuleTemplate Rule in RuleTemplateList)
                     Rule.ErrorList.ClearErrors();
 
+                //Debug.WriteLine($"Tries left: {Retries}");
+
                 IErrorList TryErrorList = new ErrorList();
                 bool TryResult = SolveWithRetry(TryErrorList);
                 if (Retries == 0)
@@ -134,7 +136,7 @@
 
                 // Reset sources so we restart inference from a fresh state.
                 ResetSources();
-                ShuffleRules(RuleTemplateList);
+                ShuffleRules(RuleTemplateList, Retries);
 
                 if (Retries <= 0)
                     throw new InvalidOperationException("Invalid inference retries count.");
@@ -299,19 +301,20 @@
             bool IsResolved = true;
 
             foreach (ISource Source in SourceList)
-                if (Source.EmbeddingClass == item)
-                {
+            {
+                if (Source.EmbeddingClass == item || Source == item)
                     IsResolved = Source.IsResolved(RuleTemplateList);
-                    if (!IsResolved)
-                        break;
-                }
+
+                if (!IsResolved)
+                    break;
+            }
 
             return IsResolved;
         }
 
-        private static void ShuffleRules(IList<IRuleTemplate> ruleTemplateList)
+        private static void ShuffleRules(IList<IRuleTemplate> ruleTemplateList, int retries)
         {
-            Random Rng = new Random();
+            Random Rng = new Random(retries);
             int ShuffleCount = ruleTemplateList.Count * 4;
             int Count = ruleTemplateList.Count;
 
@@ -334,7 +337,7 @@
 
             foreach (IRuleTemplate Rule in RuleTemplateList)
             {
-                if (Rule is ISimpleTypeClassRuleTemplate AsRuleTemplate)
+                if (Rule is IAllLocalTypedefsRuleTemplate AsRuleTemplate)
                 {
 
                 }

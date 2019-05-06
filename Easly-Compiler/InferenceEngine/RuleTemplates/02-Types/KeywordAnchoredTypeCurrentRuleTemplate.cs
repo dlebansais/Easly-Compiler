@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
     using Easly;
 
@@ -52,13 +53,12 @@
             {
                 IClass EmbeddingClass = node.EmbeddingClass;
                 IErrorList CheckErrorList = new ErrorList();
-                if (!KeywordExpression.IsKeywordAvailable(node, node.Anchor, CheckErrorList, out ITypeName ResultTypeName, out ICompiledType ResultType))
-                {
-                    AddSourceErrorList(CheckErrorList);
-                    Success = false;
-                }
-                else
-                    data = new Tuple<ITypeName, ICompiledType>(ResultTypeName, ResultType);
+
+                // 'Current' is always available.
+                Success = KeywordExpression.IsKeywordAvailable(node, node.Anchor, CheckErrorList, out ITypeName ResultTypeName, out ICompiledType ResultType);
+                Debug.Assert(Success);
+
+                data = new Tuple<ITypeName, ICompiledType>(ResultTypeName, ResultType);
             }
             else
                 data = new Tuple<ITypeName, ICompiledType>(Class.ClassAny.ResolvedClassTypeName.Item, Class.ClassAny.ResolvedClassType.Item);

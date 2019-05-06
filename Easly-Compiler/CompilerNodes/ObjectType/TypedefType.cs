@@ -18,7 +18,7 @@
         /// <summary>
         /// Resolved type of the source.
         /// </summary>
-        OnceReference<ICompiledType> ReferencedType2 { get; }
+        OnceReference<ICompiledType> ReferencedType { get; }
     }
 
     /// <summary>
@@ -35,7 +35,7 @@
         /// <summary>
         /// Resolved type of the source.
         /// </summary>
-        public OnceReference<ICompiledType> ReferencedType2 { get; private set; } = new OnceReference<ICompiledType>();
+        public OnceReference<ICompiledType> ReferencedType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
 
         #region Debugging
@@ -47,7 +47,7 @@
             get
             {
                 string NameString = ReferencedTypeName.IsAssigned ? $" {ReferencedTypeName.Item.Name}" : string.Empty;
-                string TypeString = ReferencedType2.IsAssigned && ReferencedType2.Item is IObjectType AsObjectType ? $" = {AsObjectType.TypeToString}" : string.Empty;
+                string TypeString = ReferencedType.IsAssigned && ReferencedType.Item is IObjectType AsObjectType ? $" = {AsObjectType.TypeToString}" : string.Empty;
                 return $"typedef{NameString}{TypeString}";
             }
         }

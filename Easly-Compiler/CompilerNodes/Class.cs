@@ -589,7 +589,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                IsResolved = false;
+                IsResolved = NamespaceTable.IsSealed;
                 IsHandled = true;
             }
 

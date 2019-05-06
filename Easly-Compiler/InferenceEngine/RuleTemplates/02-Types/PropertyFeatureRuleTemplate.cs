@@ -72,17 +72,9 @@
             ScopeHolder.RecursiveCheck(CheckedGetScope, node.InnerScopes, ConflictList);
             ScopeHolder.RecursiveCheck(CheckedSetScope, node.InnerScopes, ConflictList);
 
-            if (ConflictList.Contains(NameResult))
-            {
-                AddSourceError(new ErrorNameResultNotAllowed(node));
-                Success = false;
-            }
-
-            if (ConflictList.Contains(NameValue))
-            {
-                AddSourceError(new ErrorNameValueNotAllowed(node));
-                Success = false;
-            }
+            // This has been checked in another rule.
+            Debug.Assert(!ConflictList.Contains(NameResult));
+            Debug.Assert(!ConflictList.Contains(NameValue));
 
             IName PropertyName = (IName)((IFeatureWithName)node).EntityName;
 

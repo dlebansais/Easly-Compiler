@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
     using Easly;
 
@@ -88,18 +89,13 @@
             ScopeHolder.RecursiveCheck(CheckedGetScope, node.InnerScopes, ConflictList);
             ScopeHolder.RecursiveCheck(CheckedSetScope, node.InnerScopes, ConflictList);
 
-            if (ConflictList.Contains(NameResult))
-            {
-                AddSourceError(new ErrorNameResultNotAllowed(node));
-                Success = false;
-            }
-            if (ConflictList.Contains(NameValue))
-            {
-                AddSourceError(new ErrorNameValueNotAllowed(node));
-                Success = false;
-            }
+            Debug.Assert(node.InnerScopes.Count == 0);
 
-            Success &= CheckParameterConflicts(node, ConflictList);
+            // This has been checked in another rule.
+            Debug.Assert(!ConflictList.Contains(NameResult));
+            Debug.Assert(!ConflictList.Contains(NameValue));
+
+            // Success &= CheckParameterConflicts(node, ConflictList);
             Success &= CheckIndexerKind(node, out BaseNode.UtilityType IndexerKind);
 
             if (Success)
@@ -141,6 +137,8 @@
             return Success;
         }
 
+        /*
+         * TODO: check if this error is really possible.
         private bool CheckParameterConflicts(IIndexerFeature node, List<string> conflictList)
         {
             bool Success = true;
@@ -158,7 +156,7 @@
             }
 
             return Success;
-        }
+        }*/
 
         private bool CheckIndexerKind(IIndexerFeature node, out BaseNode.UtilityType indexerKind)
         {

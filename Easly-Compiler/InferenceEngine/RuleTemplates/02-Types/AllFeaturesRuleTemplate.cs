@@ -319,6 +319,11 @@
                             errorList.AddError(new ErrorInheritanceConflict(ThisInstance.Location, ThisInstance.Name.Name));
                     }
                 }
+
+                if (Result)
+                {
+
+                }
             }
 
             return Result;

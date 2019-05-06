@@ -78,7 +78,7 @@
             Debug.Assert(IsFound && ResolvedTypedefType != null);
 
             ResolvedTypedefType.ReferencedTypeName.Item = DefinedTypeName;
-            ResolvedTypedefType.ReferencedType2.Item = DefinedType;
+            ResolvedTypedefType.ReferencedType.Item = DefinedType;
 
 #if DEBUG
             // TODO: remove this code, for code coverage purpose only.

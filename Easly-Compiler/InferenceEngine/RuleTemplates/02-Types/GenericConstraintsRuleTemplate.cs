@@ -129,15 +129,18 @@
             switch (CopyConstraint)
             {
                 case BaseNode.CopySemantic.Any:
-                    Debug.Assert(!GenericType.IsReference && !GenericType.IsValue);
+                    Debug.Assert(!GenericType.IsReference);
+                    Debug.Assert(!GenericType.IsValue);
                     break;
 
                 case BaseNode.CopySemantic.Reference:
-                    Debug.Assert(GenericType.IsReference && !GenericType.IsValue);
+                    Debug.Assert(GenericType.IsReference);
+                    Debug.Assert(!GenericType.IsValue);
                     break;
 
                 case BaseNode.CopySemantic.Value:
-                    Debug.Assert(!GenericType.IsReference && GenericType.IsValue);
+                    Debug.Assert(!GenericType.IsReference);
+                    Debug.Assert(GenericType.IsValue);
                     break;
             }
 

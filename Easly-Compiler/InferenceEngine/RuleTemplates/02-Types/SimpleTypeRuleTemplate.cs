@@ -120,7 +120,7 @@
             IIdentifier ClassIdentifier = (IIdentifier)node.ClassIdentifier;
             string ValidIdentifier = ClassIdentifier.ValidText.Item;
 
-            if (baseClass.GenericTable.Count > 0)
+            if (baseClass.GenericList.Count > 0)
             {
                 AddSourceError(new ErrorGenericClass(ClassIdentifier, ValidIdentifier));
                 return false;
@@ -144,7 +144,7 @@
         private void CheckValidityAsTypedef(ITypedefType definedType, out ITypeName validTypeName, out ICompiledType validType)
         {
             validTypeName = definedType.ReferencedTypeName.Item;
-            validType = definedType.ReferencedType2.Item;
+            validType = definedType.ReferencedType.Item;
         }
 
         /// <summary>
