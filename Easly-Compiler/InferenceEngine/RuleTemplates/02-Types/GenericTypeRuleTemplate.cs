@@ -60,52 +60,47 @@
             IHashtableEx<string, ICompiledType> ResolvedTable = new HashtableEx<string, ICompiledType>();
             IHashtableEx<string, IObjectType> LocationTable = new HashtableEx<string, IObjectType>();
 
-            if (!ImportedClassTable.ContainsKey(ValidIdentifier))
+            // This is verified during the class type check.
+            Debug.Assert(ImportedClassTable.ContainsKey(ValidIdentifier));
+
+            TypeArgumentStyles ArgumentStyle = TypeArgumentStyles.None;
+
+            foreach (ITypeArgument Item in node.TypeArgumentList)
+                Success &= IsTypeArgumentValid(Item, ref ArgumentStyle);
+
+            IImportedClass Imported = ImportedClassTable[ValidIdentifier];
+            IClass BaseClass = Imported.Item;
+
+            if (BaseClass.GenericTable.Count == 0)
             {
-                AddSourceError(new ErrorUnknownIdentifier(ClassIdentifier, ValidIdentifier));
+                AddSourceError(new ErrorGenericClass(node, ValidIdentifier));
                 Success = false;
             }
-            else
+
+            if (Success)
             {
-                TypeArgumentStyles ArgumentStyle = TypeArgumentStyles.None;
+                bool IsHandled = false;
 
-                foreach (ITypeArgument Item in node.TypeArgumentList)
-                    Success &= IsTypeArgumentValid(Item, ref ArgumentStyle);
-
-                IImportedClass Imported = ImportedClassTable[ValidIdentifier];
-                IClass BaseClass = Imported.Item;
-
-                if (BaseClass.GenericTable.Count == 0)
+                switch (ArgumentStyle)
                 {
-                    AddSourceError(new ErrorGenericClass(node, ValidIdentifier));
-                    Success = false;
+                    case TypeArgumentStyles.None:
+                    case TypeArgumentStyles.Positional:
+                        Success = CheckPositionalTypeArgumentsValidity(node, BaseClass, ResolvedTable, LocationTable);
+                        IsHandled = true;
+                        break;
+
+                    case TypeArgumentStyles.Assignment:
+                        Success = CheckAssignmentTypeArgumentsValidity(node, BaseClass, ResolvedTable, LocationTable);
+                        IsHandled = true;
+                        break;
                 }
+
+                Debug.Assert(IsHandled);
 
                 if (Success)
                 {
-                    bool IsHandled = false;
-
-                    switch (ArgumentStyle)
-                    {
-                        case TypeArgumentStyles.None:
-                        case TypeArgumentStyles.Positional:
-                            Success = CheckPositionalTypeArgumentsValidity(node, BaseClass, ResolvedTable, LocationTable);
-                            IsHandled = true;
-                            break;
-
-                        case TypeArgumentStyles.Assignment:
-                            Success = CheckAssignmentTypeArgumentsValidity(node, BaseClass, ResolvedTable, LocationTable);
-                            IsHandled = true;
-                            break;
-                    }
-
-                    Debug.Assert(IsHandled);
-
-                    if (Success)
-                    {
-                        ClassType.ResolveType(EmbeddingClass.TypeTable, BaseClass, ResolvedTable, EmbeddingClass.ResolvedClassType.Item, out ITypeName ValidResolvedTypeName, out ICompiledType ValidResolvedType);
-                        data = new Tuple<IClass, TypeArgumentStyles, IHashtableEx<string, ICompiledType>, IHashtableEx<string, IObjectType>, ITypeName, ICompiledType>(BaseClass, ArgumentStyle, ResolvedTable, LocationTable, ValidResolvedTypeName, ValidResolvedType);
-                    }
+                    ClassType.ResolveType(EmbeddingClass.TypeTable, BaseClass, ResolvedTable, EmbeddingClass.ResolvedClassType.Item, out ITypeName ValidResolvedTypeName, out ICompiledType ValidResolvedType);
+                    data = new Tuple<IClass, TypeArgumentStyles, IHashtableEx<string, ICompiledType>, IHashtableEx<string, IObjectType>, ITypeName, ICompiledType>(BaseClass, ArgumentStyle, ResolvedTable, LocationTable, ValidResolvedTypeName, ValidResolvedType);
                 }
             }
 
@@ -199,11 +194,8 @@
                 IIdentifier ParameterIdentifier = (IIdentifier)Item.ParameterIdentifier;
                 string GenericName = ParameterIdentifier.ValidText.Item;
 
-                if (resolvedTable.ContainsKey(GenericName))
-                {
-                    AddSourceError(new ErrorIdentifierAlreadyListed(ParameterIdentifier, GenericName));
-                    Result = false;
-                }
+                // This is checked in a separate rule.
+                Debug.Assert(!resolvedTable.ContainsKey(GenericName));
 
                 if (!baseClass.LocalGenericTable.ContainsKey(GenericName))
                 {

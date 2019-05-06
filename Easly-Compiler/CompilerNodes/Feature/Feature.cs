@@ -162,7 +162,7 @@
 
             if (ObjectType.TypeConformToBase(DerivedType, BaseType, substitutionTypeTable))
             {
-                errorList.AddError(new ErrorMoreBasicParameter(baseParameter.ResolvedParameter.EmbeddingOverload));
+                errorList.AddError(new ErrorMoreBasicParameter(baseParameter.ResolvedParameter.Location));
                 Success = false;
             }
 

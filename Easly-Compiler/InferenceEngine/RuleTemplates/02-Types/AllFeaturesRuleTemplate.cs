@@ -525,14 +525,7 @@
                     }
 
                     if (Item.Instance.OriginalPrecursor.IsAssigned)
-                    {
-                        if (OriginalPrecursor.IsAssigned && OriginalPrecursor.Item != Item.Instance.OriginalPrecursor.Item)
-                        {
-
-                        }
-
                         OriginalPrecursor.Item = Item.Instance.OriginalPrecursor.Item;
-                    }
                 }
 
                 if (OriginalPrecursor.IsAssigned)
