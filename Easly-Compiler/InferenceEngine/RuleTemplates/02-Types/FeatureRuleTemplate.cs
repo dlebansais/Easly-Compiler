@@ -66,6 +66,7 @@
             }
             else if (FeatureName.TableContain(EmbeddingClass.LocalTypedefTable, ValidText, out Key, out ITypedefType TypedefType))
             {
+                Debug.Assert(false);
                 AddSourceError(new ErrorDuplicateName(EntityName, ValidText));
                 Success = false;
             }

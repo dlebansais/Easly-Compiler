@@ -980,13 +980,16 @@ namespace CompilerNode
         /// <param name="inheritedSingleClassList">The list of classes added.</param>
         public void UpdateClassGroup(IList<IClass> inheritedSingleClassList)
         {
+            Debug.Assert(ClassGroup.IsAssigned);
+
             bool IsUpdated = false;
             foreach (IClass GroupClass in inheritedSingleClassList)
                 ClassGroup.Item.AddClass(GroupClass, ref IsUpdated);
 
             if (IsUpdated)
                 foreach (IClass GroupClass in ClassGroup.Item.GroupClassList)
-                    GroupClass.UpdateClassGroup(inheritedSingleClassList);
+                    if (GroupClass.ClassGroup.IsAssigned)
+                        GroupClass.UpdateClassGroup(inheritedSingleClassList);
         }
 
         /// <summary>

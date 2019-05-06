@@ -50,7 +50,7 @@
             bool Success = true;
             data = null;
 
-            if (node.EntityName.Text == "Coverage Invalid 3-65-4")
+            if (node.EntityName.Text == "Coverage Base 3")
             {
 
             }
@@ -130,11 +130,6 @@
                             if (Value.Feature.Item == ImportedKey)
                             {
                                 OnceReference<InstanceNameInfo> PreviousInstance = new OnceReference<InstanceNameInfo>();
-
-                                if (NameList.Count > 1)
-                                {
-
-                                }
 
                                 int i;
                                 for (i = 0; i < NameList.Count; i++)
