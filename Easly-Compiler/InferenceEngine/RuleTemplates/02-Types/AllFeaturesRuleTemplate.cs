@@ -50,7 +50,7 @@
             bool Success = true;
             data = null;
 
-            if (node.EntityName.Text == "Coverage Base 3")
+            if (node.EntityName.Text.StartsWith("Coverage"))
             {
 
             }

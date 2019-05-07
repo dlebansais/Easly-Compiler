@@ -170,25 +170,37 @@
 
         private bool RemoveForgottenIdentifiers(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IHashtableEx<IFeatureName, ITypedefType> typedefTable, IHashtableEx<IFeatureName, IDiscrete> discreteTable, IHashtableEx<IFeatureName, IFeatureInstance> featureTable, IHashtableEx<string, IIdentifier> forgetTable)
         {
+            bool Result = true;
+
             foreach (KeyValuePair<string, IIdentifier> IdentifierEntry in forgetTable)
             {
                 string ValidIdentifier = IdentifierEntry.Key;
                 IIdentifier IdentifierItem = IdentifierEntry.Value;
-                bool Removed = false;
+                bool IsRemoved = false;
 
-                RemoveIdentifierFromTable(exportTable as IDictionary, ValidIdentifier, ref Removed);
-                RemoveIdentifierFromTable(typedefTable as IDictionary, ValidIdentifier, ref Removed);
-                RemoveIdentifierFromTable(discreteTable as IDictionary, ValidIdentifier, ref Removed);
-                RemoveIdentifierFromTable(featureTable as IDictionary, ValidIdentifier, ref Removed);
+                RemoveIdentifierFromTable(exportTable as IDictionary, ValidIdentifier, ref IsRemoved);
+                RemoveIdentifierFromTable(typedefTable as IDictionary, ValidIdentifier, ref IsRemoved);
+                RemoveIdentifierFromTable(discreteTable as IDictionary, ValidIdentifier, ref IsRemoved);
 
-                if (!Removed)
+                foreach (KeyValuePair<IFeatureName, IFeatureInstance> Entry in featureTable)
                 {
-                    AddSourceError(new ErrorUnknownIdentifier(IdentifierItem, ValidIdentifier));
-                    return false;
+                    IFeatureName EntryName = Entry.Key;
+                    if (EntryName.Name == ValidIdentifier)
+                    {
+                        IFeatureInstance CurrentInstance = Entry.Value;
+                        CurrentInstance.SetIsForgotten(true);
+                        IsRemoved = true;
+                        break;
+                    }
                 }
+
+                if (!IsRemoved)
+                    AddSourceError(new ErrorUnknownIdentifier(IdentifierItem, ValidIdentifier));
+
+                Result &= IsRemoved;
             }
 
-            return true;
+            return Result;
         }
 
         private void RemoveIdentifierFromTable(IDictionary table, string identifier, ref bool isRemoved)

@@ -11,7 +11,7 @@ namespace Test
         static int Main(string[] args)
         {
             Compiler c = new Compiler();
-            //c.InferenceRetries = 20;
+            c.InferenceRetries = 20;
 
             c.Compile(@"C:\Users\DLB\AppData\Local\Temp\root.easly");
             //c.Compile("../../../coverage/coverage.easly");
