@@ -73,15 +73,15 @@
                 AddSourceError(new ErrorDuplicateName(EntityName, ValidText));
                 Success = false;
             }
-            else if (FeatureName.TableContain(EmbeddingClass.LocalDiscreteTable, ValidText, out Key, out IDiscrete Discrete))
+            else
             {
-                AddSourceError(new ErrorDuplicateName(EntityName, ValidText));
-                Success = false;
-            }
-            else if (FeatureName.TableContain(EmbeddingClass.LocalFeatureTable, ValidText, out Key, out IFeatureInstance Feature))
-            {
-                AddSourceError(new ErrorDuplicateName(EntityName, ValidText));
-                Success = false;
+                // This is checked in the corresponding step of a discrete rule.
+                bool IsDiscreteName = FeatureName.TableContain(EmbeddingClass.LocalDiscreteTable, ValidText, out Key, out IDiscrete Discrete);
+                Debug.Assert(!IsDiscreteName);
+
+                // This is checked in the corresponding step of a feature rule.
+                bool IsFeatureName = FeatureName.TableContain(EmbeddingClass.LocalFeatureTable, ValidText, out Key, out IFeatureInstance Feature);
+                Debug.Assert(!IsFeatureName);
             }
 
             if (node.DefinedType is IAnchoredType AsAnchoredType)

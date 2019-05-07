@@ -1,7 +1,9 @@
 ﻿namespace EaslyCompiler
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
     using Easly;
 
@@ -174,50 +176,10 @@
                 IIdentifier IdentifierItem = IdentifierEntry.Value;
                 bool Removed = false;
 
-                foreach (KeyValuePair<IFeatureName, IHashtableEx<string, IClass>> Entry in exportTable)
-                {
-                    IFeatureName EntryName = Entry.Key;
-                    if (EntryName.Name == ValidIdentifier)
-                    {
-                        exportTable.Remove(EntryName);
-                        Removed = true;
-                        break;
-                    }
-                }
-
-                foreach (KeyValuePair<IFeatureName, ITypedefType> Entry in typedefTable)
-                {
-                    IFeatureName EntryName = Entry.Key;
-                    if (EntryName.Name == ValidIdentifier)
-                    {
-                        typedefTable.Remove(EntryName);
-                        Removed = true;
-                        break;
-                    }
-                }
-
-                foreach (KeyValuePair<IFeatureName, IDiscrete> Entry in discreteTable)
-                {
-                    IFeatureName EntryName = Entry.Key;
-                    if (EntryName.Name == ValidIdentifier)
-                    {
-                        discreteTable.Remove(EntryName);
-                        Removed = true;
-                        break;
-                    }
-                }
-
-                foreach (KeyValuePair<IFeatureName, IFeatureInstance> Entry in featureTable)
-                {
-                    IFeatureName EntryName = Entry.Key;
-                    if (EntryName.Name == ValidIdentifier)
-                    {
-                        IFeatureInstance CurrentInstance = Entry.Value;
-                        CurrentInstance.SetIsForgotten(true);
-                        Removed = true;
-                        break;
-                    }
-                }
+                RemoveIdentifierFromTable(exportTable as IDictionary, ValidIdentifier, ref Removed);
+                RemoveIdentifierFromTable(typedefTable as IDictionary, ValidIdentifier, ref Removed);
+                RemoveIdentifierFromTable(discreteTable as IDictionary, ValidIdentifier, ref Removed);
+                RemoveIdentifierFromTable(featureTable as IDictionary, ValidIdentifier, ref Removed);
 
                 if (!Removed)
                 {
@@ -227,6 +189,22 @@
             }
 
             return true;
+        }
+
+        private void RemoveIdentifierFromTable(IDictionary table, string identifier, ref bool isRemoved)
+        {
+            foreach (DictionaryEntry Entry in table)
+            {
+                IFeatureName EntryName = Entry.Key as IFeatureName;
+                Debug.Assert(EntryName != null);
+
+                if (EntryName.Name == identifier)
+                {
+                    table.Remove(EntryName);
+                    isRemoved = true;
+                    break;
+                }
+            }
         }
 
         private bool RemoveForgottenIndexer(IHashtableEx<IFeatureName, IFeatureInstance> featureTable, IInheritance inheritanceItem)
