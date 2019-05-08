@@ -52,26 +52,14 @@
         /// <param name="source">The node for which a value is requested.</param>
         public virtual ISource GetStart(TSource source)
         {
-            bool IsHandled = false;
             INodeWithResult Result = null;
 
             if (source.EmbeddingFeature is IPropertyFeature AsPropertyFeature)
-            {
                 Result = AsPropertyFeature;
-                IsHandled = true;
-            }
             else if (source.EmbeddingFeature is IIndexerFeature AsIndexerFeature)
-            {
                 Result = AsIndexerFeature;
-                IsHandled = true;
-            }
             else if (source.EmbeddingOverload is IQueryOverload AsQueryOverload)
-            {
                 Result = AsQueryOverload;
-                IsHandled = true;
-            }
-
-            Debug.Assert(IsHandled);
 
             return Result;
         }

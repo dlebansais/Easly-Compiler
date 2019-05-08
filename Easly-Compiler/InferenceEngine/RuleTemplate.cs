@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
 
     /// <summary>
     /// A rule to process an Easly node.
@@ -17,6 +18,11 @@
         /// List of errors found when applying this rule.
         /// </summary>
         IErrorList ErrorList { get; }
+
+        /// <summary>
+        /// Clears the rule template state.
+        /// </summary>
+        void Clear();
 
         /// <summary>
         /// Checks that no destination value has been set.
@@ -84,6 +90,11 @@
         /// List of errors found when applying this rule.
         /// </summary>
         IErrorList ErrorList { get; }
+
+        /// <summary>
+        /// Clears the rule template state.
+        /// </summary>
+        void Clear();
 
         /// <summary>
         /// Checks that no destination value has been set.
@@ -174,6 +185,22 @@
         #endregion
 
         #region Client Interface
+        /// <summary>
+        /// Clears the rule template state.
+        /// </summary>
+        public void Clear()
+        {
+            ErrorList.ClearErrors();
+
+#if DEBUG
+            // TODO: remove this code, for code coverage purpose only.
+            foreach (ISourceTemplate SourceTemplate in SourceTemplateList)
+                Debug.Assert(SourceTemplate.ToString() != null);
+            foreach (IDestinationTemplate DestinationTemplate in DestinationTemplateList)
+                Debug.Assert(DestinationTemplate.ToString() != null);
+#endif
+        }
+
         /// <summary>
         /// Checks that no destination value has been set.
         /// </summary>

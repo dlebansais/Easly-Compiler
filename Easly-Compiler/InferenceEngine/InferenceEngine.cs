@@ -115,7 +115,7 @@
             for (;;)
             {
                 foreach (IRuleTemplate Rule in RuleTemplateList)
-                    Rule.ErrorList.ClearErrors();
+                    Rule.Clear();
 
                 //Debug.WriteLine($"Tries left: {Retries}");
 

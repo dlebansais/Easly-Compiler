@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Diagnostics;
     using CompilerNode;
     using Easly;
 
@@ -55,15 +56,7 @@
             data = null;
             bool Result = false;
 
-            INodeWithResult EmbeddingNode = null;
-
-            if (node.EmbeddingFeature is IPropertyFeature AsPropertyFeature)
-                EmbeddingNode = AsPropertyFeature;
-            else if (node.EmbeddingFeature is IIndexerFeature AsIndexerFeature)
-                EmbeddingNode = AsIndexerFeature;
-            else if (node.EmbeddingOverload is IQueryOverload AsQueryOverload)
-                EmbeddingNode = AsQueryOverload;
-
+            INodeWithResult EmbeddingNode = StartingPoint.GetStart(node) as INodeWithResult;
             if (EmbeddingNode != null)
             {
                 OnceReference<TRef> Value = TemplateHelper.GetPropertyPathValue<INodeWithResult, OnceReference<TRef>>(EmbeddingNode, TemplateNodeStart<INodeWithResult>.Default, PropertyPath, out bool IsInterrupted);

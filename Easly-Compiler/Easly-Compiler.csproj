@@ -415,7 +415,6 @@
     <Compile Include="InferenceEngine\SourceTemplates\StringSourceTemplate.cs" />
     <Compile Include="InferenceEngine\StartingPoints\TemplateResultStart.cs" />
     <Compile Include="InferenceEngine\StartingPoints\TemplateGenericStart.cs" />
-    <Compile Include="InferenceEngine\StartingPoints\TemplateGenericTypeStart.cs" />
     <Compile Include="InferenceEngine\StartingPoints\TemplateClassStart.cs" />
     <Compile Include="InferenceEngine\StartingPoints\TemplateNodeStart.cs" />
     <Compile Include="InferenceEngine\StartingPoints\TemplatePathStart.cs" />
