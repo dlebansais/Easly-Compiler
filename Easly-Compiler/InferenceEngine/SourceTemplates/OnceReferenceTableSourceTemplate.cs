@@ -65,15 +65,16 @@
         public override bool IsReady(TSource node, out object data)
         {
             data = null;
-            bool Result = true;
+            bool Result = false;
 
             IList<TRef> ReadyReferenceList = new List<TRef>();
 
             IHashtableEx<TKey, TValue> ValueTable = GetSourceObject(node, out bool IsInterrupted);
 
-            if (IsInterrupted)
-                Result = false;
-            else
+            if (!IsInterrupted)
+            {
+                Result = true;
+
                 foreach (KeyValuePair<TKey, TValue> Entry in ValueTable)
                 {
                     TValue Value = Entry.Value;
@@ -90,6 +91,7 @@
 
                     ReadyReferenceList.Add(Reference.Item);
                 }
+            }
 
             if (Result)
                 data = ReadyReferenceList;

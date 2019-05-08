@@ -289,11 +289,6 @@
         protected virtual void GenerateCompilationUID()
         {
             string NewGuidDigits = Guid.NewGuid().ToString("N");
-
-            // Eliminate leading zeroes that are not valid.
-            while (NewGuidDigits.Length > 1 && NewGuidDigits[0] == '0')
-                NewGuidDigits = NewGuidDigits.Substring(1);
-
             CompilationUID = InitializedNumberExpression(LanguageClasses.UniversallyUniqueIdentifier.Name, "Value", NewGuidDigits + IntegerBase.Hexadecimal.Suffix);
         }
 
@@ -764,10 +759,6 @@
             string Value = string.Empty;
             foreach (byte b in Data)
                 Value += b.ToString("X2");
-
-            // Eliminate leading zeroes that are not valid.
-            while (Value.Length > 1 && Value[0] == '0')
-                Value = Value.Substring(1);
 
             return new ManifestNumberExpression(Value + IntegerBase.Hexadecimal.Suffix);
         }

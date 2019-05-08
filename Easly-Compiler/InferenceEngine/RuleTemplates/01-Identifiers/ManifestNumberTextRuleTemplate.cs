@@ -48,7 +48,7 @@
                 Success = false;
             else
             {
-                IFormattedNumber fn = FormattedNumber.Parse(ValidText);
+                IFormattedNumber fn = FormattedNumber.Parse(ValidText, true);
                 if (!string.IsNullOrEmpty(fn.InvalidText))
                     Success = false;
             }
@@ -70,7 +70,7 @@
         {
             string ValidText = data as string;
             Debug.Assert(StringValidation.IsValidIdentifier(ValidText));
-            Debug.Assert(string.IsNullOrEmpty(FormattedNumber.Parse(ValidText).InvalidText));
+            Debug.Assert(string.IsNullOrEmpty(FormattedNumber.Parse(ValidText, true).InvalidText));
 
             node.ValidText.Item = ValidText;
         }

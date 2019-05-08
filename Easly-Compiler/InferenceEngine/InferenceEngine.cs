@@ -401,22 +401,14 @@
             }
             while (!Exit);
 
-            if (Analysis.Count == 0)
-                Debug.WriteLine("No missing rule found.");
-            else
-            {
-                Debug.WriteLine("The following rules are waiting on a source template:");
-                foreach (KeyValuePair<IRuleTemplate, IList<ISource>> Entry in Analysis)
-                    Debug.WriteLine($"{Entry.Key} on {Entry.Value.Count} node(s)");
-            }
+            Debug.WriteLine($"{Analysis.Count} rule(s) are waiting on a source template:");
+            foreach (KeyValuePair<IRuleTemplate, IList<ISource>> Entry in Analysis)
+                Debug.WriteLine($"{Entry.Key} on {Entry.Value.Count} node(s)");
         }
 
         private bool FindRuleWithDestination(ICollection<IRuleTemplate> ruleTemplateList, IList<ISource> unresolvedSourceList, string path, Type type, ITemplatePathStart startingPoint, out IRuleTemplate matchingRule)
         {
             matchingRule = null;
-
-            if (path == nameof(IClass.ResolvedImportedClassTable))
-                path = nameof(IClass.ResolvedImportedClassTable);
 
             foreach (IRuleTemplate Rule in ruleTemplateList)
             {

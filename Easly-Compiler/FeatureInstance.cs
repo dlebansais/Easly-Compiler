@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
     using Easly;
 
@@ -197,12 +198,10 @@
         public virtual IFeatureInstance Clone(IClassType ancestor)
         {
             IPrecursorInstance NewPrecursor = new PrecursorInstance(ancestor, this);
+            Debug.Assert(NewPrecursor.Ancestor == ancestor);
 
-            IFeatureInstance ClonedObject;
-            if (Feature.IsAssigned)
-                ClonedObject = new FeatureInstance(Owner.Item, Feature.Item);
-            else
-                ClonedObject = new FeatureInstance(Owner.Item, Feature.Item); // Wait, what??
+            Debug.Assert(Feature.IsAssigned);
+            IFeatureInstance ClonedObject = new FeatureInstance(Owner.Item, Feature.Item);
 
             foreach (IPrecursorInstance PrecursorInstance in PrecursorList)
                 ClonedObject.PrecursorList.Add(PrecursorInstance);

@@ -74,8 +74,10 @@
             isInterrupted = true;
             object IntermediateResult = startingPoint.GetStart(source);
 
+#if DEBUG_ENGINE
             try
             {
+#endif
                 for (int i = 0; i < propertyPath.Count; i++)
                 {
                     if (IntermediateResult is IOnceReference AsOnceReference)
@@ -89,23 +91,29 @@
 
                     IntermediateResult = propertyPath[i].GetValue(IntermediateResult);
                 }
+#if DEBUG_ENGINE
             }
             catch (Exception e)
             {
                 Debug.Fail(e.Message);
             }
+#endif
 
             TValue Result = default;
 
+#if DEBUG_ENGINE
             try
             {
+#endif
                 Result = (TValue)IntermediateResult;
                 isInterrupted = false;
+#if DEBUG_ENGINE
             }
             catch (Exception e)
             {
                 Debug.Fail(e.Message);
             }
+#endif
 
             return Result;
         }
