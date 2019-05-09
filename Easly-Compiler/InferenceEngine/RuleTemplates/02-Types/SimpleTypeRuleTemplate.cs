@@ -44,107 +44,37 @@
             bool Success = true;
             data = null;
 
-            IClass EmbeddingClass = node.EmbeddingClass;
-            IFeature EmbeddingFeature = node.EmbeddingFeature;
-
             IIdentifier ClassIdentifier = (IIdentifier)node.ClassIdentifier;
 
             Debug.Assert(ClassIdentifier.ValidText.IsAssigned);
             string ValidIdentifier = ClassIdentifier.ValidText.Item;
 
-            IHashtableEx<string, IImportedClass> ImportedClassTable = EmbeddingClass.ImportedClassTable;
-            IHashtableEx<string, ICompiledType> LocalGenericTable = EmbeddingClass.LocalGenericTable;
-            IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> LocalExportTable = EmbeddingClass.LocalExportTable;
-            IHashtableEx<IFeatureName, ITypedefType> LocalTypedefTable = EmbeddingClass.LocalTypedefTable;
-            IHashtableEx<IFeatureName, IDiscrete> LocalDiscreteTable = EmbeddingClass.LocalDiscreteTable;
-            IHashtableEx<IFeatureName, IFeatureInstance> LocalFeatureTable = EmbeddingClass.LocalFeatureTable;
+            Debug.Assert(SourceTemplateList.Count > 0);
+            IOnceReferenceTypeSourceTemplate TypeSourceTemplate = SourceTemplateList[0] as IOnceReferenceTypeSourceTemplate;
+            Debug.Assert(dataList.ContainsKey(TypeSourceTemplate));
+            Tuple<ITypeName, ICompiledType, IError> TypeSourceData = dataList[TypeSourceTemplate] as Tuple<ITypeName, ICompiledType, IError>;
 
-            ITypeName ValidTypeName = null;
-            ICompiledType ValidType = null;
+            ITypeName ValidTypeName = TypeSourceData.Item1;
+            ICompiledType ValidType = TypeSourceData.Item2;
+            IError Error = TypeSourceData.Item3;
 
-            if (ValidIdentifier.ToLower() == LanguageClasses.Any.Name.ToLower())
+            if (Error != null)
             {
-                IClass BaseClass = Class.ClassAny;
-                Success &= CheckValidityAsClass(BaseClass, node, out ValidTypeName, out ValidType);
-                Debug.Assert(ValidType is IClassType);
-            }
-            else if (ValidIdentifier.ToLower() == LanguageClasses.AnyReference.Name.ToLower())
-            {
-                IClass BaseClass = Class.ClassAnyReference;
-                Success &= CheckValidityAsClass(BaseClass, node, out ValidTypeName, out ValidType);
-                Debug.Assert(ValidType is IClassType);
-            }
-            else if (ValidIdentifier.ToLower() == LanguageClasses.AnyValue.Name.ToLower())
-            {
-                IClass BaseClass = Class.ClassAnyValue;
-                Success &= CheckValidityAsClass(BaseClass, node, out ValidTypeName, out ValidType);
-                Debug.Assert(ValidType is IClassType);
-            }
-            else if (ImportedClassTable.ContainsKey(ValidIdentifier))
-            {
-                IImportedClass Imported = ImportedClassTable[ValidIdentifier];
-                IClass BaseClass = Imported.Item;
-                Success &= CheckValidityAsClass(BaseClass, node, out ValidTypeName, out ValidType);
-                Debug.Assert(!Success || ValidType is IClassType);
-            }
-            else if (LocalGenericTable.ContainsKey(ValidIdentifier))
-            {
-                IFormalGenericType FormalGeneric = (IFormalGenericType)LocalGenericTable[ValidIdentifier];
-                node.FormalGenericSource.Item = FormalGeneric;
-                node.FormalGenericNameSource.Item = FormalGeneric.ResolvedTypeName;
-                CheckValidityAsGeneric(node.FormalGenericNameSource.Item, node.FormalGenericSource.Item, out ValidTypeName, out ValidType);
-                Debug.Assert(!(ValidType is IClassType));
-            }
-            else if (FeatureName.TableContain(LocalTypedefTable, ValidIdentifier, out IFeatureName Key, out ITypedefType DefinedType))
-            {
-                CheckValidityAsTypedef(DefinedType, out ValidTypeName, out ValidType);
-                Debug.Assert(!(ValidType is IClassType));
+                Debug.Assert(ValidTypeName == null);
+                Debug.Assert(ValidType == null);
+
+                AddSourceError(Error);
+                Success = false;
             }
             else
             {
-                AddSourceError(new ErrorUnknownIdentifier(ClassIdentifier, ValidIdentifier));
-                Success = false;
-            }
+                Debug.Assert(ValidTypeName != null);
+                Debug.Assert(ValidType != null);
 
-            if (Success)
                 data = new Tuple<ITypeName, ICompiledType>(ValidTypeName, ValidType);
+            }
 
             return Success;
-        }
-
-        private bool CheckValidityAsClass(IClass baseClass, ISimpleType node, out ITypeName validTypeName, out ICompiledType validType)
-        {
-            validTypeName = null;
-            validType = null;
-
-            IIdentifier ClassIdentifier = (IIdentifier)node.ClassIdentifier;
-            string ValidIdentifier = ClassIdentifier.ValidText.Item;
-
-            if (baseClass.GenericList.Count > 0)
-            {
-                AddSourceError(new ErrorGenericClass(ClassIdentifier, ValidIdentifier));
-                return false;
-            }
-
-            Debug.Assert(baseClass.ResolvedClassType.IsAssigned && baseClass.GenericTable.IsSealed);
-
-            validTypeName = baseClass.ResolvedClassTypeName.Item;
-            validType = baseClass.ResolvedAsCompiledType.Item;
-            return true;
-        }
-
-        private void CheckValidityAsGeneric(ITypeName genericNameSource, ICompiledType genericSource, out ITypeName validTypeName, out ICompiledType validType)
-        {
-            // TODO check: Debug.Assert(c.TypeTable.Contains(FormalGeneric.ResolvedTypeName));
-
-            validTypeName = genericNameSource;
-            validType = genericSource;
-        }
-
-        private void CheckValidityAsTypedef(ITypedefType definedType, out ITypeName validTypeName, out ICompiledType validType)
-        {
-            validTypeName = definedType.ReferencedTypeName.Item;
-            validType = definedType.ReferencedType.Item;
         }
 
         /// <summary>
@@ -160,6 +90,19 @@
             node.TypeNameSource.Item = ValidTypeName;
             node.TypeSource.Item = ValidType;
             node.ValidTypeSource.Item = "Set";
+
+            IIdentifier ClassIdentifier = (IIdentifier)node.ClassIdentifier;
+            string ValidIdentifier = ClassIdentifier.ValidText.Item;
+
+            IClass EmbeddingClass = node.EmbeddingClass;
+            IHashtableEx<string, ICompiledType> LocalGenericTable = EmbeddingClass.LocalGenericTable;
+
+            if (LocalGenericTable.ContainsKey(ValidIdentifier))
+            {
+                IFormalGenericType FormalGeneric = (IFormalGenericType)LocalGenericTable[ValidIdentifier];
+                node.FormalGenericSource.Item = FormalGeneric;
+                node.FormalGenericNameSource.Item = FormalGeneric.ResolvedTypeName;
+            }
         }
         #endregion
     }

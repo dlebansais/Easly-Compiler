@@ -92,7 +92,6 @@
 
             List<PropertyInfo> PropertyPath = new List<PropertyInfo>();
             TemplateHelper.BuildPropertyPath(StartingPoint.PropertyType, path, PropertyPath);
-            Debug.Assert(PropertyPath.Count > 0);
 
             this.PropertyPath = PropertyPath.AsReadOnly();
         }

@@ -402,6 +402,7 @@
     <Compile Include="InferenceEngine\RuleTemplate.cs" />
     <Compile Include="InferenceEngine\InferenceEngine.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\ConditionallyAssignedReferenceSourceTemplate.cs" />
+    <Compile Include="InferenceEngine\SourceTemplates\OnceReferenceTypeSourceTemplate.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\OnceReferenceResultSourceTemplate.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\SealedListCollectionSourceTemplate.cs" />
     <Compile Include="InferenceEngine\SourceTemplates\OnceReferenceTableSourceTemplate.cs" />
