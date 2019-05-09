@@ -389,13 +389,16 @@ namespace CompilerNode
                 {
                     IsMatching &= overload.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item == Item.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item;
 
-                    IName overloadName = (IName)overload.ParameterList[i].EntityName;
-                    IName ItemName = (IName)Item.ParameterList[i].EntityName;
+                    if (IsMatching)
+                    {
+                        IName overloadName = (IName)overload.ParameterList[i].EntityName;
+                        IName ItemName = (IName)Item.ParameterList[i].EntityName;
 
-                    Debug.Assert(overloadName != null);
-                    Debug.Assert(ItemName != null);
+                        Debug.Assert(overloadName != null);
+                        Debug.Assert(ItemName != null);
 
-                    IsMatching &= overloadName.ValidText.Item == ItemName.ValidText.Item;
+                        IsMatching &= overloadName.ValidText.Item == ItemName.ValidText.Item;
+                    }
                 }
 
                 IsMatching &= overload.ParameterEnd == Item.ParameterEnd;
