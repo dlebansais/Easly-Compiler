@@ -56,10 +56,10 @@
             data = null;
             bool Result = false;
 
-            if (node is ISimpleType AsSimpleType)
-                Result = IsTypeReady(AsSimpleType, out data);
-            else
-                Result = true;
+            ISimpleType SimpleType = node as ISimpleType;
+            Debug.Assert(SimpleType != null);
+
+            Result = IsTypeReady(SimpleType, out data);
 
             return Result;
         }

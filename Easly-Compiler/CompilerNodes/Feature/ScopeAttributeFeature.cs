@@ -8,7 +8,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IScopeAttributeFeature.
     /// </summary>
-    public interface IScopeAttributeFeature : IFeatureWithName // ,ICompiledFeature
+    public interface IScopeAttributeFeature : IFeatureWithName
     {
         /// <summary>
         /// The source used to create this attribute.
@@ -16,20 +16,9 @@ namespace CompilerNode
         ISource Location { get; }
 
         /// <summary>
-        /// The parent overload, null if none.
-        /// </summary>
-        IOverload EmbeddingOverload { get; }
-
-        /// <summary>
         /// The resolved feature name.
         /// </summary>
         OnceReference<IFeatureName> ValidFeatureName { get; }
-
-        /*
-        /// <summary>
-        /// The resolved feature.
-        /// </summary>
-        OnceReference<ICompiledFeature> ResolvedFeature { get; }*/
 
         /// <summary>
         /// The default value, if any.
@@ -144,18 +133,8 @@ namespace CompilerNode
         public ScopeAttributeFeature(ISource location, string attributeName, ITypeName attributeTypeName, ICompiledType attributeType, IExpression initialDefaultValue)
         {
             Location = location;
-            EmbeddingOverload = location.EmbeddingOverload;
 
             EntityName = new Name(Location, attributeName);
-
-            /*
-            ResolvedFeature = new OnceReference<ICompiledFeature>();
-            ResolvedFeature.Item = this;
-
-            ExportIdentifier = new ExportIdentifier();
-            Export = BaseNode.ExportStatus.Exported;
-            Documentation = BaseNodeHelper.NodeHelper.CreateEmptyDocumentation();
-            */
             ValidFeatureName = new OnceReference<IFeatureName>();
             ValidFeatureName.Item = new FeatureName(EntityName.Text);
 
@@ -241,53 +220,15 @@ namespace CompilerNode
         public ISource Location { get; }
 
         /// <summary>
-        /// The parent overload, null if none.
+        /// The resolved feature name.
         /// </summary>
-        public IOverload EmbeddingOverload { get; }
-/*
-        /// <summary>
-        /// Fake export identifier.
-        /// </summary>
-        public BaseNode.IIdentifier ExportIdentifier { get; }
-
-        /// <summary>
-        /// Fake export specification.
-        /// </summary>
-        public BaseNode.ExportStatus Export { get; }
-
-        /// <summary>
-        /// Fake documentation.
-        /// </summary>
-        public BaseNode.IDocument Documentation { get; }
-*/
-        /// <summary>
-        /// The generated attribute name.
-        /// </summary>
-        public BaseNode.IName EntityName { get; }
+        public OnceReference<IFeatureName> ValidFeatureName { get; private set; } = new OnceReference<IFeatureName>();
 
         /// <summary>
         /// The default value, if any.
         /// </summary>
         public IOptionalReference<IExpression> DefaultValue { get; }
-        #endregion
 
-        #region Implementation of ICompiledFeature
-/*
-        /// <summary>
-        /// Indicates if the feature is deferred in another class.
-        /// </summary>
-        public bool IsDeferredFeature { get { return false; } }
-
-        /// <summary>
-        /// True if the feature contains extern bodies in its overloads.
-        /// </summary>
-        public bool HasExternBody { get { return false; } }
-
-        /// <summary>
-        /// True if the feature contains precursor bodies in its overloads.
-        /// </summary>
-        public bool HasPrecursorBody { get { return false; } }
-*/
         /// <summary>
         /// Name of the associated type.
         /// </summary>
@@ -299,17 +240,11 @@ namespace CompilerNode
         public OnceReference<ICompiledType> ResolvedFeatureType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
 
-        #region Implementation of IFeature
+        #region Implementation of IFeatureWithName
         /// <summary>
-        /// The resolved feature name.
+        /// The generated attribute name.
         /// </summary>
-        public OnceReference<IFeatureName> ValidFeatureName { get; private set; } = new OnceReference<IFeatureName>();
-
-        /*
-        /// <summary>
-        /// The resolved feature.
-        /// </summary>
-        public OnceReference<ICompiledFeature> ResolvedFeature { get; private set; } = new OnceReference<ICompiledFeature>();*/
+        public BaseNode.IName EntityName { get; }
         #endregion
     }
 }
