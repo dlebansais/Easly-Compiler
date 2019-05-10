@@ -11,11 +11,6 @@
     public interface IName : BaseNode.IName, INode, ISource
     {
         /// <summary>
-        /// The source used to create this name.
-        /// </summary>
-        //ISource Location { get; }
-
-        /// <summary>
         /// The valid value of <see cref="BaseNode.IName.Text"/>.
         /// </summary>
         OnceReference<string> ValidText { get; }
@@ -33,7 +28,6 @@
         /// </summary>
         public Name()
         {
-            //Location = this;
         }
 
         /// <summary>
@@ -43,7 +37,6 @@
         /// <param name="name">The name.</param>
         public Name(ISource location, string name)
         {
-            //Location = location;
             EmbeddingClass = location.EmbeddingClass;
             EmbeddingFeature = location.EmbeddingFeature;
             EmbeddingOverload = location.EmbeddingOverload;
@@ -150,11 +143,6 @@
         #endregion
 
         #region Compiler
-        /// <summary>
-        /// The source used to create this name.
-        /// </summary>
-        //public ISource Location { get; }
-
         /// <summary>
         /// The valid value of <see cref="BaseNode.IName.Text"/>.
         /// </summary>

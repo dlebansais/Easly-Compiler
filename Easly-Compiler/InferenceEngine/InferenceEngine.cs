@@ -117,8 +117,6 @@
                 foreach (IRuleTemplate Rule in RuleTemplateList)
                     Rule.Clear();
 
-                //Debug.WriteLine($"Tries left: {Retries}");
-
                 IErrorList TryErrorList = new ErrorList();
                 bool TryResult = SolveWithRetry(TryErrorList);
                 if (Retries == 0)
@@ -159,16 +157,12 @@
             IList<IClass> UnresolvedClassList = new List<IClass>(ClassList);
             IList<ISource> UnresolvedSourceList = new List<ISource>(SourceList);
             bool Success = true;
-            int LoopCount = 0;
 
             Debug.Assert(IsNoDestinationSet());
 
             bool Exit = false;
             while (UnresolvedClassList.Count > 0 && Success && !Exit)
             {
-                //Debug.WriteLine($"Loop count: {LoopCount}");
-                LoopCount++;
-
                 Exit = true;
                 Success = InferTemplates(ref Exit, UnresolvedSourceList, errorList);
                 if (Success)
@@ -220,10 +214,10 @@
             {
                 IRuleTemplate Rule = RuleTemplateList[i];
 
-                if (Rule is ISimpleTypeClassRuleTemplate AsRuleTemplate)
+                /*if (Rule is ISimpleTypeClassRuleTemplate AsRuleTemplate)
                 {
 
-                }
+                }*/
 
                 foreach (ISource Source in unresolvedSourceList)
                 {
@@ -242,8 +236,6 @@
 
                         if (AreAllSourcesReady && NoError)
                         {
-                            //Debug.WriteLine($"Rule {Rule} on {Source}");
-
                             if (Rule.CheckConsistency(Source, DataList, out object data))
                             {
                                 Debug.Assert(Rule.ErrorList.IsEmpty);
@@ -337,10 +329,10 @@
 
             foreach (IRuleTemplate Rule in RuleTemplateList)
             {
-                if (Rule is IAllLocalTypedefsRuleTemplate AsRuleTemplate)
+                /*if (Rule is IAllLocalTypedefsRuleTemplate AsRuleTemplate)
                 {
 
-                }
+                }*/
 
                 foreach (ISource Source in unresolvedSourceList)
                 {

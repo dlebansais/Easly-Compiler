@@ -90,3 +90,36 @@ In a rename clause, the source and destination must be different.
 
     All items with the same name must have a source.
 Different classes can use the same name, but when they are used together they must have a different source name.
+
+## Inference Engine
+
+Once all classes and libraries been validated, they can be inspected for semantic consistency and eventually translated to text in the target language. This large step is decomposed in many little steps, whereby a particular semantic verification is performed, and if successful, enable other verifications. For example, verifying that a generic type is used with the correct number of arguments enable its use as ancestor in class inheritance, for which further verifications are necessary.
+
+The whole process is performed by an inference engine. The engine basically contains a set of rules, and for each rule:
++ Checks that elements that are verified by the rule are ready for verification.
++ Execute the verification code, and upon success modifies nodes with updated information, or upon failure record an error.
++ Ensures modified elements are ready for other rules.
+
+### Sources
+
+Each rules inspects one or more source node to see if their content is ready. For example, if a type has been verified and is valid, the node contains a field updated with this type. While the field is not filled, the source is considered not ready for the purpose of this rule, and thr inference engine either checks another node, or until they have all been checked, moves to the next rule.
+
+Example of sources are:
++ A field filled by the execution of another rule.
++ A sealed list or hash table.
++ A collection of nodes for which all fields must be filled, or the collection is not yet ready.
++ And more
+
+### Destinations
+
+They are fields, lists or tables, that can be filled with information, or sealed. If all destinations of a rule are filled on a given node, it means the rule has been executed and there is no need to wait for sources to be ready. Therefore, the engine mostly looks for destinations not filled, checks if all sources associated to a rule that could fill them are ready, and executes the rule.
+
+### Major steps
+
+If it necessary, to ensure consistency of the language semantic, to split inference in a few steps separated by some barrier. For example, types are evaluated only after duplicate names or invalid manifest constants have been checked. Expressions are evaluated only after all types has been verified, and so no.
+
+The inference steps are as follow:
++ Identifiers: no duplicate name, no invalid string or constant.
++ Types: no missing type argument, no unknown identifier, no use of a type in the wrong context. This is a big and complex step.
++ Contract: boolean types where boolean is expected, respect of exceptions.
++ Body: each instruction has their own requirement and they are checked. 

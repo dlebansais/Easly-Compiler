@@ -50,11 +50,6 @@
             bool Success = true;
             data = null;
 
-            if (node.EntityName.Text.StartsWith("Coverage"))
-            {
-
-            }
-
             IHashtableEx<IFeatureName, IFeatureInstance> MergedFeatureTable = null;
 
             IList<AncestorFeatureInfo> FeatureTableList = new List<AncestorFeatureInfo>();
@@ -318,11 +313,6 @@
                         else
                             errorList.AddError(new ErrorInheritanceConflict(ThisInstance.Location, ThisInstance.Name.Name));
                     }
-                }
-
-                if (Result)
-                {
-
                 }
             }
 

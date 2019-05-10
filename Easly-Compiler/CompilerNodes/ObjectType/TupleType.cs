@@ -427,9 +427,6 @@ namespace CompilerNode
         {
             ITupleType ClonedTupleType = new TupleType(EntityDeclarationList, Sharing, renamedFieldTable);
 
-            //ClonedTupleType.ResolvedTypeName.Item = new TypeName(ResolvedTypeName.Item.Name);
-            //ClonedTupleType.ResolvedType.Item = ResolvedType.Item;
-
             return ClonedTupleType;
         }
         #endregion

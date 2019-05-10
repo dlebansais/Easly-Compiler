@@ -49,11 +49,6 @@
             bool Success = true;
             data = null;
 
-            if (node.EmbeddingClass != null && node.EmbeddingClass.EntityName.Text == "Coverage Invalid 3-84")
-            {
-
-            }
-
             IHashtableEx<string, IScopeAttributeFeature> CheckedScope = new HashtableEx<string, IScopeAttributeFeature>();
 
             foreach (IEntityDeclaration Item in node.EntityDeclarationList)
