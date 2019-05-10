@@ -108,8 +108,7 @@
             TypeName ResolvedTypeName = new TypeName(ValidText);
             IFormalGenericType GenericFormalType = new FormalGenericType(node, ResolvedTypeName);
 
-#if DEBUG
-            // TODO: remove this code, for code coverage purpose only.
+#if COVERAGE
             string TypeString = GenericFormalType.ToString();
 #endif
 

@@ -102,9 +102,6 @@
             byFeatureTable = new HashtableEx<ICompiledFeature, IList<InstanceNameInfo>>(); // ICompiledFeature -> List of InstanceNameInfo
             byNameTable = new HashtableEx<IFeatureName, InheritedInstanceInfo>(); // FeatureName -> InheritedInstanceInfo
 
-            bool FeatureAlreadyListed;
-            bool NameAlreadyListed;
-
             foreach (AncestorFeatureInfo FeatureInfoItem in featureTableList)
             {
                 foreach (KeyValuePair<IFeatureName, IFeatureInstance> Entry in FeatureInfoItem.FeatureTable)
@@ -113,102 +110,114 @@
                     IFeatureInstance Value = Entry.Value;
 
                     if (Value.Feature.IsAssigned)
-                    {
-                        FeatureAlreadyListed = false;
-                        NameAlreadyListed = false;
-                        foreach (KeyValuePair<ICompiledFeature, IList<InstanceNameInfo>> ImportedEntry in byFeatureTable)
-                        {
-                            ICompiledFeature ImportedKey = ImportedEntry.Key;
-                            IList<InstanceNameInfo> NameList = ImportedEntry.Value;
+                        CheckIfFeatureListed(byFeatureTable, FeatureInfoItem, Key, Value);
 
-                            // Feature already listed
-                            if (Value.Feature.Item == ImportedKey)
+                    CheckIfFeatureNameListed(byNameTable, FeatureInfoItem, Key, Value);
+                }
+            }
+        }
+
+        private void CheckIfFeatureListed(IHashtableEx<ICompiledFeature, IList<InstanceNameInfo>> byFeatureTable, AncestorFeatureInfo featureInfo, IFeatureName featureName, IFeatureInstance featureInstance)
+        {
+            bool FeatureAlreadyListed = false;
+            foreach (KeyValuePair<ICompiledFeature, IList<InstanceNameInfo>> ImportedEntry in byFeatureTable)
+            {
+                ICompiledFeature ImportedKey = ImportedEntry.Key;
+                IList<InstanceNameInfo> NameList = ImportedEntry.Value;
+
+                // Feature already listed
+                if (featureInstance.Feature.Item == ImportedKey)
+                {
+                    UpdateNameList(featureInfo, featureName, featureInstance, NameList);
+                    FeatureAlreadyListed = true;
+                    break;
+                }
+            }
+            if (!FeatureAlreadyListed)
+            {
+                IList<InstanceNameInfo> InitList = new List<InstanceNameInfo>();
+                InstanceNameInfo NewInfo = new InstanceNameInfo(featureInfo, featureInstance, featureName);
+                InitList.Add(NewInfo);
+
+                byFeatureTable.Add(featureInstance.Feature.Item, InitList);
+            }
+        }
+
+        private void UpdateNameList(AncestorFeatureInfo featureInfo, IFeatureName featureName, IFeatureInstance featureInstance, IList<InstanceNameInfo> nameList)
+        {
+            OnceReference<InstanceNameInfo> PreviousInstance = new OnceReference<InstanceNameInfo>();
+
+            int i;
+            for (i = 0; i < nameList.Count; i++)
+            {
+                InstanceNameInfo Item = nameList[i];
+                if (featureName.Name == Item.Name.Name)
+                {
+                    PreviousInstance.Item = Item;
+                    break;
+                }
+            }
+
+            // C inherit f from A and B, effectively or not, but keep or discontinue flags don't match.
+            if (PreviousInstance.IsAssigned && (PreviousInstance.Item.Instance.IsForgotten == featureInstance.IsForgotten))
+            {
+                PreviousInstance.Item.SameIsKept = PreviousInstance.Item.Instance.IsKept == featureInstance.IsKept;
+                PreviousInstance.Item.SameIsDiscontinued = PreviousInstance.Item.Instance.IsDiscontinued == featureInstance.IsDiscontinued;
+            }
+
+            if (!PreviousInstance.IsAssigned || (PreviousInstance.Item.Instance.IsForgotten && !featureInstance.IsForgotten))
+            {
+                InstanceNameInfo NewInfo = new InstanceNameInfo(featureInfo, featureInstance, featureName);
+                if (i < nameList.Count)
+                    nameList[i] = NewInfo;
+                else
+                    nameList.Add(NewInfo);
+            }
+        }
+
+        private void CheckIfFeatureNameListed(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, AncestorFeatureInfo featureInfo, IFeatureName featureName, IFeatureInstance featureInstance)
+        {
+            bool FeatureAlreadyListed = false;
+            bool NameAlreadyListed = false;
+
+            foreach (KeyValuePair<IFeatureName, InheritedInstanceInfo> ImportedEntry in byNameTable)
+            {
+                IFeatureName ImportedKey = ImportedEntry.Key;
+                InheritedInstanceInfo ImportedInstance = ImportedEntry.Value;
+                IList<InstanceNameInfo> InstanceList = ImportedInstance.PrecursorInstanceList;
+
+                if (featureName.Name == ImportedKey.Name)
+                {
+                    FeatureAlreadyListed = false;
+
+                    if (featureInstance.Feature.IsAssigned)
+                        foreach (InstanceNameInfo Item in InstanceList)
+                            if (Item.Instance.Feature.IsAssigned && featureInstance.Feature.Item == Item.Instance.Feature.Item)
                             {
-                                OnceReference<InstanceNameInfo> PreviousInstance = new OnceReference<InstanceNameInfo>();
-
-                                int i;
-                                for (i = 0; i < NameList.Count; i++)
-                                {
-                                    InstanceNameInfo Item = NameList[i];
-                                    if (Key.Name == Item.Name.Name)
-                                    {
-                                        PreviousInstance.Item = Item;
-                                        break;
-                                    }
-                                }
-
-                                // C inherit f from A and B, effectively or not, but keep or discontinue flags don't match.
-                                if (PreviousInstance.IsAssigned && (PreviousInstance.Item.Instance.IsForgotten == Value.IsForgotten))
-                                {
-                                    PreviousInstance.Item.SameIsKept = PreviousInstance.Item.Instance.IsKept == Value.IsKept;
-                                    PreviousInstance.Item.SameIsDiscontinued = PreviousInstance.Item.Instance.IsDiscontinued == Value.IsDiscontinued;
-                                }
-
-                                if (!PreviousInstance.IsAssigned || (PreviousInstance.Item.Instance.IsForgotten && !Value.IsForgotten))
-                                {
-                                    InstanceNameInfo NewInfo = new InstanceNameInfo(FeatureInfoItem, Value, Key);
-                                    if (i < NameList.Count)
-                                        NameList[i] = NewInfo;
-                                    else
-                                        NameList.Add(NewInfo);
-                                }
-
                                 FeatureAlreadyListed = true;
                                 break;
                             }
-                        }
-                        if (!FeatureAlreadyListed)
-                        {
-                            IList<InstanceNameInfo> InitList = new List<InstanceNameInfo>();
-                            InstanceNameInfo NewInfo = new InstanceNameInfo(FeatureInfoItem, Value, Key);
-                            InitList.Add(NewInfo);
 
-                            byFeatureTable.Add(Value.Feature.Item, InitList);
-                        }
-                    }
-
-                    FeatureAlreadyListed = false;
-                    NameAlreadyListed = false;
-                    foreach (KeyValuePair<IFeatureName, InheritedInstanceInfo> ImportedEntry in byNameTable)
+                    if (!FeatureAlreadyListed)
                     {
-                        IFeatureName ImportedKey = ImportedEntry.Key;
-                        InheritedInstanceInfo ImportedInstance = ImportedEntry.Value;
-                        IList<InstanceNameInfo> InstanceList = ImportedInstance.PrecursorInstanceList;
-
-                        if (Key.Name == ImportedKey.Name)
-                        {
-                            FeatureAlreadyListed = false;
-
-                            if (Value.Feature.IsAssigned)
-                                foreach (InstanceNameInfo Item in InstanceList)
-                                    if (Item.Instance.Feature.IsAssigned && Value.Feature.Item == Item.Instance.Feature.Item)
-                                    {
-                                        FeatureAlreadyListed = true;
-                                        break;
-                                    }
-
-                            if (!FeatureAlreadyListed)
-                            {
-                                InstanceNameInfo NewInfo = new InstanceNameInfo(FeatureInfoItem, Value, Key);
-                                InstanceList.Add(NewInfo);
-                            }
-
-                            NameAlreadyListed = true;
-                            break;
-                        }
+                        InstanceNameInfo NewInfo = new InstanceNameInfo(featureInfo, featureInstance, featureName);
+                        InstanceList.Add(NewInfo);
                     }
-                    if (!NameAlreadyListed)
-                    {
-                        IList<InstanceNameInfo> InitList = new List<InstanceNameInfo>();
-                        InstanceNameInfo NewInfo = new InstanceNameInfo(FeatureInfoItem, Value, Key);
-                        InitList.Add(NewInfo);
 
-                        InheritedInstanceInfo NewName = new InheritedInstanceInfo();
-                        NewName.PrecursorInstanceList = InitList;
-
-                        byNameTable.Add(Key, NewName);
-                    }
+                    NameAlreadyListed = true;
+                    break;
                 }
+            }
+            if (!NameAlreadyListed)
+            {
+                IList<InstanceNameInfo> InitList = new List<InstanceNameInfo>();
+                InstanceNameInfo NewInfo = new InstanceNameInfo(featureInfo, featureInstance, featureName);
+                InitList.Add(NewInfo);
+
+                InheritedInstanceInfo NewName = new InheritedInstanceInfo();
+                NewName.PrecursorInstanceList = InitList;
+
+                byNameTable.Add(featureName, NewName);
             }
         }
 

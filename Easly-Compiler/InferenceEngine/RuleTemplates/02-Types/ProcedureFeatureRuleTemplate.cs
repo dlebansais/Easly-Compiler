@@ -107,8 +107,7 @@
 
             node.ResolvedFeature.Item = node;
 
-#if DEBUG
-            // TODO: remove this code, for code coverage purpose only.
+#if COVERAGE
             string TypeString = ResolvedProcedureType.ToString();
 #endif
         }

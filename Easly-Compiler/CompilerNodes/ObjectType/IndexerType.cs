@@ -644,8 +644,7 @@
         {
             IIndexerType ResolvedIndexerType = new IndexerType(baseTypeName, baseType, entityTypeName, entityType, indexerKind, indexParameterList, parameterEnd, getRequireList, getEnsureList, getExceptionIdentifierList, setRequireList, setEnsureList, setExceptionIdentifierList);
 
-#if DEBUG
-            // TODO: remove this code, for code coverage purpose only.
+#if COVERAGE
             string TypeString = ResolvedIndexerType.ToString();
             Debug.Assert(!ResolvedIndexerType.IsReference);
             Debug.Assert(ResolvedIndexerType.IsValue);

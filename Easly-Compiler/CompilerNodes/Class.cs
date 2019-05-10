@@ -770,8 +770,7 @@ namespace CompilerNode
                 IImportedClass SelfImport = new ImportedClass(this, BaseNode.ImportType.Latest);
                 ImportedClassTable.Add(ValidClassName, SelfImport);
 
-#if DEBUG
-                // TODO: remove this code, for code coverage purpose only.
+#if COVERAGE
                 string ImportString = SelfImport.ToString();
 #endif
             }

@@ -135,8 +135,7 @@
             EmbeddingClass.LocalTypedefTable.Add(ResolvedTypedefTypeName, ResolvedTypedefType);
             node.ValidTypedefName.Item = ResolvedTypedefTypeName;
 
-#if DEBUG
-            // TODO: remove this code, for code coverage purpose only.
+#if COVERAGE
             string NameString = ResolvedTypedefTypeName.ToString();
             string TypeString = ResolvedTypedefType.ToString();
 #endif

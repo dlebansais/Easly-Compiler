@@ -714,8 +714,9 @@
                 bool IsHandled = false;
                 IExpression ReplacementNode;
 
-                // TODO: remove this code, for code coverage purpose only.
+#if COVERAGE
                 Debug.Assert(AsPreprocessorExpression.ToString().Length > 0);
+#endif
 
                 switch (AsPreprocessorExpression.Value)
                 {
@@ -1004,10 +1005,11 @@
             ISource Source = node as ISource;
             Debug.Assert(Source != null);
 
-            // TODO: remove this code, for code coverage purpose only.
+#if COVERAGE
             Source.Reset(context.RuleTemplateList);
             Debug.Assert(!Source.IsResolved(context.RuleTemplateList));
             Debug.Assert(Source.ToString().Length > 0);
+#endif
 
             foreach (IRuleTemplate RuleTemplate in context.RuleTemplateList)
                 if (RuleTemplate.NodeType.IsAssignableFrom(Source.GetType()))
@@ -1048,10 +1050,11 @@
             ISource Source = node as ISource;
             Debug.Assert(Source != null);
 
-            // TODO: remove this code, for code coverage purpose only.
+#if COVERAGE
             Source.Reset(context.RuleTemplateList);
             Debug.Assert(!Source.IsResolved(context.RuleTemplateList));
             Debug.Assert(Source.ToString().Length > 0);
+#endif
 
             foreach (IRuleTemplate RuleTemplate in context.RuleTemplateList)
                 if (RuleTemplate.NodeType.IsAssignableFrom(Source.GetType()))

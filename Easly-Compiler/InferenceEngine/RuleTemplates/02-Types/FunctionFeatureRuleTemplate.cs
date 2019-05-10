@@ -116,8 +116,7 @@
             node.ResolvedFeatureType.Item = ResolvedFunctionType;
             node.ResolvedFeature.Item = node;
 
-#if DEBUG
-            // TODO: remove this code, for code coverage purpose only.
+#if COVERAGE
             string TypeString = ResolvedFunctionType.ToString();
 #endif
         }

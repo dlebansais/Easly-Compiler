@@ -188,54 +188,13 @@
 
             if (isEscapeSequence)
             {
-                if (c == 'u' || c == 'U')
-                {
-                    isEscapeSequence = false;
-                    isUnicodeSyntax = true;
-                    unicodeCharacter = string.Empty;
-                }
-                else
-                {
-                    isEscapeSequence = false;
-
-                    bool IsTranslated = false;
-                    foreach (KeyValuePair<char, string> Entry in CSharpEscapeTable)
-                        if (c == Entry.Value[1])
-                        {
-                            IsTranslated = true;
-                            validText += Entry.Key;
-                            break;
-                        }
-                    if (!IsTranslated)
-                    {
-                        error = new ErrorIllFormedString(source);
-                        return false;
-                    }
-                }
+                if (!IsValidManifestEscapeSequence(c, source, ref validText, ref isEscapeSequence, ref isUnicodeSyntax, ref unicodeCharacter, out error))
+                    return false;
             }
             else if (isUnicodeSyntax)
             {
-                if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
-                {
-                    unicodeCharacter += (char)c;
-
-                    if (unicodeCharacter.Length == 4)
-                    {
-                        bool IsTranslated = int.TryParse(unicodeCharacter, NumberStyles.HexNumber, null, out int CodePoint);
-                        Debug.Assert(IsTranslated);
-
-                        byte[] CodeBytes = BitConverter.GetBytes(CodePoint);
-                        validText += Encoding.UTF32.GetString(CodeBytes);
-
-                        isUnicodeSyntax = false;
-                        unicodeCharacter = string.Empty;
-                    }
-                }
-                else
-                {
-                    error = new ErrorIllFormedString(source);
+                if (!IsValidUnicodeSyntax(c, source, ref validText, ref isUnicodeSyntax, ref unicodeCharacter, out error))
                     return false;
-                }
             }
             else
             {
@@ -246,6 +205,67 @@
             }
 
             error = null;
+            return true;
+        }
+
+        private static bool IsValidManifestEscapeSequence(int c, ISource source, ref string validText, ref bool isEscapeSequence, ref bool isUnicodeSyntax, ref string unicodeCharacter, out IErrorStringValidity error)
+        {
+            error = null;
+
+            if (c == 'u' || c == 'U')
+            {
+                isEscapeSequence = false;
+                isUnicodeSyntax = true;
+                unicodeCharacter = string.Empty;
+            }
+            else
+            {
+                isEscapeSequence = false;
+
+                bool IsTranslated = false;
+                foreach (KeyValuePair<char, string> Entry in CSharpEscapeTable)
+                    if (c == Entry.Value[1])
+                    {
+                        IsTranslated = true;
+                        validText += Entry.Key;
+                        break;
+                    }
+                if (!IsTranslated)
+                {
+                    error = new ErrorIllFormedString(source);
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool IsValidUnicodeSyntax(int c, ISource source, ref string validText, ref bool isUnicodeSyntax, ref string unicodeCharacter, out IErrorStringValidity error)
+        {
+            error = null;
+
+            if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
+            {
+                unicodeCharacter += (char)c;
+
+                if (unicodeCharacter.Length == 4)
+                {
+                    bool IsTranslated = int.TryParse(unicodeCharacter, NumberStyles.HexNumber, null, out int CodePoint);
+                    Debug.Assert(IsTranslated);
+
+                    byte[] CodeBytes = BitConverter.GetBytes(CodePoint);
+                    validText += Encoding.UTF32.GetString(CodeBytes);
+
+                    isUnicodeSyntax = false;
+                    unicodeCharacter = string.Empty;
+                }
+            }
+            else
+            {
+                error = new ErrorIllFormedString(source);
+                return false;
+            }
+
             return true;
         }
 

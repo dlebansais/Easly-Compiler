@@ -107,8 +107,7 @@
             ITypeName EntityTypeName = EntityTypeItem.ResolvedTypeName.Item;
             ICompiledType EntityType = EntityTypeItem.ResolvedType.Item;
 
-#if DEBUG
-            // TODO: remove this code, for code coverage purpose only.
+#if COVERAGE
             string TypeString = node.ToString();
             Debug.Assert(!node.IsReference);
             Debug.Assert(node.IsValue);

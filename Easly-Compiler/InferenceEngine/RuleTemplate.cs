@@ -192,8 +192,7 @@
         {
             ErrorList.ClearErrors();
 
-#if DEBUG
-            // TODO: remove this code, for code coverage purpose only.
+#if COVERAGE
             foreach (ISourceTemplate SourceTemplate in SourceTemplateList)
                 Debug.Assert(SourceTemplate.ToString() != null);
             foreach (IDestinationTemplate DestinationTemplate in DestinationTemplateList)

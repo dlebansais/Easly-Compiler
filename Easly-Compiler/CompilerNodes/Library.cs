@@ -269,8 +269,7 @@ namespace CompilerNode
                     IImportedClass Imported = new ImportedClass(SourceNameTable[ValidSourceName]);
                     ImportedClassTable.Add(ValidClassIdentifier, Imported);
 
-#if DEBUG
-                    // TODO: remove this code, for code coverage purpose only.
+#if COVERAGE
                     string ImportString = Imported.ToString();
 #endif
                 }

@@ -80,8 +80,7 @@
             ResolvedTypedefType.ReferencedTypeName.Item = DefinedTypeName;
             ResolvedTypedefType.ReferencedType.Item = DefinedType;
 
-#if DEBUG
-            // TODO: remove this code, for code coverage purpose only.
+#if COVERAGE
             string TypeString = ResolvedTypedefType.ToString();
 #endif
         }

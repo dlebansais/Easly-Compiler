@@ -114,8 +114,42 @@
         {
             bool Success = true;
 
+            IHashtableEx<IFeatureName, IIdentifier> ListedExportList = MergeExportClassIdentifiers(node, export, mergedExportTable, ref Success);
+            IList<IFeatureName> ListedIdentifiers = new List<IFeatureName>(ListedExportList.Indexes);
+
+            List<IHashtableEx<string, IClass>> OtherClassTableList = new List<IHashtableEx<string, IClass>>();
+            foreach (IFeatureName ExportName in ListedIdentifiers)
+            {
+                IHashtableEx<string, IClass> OtherClassTable = mergedExportTable[ExportName];
+                OtherClassTableList.Add(OtherClassTable);
+            }
+
+            IHashtableEx<string, IClass> FilledClassTable = new HashtableEx<string, IClass>();
+
+            foreach (IHashtableEx<string, IClass> OtherClassTable in OtherClassTableList)
+                ResolveAsExportIdentifier(OtherClassTable, FilledClassTable);
+
+            CheckMultipleClassIdentifiers(node, export, FilledClassTable, ref Success);
+
+            IHashtableEx<string, IClass> ClassTable = node.LocalExportTable[export.ValidExportName.Item];
+            foreach (KeyValuePair<string, IClass> Entry in FilledClassTable)
+            {
+                string ClassIdentifier = Entry.Key;
+                IClass ExportClassItem = Entry.Value;
+
+                ClassTable.Add(ClassIdentifier, ExportClassItem);
+            }
+
+            export.ExportClassTable.Item = FilledClassTable;
+
+            return Success;
+        }
+
+        private IHashtableEx<IFeatureName, IIdentifier> MergeExportClassIdentifiers(IClass node, IExport export, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> mergedExportTable, ref bool success)
+        {
             IList<string> ListedClassList = new List<string>();
             IHashtableEx<IFeatureName, IIdentifier> ListedExportList = new HashtableEx<IFeatureName, IIdentifier>();
+
             for (int i = 0; i < export.ClassIdentifierList.Count; i++)
             {
                 IIdentifier Identifier = export.ClassIdentifierList[i];
@@ -132,7 +166,7 @@
                     if (ListedExportList.ContainsKey(Key))
                     {
                         AddSourceError(new ErrorIdentifierAlreadyListed(Identifier, ValidText));
-                        Success = false;
+                        success = false;
                     }
                     else
                         ListedExportList.Add(Key, Identifier);
@@ -140,55 +174,11 @@
                 else
                 {
                     AddSourceError(new ErrorUnknownIdentifier(Identifier, ValidText));
-                    Success = false;
+                    success = false;
                 }
             }
 
-            IList<IFeatureName> ListedIdentifiers = new List<IFeatureName>(ListedExportList.Indexes);
-
-            List<IHashtableEx<string, IClass>> OtherClassTableList = new List<IHashtableEx<string, IClass>>();
-            foreach (IFeatureName ExportName in ListedIdentifiers)
-            {
-                IHashtableEx<string, IClass> OtherClassTable = mergedExportTable[ExportName];
-                OtherClassTableList.Add(OtherClassTable);
-            }
-
-            IHashtableEx<string, IClass> FilledClassTable = new HashtableEx<string, IClass>();
-
-            foreach (IHashtableEx<string, IClass> OtherClassTable in OtherClassTableList)
-                ResolveAsExportIdentifier(OtherClassTable, FilledClassTable);
-
-            for (int i = 0; i < export.ClassIdentifierList.Count; i++)
-            {
-                IIdentifier Identifier = export.ClassIdentifierList[i];
-                string ValidIdentifier = Identifier.ValidText.Item;
-
-                if (ValidIdentifier.ToLower() != LanguageClasses.Any.Name.ToLower() && node.ImportedClassTable.ContainsKey(ValidIdentifier))
-                {
-                    IImportedClass Imported = node.ImportedClassTable[ValidIdentifier];
-
-                    if (FilledClassTable.ContainsKey(ValidIdentifier))
-                    {
-                        AddSourceError(new ErrorIdentifierAlreadyListed(Identifier, ValidIdentifier));
-                        Success = false;
-                    }
-                    else
-                        FilledClassTable.Add(ValidIdentifier, Imported.Item);
-                }
-            }
-
-            IHashtableEx<string, IClass> ClassTable = node.LocalExportTable[export.ValidExportName.Item];
-            foreach (KeyValuePair<string, IClass> Entry in FilledClassTable)
-            {
-                string ClassIdentifier = Entry.Key;
-                IClass ExportClassItem = Entry.Value;
-
-                ClassTable.Add(ClassIdentifier, ExportClassItem);
-            }
-
-            export.ExportClassTable.Item = FilledClassTable;
-
-            return Success;
+            return ListedExportList;
         }
 
         private void ResolveAsExportIdentifier(IHashtableEx<string, IClass> otherClassTable, IHashtableEx<string, IClass> classTable)
@@ -200,6 +190,28 @@
 
                 if (!classTable.ContainsKey(ClassIdentifier))
                     classTable.Add(ClassIdentifier, ClassItem);
+            }
+        }
+
+        private void CheckMultipleClassIdentifiers(IClass node, IExport export, IHashtableEx<string, IClass> filledClassTable, ref bool success)
+        {
+            for (int i = 0; i < export.ClassIdentifierList.Count; i++)
+            {
+                IIdentifier Identifier = export.ClassIdentifierList[i];
+                string ValidIdentifier = Identifier.ValidText.Item;
+
+                if (ValidIdentifier.ToLower() != LanguageClasses.Any.Name.ToLower() && node.ImportedClassTable.ContainsKey(ValidIdentifier))
+                {
+                    IImportedClass Imported = node.ImportedClassTable[ValidIdentifier];
+
+                    if (filledClassTable.ContainsKey(ValidIdentifier))
+                    {
+                        AddSourceError(new ErrorIdentifierAlreadyListed(Identifier, ValidIdentifier));
+                        success = false;
+                    }
+                    else
+                        filledClassTable.Add(ValidIdentifier, Imported.Item);
+                }
             }
         }
 

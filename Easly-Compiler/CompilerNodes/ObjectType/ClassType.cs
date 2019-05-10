@@ -422,8 +422,7 @@
 
             IClassType ResolvedClassType = Create(baseClass, typeArgumentTable, instancingClassType);
 
-#if DEBUG
-            // TODO: remove this code, for code coverage purpose only.
+#if COVERAGE
             string TypeString = ResolvedClassType.ToString();
 #endif
 

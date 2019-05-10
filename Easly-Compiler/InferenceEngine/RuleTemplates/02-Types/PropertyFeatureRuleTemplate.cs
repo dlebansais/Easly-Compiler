@@ -157,8 +157,7 @@
 
             PropertyType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType, EntityTypeName, EntityType, node.PropertyKind, GetEnsureList, GetExceptionIdentifierList, SetRequireList, SetExceptionIdentifierList, out ITypeName ResolvedPropertyTypeName, out ICompiledType ResolvedPropertyType);
 
-#if DEBUG
-            // TODO: remove this code, for code coverage purpose only.
+#if COVERAGE
             Debug.Assert(!ResolvedPropertyType.IsReference);
             Debug.Assert(ResolvedPropertyType.IsValue);
 #endif
@@ -193,8 +192,7 @@
 
             node.ResolvedFeature.Item = node;
 
-#if DEBUG
-            // TODO: remove this code, for code coverage purpose only.
+#if COVERAGE
             string TypeString = ResolvedPropertyType.ToString();
 #endif
         }
