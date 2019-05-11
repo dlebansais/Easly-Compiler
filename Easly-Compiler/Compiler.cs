@@ -170,11 +170,8 @@
 
                     if (CheckClassAndLibraryNames(root))
                     {
-                        if (ResolveIdentifiers(root))
+                        if (ResolveIdentifiers(root) && ResolveTypes(root)/* && ResolveContract(root)*/)
                         {
-                            if (ResolveTypes(root))
-                            {
-                            }
                         }
                     }
                 }
@@ -977,66 +974,37 @@
         private IHashtableEx<string, IHashtableEx<string, ILibrary>> LibraryTable = new HashtableEx<string, IHashtableEx<string, ILibrary>>();
         #endregion
 
-        #region Inference Pass: Identifiers
+        #region Inference
         /// <summary></summary>
         protected virtual bool ResolveIdentifiers(IRoot root)
         {
-            IList<IRuleTemplate> RuleTemplateList = RuleTemplateSet.Identifiers;
-            BuildInferenceSourceList Context = new BuildInferenceSourceList(RuleTemplateList);
-            IWalkCallbacks<BuildInferenceSourceList> Callbacks = new WalkCallbacks<BuildInferenceSourceList>() { HandlerNode = ListAllSourcesForIdentifiers, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() };
-            IList<IClass> ClassList = root.ClassList;
-
-            foreach (IClass Class in ClassList)
-                NodeTreeWalk<BuildInferenceSourceList>.Walk(Class, Callbacks, Context);
-
-            IList<ISource> SourceList = Context.SourceList;
-
-            InferenceEngine Engine = new InferenceEngine(RuleTemplateList, SourceList, ClassList, true, InferenceRetries);
-
-            bool Success = Engine.Solve(ErrorList);
-
-            Debug.Assert(Success || !ErrorList.IsEmpty);
-            return Success;
+            return Resolve(root, RuleTemplateSet.Identifiers);
         }
 
-        /// <summary></summary>
-        protected virtual bool ListAllSourcesForIdentifiers(BaseNode.INode node, BaseNode.INode parentNode, string propertyName, IWalkCallbacks<BuildInferenceSourceList> callbacks, BuildInferenceSourceList context)
-        {
-            ISource Source = node as ISource;
-            Debug.Assert(Source != null);
-
-#if COVERAGE
-            Source.Reset(context.RuleTemplateList);
-            Debug.Assert(!Source.IsResolved(context.RuleTemplateList));
-            Debug.Assert(Source.ToString().Length > 0);
-#endif
-
-            foreach (IRuleTemplate RuleTemplate in context.RuleTemplateList)
-                if (RuleTemplate.NodeType.IsAssignableFrom(Source.GetType()))
-                {
-                    context.SourceList.Add(Source);
-                    break;
-                }
-
-            return true;
-        }
-        #endregion
-
-        #region Inference Pass: Types
         /// <summary></summary>
         protected virtual bool ResolveTypes(IRoot root)
         {
-            IList<IRuleTemplate> RuleTemplateList = RuleTemplateSet.Types;
-            BuildInferenceSourceList Context = new BuildInferenceSourceList(RuleTemplateList);
-            IWalkCallbacks<BuildInferenceSourceList> Callbacks = new WalkCallbacks<BuildInferenceSourceList>() { HandlerNode = ListAllSourcesForTypes, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() };
+            return Resolve(root, RuleTemplateSet.Types);
+        }
+
+        /// <summary></summary>
+        protected virtual bool ResolveContract(IRoot root)
+        {
+            return Resolve(root, RuleTemplateSet.Contract);
+        }
+
+        /// <summary></summary>
+        protected virtual bool Resolve(IRoot root, IList<IRuleTemplate> ruleTemplateList)
+        {
+            BuildInferenceSourceList Context = new BuildInferenceSourceList(ruleTemplateList);
+            IWalkCallbacks<BuildInferenceSourceList> Callbacks = new WalkCallbacks<BuildInferenceSourceList>() { HandlerNode = ListAllSources, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() };
             IList<IClass> ClassList = root.ClassList;
 
             foreach (IClass Class in ClassList)
                 NodeTreeWalk<BuildInferenceSourceList>.Walk(Class, Callbacks, Context);
 
             IList<ISource> SourceList = Context.SourceList;
-
-            InferenceEngine Engine = new InferenceEngine(RuleTemplateList, SourceList, ClassList, true, InferenceRetries);
+            InferenceEngine Engine = new InferenceEngine(ruleTemplateList, SourceList, ClassList, true, InferenceRetries);
 
             bool Success = Engine.Solve(ErrorList);
 
@@ -1045,7 +1013,7 @@
         }
 
         /// <summary></summary>
-        protected virtual bool ListAllSourcesForTypes(BaseNode.INode node, BaseNode.INode parentNode, string propertyName, IWalkCallbacks<BuildInferenceSourceList> callbacks, BuildInferenceSourceList context)
+        protected virtual bool ListAllSources(BaseNode.INode node, BaseNode.INode parentNode, string propertyName, IWalkCallbacks<BuildInferenceSourceList> callbacks, BuildInferenceSourceList context)
         {
             ISource Source = node as ISource;
             Debug.Assert(Source != null);

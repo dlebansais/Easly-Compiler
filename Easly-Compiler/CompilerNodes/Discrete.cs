@@ -84,6 +84,10 @@ namespace CompilerNode
                 ValidDiscreteName = new OnceReference<IFeatureName>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -106,6 +110,11 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 IsResolved = ValidDiscreteName.IsAssigned;
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = false;
                 IsHandled = true;
             }
 

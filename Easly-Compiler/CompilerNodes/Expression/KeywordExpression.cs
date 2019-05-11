@@ -80,6 +80,13 @@ namespace CompilerNode
             {
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                NumberConstant = new OnceReference<ILanguageConstant>();
+                ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -104,10 +111,86 @@ namespace CompilerNode
                 IsResolved = false;
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = ResolvedResult.IsAssigned && NumberConstant.IsAssigned && ResolvedExceptions.IsAssigned;
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
             return IsResolved;
         }
+        #endregion
+
+        #region Implementation of IExpression
+        /// <summary>
+        /// Types of expression results.
+        /// </summary>
+        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+
+        /// <summary>
+        /// True if the expression is a constant.
+        /// </summary>
+        public bool IsConstant
+        {
+            get
+            {
+                bool Result = false;
+                bool IsHandled = false;
+
+                switch (Value)
+                {
+                    case BaseNode.Keyword.True:
+                        Result = true;
+                        IsHandled = true;
+                        break;
+
+                    case BaseNode.Keyword.False:
+                        Result = true;
+                        IsHandled = true;
+                        break;
+
+                    case BaseNode.Keyword.Current:
+                        Result = false;
+                        IsHandled = true;
+                        break;
+
+                    case BaseNode.Keyword.Value:
+                        Result = false;
+                        IsHandled = true;
+                        break;
+
+                    case BaseNode.Keyword.Result:
+                        Result = false;
+                        IsHandled = true;
+                        break;
+
+                    case BaseNode.Keyword.Retry:
+                        Result = false;
+                        IsHandled = true;
+                        break;
+
+                    case BaseNode.Keyword.Exception:
+                        Result = false;
+                        IsHandled = true;
+                        break;
+                }
+
+                Debug.Assert(IsHandled);
+
+                return Result;
+            }
+        }
+
+        /// <summary>
+        /// Specific constant number.
+        /// </summary>
+        public OnceReference<ILanguageConstant> NumberConstant { get; private set; } = new OnceReference<ILanguageConstant>();
+
+        /// <summary>
+        /// List of exceptions the expression can throw.
+        /// </summary>
+        public OnceReference<IList<IIdentifier>> ResolvedExceptions { get; private set; } = new OnceReference<IList<IIdentifier>>();
         #endregion
 
         #region Compiler
@@ -128,12 +211,12 @@ namespace CompilerNode
         /// <summary>
         /// Checks that a keyword is available in the context of the source.
         /// </summary>
-        /// <param name="source">The source node.</param>
         /// <param name="keyword">The keyword to check.</param>
+        /// <param name="source">The source node.</param>
         /// <param name="errorList">The list of errors found if not available.</param>
         /// <param name="resultTypeName">The resulting type name upon return if available.</param>
         /// <param name="resultType">The resulting type upon return if available.</param>
-        public static bool IsKeywordAvailable(ISource source, BaseNode.Keyword keyword, IErrorList errorList, out ITypeName resultTypeName, out ICompiledType resultType)
+        public static bool IsKeywordAvailable(BaseNode.Keyword keyword, ISource source, IErrorList errorList, out ITypeName resultTypeName, out ICompiledType resultType)
         {
             resultTypeName = null;
             resultType = null;
@@ -147,7 +230,7 @@ namespace CompilerNode
                 case BaseNode.Keyword.True:
                 case BaseNode.Keyword.False:
                 case BaseNode.Keyword.Retry:
-                    Result = IsLanguageTypeAvailable(source, LanguageClasses.Boolean.Guid, errorList, out resultTypeName, out resultType);
+                    Result = Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, source, errorList, out resultTypeName, out resultType);
                     IsHandled = true;
                     break;
 
@@ -169,7 +252,7 @@ namespace CompilerNode
                     break;
 
                 case BaseNode.Keyword.Exception:
-                    Result = IsLanguageTypeAvailable(source, LanguageClasses.Exception.Guid, errorList, out resultTypeName, out resultType);
+                    Result = Expression.IsLanguageTypeAvailable(LanguageClasses.Exception.Guid, source, errorList, out resultTypeName, out resultType);
                     IsHandled = true;
                     break;
             }
@@ -177,45 +260,6 @@ namespace CompilerNode
             Debug.Assert(IsHandled);
 
             return Result;
-        }
-
-        private static bool IsLanguageTypeAvailable(ISource source, Guid guid, IErrorList errorList, out ITypeName resultTypeName, out ICompiledType resultType)
-        {
-            resultTypeName = null;
-            resultType = null;
-
-            IClass EmbeddingClass = source.EmbeddingClass;
-            bool Found = false;
-            foreach (KeyValuePair<Guid, Tuple<ITypeName, IClassType>> Entry in EmbeddingClass.ImportedLanguageTypeTable)
-            {
-                if (Entry.Key == guid)
-                {
-                    resultTypeName = Entry.Value.Item1;
-                    resultType = Entry.Value.Item2;
-                    Found = true;
-                    break;
-                }
-            }
-
-            if (!Found)
-            {
-                bool IsHandled = false;
-
-                if (guid == LanguageClasses.Boolean.Guid)
-                {
-                    errorList.AddError(new ErrorBooleanTypeMissing(source));
-                    IsHandled = true;
-                }
-                else if (guid == LanguageClasses.Exception.Guid)
-                {
-                    errorList.AddError(new ErrorExceptionTypeMissing(source));
-                    IsHandled = true;
-                }
-
-                Debug.Assert(IsHandled);
-            }
-
-            return Found;
         }
 
         private static bool IsWithinProperty(ISource source, IErrorList errorList, out ITypeName resultTypeName, out ICompiledType resultType)

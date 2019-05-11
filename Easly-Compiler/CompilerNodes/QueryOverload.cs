@@ -65,6 +65,11 @@
         /// List of resolved conformant parameter types, both this overload and the associated type.
         /// </summary>
         ListTableEx<ICompiledType> CompleteConformantResultTable { get; }
+
+        /// <summary>
+        /// The resolved body.
+        /// </summary>
+        OnceReference<ICompiledBody> ResolvedBody { get; }
     }
 
     /// <summary>
@@ -192,6 +197,11 @@
                 ResolvedResultType = new OnceReference<ICompiledType>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                ResolvedBody = new OnceReference<ICompiledBody>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -219,6 +229,11 @@
                 Debug.Assert(ConformantResultTable.IsSealed || !IsResolved);
                 Debug.Assert(ResolvedResultTypeName.IsAssigned || !IsResolved);
                 Debug.Assert(ResolvedResultType.IsAssigned || !IsResolved);
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = ResolvedBody.IsAssigned;
                 IsHandled = true;
             }
 
@@ -294,6 +309,11 @@
         /// The resolved result type.
         /// </summary>
         public OnceReference<ICompiledType> ResolvedResultType { get; private set; } = new OnceReference<ICompiledType>();
+
+        /// <summary>
+        /// The resolved body.
+        /// </summary>
+        public OnceReference<ICompiledBody> ResolvedBody { get; private set; } = new OnceReference<ICompiledBody>();
         #endregion
 
         #region Debugging

@@ -1,5 +1,7 @@
 ﻿namespace EaslyCompiler
 {
+    using CompilerNode;
+
     /// <summary>
     /// Type of an expression.
     /// </summary>
@@ -19,6 +21,24 @@
         /// Name of the expression value, empty if none.
         /// </summary>
         string Name { get; }
+
+        /// <summary>
+        /// The expression with this type.
+        /// </summary>
+        IExpression Source { get; }
+
+        /// <summary>
+        /// Sets the origin expression of this type.
+        /// </summary>
+        /// <param name="source">The expression with this type.</param>
+        /// <param name="index">Index of this type in results of <paramref name="source"/>.</param>
+        void SetSource(IExpression source, int index);
+
+        /// <summary>
+        /// Set this type name.
+        /// </summary>
+        /// <param name="name">The name to set.</param>
+        void SetName(string name);
     }
 
     /// <summary>
@@ -56,22 +76,38 @@
         /// Name of the expression value, empty if none.
         /// </summary>
         public string Name { get; private set; }
+
+        /// <summary>
+        /// The expression with this type.
+        /// </summary>
+        public IExpression Source { get; private set; }
+
+        /// <summary>
+        /// Index of this type in results of <see cref="Source"/>.
+        /// </summary>
+        public int Index { get; private set; }
         #endregion
 
-        /*
-        public void SetSource(IExpression Source, int Index)
+        #region Client Interface
+        /// <summary>
+        /// Sets the origin expression of this type.
+        /// </summary>
+        /// <param name="source">The expression with this type.</param>
+        /// <param name="index">Index of this type in results of <paramref name="source"/>.</param>
+        public void SetSource(IExpression source, int index)
         {
-            this.Source = Source;
-            this.Index = Index;
+            Source = source;
+            Index = index;
         }
 
-        public void SetName(string Name)
+        /// <summary>
+        /// Set this type name.
+        /// </summary>
+        /// <param name="name">The name to set.</param>
+        public void SetName(string name)
         {
-            this.Name = Name;
+            Name = name;
         }
-
-        public IExpression Source { get; private set; }
-        public int Index { get; private set; }
-        */
+        #endregion
     }
 }

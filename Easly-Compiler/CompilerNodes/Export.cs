@@ -126,6 +126,10 @@ namespace CompilerNode
                 ExportClassTable = new OnceReference<IHashtableEx<string, IClass>>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -148,6 +152,11 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 IsResolved = ValidExportName.IsAssigned;
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = false;
                 IsHandled = true;
             }
 

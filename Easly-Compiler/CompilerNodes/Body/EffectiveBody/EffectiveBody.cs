@@ -172,6 +172,14 @@ namespace CompilerNode
                 FullScope = new HashtableEx<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                ResolvedTagTable = new HashtableEx<string, IExpression>();
+                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedRequireList = new OnceReference<IList<IAssertion>>();
+                ResolvedEnsureList = new OnceReference<IList<IAssertion>>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -196,10 +204,37 @@ namespace CompilerNode
                 IsResolved = LocalScope.IsSealed;
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = ResolvedResult.IsAssigned && ResolvedRequireList.IsAssigned && ResolvedEnsureList.IsAssigned;
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
             return IsResolved;
         }
+        #endregion
+
+        #region Implementation of IBody
+        /// <summary>
+        /// Tags for tag expressions.
+        /// </summary>
+        public IHashtableEx<string, IExpression> ResolvedTagTable { get; private set; } = new HashtableEx<string, IExpression>();
+
+        /// <summary>
+        /// Types of results.
+        /// </summary>
+        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+
+        /// <summary>
+        /// Resolved list of require assertions.
+        /// </summary>
+        public OnceReference<IList<IAssertion>> ResolvedRequireList { get; private set; } = new OnceReference<IList<IAssertion>>();
+
+        /// <summary>
+        /// Resolved list of ensure assertions.
+        /// </summary>
+        public OnceReference<IList<IAssertion>> ResolvedEnsureList { get; private set; } = new OnceReference<IList<IAssertion>>();
         #endregion
 
         #region Implementation of ICompiledBody

@@ -2,6 +2,7 @@ namespace CompilerNode
 {
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -9,6 +10,10 @@ namespace CompilerNode
     /// </summary>
     public interface IAssertionTagExpression : BaseNode.IAssertionTagExpression, IExpression
     {
+        /// <summary>
+        /// The resolved expression.
+        /// </summary>
+        OnceReference<IExpression> ResolvedBooleanExpression { get; }
     }
 
     /// <summary>
@@ -78,6 +83,14 @@ namespace CompilerNode
             {
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                NumberConstant = new OnceReference<ILanguageConstant>();
+                ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
+                ResolvedBooleanExpression = new OnceReference<IExpression>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -102,13 +115,46 @@ namespace CompilerNode
                 IsResolved = false;
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = ResolvedResult.IsAssigned && NumberConstant.IsAssigned && ResolvedExceptions.IsAssigned;
+                Debug.Assert(ResolvedBooleanExpression.IsAssigned || !IsResolved);
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
             return IsResolved;
         }
         #endregion
 
+        #region Implementation of IExpression
+        /// <summary>
+        /// Types of expression results.
+        /// </summary>
+        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+
+        /// <summary>
+        /// True if the expression is a constant.
+        /// </summary>
+        public bool IsConstant { get { return false; } }
+
+        /// <summary>
+        /// Specific constant number.
+        /// </summary>
+        public OnceReference<ILanguageConstant> NumberConstant { get; private set; } = new OnceReference<ILanguageConstant>();
+
+        /// <summary>
+        /// List of exceptions the expression can throw.
+        /// </summary>
+        public OnceReference<IList<IIdentifier>> ResolvedExceptions { get; private set; } = new OnceReference<IList<IIdentifier>>();
+        #endregion
+
         #region Compiler
+        /// <summary>
+        /// The resolved expression.
+        /// </summary>
+        public OnceReference<IExpression> ResolvedBooleanExpression { get; private set; } = new OnceReference<IExpression>();
+
         /// <summary>
         /// Compares two expressions.
         /// </summary>

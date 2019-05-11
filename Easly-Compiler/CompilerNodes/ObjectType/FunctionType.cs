@@ -176,6 +176,10 @@ namespace CompilerNode
                 OriginatingTypedef = new OnceReference<ITypedef>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -201,6 +205,11 @@ namespace CompilerNode
                 Debug.Assert(MostCommonTypeName.IsAssigned == MostCommonType.IsAssigned);
                 IsResolved = MostCommonType.IsAssigned;
                 Debug.Assert(ResolvedType.IsAssigned || !IsResolved);
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = false;
                 IsHandled = true;
             }
 

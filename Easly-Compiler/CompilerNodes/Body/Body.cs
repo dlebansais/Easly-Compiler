@@ -28,5 +28,25 @@
         /// Entities local to a scope.
         /// </summary>
         IHashtableEx<string, IScopeAttributeFeature> LocalScope { get; }
+
+        /// <summary>
+        /// Tags for tag expressions.
+        /// </summary>
+        IHashtableEx<string, IExpression> ResolvedTagTable { get; }
+
+        /// <summary>
+        /// Types of results.
+        /// </summary>
+        OnceReference<IList<IExpressionType>> ResolvedResult { get; }
+
+        /// <summary>
+        /// Resolved list of require assertions.
+        /// </summary>
+        OnceReference<IList<IAssertion>> ResolvedRequireList { get; }
+
+        /// <summary>
+        /// Resolved list of ensure assertions.
+        /// </summary>
+        OnceReference<IList<IAssertion>> ResolvedEnsureList { get; }
     }
 }

@@ -229,6 +229,10 @@
                 Result = new List<IExpressionType>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -253,6 +257,11 @@
                 IsResolved = ConformantResultTable.IsSealed;
                 Debug.Assert(ParameterTable.IsSealed || !IsResolved);
                 Debug.Assert(ResultTable.IsSealed || !IsResolved);
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = false;
                 IsHandled = true;
             }
 

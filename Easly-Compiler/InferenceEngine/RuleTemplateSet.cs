@@ -140,5 +140,13 @@
             new TupleTypeRuleTemplate(),
             new TypedefSourceRuleTemplate(),
         };
+
+        /// <summary>
+        /// Rules for the contract inference pass.
+        /// </summary>
+        public static IList<IRuleTemplate> Contract { get; } = new List<IRuleTemplate>()
+        {
+            new AgentExpressionRuleTemplate(),
+        };
     }
 }

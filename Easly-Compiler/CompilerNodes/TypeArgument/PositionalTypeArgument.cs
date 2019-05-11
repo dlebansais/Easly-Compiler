@@ -81,6 +81,10 @@ namespace CompilerNode
                 ResolvedSourceType = new OnceReference<ICompiledType>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -104,6 +108,11 @@ namespace CompilerNode
             {
                 Debug.Assert(ResolvedSourceTypeName.IsAssigned == ResolvedSourceType.IsAssigned);
                 IsResolved = ResolvedSourceType.IsAssigned;
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = false;
                 IsHandled = true;
             }
 

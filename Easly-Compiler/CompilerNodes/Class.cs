@@ -253,12 +253,12 @@ namespace CompilerNode
         IList<IQueryOverload> QueryOverloadList { get; }
 
         /// <summary>
-        /// List of resolved expressions that are default values of features of this class.
+        /// List of expressions that are default values of features of this class.
         /// </summary>
         IList<IExpression> NodeWithDefaultList { get; }
 
         /// <summary>
-        /// List of resolved expressions that are constant numbers in this class.
+        /// List of expressions that are constant numbers in this class.
         /// </summary>
         IList<IExpression> NodeWithNumberConstantList { get; }
 
@@ -271,6 +271,26 @@ namespace CompilerNode
         /// All resolved names.
         /// </summary>
         IHashtableEx<string, IHashtableEx> NamespaceTable { get; }
+
+        /// <summary>
+        /// All resolved bodies.
+        /// </summary>
+        OnceReference<IList<IBody>> ResolvedBodyTagList { get; }
+
+        /// <summary>
+        /// List of resolved expressions that are default values of features of this class.
+        /// </summary>
+        OnceReference<IList<IExpression>> ResolvedNodeWithDefaultList { get; }
+
+        /// <summary>
+        /// List of resolved expressions that are constant numbers in this class.
+        /// </summary>
+        OnceReference<IList<IExpression>> ResolvedNodeWithNumberConstantList { get; }
+
+        /// <summary>
+        /// Table of inherited bodies.
+        /// </summary>
+        IHashtableEx<IClassType, IList<IBody>> InheritedBodyTagListTable { get; }
     }
 
     /// <summary>
@@ -568,6 +588,14 @@ namespace CompilerNode
                 FullScope = new HashtableEx<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                ResolvedBodyTagList = new OnceReference<IList<IBody>>();
+                ResolvedNodeWithDefaultList = new OnceReference<IList<IExpression>>();
+                ResolvedNodeWithNumberConstantList = new OnceReference<IList<IExpression>>();
+                InheritedBodyTagListTable = new HashtableEx<IClassType, IList<IBody>>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -590,6 +618,11 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 IsResolved = NamespaceTable.IsSealed;
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = ResolvedBodyTagList.IsAssigned && ResolvedNodeWithDefaultList.IsAssigned && ResolvedNodeWithNumberConstantList.IsAssigned && InheritedBodyTagListTable.IsSealed;
                 IsHandled = true;
             }
 
@@ -1040,6 +1073,26 @@ namespace CompilerNode
         /// All resolved names.
         /// </summary>
         public IHashtableEx<string, IHashtableEx> NamespaceTable { get; private set; } = new HashtableEx<string, IHashtableEx>();
+
+        /// <summary>
+        /// All resolved bodies.
+        /// </summary>
+        public OnceReference<IList<IBody>> ResolvedBodyTagList { get; private set; } = new OnceReference<IList<IBody>>();
+
+        /// <summary>
+        /// List of resolved expressions that are default values of features of this class.
+        /// </summary>
+        public OnceReference<IList<IExpression>> ResolvedNodeWithDefaultList { get; private set; } = new OnceReference<IList<IExpression>>();
+
+        /// <summary>
+        /// List of resolved expressions that are constant numbers in this class.
+        /// </summary>
+        public OnceReference<IList<IExpression>> ResolvedNodeWithNumberConstantList { get; private set; } = new OnceReference<IList<IExpression>>();
+
+        /// <summary>
+        /// Table of inherited bodies.
+        /// </summary>
+        public IHashtableEx<IClassType, IList<IBody>> InheritedBodyTagListTable { get; private set; } = new HashtableEx<IClassType, IList<IBody>>();
         #endregion
 
         #region Debugging

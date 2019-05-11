@@ -94,6 +94,10 @@ namespace CompilerNode
                 ResolvedEntityType = new OnceReference<ICompiledType>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -120,6 +124,11 @@ namespace CompilerNode
                 IsResolved = ResolvedFeature.IsAssigned;
                 Debug.Assert(ResolvedEntityType.IsAssigned == IsResolved);
                 Debug.Assert(ResolvedFeatureType.IsAssigned == IsResolved);
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = false;
                 IsHandled = true;
             }
 

@@ -11,6 +11,25 @@ namespace CompilerNode
     /// </summary>
     public interface IAttachment : BaseNode.IAttachment, INode, INodeWithReplicatedBlocks, ISource, IScopeHolder
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.Attachment.AttachTypeBlocks"/>.
+        /// </summary>
+        IList<IObjectType> AttachTypeList { get; }
+
+        /// <summary>
+        /// Types of results of the attachment.
+        /// </summary>
+        OnceReference<IList<IExpressionType>> ResolvedResult { get; }
+
+        /// <summary>
+        /// List of exceptions the attachment can throw.
+        /// </summary>
+        OnceReference<IList<IIdentifier>> ResolvedExceptions { get; }
+
+        /// <summary>
+        /// List of resolved features for each attached entity.
+        /// </summary>
+        IList<IScopeAttributeFeature> ResolvedLocalEntitiesList { get; }
     }
 
     /// <summary>
@@ -113,6 +132,13 @@ namespace CompilerNode
                 FullScope = new HashtableEx<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
+                ResolvedLocalEntitiesList = new List<IScopeAttributeFeature>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -137,6 +163,11 @@ namespace CompilerNode
                 IsResolved = LocalScope.IsSealed;
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = ResolvedResult.IsAssigned && ResolvedExceptions.IsAssigned;
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
             return IsResolved;
@@ -158,6 +189,23 @@ namespace CompilerNode
         /// All reachable entities.
         /// </summary>
         public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Types of results of the attachment.
+        /// </summary>
+        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+
+        /// <summary>
+        /// List of exceptions the attachment can throw.
+        /// </summary>
+        public OnceReference<IList<IIdentifier>> ResolvedExceptions { get; private set; } = new OnceReference<IList<IIdentifier>>();
+
+        /// <summary>
+        /// List of resolved features for each attached entity.
+        /// </summary>
+        public IList<IScopeAttributeFeature> ResolvedLocalEntitiesList { get; private set; } = new List<IScopeAttributeFeature>();
         #endregion
     }
 }

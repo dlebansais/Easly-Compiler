@@ -90,6 +90,11 @@ namespace CompilerNode
         /// The class inherited, if not cloneable.
         /// </summary>
         OnceReference<IClass> ClassGroup { get; }
+
+        /// <summary>
+        /// Bodies inherited from the parent.
+        /// </summary>
+        OnceReference<IList<IBody>> ResolvedBodyTagList { get; }
     }
 
     /// <summary>
@@ -236,6 +241,11 @@ namespace CompilerNode
                 ClassGroup = new OnceReference<IClass>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                ResolvedBodyTagList = new OnceReference<IList<IBody>>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -263,6 +273,11 @@ namespace CompilerNode
                 Debug.Assert(TypedefTable.IsAssigned == IsResolved);
                 Debug.Assert(DiscreteTable.IsAssigned == IsResolved);
                 Debug.Assert(FeatureTable.IsAssigned == IsResolved);
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = ResolvedBodyTagList.IsAssigned;
                 IsHandled = true;
             }
 
@@ -326,6 +341,11 @@ namespace CompilerNode
         /// The class inherited, if not cloneable.
         /// </summary>
         public OnceReference<IClass> ClassGroup { get; private set; } = new OnceReference<IClass>();
+
+        /// <summary>
+        /// Bodies inherited from the parent.
+        /// </summary>
+        public OnceReference<IList<IBody>> ResolvedBodyTagList { get; private set; } = new OnceReference<IList<IBody>>();
         #endregion
     }
 }

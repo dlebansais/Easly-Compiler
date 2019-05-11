@@ -2,6 +2,7 @@ namespace CompilerNode
 {
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -9,6 +10,10 @@ namespace CompilerNode
     /// </summary>
     public interface IAssertion : BaseNode.IAssertion, INode, ISource
     {
+        /// <summary>
+        /// The resolved contract with the associated tag.
+        /// </summary>
+        OnceReference<ITaggedContract> ResolvedContract { get; }
     }
 
     /// <summary>
@@ -78,6 +83,11 @@ namespace CompilerNode
             {
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                ResolvedContract = new OnceReference<ITaggedContract>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -102,6 +112,11 @@ namespace CompilerNode
                 IsResolved = false;
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = ResolvedContract.IsAssigned;
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
             return IsResolved;
@@ -109,6 +124,11 @@ namespace CompilerNode
         #endregion
 
         #region Compiler
+        /// <summary>
+        /// The resolved contract with the associated tag.
+        /// </summary>
+        public OnceReference<ITaggedContract> ResolvedContract { get; private set; } = new OnceReference<ITaggedContract>();
+
         /// <summary>
         /// Checks that two lists of assertions are equal.
         /// </summary>

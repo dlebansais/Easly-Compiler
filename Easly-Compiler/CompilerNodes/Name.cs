@@ -112,6 +112,10 @@
             {
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -132,6 +136,11 @@
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
+            {
+                IsResolved = false;
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsResolved = false;
                 IsHandled = true;

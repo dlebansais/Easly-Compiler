@@ -3,6 +3,7 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -113,6 +114,11 @@
             {
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -137,10 +143,22 @@
                 IsResolved = false;
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = ResolvedResult.IsAssigned;
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
             return IsResolved;
         }
+        #endregion
+
+        #region Implementation of IArgument
+        /// <summary>
+        /// Types of expression results for the argument.
+        /// </summary>
+        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
         #endregion
 
         #region Compiler

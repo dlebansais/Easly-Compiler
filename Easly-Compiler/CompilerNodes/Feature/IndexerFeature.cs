@@ -159,6 +159,10 @@ namespace CompilerNode
                 FullSetScope = new HashtableEx<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -181,6 +185,11 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 IsResolved = ResolvedFeature.IsAssigned; // TODO confirm
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = false;
                 IsHandled = true;
             }
 

@@ -2,6 +2,7 @@ namespace CompilerNode
 {
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -9,6 +10,20 @@ namespace CompilerNode
     /// </summary>
     public interface IAgentExpression : BaseNode.IAgentExpression, IExpression
     {
+        /// <summary>
+        /// The resolved type name of the feature providing the expression result.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedAncestorTypeName { get; }
+
+        /// <summary>
+        /// The resolved type of the feature providing the expression result.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedAncestorType { get; }
+
+        /// <summary>
+        /// The resolved feature providing the expression result.
+        /// </summary>
+        OnceReference<ICompiledFeature> ResolvedFeature { get; }
     }
 
     /// <summary>
@@ -78,6 +93,16 @@ namespace CompilerNode
             {
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                NumberConstant = new OnceReference<ILanguageConstant>();
+                ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
+                ResolvedAncestorTypeName = new OnceReference<ITypeName>();
+                ResolvedAncestorType = new OnceReference<ICompiledType>();
+                ResolvedFeature = new OnceReference<ICompiledFeature>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -102,13 +127,58 @@ namespace CompilerNode
                 IsResolved = false;
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = ResolvedResult.IsAssigned && NumberConstant.IsAssigned && ResolvedExceptions.IsAssigned;
+                Debug.Assert(ResolvedAncestorTypeName.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedAncestorType.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedFeature.IsAssigned || !IsResolved);
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
             return IsResolved;
         }
         #endregion
 
+        #region Implementation of IExpression
+        /// <summary>
+        /// Types of expression results.
+        /// </summary>
+        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+
+        /// <summary>
+        /// True if the expression is a constant.
+        /// </summary>
+        public bool IsConstant { get { return true; } }
+
+        /// <summary>
+        /// Specific constant number.
+        /// </summary>
+        public OnceReference<ILanguageConstant> NumberConstant { get; private set; } = new OnceReference<ILanguageConstant>();
+
+        /// <summary>
+        /// List of exceptions the expression can throw.
+        /// </summary>
+        public OnceReference<IList<IIdentifier>> ResolvedExceptions { get; private set; } = new OnceReference<IList<IIdentifier>>();
+        #endregion
+
         #region Compiler
+        /// <summary>
+        /// The resolved type name of the feature providing the expression result.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedAncestorTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The resolved type of the feature providing the expression result.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedAncestorType { get; private set; } = new OnceReference<ICompiledType>();
+
+        /// <summary>
+        /// The resolved feature providing the expression result.
+        /// </summary>
+        public OnceReference<ICompiledFeature> ResolvedFeature { get; private set; } = new OnceReference<ICompiledFeature>();
+
         /// <summary>
         /// Compares two expressions.
         /// </summary>

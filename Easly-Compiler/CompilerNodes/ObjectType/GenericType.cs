@@ -152,6 +152,10 @@ namespace CompilerNode
                 ResolvedArgumentLocationTable = new OnceReference<IHashtableEx<string, IObjectType>>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -178,6 +182,11 @@ namespace CompilerNode
                 Debug.Assert(ResolvedArgumentLocationTable.IsAssigned == IsResolved);
                 Debug.Assert(ResolvedTypeArgumentTable.IsAssigned == IsResolved);
                 Debug.Assert(BaseClass.IsAssigned == IsResolved);
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = false;
                 IsHandled = true;
             }
 

@@ -1,6 +1,9 @@
 namespace CompilerNode
 {
+    using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -12,6 +15,26 @@ namespace CompilerNode
         /// Gets a string representation of the expression.
         /// </summary>
         string ExpressionToString { get; }
+
+        /// <summary>
+        /// Types of results of the expression.
+        /// </summary>
+        OnceReference<IList<IExpressionType>> ResolvedResult { get; }
+
+        /// <summary>
+        /// True if the expression is a constant.
+        /// </summary>
+        bool IsConstant { get; }
+
+        /// <summary>
+        /// Specific constant number.
+        /// </summary>
+        OnceReference<ILanguageConstant> NumberConstant { get; }
+
+        /// <summary>
+        /// List of exceptions the expression can throw.
+        /// </summary>
+        OnceReference<IList<IIdentifier>> ResolvedExceptions { get; }
     }
 
     /// <summary>
@@ -149,6 +172,53 @@ namespace CompilerNode
 
             Debug.Assert(IsHandled);
             return Result;
+        }
+
+        /// <summary>
+        /// Checks if a built-in language type is imported, and return the corresponding name and type.
+        /// </summary>
+        /// <param name="guid">The language type guid.</param>
+        /// <param name="source">The source to use when reporting errors.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="resultTypeName">The type name upon return.</param>
+        /// <param name="resultType">The type upon return.</param>
+        public static bool IsLanguageTypeAvailable(Guid guid, ISource source, IErrorList errorList, out ITypeName resultTypeName, out ICompiledType resultType)
+        {
+            resultTypeName = null;
+            resultType = null;
+
+            IClass EmbeddingClass = source.EmbeddingClass;
+            bool Found = false;
+            foreach (KeyValuePair<Guid, Tuple<ITypeName, IClassType>> Entry in EmbeddingClass.ImportedLanguageTypeTable)
+            {
+                if (Entry.Key == guid)
+                {
+                    resultTypeName = Entry.Value.Item1;
+                    resultType = Entry.Value.Item2;
+                    Found = true;
+                    break;
+                }
+            }
+
+            if (!Found)
+            {
+                bool IsHandled = false;
+
+                if (guid == LanguageClasses.Boolean.Guid)
+                {
+                    errorList.AddError(new ErrorBooleanTypeMissing(source));
+                    IsHandled = true;
+                }
+                else if (guid == LanguageClasses.Exception.Guid)
+                {
+                    errorList.AddError(new ErrorExceptionTypeMissing(source));
+                    IsHandled = true;
+                }
+
+                Debug.Assert(IsHandled);
+            }
+
+            return Found;
         }
     }
 }

@@ -55,7 +55,7 @@
                 IErrorList CheckErrorList = new ErrorList();
 
                 // 'Current' is always available.
-                Success = KeywordExpression.IsKeywordAvailable(node, node.Anchor, CheckErrorList, out ITypeName ResultTypeName, out ICompiledType ResultType);
+                Success = KeywordExpression.IsKeywordAvailable(node.Anchor, node, CheckErrorList, out ITypeName ResultTypeName, out ICompiledType ResultType);
                 Debug.Assert(Success);
 
                 data = new Tuple<ITypeName, ICompiledType>(ResultTypeName, ResultType);

@@ -3,6 +3,7 @@ namespace CompilerNode
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -14,6 +15,11 @@ namespace CompilerNode
         /// Gets a string representation of the argument.
         /// </summary>
         string ArgumentToString { get; }
+
+        /// <summary>
+        /// Types of expression results for the argument.
+        /// </summary>
+        OnceReference<IList<IExpressionType>> ResolvedResult { get; }
     }
 
     /// <summary>
@@ -94,6 +100,153 @@ namespace CompilerNode
             }
 
             return Result;
+        }
+
+        /// <summary>
+        /// Validate and merge a list of arguments.
+        /// </summary>
+        /// <param name="argumentList">The list of arguments.</param>
+        /// <param name="mergedArgumentList">The merged result.</param>
+        /// <param name="argumentStyle">The validated style.</param>
+        /// <param name="errorList">List of errors found.</param>
+        public static bool Validate(IList<IArgument> argumentList, List<IExpressionType> mergedArgumentList, out TypeArgumentStyles argumentStyle, IErrorList errorList)
+        {
+            argumentStyle = TypeArgumentStyles.None;
+
+            bool IsHandled;
+
+            foreach (IArgument Argument in argumentList)
+            {
+                IsHandled = false;
+
+                switch (Argument)
+                {
+                    case IPositionalArgument AsPositionalArgument:
+                        if (argumentStyle == TypeArgumentStyles.None)
+                            argumentStyle = TypeArgumentStyles.Positional;
+
+                        else if (argumentStyle == TypeArgumentStyles.Assignment)
+                        {
+                            errorList.AddError(new ErrorArgumentMixed(AsPositionalArgument));
+                            return false;
+                        }
+
+                        IsHandled = true;
+                        break;
+
+                    case IAssignmentArgument AsAssignmentArgument:
+                        if (argumentStyle == TypeArgumentStyles.None)
+                            argumentStyle = TypeArgumentStyles.Assignment;
+
+                        else if (argumentStyle == TypeArgumentStyles.Positional)
+                        {
+                            errorList.AddError(new ErrorArgumentMixed(AsAssignmentArgument));
+                            return false;
+                        }
+
+                        IsHandled = true;
+                        break;
+                }
+
+                Debug.Assert(IsHandled);
+            }
+
+            IHashtableEx<string, IArgument> DuplicateNameTable = new HashtableEx<string, IArgument>();
+            IsHandled = false;
+
+            switch (argumentStyle)
+            {
+                case TypeArgumentStyles.None:
+                    IsHandled = true;
+                    break;
+
+                case TypeArgumentStyles.Positional:
+                    for (int i = 0; i < argumentList.Count; i++)
+                    {
+                        IArgument Argument = argumentList[i];
+                        IExpression Source = null;
+
+                        switch (Argument)
+                        {
+                            case IPositionalArgument AsPositionalArgument:
+                                Source = (IExpression)AsPositionalArgument.Source;
+                                break;
+
+                            case IAssignmentArgument AsAssignmentArgument:
+                                Source = (IExpression)AsAssignmentArgument.Source;
+                                break;
+                        }
+
+                        Debug.Assert(Source != null);
+
+                        for (int j = 0; j < Argument.ResolvedResult.Item.Count; j++)
+                        {
+                            IExpressionType Item = Argument.ResolvedResult.Item[j];
+                            Item.SetSource(Source, j);
+                            mergedArgumentList.Add(Item);
+                        }
+                    }
+
+                    IsHandled = true;
+                    break;
+
+                case TypeArgumentStyles.Assignment:
+                    for (int i = 0; i < argumentList.Count; i++)
+                    {
+                        IArgument Argument = argumentList[i];
+                        IExpression Source = null;
+                        IList<IIdentifier> ParameterList;
+
+                        switch (Argument)
+                        {
+                            case IPositionalArgument AsPositionalArgument:
+                                Source = (IExpression)AsPositionalArgument.Source;
+
+                                for (int j = 0; j < Argument.ResolvedResult.Item.Count; j++)
+                                {
+                                    IExpressionType Item = Argument.ResolvedResult.Item[j];
+                                    Item.SetSource(Source, j);
+                                    mergedArgumentList.Add(Item);
+                                }
+                                break;
+
+                            case IAssignmentArgument AsAssignmentArgument:
+                                Source = (IExpression)AsAssignmentArgument.Source;
+                                ParameterList = AsAssignmentArgument.ParameterList;
+
+                                for (int j = 0; j < Argument.ResolvedResult.Item.Count; j++)
+                                {
+                                    IExpressionType Item = Argument.ResolvedResult.Item[j];
+                                    Item.SetName(ParameterList[j].ValidText.Item);
+
+                                    if (mergedArgumentList.Exists((IExpressionType other) => { return Item.Name == other.Name; }))
+                                        if (!DuplicateNameTable.ContainsKey(Item.Name))
+                                            DuplicateNameTable.Add(Item.Name, Argument);
+
+                                    Item.SetSource(Source, j);
+                                    mergedArgumentList.Add(Item);
+                                }
+                                break;
+                        }
+
+                        Debug.Assert(Source != null);
+                    }
+
+                    if (DuplicateNameTable.Count > 0)
+                    {
+                        foreach (KeyValuePair<string, IArgument> Entry in DuplicateNameTable)
+                            errorList.AddError(new ErrorDuplicateName(Entry.Value, Entry.Key));
+
+                        return false;
+                    }
+
+                    IsHandled = true;
+                    break;
+            }
+
+            Debug.Assert(IsHandled);
+
+            return true;
         }
     }
 }

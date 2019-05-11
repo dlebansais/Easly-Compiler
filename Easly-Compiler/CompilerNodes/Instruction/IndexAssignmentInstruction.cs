@@ -117,6 +117,12 @@
                 FullScope = new HashtableEx<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -141,10 +147,27 @@
                 IsResolved = LocalScope.IsSealed;
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = ResolvedResult.IsAssigned && ResolvedExceptions.IsAssigned;
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
             return IsResolved;
         }
+        #endregion
+
+        #region Implementation of IInstruction
+        /// <summary>
+        /// Types of results of the instruction.
+        /// </summary>
+        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+
+        /// <summary>
+        /// List of exceptions the instruction can throw.
+        /// </summary>
+        public OnceReference<IList<IIdentifier>> ResolvedExceptions { get; private set; } = new OnceReference<IList<IIdentifier>>();
         #endregion
 
         #region Implementation of IScopeHolder

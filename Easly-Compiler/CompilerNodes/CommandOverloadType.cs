@@ -195,6 +195,10 @@
                 ParameterTable = new ListTableEx<IParameter>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -217,6 +221,11 @@
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 IsResolved = ParameterTable.IsSealed;
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = false;
                 IsHandled = true;
             }
 

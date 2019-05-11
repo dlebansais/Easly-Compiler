@@ -130,6 +130,10 @@ namespace CompilerNode
                 MostCommonType = new OnceReference<ICompiledType>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -156,6 +160,11 @@ namespace CompilerNode
                 IsResolved = MostCommonType.IsAssigned;
                 Debug.Assert(ResolvedFeature.IsAssigned || !IsResolved);
                 Debug.Assert(ResolvedFeatureType.IsAssigned || !IsResolved);
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = false;
                 IsHandled = true;
             }
 

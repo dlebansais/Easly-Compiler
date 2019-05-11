@@ -40,6 +40,11 @@ namespace CompilerNode
         /// The resolved associated type.
         /// </summary>
         OnceReference<ICommandOverloadType> ResolvedAssociatedType { get; }
+
+        /// <summary>
+        /// The resolved body.
+        /// </summary>
+        OnceReference<ICompiledBody> ResolvedBody { get; }
     }
 
     /// <summary>
@@ -144,6 +149,11 @@ namespace CompilerNode
                 ResolvedAssociatedType = new OnceReference<ICommandOverloadType>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                ResolvedBody = new OnceReference<ICompiledBody>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -167,6 +177,11 @@ namespace CompilerNode
             {
                 IsResolved = LocalScope.IsSealed;
                 Debug.Assert(ParameterTable.IsSealed == IsResolved);
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = ResolvedBody.IsAssigned;
                 IsHandled = true;
             }
 
@@ -217,6 +232,11 @@ namespace CompilerNode
         /// The resolved associated type.
         /// </summary>
         public OnceReference<ICommandOverloadType> ResolvedAssociatedType { get; private set; } = new OnceReference<ICommandOverloadType>();
+
+        /// <summary>
+        /// The resolved body.
+        /// </summary>
+        public OnceReference<ICompiledBody> ResolvedBody { get; private set; } = new OnceReference<ICompiledBody>();
         #endregion
 
         #region Debugging

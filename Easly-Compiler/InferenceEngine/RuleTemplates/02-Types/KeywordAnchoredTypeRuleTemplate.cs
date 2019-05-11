@@ -54,7 +54,7 @@
             {
                 IClass EmbeddingClass = node.EmbeddingClass;
                 IErrorList CheckErrorList = new ErrorList();
-                if (!KeywordExpression.IsKeywordAvailable(node, node.Anchor, CheckErrorList, out ITypeName ResultTypeName, out ICompiledType ResultType))
+                if (!KeywordExpression.IsKeywordAvailable(node.Anchor, node, CheckErrorList, out ITypeName ResultTypeName, out ICompiledType ResultType))
                 {
                     AddSourceErrorList(CheckErrorList);
                     Success = false;

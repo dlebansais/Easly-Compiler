@@ -166,6 +166,10 @@ namespace CompilerNode
                 FieldTable = new HashtableEx<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -190,6 +194,11 @@ namespace CompilerNode
                 Debug.Assert(ResolvedTypeName.IsAssigned == ResolvedType.IsAssigned);
                 IsResolved = ResolvedType.IsAssigned;
                 Debug.Assert(FieldTable.IsSealed == IsResolved);
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = false;
                 IsHandled = true;
             }
 

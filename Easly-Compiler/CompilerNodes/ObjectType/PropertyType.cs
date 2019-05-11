@@ -231,6 +231,10 @@
                 OriginatingTypedef = new OnceReference<ITypedef>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -254,6 +258,11 @@
             {
                 Debug.Assert(ResolvedTypeName.IsAssigned == ResolvedType.IsAssigned);
                 IsResolved = ResolvedType.IsAssigned;
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = false;
                 IsHandled = true;
             }
 

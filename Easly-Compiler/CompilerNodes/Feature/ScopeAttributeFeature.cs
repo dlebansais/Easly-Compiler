@@ -42,6 +42,13 @@ namespace CompilerNode
         /// <param name="source">The location where to report errors.</param>
         /// <param name="errorList">The list of errors found.</param>
         bool IsGroupAssigned(IList<IClass> assignedSingleClassList, ISource source, IErrorList errorList);
+
+        /// <summary>
+        /// Sets the associated type.
+        /// </summary>
+        /// <param name="attributeTypeName">The associated type name.</param>
+        /// <param name="attributeType">The associated type.</param>
+        void FixFeatureType(ITypeName attributeTypeName, ICompiledType attributeType);
     }
 
     /// <summary>
@@ -210,6 +217,20 @@ namespace CompilerNode
         public static IScopeAttributeFeature CreateValueFeature(IObjectType resultType, IClass embeddingClass, ISource location)
         {
             return Create(location, BaseNode.Keyword.Value.ToString(), resultType.ResolvedTypeName.Item, resultType.ResolvedType.Item);
+        }
+
+        /// <summary>
+        /// Sets the associated type.
+        /// </summary>
+        /// <param name="attributeTypeName">The associated type name.</param>
+        /// <param name="attributeType">The associated type.</param>
+        public void FixFeatureType(ITypeName attributeTypeName, ICompiledType attributeType)
+        {
+            Debug.Assert(!ResolvedFeatureTypeName.IsAssigned);
+            Debug.Assert(!ResolvedFeatureType.IsAssigned);
+
+            ResolvedFeatureTypeName.Item = attributeTypeName;
+            ResolvedFeatureType.Item = attributeType;
         }
         #endregion
 
