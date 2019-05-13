@@ -321,7 +321,7 @@ namespace CompilerNode
             bool Success = false;
 
             foreach (IParameter Item in innerQueryOverload.ResultTable)
-                if (Item.Name == BaseNode.Keyword.Result.ToString())
+                if (Item.Name == nameof(BaseNode.Keyword.Result))
                 {
                     resultTypeName = Item.ResolvedParameter.ResolvedFeatureTypeName.Item;
                     resultType = Item.ResolvedParameter.ResolvedFeatureType.Item;

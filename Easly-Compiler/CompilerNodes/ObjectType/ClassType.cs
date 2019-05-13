@@ -34,6 +34,16 @@
         /// <param name="renamedFeatureTable">The rename table for features.</param>
         /// <param name="instancingClassType">The type that is requesting cloning.</param>
         IClassType CloneWithRenames(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> renamedExportTable, IHashtableEx<IFeatureName, ITypedefType> renamedTypedefTable, IHashtableEx<IFeatureName, IDiscrete> renamedDiscreteTable, IHashtableEx<IFeatureName, IFeatureInstance> renamedFeatureTable, IClassType instancingClassType);
+
+        /// <summary>
+        /// True if an instance of the class is cloned at some point.
+        /// </summary>
+        bool IsCloned { get; }
+
+        /// <summary>
+        /// Sets the <see cref="IsCloned"/> flag.
+        /// </summary>
+        void MarkAsCloned();
     }
 
     /// <summary>
@@ -265,6 +275,16 @@
         /// The typedef this type comes from, if assigned.
         /// </summary>
         public OnceReference<ITypedef> OriginatingTypedef { get; private set; } = new OnceReference<ITypedef>();
+
+        /// <summary>
+        /// The type to use instead of this type for a source or destination type, for the purpose of path searching.
+        /// </summary>
+        public ICompiledType TypeAsDestinationOrSource { get { return this; } }
+
+        /// <summary>
+        /// True if an instance of the class is cloned at some point.
+        /// </summary>
+        public bool IsCloned { get; private set; }
         #endregion
 
         #region Client Interface
@@ -513,6 +533,14 @@
             ClonedType.FeatureTable.Seal();
 
             return ClonedType;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="IsCloned"/> flag.
+        /// </summary>
+        public void MarkAsCloned()
+        {
+            IsCloned = true;
         }
         #endregion
 

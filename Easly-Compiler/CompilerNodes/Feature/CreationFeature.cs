@@ -1,5 +1,6 @@
 namespace CompilerNode
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -196,6 +197,11 @@ namespace CompilerNode
         /// Associated type.
         /// </summary>
         public OnceReference<ICompiledType> ResolvedFeatureType { get; private set; } = new OnceReference<ICompiledType>();
+
+        /// <summary>
+        /// Guid of the language type corresponding to the entity object for an instance of this class.
+        /// </summary>
+        public Guid EntityGuid { get { return LanguageClasses.ProcedureEntity.Guid; } }
         #endregion
 
         #region Debugging

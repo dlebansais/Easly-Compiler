@@ -178,6 +178,7 @@ namespace CompilerNode
                 ResolvedResult = new OnceReference<IList<IExpressionType>>();
                 ResolvedRequireList = new OnceReference<IList<IAssertion>>();
                 ResolvedEnsureList = new OnceReference<IList<IAssertion>>();
+                ResolvedExceptionIdentifierList = new OnceReference<IList<IIdentifier>>();
                 IsHandled = true;
             }
 
@@ -206,7 +207,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                IsResolved = ResolvedResult.IsAssigned && ResolvedRequireList.IsAssigned && ResolvedEnsureList.IsAssigned;
+                IsResolved = ResolvedResult.IsAssigned && ResolvedRequireList.IsAssigned && ResolvedEnsureList.IsAssigned && ResolvedExceptionIdentifierList.IsAssigned;
                 IsHandled = true;
             }
 
@@ -235,6 +236,11 @@ namespace CompilerNode
         /// Resolved list of ensure assertions.
         /// </summary>
         public OnceReference<IList<IAssertion>> ResolvedEnsureList { get; private set; } = new OnceReference<IList<IAssertion>>();
+
+        /// <summary>
+        /// Resolved list of exceptions the body can throw.
+        /// </summary>
+        public OnceReference<IList<IIdentifier>> ResolvedExceptionIdentifierList { get; private set; } = new OnceReference<IList<IIdentifier>>();
         #endregion
 
         #region Implementation of ICompiledBody

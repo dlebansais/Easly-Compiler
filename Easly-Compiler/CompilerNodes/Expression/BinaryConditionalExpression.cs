@@ -10,6 +10,11 @@
     /// </summary>
     public interface IBinaryConditionalExpression : BaseNode.IBinaryConditionalExpression, IExpression
     {
+        /// <summary>
+        /// Sets the <see cref="IExpression.IsConstant"/> property.
+        /// </summary>
+        /// <param name="isConstant">The property value.</param>
+        void SetIsConstant(bool isConstant);
     }
 
     /// <summary>
@@ -144,6 +149,15 @@
         #endregion
 
         #region Compiler
+        /// <summary>
+        /// Sets the <see cref="IsConstant"/> property.
+        /// </summary>
+        /// <param name="isConstant">The property value.</param>
+        public void SetIsConstant(bool isConstant)
+        {
+            IsConstant = isConstant;
+        }
+
         /// <summary>
         /// Compares two expressions.
         /// </summary>

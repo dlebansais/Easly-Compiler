@@ -1334,5 +1334,162 @@
 
             return Result;
         }
+
+        /// <summary>
+        /// Gets the object a path is refering to.
+        /// </summary>
+        /// <param name="baseClass">The class where the path is used.</param>
+        /// <param name="baseType">The type at the start of the path.</param>
+        /// <param name="localScope">The local scope.</param>
+        /// <param name="validPath">The path.</param>
+        /// <param name="index">Index of the current identifier in the path.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="finalFeature">The feature at the end of the path, if any, upon return.</param>
+        /// <param name="finalDiscrete">The discrete at the end of the path, if any, upon return.</param>
+        /// <param name="finalTypeName">The type name of the result.</param>
+        /// <param name="finalType">The type of the result.</param>
+        /// <param name="inheritBySideAttribute">Inherited from an effective body.</param>
+        public static bool GetQualifiedPathFinalType(IClass baseClass, ICompiledType baseType, IHashtableEx<string, IScopeAttributeFeature> localScope, IList<IIdentifier> validPath, int index, IErrorList errorList, out ICompiledFeature finalFeature, out IDiscrete finalDiscrete, out ITypeName finalTypeName, out ICompiledType finalType, out bool inheritBySideAttribute)
+        {
+            finalFeature = null;
+            finalDiscrete = null;
+            finalTypeName = null;
+            finalType = null;
+            inheritBySideAttribute = false;
+
+            IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable = baseType.FeatureTable;
+
+            IIdentifier ValidIdentifier = validPath[index];
+            string ValidText = ValidIdentifier.ValidText.Item;
+            IFeatureName Key;
+            IFeatureInstance Instance;
+
+            if (index == 0 && localScope.ContainsKey(ValidText))
+            {
+                if (index + 1 < validPath.Count)
+                {
+                    Debug.Assert(localScope[ValidText].ResolvedFeatureType.IsAssigned);
+
+                    ITypeName ResolvedFeatureTypeName = localScope[ValidText].ResolvedFeatureTypeName.Item;
+                    ICompiledType ResolvedFeatureType = localScope[ValidText].ResolvedFeatureType.Item;
+                    ResolvedFeatureType.InstanciateType(baseClass.ResolvedClassType.Item, ref ResolvedFeatureTypeName, ref ResolvedFeatureType);
+
+                    return GetQualifiedPathFinalType(baseClass, ResolvedFeatureType, null, validPath, index + 1, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
+                }
+                else
+                {
+                    finalFeature = localScope[ValidText];
+                    finalTypeName = finalFeature.ResolvedFeatureTypeName.Item;
+                    finalType = finalFeature.ResolvedFeatureType.Item;
+                    return true;
+                }
+            }
+            else if (FeatureName.TableContain(FeatureTable, ValidText, out Key, out Instance))
+            {
+                ICompiledFeature SourceFeature = Instance.Feature.Item;
+                ITypeName ResolvedFeatureTypeName = SourceFeature.ResolvedFeatureTypeName.Item;
+                ICompiledType ResolvedFeatureType = SourceFeature.ResolvedFeatureType.Item;
+
+                ResolvedFeatureType = ResolvedFeatureType.TypeAsDestinationOrSource;
+
+                Debug.Assert(baseType is IClassType);
+                ResolvedFeatureType.InstanciateType((IClassType)baseType, ref ResolvedFeatureTypeName, ref ResolvedFeatureType);
+
+                if (index + 1 < validPath.Count)
+                    return GetQualifiedPathFinalType(baseClass, ResolvedFeatureType, null, validPath, index + 1, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
+                else
+                {
+                    finalFeature = SourceFeature;
+                    finalTypeName = ResolvedFeatureTypeName;
+                    finalType = ResolvedFeatureType;
+                    inheritBySideAttribute = Instance.InheritBySideAttribute;
+                    return true;
+                }
+            }
+            else if (index == 0 && index + 1 < validPath.Count && baseClass.ImportedClassTable.ContainsKey(ValidText) && baseClass.ImportedClassTable[ValidText].Item.Cloneable == BaseNode.CloneableStatus.Single)
+            {
+                IImportedClass Imported = baseClass.ImportedClassTable[ValidText];
+                ITypeName ResolvedFeatureTypeName = Imported.ResolvedClassTypeName.Item;
+                ICompiledType ResolvedFeatureType = Imported.ResolvedClassType.Item;
+                ResolvedFeatureType.InstanciateType(baseClass.ResolvedClassType.Item, ref ResolvedFeatureTypeName, ref ResolvedFeatureType);
+
+                return GetQualifiedPathFinalType(baseClass, ResolvedFeatureType, null, validPath, index + 1, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
+            }
+            else if (index + 1 == validPath.Count)
+            {
+                IHashtableEx<IFeatureName, IDiscrete> DiscreteTable = baseType.DiscreteTable;
+
+                if (FeatureName.TableContain(DiscreteTable, ValidText, out Key, out IDiscrete Constant))
+                {
+                    if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, ValidIdentifier, errorList, out ITypeName ResultTypeName, out ICompiledType ResultType))
+                    {
+                        errorList.AddError(new ErrorNumberTypeMissing(ValidIdentifier));
+                        return false;
+                    }
+                    else
+                    {
+                        finalDiscrete = Constant;
+                        finalTypeName = ResultTypeName;
+                        finalType = ResultType;
+                        return true;
+                    }
+                }
+                else
+                {
+                    errorList.AddError(new ErrorUnknownIdentifier(ValidIdentifier, ValidText));
+                    return false;
+                }
+            }
+
+            else
+            {
+                errorList.AddError(new ErrorUnknownIdentifier(ValidIdentifier, ValidText));
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Update all elements along a path with their type, previously validated.
+        /// </summary>
+        /// <param name="baseClass">The class where the path is used.</param>
+        /// <param name="baseType">The type at the start of the path.</param>
+        /// <param name="localScope">The local scope.</param>
+        /// <param name="validPath">The path.</param>
+        /// <param name="index">Index of the current identifier in the path.</param>
+        /// <param name="resultPath">The path receiving updated elements.</param>
+        public static void FillResultPath(IClass baseClass, ICompiledType baseType, IHashtableEx<string, IScopeAttributeFeature> localScope, IList<IIdentifier> validPath, int index, IList<IExpressionType> resultPath)
+        {
+            IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable = baseType.FeatureTable;
+            string ValidText = validPath[index].ValidText.Item;
+
+            if (index == 0 && localScope.ContainsKey(ValidText))
+            {
+                ITypeName ResolvedFeatureTypeName = localScope[ValidText].ResolvedFeatureTypeName.Item;
+                ICompiledType ResolvedFeatureType = localScope[ValidText].ResolvedFeatureType.Item;
+                ResolvedFeatureType.InstanciateType(baseClass.ResolvedClassType.Item, ref ResolvedFeatureTypeName, ref ResolvedFeatureType);
+
+                resultPath.Add(new ExpressionType(ResolvedFeatureTypeName, ResolvedFeatureType, string.Empty));
+
+                if (index + 1 < validPath.Count)
+                    FillResultPath(baseClass, ResolvedFeatureType, null, validPath, index + 1, resultPath);
+            }
+
+            else if (FeatureName.TableContain(FeatureTable, ValidText, out IFeatureName Key, out IFeatureInstance Instance))
+            {
+                ICompiledFeature SourceFeature = Instance.Feature.Item;
+                ITypeName ResolvedFeatureTypeName = SourceFeature.ResolvedFeatureTypeName.Item;
+                ICompiledType ResolvedFeatureType = SourceFeature.ResolvedFeatureType.Item;
+
+                ResolvedFeatureType = ResolvedFeatureType.TypeAsDestinationOrSource;
+
+                Debug.Assert(baseType is IClassType);
+                ResolvedFeatureType.InstanciateType((IClassType)baseType, ref ResolvedFeatureTypeName, ref ResolvedFeatureType);
+
+                resultPath.Add(new ExpressionType(ResolvedFeatureTypeName, ResolvedFeatureType, string.Empty));
+
+                if (index + 1 < validPath.Count)
+                    FillResultPath(baseClass, ResolvedFeatureType, null, validPath, index + 1, resultPath);
+            }
+        }
     }
 }

@@ -105,7 +105,7 @@
                 Debug.Assert(Item.ResolvedParameter.ResolvedFeatureTypeName.IsAssigned);
                 Debug.Assert(Item.ResolvedParameter.ResolvedFeatureType.IsAssigned);
 
-                if (BestResultType == null || Item.Name == BaseNode.Keyword.Result.ToString())
+                if (BestResultType == null || Item.Name == nameof(BaseNode.Keyword.Result))
                 {
                     BestResultTypeName = Item.ResolvedParameter.ResolvedFeatureTypeName.Item;
                     BestResultType = Item.ResolvedParameter.ResolvedFeatureType.Item;

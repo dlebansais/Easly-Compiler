@@ -198,6 +198,111 @@ namespace CompilerNode
         /// Types of results of the scope.
         /// </summary>
         public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+
+        /// <summary>
+        /// Gets the scope associated to a node.
+        /// </summary>
+        /// <param name="source">The node with a scope</param>
+        public static IHashtableEx<string, IScopeAttributeFeature> CurrentScope(ISource source)
+        {
+            ISource ChildSource = source;
+            ISource ParentSource = source.ParentSource;
+
+            IHashtableEx<string, IScopeAttributeFeature> Result = null;
+            bool IsHandled;
+
+            do
+            {
+                IsHandled = false;
+
+                switch (ParentSource)
+                {
+                    case IScope AsScope:
+                        Result = AsScope.FullScope;
+                        IsHandled = true;
+                        break;
+
+                    case IClass AsClass:
+                        Result = AsClass.FullScope;
+                        IsHandled = true;
+                        break;
+
+                    case IContinuation AsContinuation:
+                        Result = AsContinuation.FullScope;
+                        IsHandled = true;
+                        break;
+
+                    case IConditional AsConditional:
+                        Result = AsConditional.FullScope;
+                        IsHandled = true;
+                        break;
+
+                    case IAttachment AsAttachment:
+                        Result = AsAttachment.FullScope;
+                        IsHandled = true;
+                        break;
+
+                    case IInstruction AsInstruction:
+                        Result = AsInstruction.FullScope;
+                        IsHandled = true;
+                        break;
+
+                    case IEffectiveBody AsEffectiveBody:
+                        Result = AsEffectiveBody.FullScope;
+                        IsHandled = true;
+                        break;
+
+                    case ICommandOverload AsCommandOverload:
+                        Result = AsCommandOverload.FullScope;
+                        IsHandled = true;
+                        break;
+
+                    case IQueryOverload AsQueryOverload:
+                        Result = AsQueryOverload.FullScope;
+                        IsHandled = true;
+                        break;
+
+                    case IPropertyFeature AsPropertyFeature:
+                        if (AsPropertyFeature.GetterBody.IsAssigned && AsPropertyFeature.GetterBody.Item == ChildSource)
+                        {
+                            Result = AsPropertyFeature.FullGetScope;
+                            IsHandled = true;
+                        }
+                        else if (AsPropertyFeature.SetterBody.IsAssigned && AsPropertyFeature.SetterBody.Item == ChildSource)
+                        {
+                            Result = AsPropertyFeature.FullSetScope;
+                            IsHandled = true;
+                        }
+                        break;
+
+                    case IIndexerFeature AsIndexerFeature:
+                        if (AsIndexerFeature.GetterBody.IsAssigned && AsIndexerFeature.GetterBody.Item == ChildSource)
+                        {
+                            Result = AsIndexerFeature.FullGetScope;
+                            IsHandled = true;
+                        }
+                        else if (AsIndexerFeature.SetterBody.IsAssigned && AsIndexerFeature.SetterBody.Item == ChildSource)
+                        {
+                            Result = AsIndexerFeature.FullSetScope;
+                            IsHandled = true;
+                        }
+                        break;
+
+                    default:
+                        ChildSource = ParentSource;
+                        ParentSource = ChildSource.ParentSource;
+                        IsHandled = ParentSource != null;
+                        break;
+                }
+
+                Debug.Assert(IsHandled);
+            }
+            while (Result == null);
+
+            Debug.Assert(Result != null);
+
+            return Result;
+        }
         #endregion
     }
 }

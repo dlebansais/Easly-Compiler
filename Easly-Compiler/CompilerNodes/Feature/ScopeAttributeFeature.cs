@@ -1,5 +1,6 @@
 namespace CompilerNode
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using Easly;
@@ -8,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IScopeAttributeFeature.
     /// </summary>
-    public interface IScopeAttributeFeature : IFeatureWithName
+    public interface IScopeAttributeFeature : IFeatureWithName, ICompiledFeature
     {
         /// <summary>
         /// The source used to create this attribute.
@@ -24,16 +25,6 @@ namespace CompilerNode
         /// The default value, if any.
         /// </summary>
         IOptionalReference<IExpression> DefaultValue { get; }
-
-        /// <summary>
-        /// Name of the associated type.
-        /// </summary>
-        OnceReference<ITypeName> ResolvedFeatureTypeName { get; }
-
-        /// <summary>
-        /// Associated type.
-        /// </summary>
-        OnceReference<ICompiledType> ResolvedFeatureType { get; }
 
         /// <summary>
         /// Checks if this attribute conflicts with another from the same class group.
@@ -205,7 +196,7 @@ namespace CompilerNode
         /// <param name="location">The location to use when reporting errors.</param>
         public static IScopeAttributeFeature CreateResultFeature(IObjectType resultType, IClass embeddingClass, ISource location)
         {
-            return Create(location, BaseNode.Keyword.Result.ToString(), resultType.ResolvedTypeName.Item, resultType.ResolvedType.Item);
+            return Create(location, nameof(BaseNode.Keyword.Result), resultType.ResolvedTypeName.Item, resultType.ResolvedType.Item);
         }
 
         /// <summary>
@@ -216,7 +207,7 @@ namespace CompilerNode
         /// <param name="location">The location to use when reporting errors.</param>
         public static IScopeAttributeFeature CreateValueFeature(IObjectType resultType, IClass embeddingClass, ISource location)
         {
-            return Create(location, BaseNode.Keyword.Value.ToString(), resultType.ResolvedTypeName.Item, resultType.ResolvedType.Item);
+            return Create(location, nameof(BaseNode.Keyword.Value), resultType.ResolvedTypeName.Item, resultType.ResolvedType.Item);
         }
 
         /// <summary>
@@ -234,6 +225,38 @@ namespace CompilerNode
         }
         #endregion
 
+        #region Implementation of ICompiledFeature
+        /// <summary>
+        /// Indicates if the feature is deferred in another class.
+        /// </summary>
+        public bool IsDeferredFeature { get { return false; } }
+
+        /// <summary>
+        /// True if the feature contains extern bodies in its overloads.
+        /// </summary>
+        public bool HasExternBody { get { return false; } }
+
+        /// <summary>
+        /// True if the feature contains precursor bodies in its overloads.
+        /// </summary>
+        public bool HasPrecursorBody { get { return false; } }
+
+        /// <summary>
+        /// Name of the associated type.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedFeatureTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// Associated type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedFeatureType { get; private set; } = new OnceReference<ICompiledType>();
+
+        /// <summary>
+        /// Guid of the language type corresponding to the entity object for an instance of this class.
+        /// </summary>
+        public Guid EntityGuid { get { return LanguageClasses.LocalEntity.Guid; } }
+        #endregion
+
         #region Properties
         /// <summary>
         /// The source used to create this name.
@@ -249,16 +272,6 @@ namespace CompilerNode
         /// The default value, if any.
         /// </summary>
         public IOptionalReference<IExpression> DefaultValue { get; }
-
-        /// <summary>
-        /// Name of the associated type.
-        /// </summary>
-        public OnceReference<ITypeName> ResolvedFeatureTypeName { get; private set; } = new OnceReference<ITypeName>();
-
-        /// <summary>
-        /// Associated type.
-        /// </summary>
-        public OnceReference<ICompiledType> ResolvedFeatureType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
 
         #region Implementation of IFeatureWithName

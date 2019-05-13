@@ -248,5 +248,191 @@ namespace CompilerNode
 
             return true;
         }
+
+        /// <summary>
+        /// Checks if actual arguments of a call conform to expected parameters.
+        /// </summary>
+        /// <param name="parameterTableList">The list of expected parameters.</param>
+        /// <param name="arguments">The list of arguments.</param>
+        /// <param name="argumentStyle">The argument-passing style.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="source">The source to use for errors.</param>
+        /// <param name="selectedIndex">The selected index in the list of overloads upon return.</param>
+        public static bool ArgumentsConformToParameters(IList<ListTableEx<IParameter>> parameterTableList, IList<IExpressionType> arguments, TypeArgumentStyles argumentStyle, IErrorList errorList, ISource source, out int selectedIndex)
+        {
+            selectedIndex = -1;
+            bool Result = false;
+            bool IsHandled = false;
+
+            switch (argumentStyle)
+            {
+                case TypeArgumentStyles.None:
+                    Result = NoneArgumentsConformToParameters(parameterTableList, arguments, errorList, source, out selectedIndex);
+                    IsHandled = true;
+                    break;
+
+                case TypeArgumentStyles.Positional:
+                    Result = PositionalArgumentsConformToParameters(parameterTableList, arguments, errorList, source, out selectedIndex);
+                    IsHandled = true;
+                    break;
+
+                case TypeArgumentStyles.Assignment:
+                    Result = AssignmentArgumentsConformToParameters(parameterTableList, arguments, errorList, source, out selectedIndex);
+                    IsHandled = true;
+                    break;
+            }
+
+            Debug.Assert(IsHandled);
+            Debug.Assert(selectedIndex >= 0 || !Result);
+
+            return Result;
+        }
+
+        private static bool NoneArgumentsConformToParameters(IList<ListTableEx<IParameter>> parameterTableList, IList<IExpressionType> arguments, IErrorList errorList, ISource source, out int selectedIndex)
+        {
+            Debug.Assert(arguments.Count <= 1);
+
+            return PositionalArgumentsConformToParameters(parameterTableList, arguments, errorList, source, out selectedIndex);
+        }
+
+        private static bool PositionalArgumentsConformToParameters(IList<ListTableEx<IParameter>> parameterTableList, IList<IExpressionType> arguments, IErrorList errorList, ISource source, out int selectedIndex)
+        {
+            OnceReference<ListTableEx<IParameter>> SelectedOverload = new OnceReference<ListTableEx<IParameter>>();
+            selectedIndex = -1;
+
+            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
+            for (int i = 0; i < parameterTableList.Count; i++)
+            {
+                ListTableEx<IParameter> OverloadParameterList = parameterTableList[i];
+
+                int j;
+                bool IsMatching = true;
+                for (j = 0; j < arguments.Count && j < OverloadParameterList.Count && IsMatching; j++)
+                {
+                    ICompiledType ArgumentType = arguments[j].ValueType;
+                    IParameter OverloadParameter = OverloadParameterList[j];
+                    Debug.Assert(OverloadParameter.ResolvedParameter.ResolvedFeatureType.IsAssigned);
+
+                    ICompiledType ParameterType = null;
+                    switch (OverloadParameter.ResolvedParameter.ResolvedFeatureType.Item)
+                    {
+                        case IFunctionType AsFunctionType:
+                            ParameterType = AsFunctionType;
+                            break;
+
+                        case IProcedureType AsProcedureType:
+                            ParameterType = AsProcedureType;
+                            break;
+
+                        case IClassType AsClassType:
+                            ParameterType = AsClassType;
+                            break;
+
+                        case IFormalGenericType AsFormalGenericType:
+                            ParameterType = AsFormalGenericType;
+                            break;
+                    }
+
+                    Debug.Assert(ParameterType != null);
+
+                    IErrorList CheckErrorList = new ErrorList();
+                    IsMatching &= ObjectType.TypeConformToBase(ArgumentType, ParameterType, SubstitutionTypeTable, CheckErrorList, source);
+                }
+
+                if (IsMatching)
+                {
+                    for (; j < OverloadParameterList.Count && IsMatching; j++)
+                    {
+                        IParameter OverloadParameter = OverloadParameterList[j];
+                        IsMatching &= OverloadParameter.ResolvedParameter.DefaultValue.IsAssigned;
+                    }
+                }
+
+                if (IsMatching)
+                    if (SelectedOverload.IsAssigned)
+                    {
+                        errorList.AddError(new ErrorInvalidExpression(source));
+                        return false;
+                    }
+                    else
+                    {
+                        SelectedOverload.Item = OverloadParameterList;
+                        selectedIndex = i;
+                    }
+            }
+
+            if (!SelectedOverload.IsAssigned)
+            {
+                errorList.AddError(new ErrorInvalidExpression(source));
+                return false;
+            }
+
+            if (SelectedOverload.Item.Count < arguments.Count)
+            {
+                errorList.AddError(new ErrorTooManyArguments(source, arguments.Count, SelectedOverload.Item.Count));
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool AssignmentArgumentsConformToParameters(IList<ListTableEx<IParameter>> parameterTableList, IList<IExpressionType> arguments, IErrorList errorList, ISource source, out int selectedIndex)
+        {
+            OnceReference<ListTableEx<IParameter>> SelectedOverload = new OnceReference<ListTableEx<IParameter>>();
+            selectedIndex = -1;
+
+            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
+            for (int i = 0; i < parameterTableList.Count; i++)
+            {
+                ListTableEx<IParameter> OverloadParameterList = parameterTableList[i];
+
+                bool IsMatching = true;
+                for (int j = 0; j < arguments.Count && IsMatching; j++)
+                {
+                    ICompiledType ArgumentType = arguments[j].ValueType;
+                    string ArgumentName = arguments[j].Name;
+
+                    OnceReference<IParameter> MatchingParameter = new OnceReference<IParameter>();
+                    foreach (IParameter p in OverloadParameterList)
+                        if (p.Name == ArgumentName)
+                        {
+                            MatchingParameter.Item = p;
+                            break;
+                        }
+
+                    if (!MatchingParameter.IsAssigned)
+                    {
+                        errorList.AddError(new ErrorArgumentNameMismatch(source, ArgumentName));
+                        return false;
+                    }
+
+                    IParameter OverloadParameter = MatchingParameter.Item;
+                    ICompiledType ParameterType = OverloadParameter.ResolvedParameter.ResolvedFeatureType.Item;
+
+                    IErrorList CheckErrorList = new ErrorList();
+                    IsMatching &= ObjectType.TypeConformToBase(ArgumentType, ParameterType, SubstitutionTypeTable, CheckErrorList, source);
+                }
+
+                if (IsMatching)
+                    if (SelectedOverload.IsAssigned)
+                    {
+                        errorList.AddError(new ErrorInvalidExpression(source));
+                        return false;
+                    }
+                    else
+                    {
+                        SelectedOverload.Item = OverloadParameterList;
+                        selectedIndex = i;
+                    }
+            }
+
+            if (!SelectedOverload.IsAssigned)
+            {
+                errorList.AddError(new ErrorInvalidExpression(source));
+                return false;
+            }
+            else
+                return true;
+        }
     }
 }

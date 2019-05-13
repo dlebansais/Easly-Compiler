@@ -11,6 +11,10 @@ namespace CompilerNode
     /// </summary>
     public interface ICommandInstruction : BaseNode.ICommandInstruction, IInstruction, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.CommandInstruction.ArgumentBlocks"/>.
+        /// </summary>
+        IList<IArgument> ArgumentList { get; }
     }
 
     /// <summary>

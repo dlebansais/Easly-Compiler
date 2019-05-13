@@ -17,6 +17,11 @@
         OnceReference<IList<IIdentifier>> ValidPath { get; }
 
         /// <summary>
+        /// Result types of the feature at the end of the path.
+        /// </summary>
+        OnceReference<IList<IExpressionType>> ValidResultTypePath { get; }
+
+        /// <summary>
         /// Raw path as string.
         /// </summary>
         string PathToString { get; }
@@ -92,6 +97,7 @@
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
+                ValidResultTypePath = new OnceReference<IList<IExpressionType>>();
                 IsHandled = true;
             }
 
@@ -120,7 +126,7 @@
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                IsResolved = false;
+                IsResolved = ValidResultTypePath.IsAssigned;
                 IsHandled = true;
             }
 
@@ -134,6 +140,11 @@
         /// The valid value of <see cref="BaseNode.IQualifiedName.Path"/>.
         /// </summary>
         public OnceReference<IList<IIdentifier>> ValidPath { get; private set; } = new OnceReference<IList<IIdentifier>>();
+
+        /// <summary>
+        /// Result types of the feature at the end of the path.
+        /// </summary>
+        public OnceReference<IList<IExpressionType>> ValidResultTypePath { get; private set; } = new OnceReference<IList<IExpressionType>>();
 
         /// <summary>
         /// Compares two qualified names.

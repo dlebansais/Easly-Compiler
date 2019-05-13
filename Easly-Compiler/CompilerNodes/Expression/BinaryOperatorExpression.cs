@@ -10,6 +10,21 @@ namespace CompilerNode
     /// </summary>
     public interface IBinaryOperatorExpression : BaseNode.IBinaryOperatorExpression, IExpression
     {
+        /// <summary>
+        /// The resolved operator feature.
+        /// </summary>
+        OnceReference<IFunctionFeature> SelectedFeature { get; }
+
+        /// <summary>
+        /// The resolved operator feature overload.
+        /// </summary>
+        OnceReference<IQueryOverload> SelectedOverload { get; }
+
+        /// <summary>
+        /// Sets the <see cref="IExpression.IsConstant"/> property.
+        /// </summary>
+        /// <param name="isConstant">The property value.</param>
+        void SetIsConstant(bool isConstant);
     }
 
     /// <summary>
@@ -84,6 +99,8 @@ namespace CompilerNode
                 ResolvedResult = new OnceReference<IList<IExpressionType>>();
                 NumberConstant = new OnceReference<ILanguageConstant>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
+                SelectedFeature = new OnceReference<IFunctionFeature>();
+                SelectedOverload = new OnceReference<IQueryOverload>();
                 IsHandled = true;
             }
 
@@ -113,6 +130,9 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsResolved = ResolvedResult.IsAssigned && NumberConstant.IsAssigned && ResolvedExceptions.IsAssigned;
+                Debug.Assert(SelectedFeature.IsAssigned == ResolvedResult.IsAssigned);
+                Debug.Assert(SelectedOverload.IsAssigned == ResolvedResult.IsAssigned);
+
                 IsHandled = true;
             }
 
@@ -141,9 +161,28 @@ namespace CompilerNode
         /// List of exceptions the expression can throw.
         /// </summary>
         public OnceReference<IList<IIdentifier>> ResolvedExceptions { get; private set; } = new OnceReference<IList<IIdentifier>>();
+
+        /// <summary>
+        /// Sets the <see cref="IsConstant"/> property.
+        /// </summary>
+        /// <param name="isConstant">The property value.</param>
+        public void SetIsConstant(bool isConstant)
+        {
+            IsConstant = isConstant;
+        }
         #endregion
 
         #region Compiler
+        /// <summary>
+        /// The resolved operator feature.
+        /// </summary>
+        public OnceReference<IFunctionFeature> SelectedFeature { get; private set; } = new OnceReference<IFunctionFeature>();
+
+        /// <summary>
+        /// The resolved operator feature overload.
+        /// </summary>
+        public OnceReference<IQueryOverload> SelectedOverload { get; private set; } = new OnceReference<IQueryOverload>();
+
         /// <summary>
         /// Compares two expressions.
         /// </summary>

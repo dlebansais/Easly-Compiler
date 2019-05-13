@@ -220,5 +220,59 @@ namespace CompilerNode
 
             return Found;
         }
+
+        /// <summary>
+        /// Gets the class type of an expression, if any.
+        /// </summary>
+        /// <param name="booleanOrEventExpression">A boolean or event expression.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="expressionClassType">The class type upon return, if successful.</param>
+        public static bool GetClassTypeOfExpression(IExpression booleanOrEventExpression, IErrorList errorList, out IClassType expressionClassType)
+        {
+            expressionClassType = null;
+            bool Result = false;
+
+            IClass EmbeddingClass = booleanOrEventExpression.EmbeddingClass;
+            IList<IExpressionType> ExpressionResult = booleanOrEventExpression.ResolvedResult.Item;
+
+            ICompiledType BooleanOrEventExpressionType = null;
+
+            if (ExpressionResult.Count == 1)
+                BooleanOrEventExpressionType = ExpressionResult[0].ValueType;
+            else
+                foreach (IExpressionType Item in ExpressionResult)
+                    if (Item.Name == nameof(BaseNode.Keyword.Result))
+                    {
+                        BooleanOrEventExpressionType = Item.ValueType;
+                        break;
+                    }
+
+            if (BooleanOrEventExpressionType is IClassType AsClassType)
+            {
+                bool IsBooleanAvailable = IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, booleanOrEventExpression, errorList, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
+                bool IsEventAvailable = IsLanguageTypeAvailable(LanguageClasses.Event.Guid, booleanOrEventExpression, errorList, out ITypeName EventTypeName, out ICompiledType EventType);
+
+                if (!IsBooleanAvailable && !IsEventAvailable)
+                {
+                    if (AsClassType.BaseClass.EntityName.Text != LanguageClasses.Event.Name)
+                        errorList.AddError(new ErrorBooleanTypeMissing(booleanOrEventExpression));
+                    if (AsClassType.BaseClass.EntityName.Text != LanguageClasses.Boolean.Name)
+                        errorList.AddError(new ErrorEventTypeMissing(booleanOrEventExpression));
+
+                    Debug.Assert(!errorList.IsEmpty);
+                }
+                else if ((!IsBooleanAvailable || AsClassType != BooleanType) && (!IsEventAvailable || AsClassType != EventType))
+                    errorList.AddError(new ErrorInvalidExpression(booleanOrEventExpression));
+                else
+                {
+                    expressionClassType = AsClassType;
+                    Result = true;
+                }
+            }
+            else
+                errorList.AddError(new ErrorInvalidExpression(booleanOrEventExpression));
+
+            return Result;
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System;
     using Easly;
 
     /// <summary>
@@ -31,5 +32,10 @@
         /// Associated type.
         /// </summary>
         OnceReference<ICompiledType> ResolvedFeatureType { get; }
+
+        /// <summary>
+        /// Guid of the language type corresponding to the entity object for an instance of this class.
+        /// </summary>
+        Guid EntityGuid { get; }
     }
 }

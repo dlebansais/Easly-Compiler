@@ -10,6 +10,15 @@ namespace CompilerNode
     /// </summary>
     public interface IConditional : BaseNode.IConditional, INode, ISource, IScopeHolder
     {
+        /// <summary>
+        /// Types of results of the conditional.
+        /// </summary>
+        OnceReference<IList<IExpressionType>> ResolvedResult { get; }
+
+        /// <summary>
+        /// List of exceptions the conditional can throw.
+        /// </summary>
+        OnceReference<IList<IIdentifier>> ResolvedExceptions { get; }
     }
 
     /// <summary>
@@ -84,6 +93,8 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
+                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 IsHandled = true;
             }
 
@@ -112,13 +123,25 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                IsResolved = false;
+                IsResolved = ResolvedResult.IsAssigned && ResolvedExceptions.IsAssigned;
                 IsHandled = true;
             }
 
             Debug.Assert(IsHandled);
             return IsResolved;
         }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Types of results of the conditional.
+        /// </summary>
+        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+
+        /// <summary>
+        /// List of exceptions the conditional can throw.
+        /// </summary>
+        public OnceReference<IList<IIdentifier>> ResolvedExceptions { get; private set; } = new OnceReference<IList<IIdentifier>>();
         #endregion
 
         #region Implementation of IScopeHolder

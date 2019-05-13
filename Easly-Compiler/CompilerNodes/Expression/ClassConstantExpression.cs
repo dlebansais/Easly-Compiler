@@ -10,6 +10,21 @@ namespace CompilerNode
     /// </summary>
     public interface IClassConstantExpression : BaseNode.IClassConstantExpression, IExpression
     {
+        /// <summary>
+        /// The class type name.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedClassTypeName { get; }
+
+        /// <summary>
+        /// The class type.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedClassType { get; }
+
+        /// <summary>
+        /// Sets the <see cref="IExpression.NumberConstant"/> property.
+        /// </summary>
+        /// <param name="numberConstant">The constant type.</param>
+        void SetIsConstant(ILanguageConstant numberConstant);
     }
 
     /// <summary>
@@ -84,6 +99,8 @@ namespace CompilerNode
                 ResolvedResult = new OnceReference<IList<IExpressionType>>();
                 NumberConstant = new OnceReference<ILanguageConstant>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
+                ResolvedClassTypeName = new OnceReference<ITypeName>();
+                ResolvedClassType = new OnceReference<ICompiledType>();
                 IsHandled = true;
             }
 
@@ -113,6 +130,10 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsResolved = ResolvedResult.IsAssigned && NumberConstant.IsAssigned && ResolvedExceptions.IsAssigned;
+
+                Debug.Assert(ResolvedClassTypeName.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedClassType.IsAssigned || !IsResolved);
+
                 IsHandled = true;
             }
 
@@ -141,9 +162,30 @@ namespace CompilerNode
         /// List of exceptions the expression can throw.
         /// </summary>
         public OnceReference<IList<IIdentifier>> ResolvedExceptions { get; private set; } = new OnceReference<IList<IIdentifier>>();
+
+        /// <summary>
+        /// Sets the <see cref="IExpression.IsConstant"/> property.
+        /// </summary>
+        /// <param name="numberConstant">The constant type.</param>
+        public void SetIsConstant(ILanguageConstant numberConstant)
+        {
+            Debug.Assert(!NumberConstant.IsAssigned);
+
+            NumberConstant.Item = numberConstant;
+        }
         #endregion
 
         #region Compiler
+        /// <summary>
+        /// The class type name.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedClassTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The class type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedClassType { get; private set; } = new OnceReference<ICompiledType>();
+
         /// <summary>
         /// Compares two expressions.
         /// </summary>
