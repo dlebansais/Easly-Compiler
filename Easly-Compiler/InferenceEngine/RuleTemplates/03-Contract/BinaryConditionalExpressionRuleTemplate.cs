@@ -78,7 +78,7 @@
             if (!IsLeftClassType || !IsRightClassType)
                 return false;
 
-            if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, errorList, out ITypeName ResultTypeName, out ICompiledType ResultType))
+            if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName ResultTypeName, out ICompiledType ResultType))
             {
                 errorList.AddError(new ErrorBooleanTypeMissing(node));
                 return false;

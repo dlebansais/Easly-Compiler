@@ -55,7 +55,7 @@
                 AddSourceError(new ErrorInvalidExpression(BooleanExpression));
                 Success = false;
             }
-            else if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, ErrorList, out ITypeName ResultTypeName, out ICompiledType ResultType))
+            else if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName ResultTypeName, out ICompiledType ResultType))
             {
                 AddSourceError(new ErrorBooleanTypeMissing(node));
                 Success = false;

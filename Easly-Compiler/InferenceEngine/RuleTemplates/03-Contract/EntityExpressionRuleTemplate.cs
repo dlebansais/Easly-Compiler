@@ -77,7 +77,7 @@
             IClass EmbeddingClass = (Class)node.EmbeddingClass;
             IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;
 
-            if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Entity.Guid, node, errorList, out ITypeName ResultTypeName, out ICompiledType ResultType))
+            if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Entity.Guid, node, out ITypeName ResultTypeName, out ICompiledType ResultType))
             {
                 errorList.AddError(new ErrorEntityTypeMissing(node));
                 return false;

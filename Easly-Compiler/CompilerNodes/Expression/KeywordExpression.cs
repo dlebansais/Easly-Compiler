@@ -230,7 +230,11 @@ namespace CompilerNode
                 case BaseNode.Keyword.True:
                 case BaseNode.Keyword.False:
                 case BaseNode.Keyword.Retry:
-                    Result = Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, source, errorList, out resultTypeName, out resultType);
+                    if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, source, out resultTypeName, out resultType))
+                        errorList.AddError(new ErrorBooleanTypeMissing(source));
+                    else
+                        Result = true;
+
                     IsHandled = true;
                     break;
 
@@ -252,7 +256,11 @@ namespace CompilerNode
                     break;
 
                 case BaseNode.Keyword.Exception:
-                    Result = Expression.IsLanguageTypeAvailable(LanguageClasses.Exception.Guid, source, errorList, out resultTypeName, out resultType);
+                    if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Exception.Guid, source, out resultTypeName, out resultType))
+                        errorList.AddError(new ErrorExceptionTypeMissing(source));
+                    else
+                        Result = true;
+
                     IsHandled = true;
                     break;
             }

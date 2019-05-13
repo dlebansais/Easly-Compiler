@@ -178,11 +178,10 @@ namespace CompilerNode
         /// Checks if a built-in language type is imported, and return the corresponding name and type.
         /// </summary>
         /// <param name="guid">The language type guid.</param>
-        /// <param name="source">The source to use when reporting errors.</param>
-        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="source">The location where the language type is needed.</param>
         /// <param name="resultTypeName">The type name upon return.</param>
         /// <param name="resultType">The type upon return.</param>
-        public static bool IsLanguageTypeAvailable(Guid guid, ISource source, IErrorList errorList, out ITypeName resultTypeName, out ICompiledType resultType)
+        public static bool IsLanguageTypeAvailable(Guid guid, ISource source, out ITypeName resultTypeName, out ICompiledType resultType)
         {
             resultTypeName = null;
             resultType = null;
@@ -190,7 +189,6 @@ namespace CompilerNode
             IClass EmbeddingClass = source.EmbeddingClass;
             bool Found = false;
             foreach (KeyValuePair<Guid, Tuple<ITypeName, IClassType>> Entry in EmbeddingClass.ImportedLanguageTypeTable)
-            {
                 if (Entry.Key == guid)
                 {
                     resultTypeName = Entry.Value.Item1;
@@ -198,25 +196,6 @@ namespace CompilerNode
                     Found = true;
                     break;
                 }
-            }
-
-            if (!Found)
-            {
-                bool IsHandled = false;
-
-                if (guid == LanguageClasses.Boolean.Guid)
-                {
-                    errorList.AddError(new ErrorBooleanTypeMissing(source));
-                    IsHandled = true;
-                }
-                else if (guid == LanguageClasses.Exception.Guid)
-                {
-                    errorList.AddError(new ErrorExceptionTypeMissing(source));
-                    IsHandled = true;
-                }
-
-                Debug.Assert(IsHandled);
-            }
 
             return Found;
         }
@@ -249,8 +228,8 @@ namespace CompilerNode
 
             if (BooleanOrEventExpressionType is IClassType AsClassType)
             {
-                bool IsBooleanAvailable = IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, booleanOrEventExpression, errorList, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
-                bool IsEventAvailable = IsLanguageTypeAvailable(LanguageClasses.Event.Guid, booleanOrEventExpression, errorList, out ITypeName EventTypeName, out ICompiledType EventType);
+                bool IsBooleanAvailable = IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, booleanOrEventExpression, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
+                bool IsEventAvailable = IsLanguageTypeAvailable(LanguageClasses.Event.Guid, booleanOrEventExpression, out ITypeName EventTypeName, out ICompiledType EventType);
 
                 if (!IsBooleanAvailable && !IsEventAvailable)
                 {
@@ -273,6 +252,28 @@ namespace CompilerNode
                 errorList.AddError(new ErrorInvalidExpression(booleanOrEventExpression));
 
             return Result;
+        }
+
+        /// <summary>
+        /// Merge two lists of exceptions source code can throw.
+        /// </summary>
+        /// <param name="mergedExceptions">The list with the merged content upon return.</param>
+        /// <param name="additionalExceptions">The list of exception identifiers to merge with <paramref name="mergedExceptions"/>.</param>
+        public static void MergeExceptions(IList<IIdentifier> mergedExceptions, IList<IIdentifier> additionalExceptions)
+        {
+            foreach (IIdentifier Item in additionalExceptions)
+            {
+                bool Found = false;
+                foreach (IIdentifier OtherItem in mergedExceptions)
+                    if (OtherItem.ValidText.Item == Item.ValidText.Item)
+                    {
+                        Found = true;
+                        break;
+                    }
+
+                if (!Found)
+                    mergedExceptions.Add(Item);
+            }
         }
     }
 }

@@ -97,7 +97,7 @@
             if (FeatureName.TableContain(DiscreteTable, ValidConstantText, out IFeatureName Key, out IDiscrete Discrete))
             {
                 if (Discrete.NumericValue.IsAssigned)
-                    if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, errorList, out ITypeName ResultTypeName, out ICompiledType ResultType))
+                    if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName ResultTypeName, out ICompiledType ResultType))
                     {
                         errorList.AddError(new ErrorNumberTypeMissing(node));
                         return false;

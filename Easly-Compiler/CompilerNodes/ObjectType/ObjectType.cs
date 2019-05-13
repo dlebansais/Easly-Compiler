@@ -1421,7 +1421,7 @@
 
                 if (FeatureName.TableContain(DiscreteTable, ValidText, out Key, out IDiscrete Constant))
                 {
-                    if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, ValidIdentifier, errorList, out ITypeName ResultTypeName, out ICompiledType ResultType))
+                    if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, ValidIdentifier, out ITypeName ResultTypeName, out ICompiledType ResultType))
                     {
                         errorList.AddError(new ErrorNumberTypeMissing(ValidIdentifier));
                         return false;

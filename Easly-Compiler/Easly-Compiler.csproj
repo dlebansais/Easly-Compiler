@@ -268,6 +268,7 @@
     <Compile Include="Errors\Inference\02-Types\ErrorDiscreteNameConflict.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorNotAnchor.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorReservedName.cs" />
+    <Compile Include="Errors\Inference\03-Contract\ErrorExpressionResultMismatch.cs" />
     <Compile Include="Errors\Inference\03-Contract\ErrorArgumentMixed.cs" />
     <Compile Include="Errors\Inference\03-Contract\ErrorConstantRequired.cs" />
     <Compile Include="Errors\Inference\03-Contract\ErrorEntityTypeMissing.cs" />
@@ -410,6 +411,7 @@
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\Miscellaneous\SingleClassGroup.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\Miscellaneous\TypeArgumentStyles.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\Miscellaneous\TypeInstancingRecord.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\EqualityExpressionRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\EntityExpressionRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\EffectiveBodyRuleContractTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\DebugInstructionContractRuleTemplate.cs" />
