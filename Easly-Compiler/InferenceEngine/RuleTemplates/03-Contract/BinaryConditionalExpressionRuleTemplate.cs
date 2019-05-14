@@ -47,9 +47,9 @@
             data = null;
             bool Success = true;
 
-            Success &= BinaryConditionalExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out bool IsResultConstant, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions);
+            Success &= BinaryConditionalExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out IBooleanLanguageConstant ExpressionConstant);
             if (Success)
-                data = new Tuple<bool, IList<IExpressionType>, IList<IIdentifier>>(IsResultConstant, ResolvedResult, ResolvedExceptions);
+                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, IBooleanLanguageConstant>(ResolvedResult, ResolvedExceptions, ExpressionConstant);
 
             return Success;
         }
@@ -59,14 +59,14 @@
         /// </summary>
         /// <param name="node">The agent expression to check.</param>
         /// <param name="errorList">The list of errors found.</param>
-        /// <param name="isResultConstant">True upon return if the result is a constant.</param>
         /// <param name="resolvedResult">The expression result types upon return.</param>
         /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
-        public static bool ResolveCompilerReferences(IBinaryConditionalExpression node, IErrorList errorList, out bool isResultConstant, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions)
+        /// <param name="expressionConstant">The constant value upon return, if any.</param>
+        public static bool ResolveCompilerReferences(IBinaryConditionalExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out IBooleanLanguageConstant expressionConstant)
         {
-            isResultConstant = false;
             resolvedResult = null;
             resolvedExceptions = null;
+            expressionConstant = null;
 
             IExpression LeftExpression = (IExpression)node.LeftExpression;
             BaseNode.ConditionalTypes Conditional = node.Conditional;
@@ -84,7 +84,32 @@
                 return false;
             }
 
-            isResultConstant = LeftExpression.IsConstant && RightExpression.IsConstant;
+            if (LeftExpression.ExpressionConstant.IsAssigned && RightExpression.ExpressionConstant.IsAssigned)
+            {
+                IBooleanLanguageConstant LeftConstant = LeftExpression.ExpressionConstant.Item as IBooleanLanguageConstant;
+                Debug.Assert(LeftConstant != null);
+                IBooleanLanguageConstant RightConstant = RightExpression.ExpressionConstant.Item as IBooleanLanguageConstant;
+                Debug.Assert(RightConstant != null);
+
+                bool? LeftConstantValue = LeftConstant.Value;
+                bool? RightConstantValue = RightConstant.Value;
+
+                if (LeftConstantValue.HasValue && RightConstantValue.HasValue)
+                {
+                    switch (node.Conditional)
+                    {
+                        case BaseNode.ConditionalTypes.And:
+                            expressionConstant = new BooleanLanguageConstant(LeftConstantValue.Value && RightConstantValue.Value);
+                            break;
+
+                        case BaseNode.ConditionalTypes.Or:
+                            expressionConstant = new BooleanLanguageConstant(LeftConstantValue.Value || RightConstantValue.Value);
+                            break;
+                    }
+
+                    Debug.Assert(expressionConstant != null);
+                }
+            }
 
             resolvedResult = new List<IExpressionType>()
             {
@@ -110,12 +135,13 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IBinaryConditionalExpression node, object data)
         {
-            bool IsResultConstant = ((Tuple<bool, IList<IExpressionType>, IList<IIdentifier>>)data).Item1;
-            IList<IExpressionType> ResolvedResult = ((Tuple<bool, IList<IExpressionType>, IList<IIdentifier>>)data).Item2;
-            IList<IIdentifier> ResolvedExceptions = ((Tuple<bool, IList<IExpressionType>, IList<IIdentifier>>)data).Item3;
+            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, IBooleanLanguageConstant>)data).Item1;
+            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, IBooleanLanguageConstant>)data).Item2;
+            IBooleanLanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, IBooleanLanguageConstant>)data).Item3;
 
             node.ResolvedResult.Item = ResolvedResult;
-            node.SetIsConstant(IsResultConstant);
+            node.ResolvedExceptions.Item = ResolvedExceptions;
+            node.SetExpressionConstant(ExpressionConstant);
         }
         #endregion
     }

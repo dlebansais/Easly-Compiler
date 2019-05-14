@@ -47,9 +47,9 @@
             data = null;
             bool Success = true;
 
-            Success &= BinaryOperatorExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out bool IsResultConstant, out IFunctionFeature SelectedFeature, out IQueryOverload SelectedOverload, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions);
+            Success &= BinaryOperatorExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out ILanguageConstant ExpressionConstant, out IFunctionFeature SelectedFeature, out IQueryOverload SelectedOverload);
             if (Success)
-                data = new Tuple<bool, IFunctionFeature, IQueryOverload, IList<IExpressionType>, IList<IIdentifier>>(IsResultConstant, SelectedFeature, SelectedOverload, ResolvedResult, ResolvedExceptions);
+                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, IFunctionFeature, IQueryOverload>(ResolvedResult, ResolvedExceptions, ExpressionConstant, SelectedFeature, SelectedOverload);
 
             return Success;
         }
@@ -59,18 +59,18 @@
         /// </summary>
         /// <param name="node">The agent expression to check.</param>
         /// <param name="errorList">The list of errors found.</param>
-        /// <param name="isResultConstant">True upon return if the result is a constant.</param>
-        /// <param name="selectedFeature">The matching feature upon return.</param>
-        /// <param name="selectedOverload">The matching overload in <paramref name="selectedFeature"/> upon return.</param>
         /// <param name="resolvedResult">The expression result types upon return.</param>
         /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
-        public static bool ResolveCompilerReferences(IBinaryOperatorExpression node, IErrorList errorList, out bool isResultConstant, out IFunctionFeature selectedFeature, out IQueryOverload selectedOverload, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions)
+        /// <param name="expressionConstant">The constant value upon return, if any.</param>
+        /// <param name="selectedFeature">The matching feature upon return.</param>
+        /// <param name="selectedOverload">The matching overload in <paramref name="selectedFeature"/> upon return.</param>
+        public static bool ResolveCompilerReferences(IBinaryOperatorExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out ILanguageConstant expressionConstant, out IFunctionFeature selectedFeature, out IQueryOverload selectedOverload)
         {
-            isResultConstant = false;
-            selectedFeature = null;
-            selectedOverload = null;
             resolvedResult = null;
             resolvedExceptions = null;
+            expressionConstant = null;
+            selectedFeature = null;
+            selectedOverload = null;
 
             IExpression LeftExpression = (IExpression)node.LeftExpression;
             IIdentifier Operator = (IIdentifier)node.Operator;
@@ -117,8 +117,7 @@
                                 ParameterTableList.Add(Overload.ParameterTable);
 
                             IList<IExpressionType> RightResult = RightExpression.ResolvedResult.Item;
-int SelectedIndex;
-                            if (!Argument.ArgumentsConformToParameters(ParameterTableList, RightResult, TypeArgumentStyles.Positional, errorList, Operator, out SelectedIndex))
+                            if (!Argument.ArgumentsConformToParameters(ParameterTableList, RightResult, TypeArgumentStyles.Positional, errorList, Operator, out int SelectedIndex))
                                 return false;
 
                             IQueryOverloadType SelectedOverloadType = AsFunctionType.OverloadList[SelectedIndex];
@@ -126,11 +125,21 @@ int SelectedIndex;
                             selectedFeature = AsFunctionFeature;
                             selectedOverload = AsFunctionFeature.OverloadList[SelectedIndex];
                             resolvedExceptions = SelectedOverloadType.ExceptionIdentifierList;
-                            isResultConstant = LeftExpression.IsConstant && RightExpression.IsConstant;
-                            if (LeftExpression.NumberConstant.IsAssigned && RightExpression.NumberConstant.IsAssigned)
+
+                            if (LeftExpression.ExpressionConstant.IsAssigned && RightExpression.ExpressionConstant.IsAssigned)
                             {
-                                //TODO: evaluate the result
-                                //ResultNumberConstant.Item = ??
+                                if (resolvedResult.Count == 1)
+                                {
+                                    IExpressionType ConstantType = resolvedResult[0];
+
+                                    bool IsBooleanTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
+                                    bool IsNumberTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName NumberTypeName, out ICompiledType NumberType);
+
+                                    if (IsBooleanTypeAvailable && ConstantType.ValueType == BooleanType)
+                                        expressionConstant = new BooleanLanguageConstant();
+                                    else if (IsNumberTypeAvailable && ConstantType.ValueType == NumberType)
+                                        expressionConstant = new NumberLanguageConstant();
+                                }
                             }
                         }
                         else
@@ -167,18 +176,17 @@ int SelectedIndex;
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IBinaryOperatorExpression node, object data)
         {
-            bool IsResultConstant = ((Tuple<bool, IFunctionFeature, IQueryOverload, IList<IExpressionType>, IList<IIdentifier>>)data).Item1;
-            IFunctionFeature SelectedFeature = ((Tuple<bool, IFunctionFeature, IQueryOverload, IList<IExpressionType>, IList<IIdentifier>>)data).Item2;
-            IQueryOverload SelectedOverload = ((Tuple<bool, IFunctionFeature, IQueryOverload, IList<IExpressionType>, IList<IIdentifier>>)data).Item3;
-            IList<IExpressionType> ResolvedResult = ((Tuple<bool, IFunctionFeature, IQueryOverload, IList<IExpressionType>, IList<IIdentifier>>)data).Item4;
-            IList<IIdentifier> ResolvedExceptions = ((Tuple<bool, IFunctionFeature, IQueryOverload, IList<IExpressionType>, IList<IIdentifier>>)data).Item5;
+            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, IFunctionFeature, IQueryOverload>)data).Item1;
+            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, IFunctionFeature, IQueryOverload>)data).Item2;
+            ILanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, IFunctionFeature, IQueryOverload>)data).Item3;
+            IFunctionFeature SelectedFeature = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, IFunctionFeature, IQueryOverload>)data).Item4;
+            IQueryOverload SelectedOverload = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, IFunctionFeature, IQueryOverload>)data).Item5;
 
             node.ResolvedResult.Item = ResolvedResult;
+            node.ResolvedExceptions.Item = ResolvedExceptions;
+            node.SetExpressionConstant(ExpressionConstant);
             node.SelectedFeature.Item = SelectedFeature;
             node.SelectedOverload.Item = SelectedOverload;
-
-            //node.SetIsConstant(IsResultConstant, ResultNumberConstant);
-            node.SetIsConstant(IsResultConstant);
         }
         #endregion
     }

@@ -45,9 +45,9 @@
             data = null;
             bool Success = true;
 
-            Success &= AssertionTagExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IExpression ResolvedBooleanExpression, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions);
+            Success &= AssertionTagExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out ILanguageConstant ExpressionConstant, out IExpression ResolvedBooleanExpression);
             if (Success)
-                data = new Tuple<IExpression, IList<IExpressionType>, IList<IIdentifier>>(ResolvedBooleanExpression, ResolvedResult, ResolvedExceptions);
+                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, IExpression>(ResolvedResult, ResolvedExceptions, ExpressionConstant, ResolvedBooleanExpression);
 
             return Success;
         }
@@ -57,14 +57,16 @@
         /// </summary>
         /// <param name="node">The agent expression to check.</param>
         /// <param name="errorList">The list of errors found.</param>
-        /// <param name="resolvedBooleanExpression">The expression found upon return.</param>
         /// <param name="resolvedResult">The expression result types upon return.</param>
         /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
-        public static bool ResolveCompilerReferences(IAssertionTagExpression node, IErrorList errorList, out IExpression resolvedBooleanExpression, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions)
+        /// <param name="expressionConstant">The constant value upon return, if any.</param>
+        /// <param name="resolvedBooleanExpression">The expression found upon return.</param>
+        public static bool ResolveCompilerReferences(IAssertionTagExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out ILanguageConstant expressionConstant, out IExpression resolvedBooleanExpression)
         {
-            resolvedBooleanExpression = null;
             resolvedResult = null;
             resolvedExceptions = null;
+            expressionConstant = null;
+            resolvedBooleanExpression = null;
 
             IIdentifier TagIdentifier = (IIdentifier)node.TagIdentifier;
             IBody InnerBody = node.EmbeddingBody;
@@ -120,15 +122,15 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IAssertionTagExpression node, object data)
         {
-            IExpression ResolvedBooleanExpression = ((Tuple<IExpression, IList<IExpressionType>, IList<IIdentifier>>)data).Item1;
-            IList<IExpressionType> ResolvedResult = ((Tuple<IExpression, IList<IExpressionType>, IList<IIdentifier>>)data).Item2;
-            IList<IIdentifier> ResolvedExceptions = ((Tuple<IExpression, IList<IExpressionType>, IList<IIdentifier>>)data).Item3;
+            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, IExpression>)data).Item1;
+            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, IExpression>)data).Item2;
+            ILanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, IExpression>)data).Item3;
+            IExpression ResolvedBooleanExpression = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, IExpression>)data).Item4;
 
             node.ResolvedResult.Item = ResolvedResult;
+            node.ResolvedExceptions.Item = ResolvedExceptions;
+            node.SetExpressionConstant(ExpressionConstant);
             node.ResolvedBooleanExpression.Item = ResolvedBooleanExpression;
-
-            if (ResolvedExceptions != null)
-                node.ResolvedExceptions.Item = ResolvedExceptions;
         }
         #endregion
     }

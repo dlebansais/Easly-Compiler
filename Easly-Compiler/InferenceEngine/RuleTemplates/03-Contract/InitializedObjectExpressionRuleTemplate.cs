@@ -46,10 +46,10 @@
             data = null;
             bool Success = true;
 
-            Success &= InitializedObjectExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out ITypeName InitializedObjectTypeName, out ICompiledType InitializedObjectType, out IHashtableEx<string, ICompiledFeature> AssignedFeatureTable, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions);
+            Success &= InitializedObjectExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out ILanguageConstant ExpressionConstant, out ITypeName InitializedObjectTypeName, out ICompiledType InitializedObjectType, out IHashtableEx<string, ICompiledFeature> AssignedFeatureTable);
 
             if (Success)
-                data = new Tuple<ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>, IList<IExpressionType>, IList<IIdentifier>>(InitializedObjectTypeName, InitializedObjectType, AssignedFeatureTable, ResolvedResult, ResolvedExceptions);
+                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>(ResolvedResult, ResolvedExceptions, ExpressionConstant, InitializedObjectTypeName, InitializedObjectType, AssignedFeatureTable);
 
             return Success;
         }
@@ -59,18 +59,20 @@
         /// </summary>
         /// <param name="node">The agent expression to check.</param>
         /// <param name="errorList">The list of errors found.</param>
+        /// <param name="resolvedResult">The expression result types upon return.</param>
+        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="expressionConstant">The expression constant upon return.</param>
         /// <param name="initializedObjectTypeName">The initialized object type name upon return.</param>
         /// <param name="initializedObjectType">The initialized object type upon return.</param>
         /// <param name="assignedFeatureTable">The table of assigned values upon return.</param>
-        /// <param name="resolvedResult">The expression result types upon return.</param>
-        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
-        public static bool ResolveCompilerReferences(IInitializedObjectExpression node, IErrorList errorList, out ITypeName initializedObjectTypeName, out ICompiledType initializedObjectType, out IHashtableEx<string, ICompiledFeature> assignedFeatureTable, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions)
+        public static bool ResolveCompilerReferences(IInitializedObjectExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out ILanguageConstant expressionConstant, out ITypeName initializedObjectTypeName, out ICompiledType initializedObjectType, out IHashtableEx<string, ICompiledFeature> assignedFeatureTable)
         {
+            resolvedResult = null;
+            resolvedExceptions = null;
+            expressionConstant = null;
             initializedObjectTypeName = null;
             initializedObjectType = null;
             assignedFeatureTable = null;
-            resolvedResult = null;
-            resolvedExceptions = null;
 
             IIdentifier ClassIdentifier = (IIdentifier)node.ClassIdentifier;
             IList<IAssignmentArgument> AssignmentList = node.AssignmentList;
@@ -231,13 +233,17 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IInitializedObjectExpression node, object data)
         {
-            ITypeName InitializedObjectTypeName = ((Tuple<ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>, IList<IExpressionType>, IList<IIdentifier>>)data).Item1;
-            ICompiledType InitializedObjectType = ((Tuple<ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>, IList<IExpressionType>, IList<IIdentifier>>)data).Item2;
-            IHashtableEx<string, ICompiledFeature> AssignedFeatureTable = ((Tuple<ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>, IList<IExpressionType>, IList<IIdentifier>>)data).Item3;
-            IList<IExpressionType> ResolvedResult = ((Tuple<ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>, IList<IExpressionType>, IList<IIdentifier>>)data).Item4;
-            IList<IIdentifier> ResolvedExceptions = ((Tuple<ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>, IList<IExpressionType>, IList<IIdentifier>>)data).Item5;
+            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item1;
+            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item2;
+            ILanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item3;
+            ITypeName InitializedObjectTypeName = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item4;
+            ICompiledType InitializedObjectType = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item5;
+            IHashtableEx<string, ICompiledFeature> AssignedFeatureTable = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item6;
 
             node.ResolvedResult.Item = ResolvedResult;
+            node.ResolvedExceptions.Item = ResolvedExceptions;
+            node.SetExpressionConstant(ExpressionConstant);
+
             node.ResolvedClassTypeName.Item = InitializedObjectTypeName;
             node.ResolvedClassType.Item = InitializedObjectType;
 

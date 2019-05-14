@@ -22,19 +22,20 @@ namespace CompilerNode
         OnceReference<IList<IExpressionType>> ResolvedResult { get; }
 
         /// <summary>
-        /// True if the expression is a constant.
+        /// The constant expression, if assigned.
         /// </summary>
-        bool IsConstant { get; }
-
-        /// <summary>
-        /// Specific constant number.
-        /// </summary>
-        OnceReference<ILanguageConstant> NumberConstant { get; }
+        OnceReference<ILanguageConstant> ExpressionConstant { get; }
 
         /// <summary>
         /// List of exceptions the expression can throw.
         /// </summary>
         OnceReference<IList<IIdentifier>> ResolvedExceptions { get; }
+
+        /// <summary>
+        /// Sets the <see cref="IExpression.ExpressionConstant"/> property.
+        /// </summary>
+        /// <param name="expressionConstant">The expression constant.</param>
+        void SetExpressionConstant(ILanguageConstant expressionConstant);
     }
 
     /// <summary>

@@ -45,10 +45,10 @@
             data = null;
             bool Success = true;
 
-            Success &= ClassConstantExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out ITypeName ResolvedClassTypeName, out ICompiledType ResolvedClassType, out ILanguageConstant ResultNumberConstant, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions);
+            Success &= ClassConstantExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out ILanguageConstant ExpressionConstant, out ITypeName ResolvedClassTypeName, out ICompiledType ResolvedClassType);
 
             if (Success)
-                data = new Tuple<ITypeName, ICompiledType, ILanguageConstant, IList<IExpressionType>, IList<IIdentifier>>(ResolvedClassTypeName, ResolvedClassType, ResultNumberConstant, ResolvedResult, ResolvedExceptions);
+                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ITypeName, ICompiledType>(ResolvedResult, ResolvedExceptions, ExpressionConstant, ResolvedClassTypeName, ResolvedClassType);
 
             return Success;
         }
@@ -58,18 +58,18 @@
         /// </summary>
         /// <param name="node">The agent expression to check.</param>
         /// <param name="errorList">The list of errors found.</param>
-        /// <param name="resolvedClassTypeName">The class type name upon return.</param>
-        /// <param name="resolvedClassType">The class name upon return.</param>
-        /// <param name="resultNumberConstant">The expression constant upon return.</param>
         /// <param name="resolvedResult">The expression result types upon return.</param>
         /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
-        public static bool ResolveCompilerReferences(IClassConstantExpression node, IErrorList errorList, out ITypeName resolvedClassTypeName, out ICompiledType resolvedClassType, out ILanguageConstant resultNumberConstant, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions)
+        /// <param name="expressionConstant">The expression constant upon return.</param>
+        /// <param name="resolvedClassTypeName">The class type name upon return.</param>
+        /// <param name="resolvedClassType">The class name upon return.</param>
+        public static bool ResolveCompilerReferences(IClassConstantExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out ILanguageConstant expressionConstant, out ITypeName resolvedClassTypeName, out ICompiledType resolvedClassType)
         {
-            resolvedClassTypeName = null;
-            resolvedClassType = null;
-            resultNumberConstant = null;
             resolvedResult = null;
             resolvedExceptions = null;
+            expressionConstant = null;
+            resolvedClassTypeName = null;
+            resolvedClassType = null;
 
             IIdentifier ClassIdentifier = (IIdentifier)node.ClassIdentifier;
             IIdentifier ConstantIdentifier = (IIdentifier)node.ConstantIdentifier;
@@ -105,7 +105,7 @@
 
                 ConstantTypeName = BaseClass.ResolvedClassTypeName.Item;
                 ConstantType = BaseClass.ResolvedClassType.Item;
-                resultNumberConstant = new DiscreteLanguageConstant(Discrete);
+                expressionConstant = new DiscreteLanguageConstant(Discrete);
             }
             else if (FeatureName.TableContain(FeatureTable, ValidConstantText, out Key, out IFeatureInstance FeatureInstance))
             {
@@ -115,8 +115,10 @@
                     ConstantType = AsConstantFeature.ResolvedEntityType.Item;
 
                     IExpression ConstantValue = (IExpression)AsConstantFeature.ConstantValue;
-                    if (ConstantValue.NumberConstant.IsAssigned)
-                        resultNumberConstant = ConstantValue.NumberConstant.Item;
+                    Debug.Assert(ConstantValue.ExpressionConstant.IsAssigned); // TODO: create a rule to ensure this if necessary
+
+                    if (ConstantValue.ExpressionConstant.IsAssigned)
+                        expressionConstant = ConstantValue.ExpressionConstant.Item;
                 }
                 else
                 {
@@ -148,16 +150,17 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IClassConstantExpression node, object data)
         {
-            ITypeName ResolvedClassTypeName = ((Tuple<ITypeName, ICompiledType, ILanguageConstant, IList<IExpressionType>, IList<IIdentifier>>)data).Item1;
-            ICompiledType ResolvedClassType = ((Tuple<ITypeName, ICompiledType, ILanguageConstant, IList<IExpressionType>, IList<IIdentifier>>)data).Item2;
-            ILanguageConstant ResultNumberConstant = ((Tuple<ITypeName, ICompiledType, ILanguageConstant, IList<IExpressionType>, IList<IIdentifier>>)data).Item3;
-            IList<IExpressionType> ResolvedResult = ((Tuple<ITypeName, ICompiledType, ILanguageConstant, IList<IExpressionType>, IList<IIdentifier>>)data).Item4;
-            IList<IIdentifier> ResolvedExceptions = ((Tuple<ITypeName, ICompiledType, ILanguageConstant, IList<IExpressionType>, IList<IIdentifier>>)data).Item5;
+            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ITypeName, ICompiledType>)data).Item1;
+            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ITypeName, ICompiledType>)data).Item2;
+            ILanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ITypeName, ICompiledType>)data).Item3;
+            ITypeName ResolvedClassTypeName = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ITypeName, ICompiledType>)data).Item4;
+            ICompiledType ResolvedClassType = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ITypeName, ICompiledType>)data).Item5;
 
             node.ResolvedResult.Item = ResolvedResult;
+            node.ResolvedExceptions.Item = ResolvedExceptions;
+            node.SetExpressionConstant(ExpressionConstant);
             node.ResolvedClassTypeName.Item = ResolvedClassTypeName;
             node.ResolvedClassType.Item = ResolvedClassType;
-            node.SetIsConstant(ResultNumberConstant);
         }
         #endregion
     }

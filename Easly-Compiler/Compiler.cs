@@ -170,7 +170,7 @@
 
                     if (CheckClassAndLibraryNames(root))
                     {
-                        if (ResolveIdentifiers(root) && ResolveTypes(root)/* && ResolveContract(root)*/)
+                        if (ResolveIdentifiers(root) && ResolveTypes(root) && ResolveContract(root))
                         {
                         }
                     }

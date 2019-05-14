@@ -83,7 +83,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IList<IExpressionType>>();
-                NumberConstant = new OnceReference<ILanguageConstant>();
+                ExpressionConstant = new OnceReference<ILanguageConstant>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 IsHandled = true;
             }
@@ -113,7 +113,10 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                IsResolved = ResolvedResult.IsAssigned && NumberConstant.IsAssigned && ResolvedExceptions.IsAssigned;
+                IsResolved = ResolvedResult.IsAssigned && ResolvedExceptions.IsAssigned;
+
+                Debug.Assert(!ExpressionConstant.IsAssigned || IsResolved);
+
                 IsHandled = true;
             }
 
@@ -129,68 +132,48 @@ namespace CompilerNode
         public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
 
         /// <summary>
-        /// True if the expression is a constant.
-        /// </summary>
-        public bool IsConstant
-        {
-            get
-            {
-                bool Result = false;
-                bool IsHandled = false;
-
-                switch (Value)
-                {
-                    case BaseNode.Keyword.True:
-                        Result = true;
-                        IsHandled = true;
-                        break;
-
-                    case BaseNode.Keyword.False:
-                        Result = true;
-                        IsHandled = true;
-                        break;
-
-                    case BaseNode.Keyword.Current:
-                        Result = false;
-                        IsHandled = true;
-                        break;
-
-                    case BaseNode.Keyword.Value:
-                        Result = false;
-                        IsHandled = true;
-                        break;
-
-                    case BaseNode.Keyword.Result:
-                        Result = false;
-                        IsHandled = true;
-                        break;
-
-                    case BaseNode.Keyword.Retry:
-                        Result = false;
-                        IsHandled = true;
-                        break;
-
-                    case BaseNode.Keyword.Exception:
-                        Result = false;
-                        IsHandled = true;
-                        break;
-                }
-
-                Debug.Assert(IsHandled);
-
-                return Result;
-            }
-        }
-
-        /// <summary>
         /// Specific constant number.
         /// </summary>
-        public OnceReference<ILanguageConstant> NumberConstant { get; private set; } = new OnceReference<ILanguageConstant>();
+        public OnceReference<ILanguageConstant> ExpressionConstant { get; private set; } = new OnceReference<ILanguageConstant>();
 
         /// <summary>
         /// List of exceptions the expression can throw.
         /// </summary>
         public OnceReference<IList<IIdentifier>> ResolvedExceptions { get; private set; } = new OnceReference<IList<IIdentifier>>();
+
+        /// <summary>
+        /// Sets the <see cref="IExpression.ExpressionConstant"/> property.
+        /// </summary>
+        /// <param name="expressionConstant">The expression constant.</param>
+        public void SetExpressionConstant(ILanguageConstant expressionConstant)
+        {
+            Debug.Assert(!ExpressionConstant.IsAssigned);
+
+            bool IsHandled = false;
+
+            switch (Value)
+            {
+                case BaseNode.Keyword.True:
+                case BaseNode.Keyword.False:
+                    IBooleanLanguageConstant BooleanConstant = expressionConstant as IBooleanLanguageConstant;
+                    Debug.Assert(BooleanConstant != null && BooleanConstant.Value.HasValue);
+                    Debug.Assert(BooleanConstant.Value.Value == (Value == BaseNode.Keyword.True));
+
+                    ExpressionConstant.Item = BooleanConstant;
+                    IsHandled = true;
+                    break;
+
+                case BaseNode.Keyword.Current:
+                case BaseNode.Keyword.Value:
+                case BaseNode.Keyword.Result:
+                case BaseNode.Keyword.Retry:
+                case BaseNode.Keyword.Exception:
+                    IsHandled = true;
+                    break;
+            }
+
+            Debug.Assert(IsHandled);
+        }
         #endregion
 
         #region Compiler

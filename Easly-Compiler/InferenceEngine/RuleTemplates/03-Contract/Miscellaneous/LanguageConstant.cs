@@ -15,10 +15,10 @@
         bool IsCompatibleWith(ILanguageConstant other);
 
         /// <summary>
-        /// Checks if another constant is greater than this instance.
+        /// Checks if another constant is equal to this instance.
         /// </summary>
         /// <param name="other">The other instance.</param>
-        bool IsGreater(ILanguageConstant other);
+        bool IsConstantEqual(ILanguageConstant other);
     }
 
     /// <summary>
@@ -26,7 +26,7 @@
     /// </summary>
     public abstract class LanguageConstant : ILanguageConstant
     {
-        #region Implementation
+        #region Client Interface
         /// <summary>
         /// Checks if another constant can be compared with this instance.
         /// </summary>
@@ -34,10 +34,10 @@
         public abstract bool IsCompatibleWith(ILanguageConstant other);
 
         /// <summary>
-        /// Checks if another constant is greater than this instance.
+        /// Checks if another constant is equal to this instance.
         /// </summary>
         /// <param name="other">The other instance.</param>
-        public abstract bool IsGreater(ILanguageConstant other);
+        public abstract bool IsConstantEqual(ILanguageConstant other);
 
         /// <summary>
         /// Tries to parse the specified constant as an integer.
@@ -50,10 +50,10 @@
             value = 0;
             bool Result = false;
 
-            if (constant is IManifestLanguageConstant AsManifestConstant)
+            if (constant is INumberLanguageConstant AsNumberLanguageConstant)
             {
-                ICanonicalNumber Number = AsManifestConstant.Number;
-                Result = Number.TryParseInt(out value);
+                ICanonicalNumber Value = AsNumberLanguageConstant.Value;
+                Result = Value.TryParseInt(out value);
             }
 
             return Result;
@@ -63,18 +63,18 @@
         /// Tries to parse an expression as a constant number.
         /// </summary>
         /// <param name="expression">The expression to parse.</param>
-        /// <param name="constant">The parsed constant upon return if successful.</param>
+        /// <param name="expressionConstant">The parsed constant upon return if successful.</param>
         /// <param name="error">Error found on failure.</param>
         /// <returns>True if the expression could be parsed as a constant; Otherwise, false.</returns>
-        public static bool TryParseExpression(IExpression expression, out ILanguageConstant constant, out IError error)
+        public static bool TryParseExpression(IExpression expression, out IOrderedLanguageConstant expressionConstant, out IError error)
         {
-            constant = null;
+            expressionConstant = null;
             error = null;
             bool Result = false;
 
-            if (expression.NumberConstant.IsAssigned)
+            if (expression.ExpressionConstant.IsAssigned && expression.ExpressionConstant.Item is IOrderedLanguageConstant AsOrderedLanguageConstant)
             {
-                constant = expression.NumberConstant.Item;
+                expressionConstant = AsOrderedLanguageConstant;
                 Result = true;
             }
             else

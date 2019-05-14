@@ -49,10 +49,10 @@
             data = null;
             bool Success = true;
 
-            Success &= QueryExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out ICompiledFeature ResolvedFinalFeature, out ListTableEx<IParameter> SelectedParameterList, out ListTableEx<IParameter> SelectedResultList, out IList<IExpressionType> ResolvedArgumentList, out ILanguageConstant ResultNumberConstant, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions);
+            Success &= QueryExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out ILanguageConstant ExpressionConstant, out ICompiledFeature ResolvedFinalFeature, out ListTableEx<IParameter> SelectedParameterList, out ListTableEx<IParameter> SelectedResultList, out IList<IExpressionType> ResolvedArgumentList);
 
             if (Success)
-                data = new Tuple<ICompiledFeature, ListTableEx<IParameter>, ListTableEx<IParameter>, IList<IExpressionType>, ILanguageConstant, IList<IExpressionType>, IList<IIdentifier>>(ResolvedFinalFeature, SelectedParameterList, SelectedResultList, ResolvedArgumentList, ResultNumberConstant, ResolvedResult, ResolvedExceptions);
+                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ICompiledFeature, ListTableEx<IParameter>, ListTableEx<IParameter>, IList<IExpressionType>>(ResolvedResult, ResolvedExceptions, ExpressionConstant, ResolvedFinalFeature, SelectedParameterList, SelectedResultList, ResolvedArgumentList);
 
             return Success;
         }
@@ -62,22 +62,22 @@
         /// </summary>
         /// <param name="node">The agent expression to check.</param>
         /// <param name="errorList">The list of errors found.</param>
+        /// <param name="resolvedResult">The expression result types upon return.</param>
+        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="expressionConstant">The expression constant upon return.</param>
         /// <param name="resolvedFinalFeature">The feature if the end of the path is a feature.</param>
         /// <param name="selectedParameterList">The selected parameters.</param>
         /// <param name="selectedResultList">The selected results.</param>
         /// <param name="resolvedArgumentList">The list of arguments corresponding to selected parameters.</param>
-        /// <param name="resultNumberConstant">The expression constant upon return.</param>
-        /// <param name="resolvedResult">The expression result types upon return.</param>
-        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
-        public static bool ResolveCompilerReferences(IQueryExpression node, IErrorList errorList, out ICompiledFeature resolvedFinalFeature, out ListTableEx<IParameter> selectedParameterList, out ListTableEx<IParameter> selectedResultList, out IList<IExpressionType> resolvedArgumentList, out ILanguageConstant resultNumberConstant, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions)
+        public static bool ResolveCompilerReferences(IQueryExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature, out ListTableEx<IParameter> selectedParameterList, out ListTableEx<IParameter> selectedResultList, out IList<IExpressionType> resolvedArgumentList)
         {
+            resolvedResult = null;
+            resolvedExceptions = null;
+            expressionConstant = null;
             resolvedFinalFeature = null;
             selectedParameterList = null;
             selectedResultList = null;
             resolvedArgumentList = null;
-            resultNumberConstant = null;
-            resolvedResult = null;
-            resolvedExceptions = null;
 
             IQualifiedName Query = (IQualifiedName)node.Query;
             IList<IArgument> ArgumentList = node.ArgumentList;
@@ -194,17 +194,17 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IQueryExpression node, object data)
         {
-            ICompiledFeature ResolvedFinalFeature = ((Tuple<ICompiledFeature, ListTableEx<IParameter>, ListTableEx<IParameter>, IList<IExpressionType>, ILanguageConstant, IList<IExpressionType>, IList<IIdentifier>>)data).Item1;
-            ListTableEx<IParameter> SelectedParameterList = ((Tuple<ICompiledFeature, ListTableEx<IParameter>, ListTableEx<IParameter>, IList<IExpressionType>, ILanguageConstant, IList<IExpressionType>, IList<IIdentifier>>)data).Item2;
-            ListTableEx<IParameter> SelectedResultList = ((Tuple<ICompiledFeature, ListTableEx<IParameter>, ListTableEx<IParameter>, IList<IExpressionType>, ILanguageConstant, IList<IExpressionType>, IList<IIdentifier>>)data).Item3;
-            IList<IExpressionType> ResolvedArgumentList = ((Tuple<ICompiledFeature, ListTableEx<IParameter>, ListTableEx<IParameter>, IList<IExpressionType>, ILanguageConstant, IList<IExpressionType>, IList<IIdentifier>>)data).Item4;
-            ILanguageConstant ResultNumberConstant = ((Tuple<ICompiledFeature, ListTableEx<IParameter>, ListTableEx<IParameter>, IList<IExpressionType>, ILanguageConstant, IList<IExpressionType>, IList<IIdentifier>>)data).Item5;
-            IList<IExpressionType> ResolvedResult = ((Tuple<ICompiledFeature, ListTableEx<IParameter>, ListTableEx<IParameter>, IList<IExpressionType>, ILanguageConstant, IList<IExpressionType>, IList<IIdentifier>>)data).Item6;
-            IList<IIdentifier> ResolvedExceptions = ((Tuple<ICompiledFeature, ListTableEx<IParameter>, ListTableEx<IParameter>, IList<IExpressionType>, ILanguageConstant, IList<IExpressionType>, IList<IIdentifier>>)data).Item7;
+            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ICompiledFeature, ListTableEx<IParameter>, ListTableEx<IParameter>, IList<IExpressionType>>)data).Item1;
+            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ICompiledFeature, ListTableEx<IParameter>, ListTableEx<IParameter>, IList<IExpressionType>>)data).Item2;
+            ILanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ICompiledFeature, ListTableEx<IParameter>, ListTableEx<IParameter>, IList<IExpressionType>>)data).Item3;
+            ICompiledFeature ResolvedFinalFeature = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ICompiledFeature, ListTableEx<IParameter>, ListTableEx<IParameter>, IList<IExpressionType>>)data).Item4;
+            ListTableEx<IParameter> SelectedParameterList = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ICompiledFeature, ListTableEx<IParameter>, ListTableEx<IParameter>, IList<IExpressionType>>)data).Item5;
+            ListTableEx<IParameter> SelectedResultList = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ICompiledFeature, ListTableEx<IParameter>, ListTableEx<IParameter>, IList<IExpressionType>>)data).Item6;
+            IList<IExpressionType> ResolvedArgumentList = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ICompiledFeature, ListTableEx<IParameter>, ListTableEx<IParameter>, IList<IExpressionType>>)data).Item7;
 
-            node.ResolvedFinalFeature.Item = ResolvedFinalFeature;
             node.ResolvedResult.Item = ResolvedResult;
-            //node.SetIsConstant(ResultNumberConstant);
+            node.ResolvedExceptions.Item = ResolvedExceptions;
+            node.SetExpressionConstant(ExpressionConstant);
         }
         #endregion
     }

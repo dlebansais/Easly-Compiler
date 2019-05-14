@@ -424,6 +424,11 @@
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\Miscellaneous\SingleClassGroup.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\Miscellaneous\TypeArgumentStyles.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\Miscellaneous\TypeInstancingRecord.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\Miscellaneous\AgentLanguageConstant.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\Miscellaneous\StringLanguageConstant.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\Miscellaneous\CharacterLanguageConstant.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\Miscellaneous\BooleanLanguageConstant.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\Miscellaneous\OrderedLanguageConstant.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\PrecursorInstructionContractRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\WithContractRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\UnaryOperatorExpressionRuleTemplate.cs" />
@@ -486,7 +491,7 @@
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\ClassConstantExpressionRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\Miscellaneous\DiscreteLanguageConstant.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\Miscellaneous\LanguageConstant.cs" />
-    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\Miscellaneous\ManifestLanguageConstant.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\Miscellaneous\NumberLanguageConstant.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\Miscellaneous\TaggedContract.cs" />
     <Compile Include="InferenceEngine\SourceTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplate.cs" />

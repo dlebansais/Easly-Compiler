@@ -28,8 +28,8 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IClass, IList<IBody>>(nameof(IClass.ResolvedNodeWithDefaultList)),
-                new OnceReferenceDestinationTemplate<IClass, IList<IBody>>(nameof(IClass.ResolvedNodeWithNumberConstantList)),
+                new OnceReferenceDestinationTemplate<IClass, IList<IExpression>>(nameof(IClass.ResolvedNodeWithDefaultList)),
+                new OnceReferenceDestinationTemplate<IClass, IList<IExpression>>(nameof(IClass.ResolvedNodeWithNumberConstantList)),
             };
         }
         #endregion
@@ -55,12 +55,12 @@
                     ErrorList.AddError(new ErrorInvalidExpression(ExpressionItem));
                     Success = false;
                 }
-                else if (!ExpressionItem.IsConstant) // TODO: verify implementations
+                else if (!ExpressionItem.ExpressionConstant.IsAssigned) // TODO: verify implementations
                 {
                     ErrorList.AddError(new ErrorInvalidExpression(ExpressionItem));
                     Success = false;
                 }
-                else if (node.NodeWithNumberConstantList.Contains(ExpressionItem) && !ExpressionItem.NumberConstant.IsAssigned)
+                else if (node.NodeWithNumberConstantList.Contains(ExpressionItem) && !(ExpressionItem.ExpressionConstant.Item is INumberLanguageConstant))
                 {
                     ErrorList.AddError(new ErrorNumberConstantExpected(ExpressionItem));
                     Success = false;
@@ -86,21 +86,21 @@
                             Debug.Assert(CurrentDiscreteItem.NumericValue.IsAssigned);
                             IExpression NumericValue = (IExpression)CurrentDiscreteItem.NumericValue.Item;
 
-                            Debug.Assert(NumericValue.NumberConstant.IsAssigned);
-                            ILanguageConstant Constant = NumericValue.NumberConstant.Item;
+                            Debug.Assert(NumericValue.ExpressionConstant.IsAssigned);
+                            ILanguageConstant ExpressionConstant = NumericValue.ExpressionConstant.Item;
 
                             bool IsHandled = false;
 
-                            switch (Constant)
+                            switch (ExpressionConstant)
                             {
-                                case IManifestLanguageConstant AsManifestConstant:
-                                    NumberConstant = AsManifestConstant.Number;
+                                case INumberLanguageConstant AsNumberLanguageConstant:
+                                    NumberConstant = AsNumberLanguageConstant.Value;
                                     IsHandled = true;
                                     IsFound = true;
                                     break;
 
-                                case IDiscreteLanguageConstant AsDiscreteConstant:
-                                    CurrentDiscreteItem = AsDiscreteConstant.Discrete;
+                                case IDiscreteLanguageConstant AsDiscreteLanguageConstant:
+                                    CurrentDiscreteItem = AsDiscreteLanguageConstant.Discrete;
                                     if (!CurrentDiscreteItem.NumericValue.IsAssigned)
                                     {
                                         AddSourceError(new ErrorInvalidExpression(NumericValue));

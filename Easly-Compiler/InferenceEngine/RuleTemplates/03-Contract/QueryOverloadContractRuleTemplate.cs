@@ -29,7 +29,7 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IQueryOverload, ICompiledType>(nameof(IQueryOverload.ResolvedBody)),
+                new OnceReferenceDestinationTemplate<IQueryOverload, ICompiledBody>(nameof(IQueryOverload.ResolvedBody)),
             };
         }
         #endregion

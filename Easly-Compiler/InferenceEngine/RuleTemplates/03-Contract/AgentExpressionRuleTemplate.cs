@@ -46,10 +46,10 @@
             data = null;
             bool Success = true;
 
-            Success &= AgentExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out ICompiledFeature ResolvedFeature, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedException);
+            Success &= AgentExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedException, out ILanguageConstant ExpressionConstant, out ICompiledFeature ResolvedFeature);
 
             if (Success)
-                data = new Tuple<ICompiledFeature, IList<IExpressionType>, IList<IIdentifier>>(ResolvedFeature, ResolvedResult, ResolvedException);
+                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ICompiledFeature>(ResolvedResult, ResolvedException, ExpressionConstant, ResolvedFeature);
 
             return Success;
         }
@@ -59,14 +59,16 @@
         /// </summary>
         /// <param name="node">The agent expression to check.</param>
         /// <param name="errorList">The list of errors found.</param>
-        /// <param name="resolvedFeature">The feature found upon return.</param>
         /// <param name="resolvedResult">The expression result types upon return.</param>
         /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
-        public static bool ResolveCompilerReferences(IAgentExpression node, IErrorList errorList, out ICompiledFeature resolvedFeature, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions)
+        /// <param name="expressionConstant">The constant value upon return, if any.</param>
+        /// <param name="resolvedFeature">The feature found upon return.</param>
+        public static bool ResolveCompilerReferences(IAgentExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFeature)
         {
-            resolvedFeature = null;
             resolvedResult = null;
             resolvedExceptions = null;
+            expressionConstant = null;
+            resolvedFeature = null;
 
             IIdentifier Delegated = (IIdentifier)node.Delegated;
 
@@ -83,11 +85,14 @@
 
             Debug.Assert(Value.Feature.IsAssigned);
             resolvedFeature = Value.Feature.Item;
+
             resolvedExceptions = new List<IIdentifier>();
             resolvedResult = new List<IExpressionType>
             {
                 new ExpressionType(resolvedFeature.ResolvedFeatureTypeName.Item, resolvedFeature.ResolvedFeatureType.Item, string.Empty)
             };
+
+            expressionConstant = new AgentLanguageConstant(resolvedFeature);
 
             return true;
         }
@@ -99,11 +104,14 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IAgentExpression node, object data)
         {
-            ICompiledFeature ResolvedFeature = ((Tuple<ICompiledFeature, IList<IExpressionType>, IList<IIdentifier>>)data).Item1;
-            IList<IExpressionType> ResolvedResult = ((Tuple<ICompiledFeature, IList<IExpressionType>, IList<IIdentifier>>)data).Item2;
-            IList<IIdentifier> ResolvedExceptions = ((Tuple<ICompiledFeature, IList<IExpressionType>, IList<IIdentifier>>)data).Item3;
+            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ICompiledFeature>)data).Item1;
+            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ICompiledFeature>)data).Item2;
+            ILanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ICompiledFeature>)data).Item3;
+            ICompiledFeature ResolvedFeature = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ICompiledFeature>)data).Item4;
 
             node.ResolvedResult.Item = ResolvedResult;
+            node.ResolvedExceptions.Item = ResolvedExceptions;
+            node.SetExpressionConstant(ExpressionConstant);
             node.ResolvedAncestorTypeName.Item = ResolvedFeature.ResolvedFeatureTypeName.Item;
             node.ResolvedAncestorType.Item = ResolvedFeature.ResolvedFeatureType.Item;
             node.ResolvedFeature.Item = ResolvedFeature;

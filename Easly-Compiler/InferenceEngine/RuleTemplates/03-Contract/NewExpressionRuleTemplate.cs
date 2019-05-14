@@ -48,10 +48,10 @@
             data = null;
             bool Success = true;
 
-            Success &= NewExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out ICompiledFeature ResolvedFinalFeature, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions);
+            Success &= NewExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out ILanguageConstant ExpressionConstant, out ICompiledFeature ResolvedFinalFeature);
 
             if (Success)
-                data = new Tuple<ICompiledFeature, IList<IExpressionType>, IList<IIdentifier>>(ResolvedFinalFeature, ResolvedResult, ResolvedExceptions);
+                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ICompiledFeature>(ResolvedResult, ResolvedExceptions, ExpressionConstant, ResolvedFinalFeature);
 
             return Success;
         }
@@ -61,14 +61,16 @@
         /// </summary>
         /// <param name="node">The agent expression to check.</param>
         /// <param name="errorList">The list of errors found.</param>
-        /// <param name="resolvedFinalFeature">The matching feature upon return.</param>
         /// <param name="resolvedResult">The expression result types upon return.</param>
         /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
-        public static bool ResolveCompilerReferences(INewExpression node, IErrorList errorList, out ICompiledFeature resolvedFinalFeature, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions)
+        /// <param name="expressionConstant">The expression constant upon return.</param>
+        /// <param name="resolvedFinalFeature">The matching feature upon return.</param>
+        public static bool ResolveCompilerReferences(INewExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature)
         {
-            resolvedFinalFeature = null;
             resolvedResult = null;
             resolvedExceptions = null;
+            expressionConstant = null;
+            resolvedFinalFeature = null;
 
             IClass EmbeddingClass = node.EmbeddingClass;
             IQualifiedName Object = (IQualifiedName)node.Object;
@@ -112,11 +114,14 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(INewExpression node, object data)
         {
-            ICompiledFeature ResolvedFinalFeature = ((Tuple<ICompiledFeature, IList<IExpressionType>, IList<IIdentifier>>)data).Item1;
-            IList<IExpressionType> ResolvedResult = ((Tuple<ICompiledFeature, IList<IExpressionType>, IList<IIdentifier>>)data).Item2;
-            IList<IIdentifier> ResolvedExceptions = ((Tuple<ICompiledFeature, IList<IExpressionType>, IList<IIdentifier>>)data).Item3;
+            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ICompiledFeature>)data).Item1;
+            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ICompiledFeature>)data).Item2;
+            ILanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ICompiledFeature>)data).Item3;
+            ICompiledFeature ResolvedFinalFeature = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, ICompiledFeature>)data).Item4;
 
             node.ResolvedResult.Item = ResolvedResult;
+            node.ResolvedExceptions.Item = ResolvedExceptions;
+            node.SetExpressionConstant(ExpressionConstant);
         }
         #endregion
     }

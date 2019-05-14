@@ -6,10 +6,10 @@
     /// <summary>
     /// Represents a discrete constant.
     /// </summary>
-    public interface IDiscreteLanguageConstant : ILanguageConstant
+    public interface IDiscreteLanguageConstant : IOrderedLanguageConstant
     {
         /// <summary>
-        /// The discrete value.
+        /// The discrete constant, if known.
         /// </summary>
         IDiscrete Discrete { get; }
     }
@@ -22,14 +22,21 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscreteLanguageConstant"/> class.
         /// </summary>
-        /// <param name="discrete">The discrete value.</param>
+        public DiscreteLanguageConstant()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiscreteLanguageConstant"/> class.
+        /// </summary>
+        /// <param name="discrete">The discrete constant.</param>
         public DiscreteLanguageConstant(IDiscrete discrete)
         {
             Discrete = discrete;
         }
 
         /// <summary>
-        /// The discrete value.
+        /// The discrete constant, if known.
         /// </summary>
         public IDiscrete Discrete { get; }
 
@@ -41,7 +48,7 @@
         {
             bool Result = false;
 
-            if (other is IDiscreteLanguageConstant AsDiscreteLanguageConstant)
+            if (other is IDiscreteLanguageConstant AsDiscreteLanguageConstant && Discrete != null && AsDiscreteLanguageConstant.Discrete != null)
             {
                 IDiscrete OtherDiscrete = AsDiscreteLanguageConstant.Discrete;
                 Result = Discrete.EmbeddingClass == OtherDiscrete.EmbeddingClass;
@@ -51,17 +58,54 @@
         }
 
         /// <summary>
+        /// Checks if another constant is equal to this instance.
+        /// </summary>
+        /// <param name="other">The other instance.</param>
+        public override bool IsConstantEqual(ILanguageConstant other)
+        {
+            return IsConstantEqual(other as IDiscreteLanguageConstant);
+        }
+
+        /// <summary>
+        /// Checks if another constant is equal to this instance.
+        /// </summary>
+        /// <param name="other">The other instance.</param>
+        protected virtual bool IsConstantEqual(IDiscreteLanguageConstant other)
+        {
+            Debug.Assert(other != null && Discrete != null && other.Discrete != null);
+
+            IDiscrete OtherDiscrete = other.Discrete;
+            IClass EmbeddingClass = Discrete.EmbeddingClass;
+
+            Debug.Assert(EmbeddingClass != null);
+            Debug.Assert(EmbeddingClass == OtherDiscrete.EmbeddingClass);
+
+            int ThisDiscreteIndex = EmbeddingClass.DiscreteList.IndexOf(Discrete);
+            int OtherDiscreteIndex = EmbeddingClass.DiscreteList.IndexOf(OtherDiscrete);
+
+            Debug.Assert(ThisDiscreteIndex != -1 && OtherDiscreteIndex != -1);
+
+            return ThisDiscreteIndex == OtherDiscreteIndex;
+        }
+
+        /// <summary>
         /// Checks if another constant is greater than this instance.
         /// </summary>
         /// <param name="other">The other instance.</param>
-        public override bool IsGreater(ILanguageConstant other)
+        public virtual bool IsConstantGreater(IOrderedLanguageConstant other)
         {
-            Debug.Assert(IsCompatibleWith(other));
+            return IsConstantGreater(other as IDiscreteLanguageConstant);
+        }
 
-            IDiscreteLanguageConstant AsDiscreteLanguageConstant = other as IDiscreteLanguageConstant;
-            Debug.Assert(AsDiscreteLanguageConstant != null);
+        /// <summary>
+        /// Checks if another constant is greater than this instance.
+        /// </summary>
+        /// <param name="other">The other instance.</param>
+        protected virtual bool IsConstantGreater(IDiscreteLanguageConstant other)
+        {
+            Debug.Assert(other != null && Discrete != null && other.Discrete != null);
 
-            IDiscrete OtherDiscrete = AsDiscreteLanguageConstant.Discrete;
+            IDiscrete OtherDiscrete = other.Discrete;
             IClass EmbeddingClass = Discrete.EmbeddingClass;
 
             Debug.Assert(EmbeddingClass != null);

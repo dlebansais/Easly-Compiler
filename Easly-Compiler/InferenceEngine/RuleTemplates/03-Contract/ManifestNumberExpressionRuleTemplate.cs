@@ -45,10 +45,10 @@
             data = null;
             bool Success = true;
 
-            Success &= ManifestNumberExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out ILanguageConstant ResultNumberConstant, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions);
+            Success &= ManifestNumberExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out INumberLanguageConstant ExpressionConstant);
 
             if (Success)
-                data = new Tuple<ILanguageConstant, IList<IExpressionType>, IList<IIdentifier>>(ResultNumberConstant, ResolvedResult, ResolvedExceptions);
+                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, INumberLanguageConstant>(ResolvedResult, ResolvedExceptions, ExpressionConstant);
 
             return Success;
         }
@@ -58,14 +58,14 @@
         /// </summary>
         /// <param name="node">The agent expression to check.</param>
         /// <param name="errorList">The list of errors found.</param>
-        /// <param name="resultNumberConstant">The constant type upon return.</param>
         /// <param name="resolvedResult">The expression result types upon return.</param>
         /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
-        public static bool ResolveCompilerReferences(IManifestNumberExpression node, IErrorList errorList, out ILanguageConstant resultNumberConstant, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions)
+        /// <param name="expressionConstant">The constant type upon return.</param>
+        public static bool ResolveCompilerReferences(IManifestNumberExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out INumberLanguageConstant expressionConstant)
         {
-            resultNumberConstant = null;
             resolvedResult = null;
             resolvedExceptions = null;
+            expressionConstant = null;
 
             IClass EmbeddingClass = node.EmbeddingClass;
             string NumberText = node.ValidText.Item;
@@ -87,7 +87,7 @@
             BaseNodeHelper.IFormattedNumber FormattedNumber = BaseNodeHelper.FormattedNumber.Parse(NumberText, false);
             Debug.Assert(string.IsNullOrEmpty(FormattedNumber.InvalidText));
 
-            resultNumberConstant = new ManifestLanguageConstant(FormattedNumber.Canonical);
+            expressionConstant = new NumberLanguageConstant(FormattedNumber.Canonical);
 
             return true;
         }
@@ -99,12 +99,13 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IManifestNumberExpression node, object data)
         {
-            ILanguageConstant ResultNumberConstant = ((Tuple<ILanguageConstant, IList<IExpressionType>, IList<IIdentifier>>)data).Item1;
-            IList<IExpressionType> ResolvedResult = ((Tuple<ILanguageConstant, IList<IExpressionType>, IList<IIdentifier>>)data).Item2;
-            IList<IIdentifier> ResolvedExceptions = ((Tuple<ILanguageConstant, IList<IExpressionType>, IList<IIdentifier>>)data).Item3;
+            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, INumberLanguageConstant>)data).Item1;
+            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, INumberLanguageConstant>)data).Item2;
+            INumberLanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, INumberLanguageConstant>)data).Item3;
 
             node.ResolvedResult.Item = ResolvedResult;
-            node.SetIsConstant(ResultNumberConstant);
+            node.ResolvedExceptions.Item = ResolvedExceptions;
+            node.SetExpressionConstant(ExpressionConstant);
         }
         #endregion
     }

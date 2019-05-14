@@ -45,10 +45,10 @@
             data = null;
             bool Success = true;
 
-            Success &= ManifestCharacterExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions);
+            Success &= ManifestCharacterExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out ILanguageConstant ExpressionConstant);
 
             if (Success)
-                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>>(ResolvedResult, ResolvedExceptions);
+                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant>(ResolvedResult, ResolvedExceptions, ExpressionConstant);
 
             return Success;
         }
@@ -60,12 +60,17 @@
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="resolvedResult">The expression result types upon return.</param>
         /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
-        public static bool ResolveCompilerReferences(IManifestCharacterExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions)
+        /// <param name="expressionConstant">The expression constant upon return.</param>
+        public static bool ResolveCompilerReferences(IManifestCharacterExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out ILanguageConstant expressionConstant)
         {
             resolvedResult = null;
             resolvedExceptions = null;
+            expressionConstant = null;
 
             IClass EmbeddingClass = node.EmbeddingClass;
+            string ValidText = node.ValidText.Item;
+            Debug.Assert(ValidText.Length == 1);
+            char ValidChar = ValidText[0];
 
             if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Character.Guid, node, out ITypeName CharacterTypeName, out ICompiledType CharacterType))
             {
@@ -79,6 +84,7 @@
             };
 
             resolvedExceptions = new List<IIdentifier>();
+            expressionConstant = new CharacterLanguageConstant(ValidChar);
 
             return true;
         }
@@ -90,10 +96,13 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IManifestCharacterExpression node, object data)
         {
-            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>>)data).Item1;
-            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>>)data).Item2;
+            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant>)data).Item1;
+            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant>)data).Item2;
+            ILanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant>)data).Item3;
 
             node.ResolvedResult.Item = ResolvedResult;
+            node.ResolvedExceptions.Item = ResolvedExceptions;
+            node.SetExpressionConstant(ExpressionConstant);
         }
         #endregion
     }

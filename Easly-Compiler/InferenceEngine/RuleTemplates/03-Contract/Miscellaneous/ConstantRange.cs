@@ -10,12 +10,12 @@
         /// <summary>
         /// The minimum value in the range.
         /// </summary>
-        ILanguageConstant Minimum { get; }
+        IOrderedLanguageConstant Minimum { get; }
 
         /// <summary>
         /// The maximum value in the range.
         /// </summary>
-        ILanguageConstant Maximum { get; }
+        IOrderedLanguageConstant Maximum { get; }
 
         /// <summary>
         /// Checks if two ranges intersect.
@@ -35,7 +35,7 @@
         /// </summary>
         /// <param name="minimum">The minimum value in the range.</param>
         /// <param name="maximum">The maximum value in the range.</param>
-        public ConstantRange(ILanguageConstant minimum, ILanguageConstant maximum)
+        public ConstantRange(IOrderedLanguageConstant minimum, IOrderedLanguageConstant maximum)
         {
             Minimum = minimum;
             Maximum = maximum;
@@ -46,12 +46,12 @@
         /// <summary>
         /// The minimum value in the range.
         /// </summary>
-        public ILanguageConstant Minimum { get; }
+        public IOrderedLanguageConstant Minimum { get; }
 
         /// <summary>
         /// The maximum value in the range.
         /// </summary>
-        public ILanguageConstant Maximum { get; }
+        public IOrderedLanguageConstant Maximum { get; }
         #endregion
 
         #region Client Interface
@@ -65,8 +65,8 @@
         {
             result = null;
 
-            ILanguageConstant LeftExpressionConstant;
-            ILanguageConstant RightExpressionConstant;
+            IOrderedLanguageConstant LeftExpressionConstant;
+            IOrderedLanguageConstant RightExpressionConstant;
 
             if (!LanguageConstant.TryParseExpression((IExpression)range.LeftExpression, out LeftExpressionConstant, out error))
                 return false;
@@ -96,7 +96,7 @@
             if (!Minimum.IsCompatibleWith(other.Maximum) || !other.Minimum.IsCompatibleWith(Maximum))
                 return false;
 
-            if (Minimum.IsGreater(other.Maximum) || other.Minimum.IsGreater(Maximum))
+            if (Minimum.IsConstantGreater(other.Maximum) || other.Minimum.IsConstantGreater(Maximum))
                 return false;
 
             return true;
