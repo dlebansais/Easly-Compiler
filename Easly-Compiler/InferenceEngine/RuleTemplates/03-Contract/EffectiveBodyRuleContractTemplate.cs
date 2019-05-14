@@ -37,7 +37,7 @@
                 new OnceReferenceSourceTemplate<TBody, IList<IAssertion>>(nameof(IEffectiveBody.ResolvedEnsureList)),
                 new OnceReferenceSourceTemplate<TBody, IList<IIdentifier>>(nameof(IEffectiveBody.ResolvedExceptionIdentifierList)),
                 new OnceReferenceCollectionSourceTemplate<TBody, IEntityDeclaration, IScopeAttributeFeature>(nameof(IEffectiveBody.EntityDeclarationList), nameof(IEntityDeclaration.ValidEntity)),
-                new OnceReferenceCollectionSourceTemplate<TBody, IInstruction, IScopeAttributeFeature>(nameof(IEffectiveBody.BodyInstructionList), nameof(IInstruction.ResolvedResult)),
+                new OnceReferenceCollectionSourceTemplate<TBody, IInstruction, IList<IExpressionType>>(nameof(IEffectiveBody.BodyInstructionList), nameof(IInstruction.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()

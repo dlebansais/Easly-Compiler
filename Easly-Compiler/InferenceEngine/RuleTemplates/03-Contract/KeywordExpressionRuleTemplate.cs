@@ -80,6 +80,27 @@
 
             resolvedExceptions = new List<IIdentifier>();
 
+            bool IsHandled = false;
+
+            switch (Value)
+            {
+                case BaseNode.Keyword.True:
+                case BaseNode.Keyword.False:
+                    expressionConstant = new BooleanLanguageConstant(Value == BaseNode.Keyword.True);
+                    IsHandled = true;
+                    break;
+
+                case BaseNode.Keyword.Current:
+                case BaseNode.Keyword.Value:
+                case BaseNode.Keyword.Result:
+                case BaseNode.Keyword.Retry:
+                case BaseNode.Keyword.Exception:
+                    IsHandled = true;
+                    break;
+            }
+
+            Debug.Assert(IsHandled);
+
             return true;
         }
 

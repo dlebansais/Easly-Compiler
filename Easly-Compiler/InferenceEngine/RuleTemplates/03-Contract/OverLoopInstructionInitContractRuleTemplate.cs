@@ -188,7 +188,7 @@
                 TypeFixedEntity.FixFeatureType(ItemTypeName, ItemType);
             }
 
-            node.ResolvedResult.Item = new List<IExpressionType>();
+            node.ResolvedInitResult.Item = new List<IExpressionType>();
         }
         #endregion
     }

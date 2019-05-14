@@ -48,7 +48,7 @@
                 Success = false;
             else
             {
-                IFormattedNumber fn = FormattedNumber.Parse(ValidText, true);
+                IFormattedNumber fn = FormattedNumber.Parse(ValidText, false);
                 if (!string.IsNullOrEmpty(fn.InvalidText))
                     Success = false;
             }
