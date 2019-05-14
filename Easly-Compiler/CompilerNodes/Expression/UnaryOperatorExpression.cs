@@ -10,6 +10,20 @@ namespace CompilerNode
     /// </summary>
     public interface IUnaryOperatorExpression : BaseNode.IUnaryOperatorExpression, IExpression
     {
+        /// <summary>
+        /// The resolved operator feature.
+        /// </summary>
+        OnceReference<IFunctionFeature> SelectedFeature { get; }
+
+        /// <summary>
+        /// The resolved operator feature overload.
+        /// </summary>
+        OnceReference<IQueryOverload> SelectedOverload { get; }
+
+        /// <summary>
+        /// Type of the resolved operator feature overload.
+        /// </summary>
+        OnceReference<IQueryOverloadType> SelectedOverloadType { get; }
     }
 
     /// <summary>
@@ -84,6 +98,9 @@ namespace CompilerNode
                 ResolvedResult = new OnceReference<IList<IExpressionType>>();
                 NumberConstant = new OnceReference<ILanguageConstant>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
+                SelectedFeature = new OnceReference<IFunctionFeature>();
+                SelectedOverload = new OnceReference<IQueryOverload>();
+                SelectedOverloadType = new OnceReference<IQueryOverloadType>();
                 IsHandled = true;
             }
 
@@ -113,6 +130,10 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsResolved = ResolvedResult.IsAssigned && NumberConstant.IsAssigned && ResolvedExceptions.IsAssigned;
+                Debug.Assert(SelectedFeature.IsAssigned || !IsResolved);
+                Debug.Assert(SelectedOverload.IsAssigned || !IsResolved);
+                Debug.Assert(SelectedOverloadType.IsAssigned || !IsResolved);
+
                 IsHandled = true;
             }
 
@@ -144,6 +165,21 @@ namespace CompilerNode
         #endregion
 
         #region Compiler
+        /// <summary>
+        /// The resolved operator feature.
+        /// </summary>
+        public OnceReference<IFunctionFeature> SelectedFeature { get; private set; } = new OnceReference<IFunctionFeature>();
+
+        /// <summary>
+        /// The resolved operator feature overload.
+        /// </summary>
+        public OnceReference<IQueryOverload> SelectedOverload { get; private set; } = new OnceReference<IQueryOverload>();
+
+        /// <summary>
+        /// Type of the resolved operator feature overload.
+        /// </summary>
+        public OnceReference<IQueryOverloadType> SelectedOverloadType { get; private set; } = new OnceReference<IQueryOverloadType>();
+
         /// <summary>
         /// Compares two expressions.
         /// </summary>

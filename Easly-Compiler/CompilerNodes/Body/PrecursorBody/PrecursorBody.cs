@@ -11,6 +11,15 @@ namespace CompilerNode
     /// </summary>
     public interface IPrecursorBody : BaseNode.IPrecursorBody, IBody, ICompiledBody
     {
+        /// <summary>
+        /// The resolved precursor type name.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedAncestorTypeName { get; }
+
+        /// <summary>
+        /// The resolved precursor type name.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedAncestorType { get; }
     }
 
     /// <summary>
@@ -145,6 +154,8 @@ namespace CompilerNode
                 ResolvedRequireList = new OnceReference<IList<IAssertion>>();
                 ResolvedEnsureList = new OnceReference<IList<IAssertion>>();
                 ResolvedExceptionIdentifierList = new OnceReference<IList<IIdentifier>>();
+                ResolvedAncestorTypeName = new OnceReference<ITypeName>();
+                ResolvedAncestorType = new OnceReference<ICompiledType>();
                 IsHandled = true;
             }
 
@@ -174,6 +185,9 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsResolved = ResolvedResult.IsAssigned && ResolvedRequireList.IsAssigned && ResolvedEnsureList.IsAssigned && ResolvedExceptionIdentifierList.IsAssigned;
+                Debug.Assert(ResolvedAncestorTypeName.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedAncestorType.IsAssigned || !IsResolved);
+
                 IsHandled = true;
             }
 
@@ -221,6 +235,16 @@ namespace CompilerNode
         /// Entities local to a scope.
         /// </summary>
         public IHashtableEx<string, IScopeAttributeFeature> LocalScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+
+        /// <summary>
+        /// The resolved precursor type name.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedAncestorTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The resolved precursor type name.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedAncestorType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
     }
 }

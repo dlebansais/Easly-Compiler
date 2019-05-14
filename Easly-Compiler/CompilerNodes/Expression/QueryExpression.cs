@@ -15,6 +15,16 @@ namespace CompilerNode
         /// Replicated list from <see cref="BaseNode.QueryExpression.ArgumentBlocks"/>.
         /// </summary>
         IList<IArgument> ArgumentList { get; }
+
+        /// <summary>
+        /// The resolved feature at the end of the path.
+        /// </summary>
+        OnceReference<ICompiledFeature> ResolvedFinalFeature { get; }
+
+        /// <summary>
+        /// The list of resolved arguments.
+        /// </summary>
+        OnceReference<List<ExpressionType>> ResolvedArgumentList { get; }
     }
 
     /// <summary>
@@ -119,6 +129,8 @@ namespace CompilerNode
                 ResolvedResult = new OnceReference<IList<IExpressionType>>();
                 NumberConstant = new OnceReference<ILanguageConstant>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
+                ResolvedFinalFeature = new OnceReference<ICompiledFeature>();
+                ResolvedArgumentList = new OnceReference<List<ExpressionType>>();
                 IsHandled = true;
             }
 
@@ -148,6 +160,9 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsResolved = ResolvedResult.IsAssigned && NumberConstant.IsAssigned && ResolvedExceptions.IsAssigned;
+                Debug.Assert(ResolvedFinalFeature.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedArgumentList.IsAssigned || !IsResolved);
+
                 IsHandled = true;
             }
 
@@ -179,6 +194,16 @@ namespace CompilerNode
         #endregion
 
         #region Compiler
+        /// <summary>
+        /// The resolved feature at the end of the path.
+        /// </summary>
+        public OnceReference<ICompiledFeature> ResolvedFinalFeature { get; private set; } = new OnceReference<ICompiledFeature>();
+
+        /// <summary>
+        /// The list of resolved arguments.
+        /// </summary>
+        public OnceReference<List<ExpressionType>> ResolvedArgumentList { get; private set; } = new OnceReference<List<ExpressionType>>();
+
         /// <summary>
         /// Compares two expressions.
         /// </summary>

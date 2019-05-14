@@ -11,6 +11,20 @@ namespace CompilerNode
     /// </summary>
     public interface IWith : BaseNode.IWith, INode, INodeWithReplicatedBlocks, ISource, IScopeHolder
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.With.RangeBlocks"/>.
+        /// </summary>
+        IList<IRange> RangeList { get; }
+
+        /// <summary>
+        /// Types of results of the with clause.
+        /// </summary>
+        OnceReference<IList<IExpressionType>> ResolvedResult { get; }
+
+        /// <summary>
+        /// List of exceptions the with clause can throw.
+        /// </summary>
+        OnceReference<IList<IIdentifier>> ResolvedExceptions { get; }
     }
 
     /// <summary>
@@ -111,6 +125,8 @@ namespace CompilerNode
                 LocalScope = new HashtableEx<string, IScopeAttributeFeature>();
                 InnerScopes = new List<IScopeHolder>();
                 FullScope = new HashtableEx<string, IScopeAttributeFeature>();
+                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
@@ -143,7 +159,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                IsResolved = false;
+                IsResolved = ResolvedResult.IsAssigned && ResolvedExceptions.IsAssigned;
                 IsHandled = true;
             }
 
@@ -167,6 +183,18 @@ namespace CompilerNode
         /// All reachable entities.
         /// </summary>
         public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Types of results of the with clause.
+        /// </summary>
+        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+
+        /// <summary>
+        /// List of exceptions the with clause can throw.
+        /// </summary>
+        public OnceReference<IList<IIdentifier>> ResolvedExceptions { get; private set; } = new OnceReference<IList<IIdentifier>>();
         #endregion
     }
 }

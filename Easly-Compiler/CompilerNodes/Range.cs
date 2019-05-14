@@ -2,6 +2,7 @@ namespace CompilerNode
 {
     using System.Collections.Generic;
     using System.Diagnostics;
+    using Easly;
     using EaslyCompiler;
 
     /// <summary>
@@ -9,6 +10,10 @@ namespace CompilerNode
     /// </summary>
     public interface IRange : BaseNode.IRange, INode, ISource
     {
+        /// <summary>
+        /// The resolved range as a constant.
+        /// </summary>
+        OnceReference<IConstantRange> ResolvedRange { get; }
     }
 
     /// <summary>
@@ -80,6 +85,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
+                ResolvedRange = new OnceReference<IConstantRange>();
                 IsHandled = true;
             }
 
@@ -108,13 +114,20 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                IsResolved = false;
+                IsResolved = ResolvedRange.IsAssigned;
                 IsHandled = true;
             }
 
             Debug.Assert(IsHandled);
             return IsResolved;
         }
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// The resolved range as a constant.
+        /// </summary>
+        public OnceReference<IConstantRange> ResolvedRange { get; private set; } = new OnceReference<IConstantRange>();
         #endregion
     }
 }

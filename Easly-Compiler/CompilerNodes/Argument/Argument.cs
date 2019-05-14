@@ -20,6 +20,11 @@ namespace CompilerNode
         /// Types of expression results for the argument.
         /// </summary>
         OnceReference<IList<IExpressionType>> ResolvedResult { get; }
+
+        /// <summary>
+        /// True if the argument is a constant.
+        /// </summary>
+        bool IsConstant { get; }
     }
 
     /// <summary>

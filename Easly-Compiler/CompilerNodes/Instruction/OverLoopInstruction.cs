@@ -25,6 +25,11 @@ namespace CompilerNode
         /// Scope of instructions in the loop.
         /// </summary>
         IHashtableEx<string, IScopeAttributeFeature> InnerLoopScope { get; }
+
+        /// <summary>
+        /// Result types of initialization.
+        /// </summary>
+        OnceReference<IList<IExpressionType>> ResolvedInitResult { get; }
     }
 
     /// <summary>
@@ -141,6 +146,7 @@ namespace CompilerNode
             {
                 ResolvedResult = new OnceReference<IList<IExpressionType>>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
+                ResolvedInitResult = new OnceReference<IList<IExpressionType>>();
                 IsHandled = true;
             }
 
@@ -170,6 +176,8 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsResolved = ResolvedResult.IsAssigned && ResolvedExceptions.IsAssigned;
+                Debug.Assert(ResolvedInitResult.IsAssigned || !IsResolved);
+
                 IsHandled = true;
             }
 
@@ -212,6 +220,13 @@ namespace CompilerNode
         /// Scope of instructions in the loop.
         /// </summary>
         public IHashtableEx<string, IScopeAttributeFeature> InnerLoopScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Result types of initialization.
+        /// </summary>
+        public OnceReference<IList<IExpressionType>> ResolvedInitResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
         #endregion
 
         #region Debugging

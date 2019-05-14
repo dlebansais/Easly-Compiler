@@ -159,6 +159,11 @@
         /// Types of expression results for the argument.
         /// </summary>
         public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+
+        /// <summary>
+        /// True if the argument is a constant.
+        /// </summary>
+        public bool IsConstant { get; private set; }
         #endregion
 
         #region Compiler

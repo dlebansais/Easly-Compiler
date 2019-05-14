@@ -15,6 +15,21 @@
         /// Replicated list from <see cref="BaseNode.InitializedObjectExpression.AssignmentBlocks"/>.
         /// </summary>
         IList<IAssignmentArgument> AssignmentList { get; }
+
+        /// <summary>
+        /// The resolved class type name.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedClassTypeName { get; }
+
+        /// <summary>
+        /// The resolved class type.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedClassType { get; }
+
+        /// <summary>
+        /// The list of features assigned in the resolved type.
+        /// </summary>
+        IHashtableEx<string, ICompiledFeature> AssignedFeatureTable { get; }
     }
 
     /// <summary>
@@ -119,6 +134,9 @@
                 ResolvedResult = new OnceReference<IList<IExpressionType>>();
                 NumberConstant = new OnceReference<ILanguageConstant>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
+                ResolvedClassTypeName = new OnceReference<ITypeName>();
+                ResolvedClassType = new OnceReference<ICompiledType>();
+                AssignedFeatureTable = new HashtableEx<string, ICompiledFeature>();
                 IsHandled = true;
             }
 
@@ -148,6 +166,10 @@
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsResolved = ResolvedResult.IsAssigned && NumberConstant.IsAssigned && ResolvedExceptions.IsAssigned;
+                Debug.Assert(ResolvedClassTypeName.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedClassType.IsAssigned || !IsResolved);
+                Debug.Assert(AssignedFeatureTable.IsSealed || !IsResolved);
+
                 IsHandled = true;
             }
 
@@ -179,6 +201,21 @@
         #endregion
 
         #region Compiler
+        /// <summary>
+        /// The resolved class type name.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedClassTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The resolved class type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedClassType { get; private set; } = new OnceReference<ICompiledType>();
+
+        /// <summary>
+        /// The list of features assigned in the resolved type.
+        /// </summary>
+        public IHashtableEx<string, ICompiledFeature> AssignedFeatureTable { get; private set; } = new HashtableEx<string, ICompiledFeature>();
+
         /// <summary>
         /// Compares two expressions.
         /// </summary>

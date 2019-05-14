@@ -11,6 +11,10 @@ namespace CompilerNode
     /// </summary>
     public interface IPrecursorIndexAssignmentInstruction : BaseNode.IPrecursorIndexAssignmentInstruction, IInstruction, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.PrecursorIndexAssignmentInstruction.ArgumentBlocks"/>.
+        /// </summary>
+        IList<IArgument> ArgumentList { get; }
     }
 
     /// <summary>

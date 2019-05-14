@@ -14,6 +14,12 @@
         /// The valid value of <see cref="BaseNode.IManifestNumberExpression.Text"/>.
         /// </summary>
         OnceReference<string> ValidText { get; }
+
+        /// <summary>
+        /// Sets the <see cref="IExpression.NumberConstant"/> property.
+        /// </summary>
+        /// <param name="numberConstant">The constant type.</param>
+        void SetIsConstant(ILanguageConstant numberConstant);
     }
 
     /// <summary>
@@ -176,6 +182,17 @@
         /// List of exceptions the expression can throw.
         /// </summary>
         public OnceReference<IList<IIdentifier>> ResolvedExceptions { get; private set; } = new OnceReference<IList<IIdentifier>>();
+
+        /// <summary>
+        /// Sets the <see cref="IExpression.IsConstant"/> property.
+        /// </summary>
+        /// <param name="numberConstant">The constant type.</param>
+        public void SetIsConstant(ILanguageConstant numberConstant)
+        {
+            Debug.Assert(!NumberConstant.IsAssigned);
+
+            NumberConstant.Item = numberConstant;
+        }
         #endregion
 
         #region Compiler

@@ -11,6 +11,10 @@ namespace CompilerNode
     /// </summary>
     public interface IThrowInstruction : BaseNode.IThrowInstruction, IInstruction, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.ThrowInstruction.ArgumentBlocks"/>.
+        /// </summary>
+        IList<IArgument> ArgumentList { get; }
     }
 
     /// <summary>
