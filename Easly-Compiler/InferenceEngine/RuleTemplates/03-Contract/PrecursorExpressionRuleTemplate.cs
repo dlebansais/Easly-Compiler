@@ -96,9 +96,11 @@
             if (AncestorType.IsAssigned)
             {
                 IObjectType AssignedAncestorType = (IObjectType)AncestorType.Item;
+                IClassType Ancestor = AssignedAncestorType.ResolvedType.Item as IClassType;
+                Debug.Assert(Ancestor != null);
 
                 foreach (IPrecursorInstance PrecursorItem in Instance.PrecursorList)
-                    if (PrecursorItem.Ancestor == AssignedAncestorType)
+                    if (PrecursorItem.Ancestor.BaseClass == Ancestor.BaseClass)
                     {
                         SelectedPrecursor.Item = PrecursorItem.Precursor;
                         break;
@@ -126,6 +128,7 @@
                 return false;
 
             ICompiledFeature OperatorFeature = SelectedPrecursor.Item.Feature.Item;
+            ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
             ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
             IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
             bool IsHandled = false;
@@ -153,6 +156,33 @@
                 case IProcedureType AsProcedureType:
                 case IIndexerType AsIndexerType:
                     errorList.AddError(new ErrorInvalidExpression(node));
+                    IsHandled = true;
+                    break;
+
+                case IClassType AsClassType:
+                    if (ArgumentList.Count > 0)
+                        errorList.AddError(new ErrorInvalidExpression(node));
+                    else
+                    {
+                        resolvedResult = new List<IExpressionType>()
+                        {
+                            new ExpressionType(OperatorTypeName, OperatorType, string.Empty)
+                        };
+
+                        resolvedExceptions = new List<IIdentifier>();
+                        selectedParameterList = new ListTableEx<IParameter>();
+                        resolvedArgumentList = new List<IExpressionType>();
+
+                        if (OperatorFeature is IConstantFeature AsConstantFeature)
+                        {
+                            IExpression ConstantValue = (IExpression)AsConstantFeature.ConstantValue;
+                            Debug.Assert(ConstantValue.ExpressionConstant.IsAssigned);
+
+                            expressionConstant = ConstantValue.ExpressionConstant.Item;
+                        }
+
+                        Success = true;
+                    }
                     IsHandled = true;
                     break;
 

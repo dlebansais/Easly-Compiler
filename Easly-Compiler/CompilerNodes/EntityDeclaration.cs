@@ -59,10 +59,16 @@ namespace CompilerNode
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityDeclaration"/> class.
         /// </summary>
+        /// <param name="source">The source object.</param>
         /// <param name="resolvedTypeName">The resolved entity type name.</param>
         /// <param name="resolvedType">The resolved entity type.</param>
-        public EntityDeclaration(ITypeName resolvedTypeName, ICompiledType resolvedType)
+        public EntityDeclaration(IEntityDeclaration source, ITypeName resolvedTypeName, ICompiledType resolvedType)
         {
+            Documentation = source.Documentation;
+            EntityName = source.EntityName;
+            EntityType = source.EntityType;
+            DefaultValue = source.DefaultValue;
+
             ResolvedEntityTypeName.Item = resolvedTypeName;
             ResolvedEntityType.Item = resolvedType;
         }

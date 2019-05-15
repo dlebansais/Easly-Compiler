@@ -312,7 +312,7 @@
                 ICompiledType InstancedParameterType = Parameter.ValidEntity.Item.ResolvedFeatureType.Item;
                 InstancedParameterType.InstanciateType(instancingClassType, ref InstancedParameterTypeName, ref InstancedParameterType);
 
-                IEntityDeclaration InstancedParameter = new EntityDeclaration(InstancedParameterTypeName, InstancedParameterType);
+                IEntityDeclaration InstancedParameter = new EntityDeclaration(Parameter, InstancedParameterTypeName, InstancedParameterType);
                 IName ParameterName = (IName)Parameter.EntityName;
 
                 IScopeAttributeFeature NewEntity;
@@ -340,7 +340,7 @@
                 ICompiledType InstancedResultType = Result.ValidEntity.Item.ResolvedFeatureType.Item;
                 InstancedResultType.InstanciateType(instancingClassType, ref InstancedResultTypeName, ref InstancedResultType);
 
-                IEntityDeclaration InstancedResult = new EntityDeclaration(InstancedResultTypeName, InstancedResultType);
+                IEntityDeclaration InstancedResult = new EntityDeclaration(Result, InstancedResultTypeName, InstancedResultType);
                 IName ResultName = (IName)Result.EntityName;
 
                 IScopeAttributeFeature NewEntity;

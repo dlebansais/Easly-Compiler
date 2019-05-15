@@ -261,7 +261,7 @@
                 ICompiledType InstancedParameterType = Parameter.ValidEntity.Item.ResolvedFeatureType.Item;
                 InstancedParameterType.InstanciateType(instancingClassType, ref InstancedParameterTypeName, ref InstancedParameterType);
 
-                IEntityDeclaration InstancedParameter = new EntityDeclaration(InstancedParameterTypeName, InstancedParameterType);
+                IEntityDeclaration InstancedParameter = new EntityDeclaration(Parameter, InstancedParameterTypeName, InstancedParameterType);
                 IName ParameterName = (IName)Parameter.EntityName;
 
                 IScopeAttributeFeature NewEntity;

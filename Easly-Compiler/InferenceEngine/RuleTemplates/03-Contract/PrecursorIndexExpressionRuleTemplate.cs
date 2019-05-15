@@ -90,9 +90,11 @@
                 if (AncestorType.IsAssigned)
                 {
                     IObjectType AssignedAncestorType = (IObjectType)AncestorType.Item;
+                    IClassType Ancestor = AssignedAncestorType.ResolvedType.Item as IClassType;
+                    Debug.Assert(Ancestor != null);
 
                     foreach (IPrecursorInstance PrecursorItem in Instance.PrecursorList)
-                        if (PrecursorItem.Ancestor == AssignedAncestorType)
+                        if (PrecursorItem.Ancestor.BaseClass == Ancestor.BaseClass)
                         {
                             SelectedPrecursor.Item = PrecursorItem.Precursor;
                             break;
@@ -131,6 +133,7 @@
                     case IFunctionType AsFunctionType:
                     case IProcedureType AsProcedureType:
                     case IPropertyType AsPropertyType:
+                    case IClassType AsClassType:
                         errorList.AddError(new ErrorInvalidExpression(node));
                         IsHandled = true;
                         break;

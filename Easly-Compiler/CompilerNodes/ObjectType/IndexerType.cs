@@ -125,6 +125,15 @@
             SetRequireList = setRequireList;
             SetEnsureList = setEnsureList;
             SetExceptionIdentifierList = setExceptionIdentifierList;
+
+            foreach (IEntityDeclaration Item in indexParameterList)
+            {
+                IName ParameterName = (IName)Item.EntityName;
+                string ValidText = ParameterName.ValidText.Item;
+                IScopeAttributeFeature ParameterFeature = Item.ValidEntity.Item;
+                ParameterTable.Add(new Parameter(ValidText, ParameterFeature));
+            }
+            ParameterTable.Seal();
         }
         #endregion
 
@@ -493,10 +502,7 @@
                 ICompiledType InstancedParameterType = Parameter.ValidEntity.Item.ResolvedFeatureType.Item;
                 InstancedParameterType.InstanciateType(instancingClassType, ref InstancedParameterTypeName, ref InstancedParameterType);
 
-                IEntityDeclaration InstancedParameter = new EntityDeclaration();
-                InstancedParameter.ResolvedEntityTypeName.Item = InstancedParameterTypeName;
-                InstancedParameter.ResolvedEntityType.Item = InstancedParameterType;
-
+                IEntityDeclaration InstancedParameter = new EntityDeclaration(Parameter, InstancedParameterTypeName, InstancedParameterType);
                 IName ParameterName = (Name)Parameter.EntityName;
 
                 IScopeAttributeFeature NewEntity;
