@@ -23,12 +23,12 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new SealedTableSourceTemplate<IAssignmentArgument, IExpression, ILanguageConstant>(nameof(IAssignmentArgument.ConstantSourceList)),
+                new SealedListSourceTemplate<IAssignmentArgument, IExpression>(nameof(IAssignmentArgument.ConstantSourceList)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IAssignmentArgument, IList<IExpressionType>>(nameof(IAssignmentArgument.ExpressionConstant)),
+                new OnceReferenceDestinationTemplate<IAssignmentArgument, ILanguageConstant>(nameof(IAssignmentArgument.ExpressionConstant)),
             };
         }
         #endregion

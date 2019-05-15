@@ -158,18 +158,6 @@ namespace CompilerNode
         /// Specific constant number.
         /// </summary>
         public OnceReference<ILanguageConstant> ExpressionConstant { get; private set; } = new OnceReference<ILanguageConstant>();
-
-        /// <summary>
-        /// Sets the <see cref="IExpression.ExpressionConstant"/> property.
-        /// </summary>
-        /// <param name="expressionConstant">The expression constant.</param>
-        public void SetExpressionConstant(ILanguageConstant expressionConstant)
-        {
-            Debug.Assert(!ExpressionConstant.IsAssigned);
-            Debug.Assert(expressionConstant != null);
-
-            ExpressionConstant.Item = expressionConstant;
-        }
         #endregion
 
         #region Compiler

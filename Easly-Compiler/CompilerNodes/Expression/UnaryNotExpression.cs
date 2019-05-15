@@ -145,21 +145,6 @@
         /// Specific constant number.
         /// </summary>
         public OnceReference<ILanguageConstant> ExpressionConstant { get; private set; } = new OnceReference<ILanguageConstant>();
-
-        /// <summary>
-        /// Sets the <see cref="IExpression.ExpressionConstant"/> property.
-        /// </summary>
-        /// <param name="expressionConstant">The expression constant.</param>
-        public void SetExpressionConstant(ILanguageConstant expressionConstant)
-        {
-            Debug.Assert(!ExpressionConstant.IsAssigned);
-
-            if (expressionConstant != null)
-            {
-                Debug.Assert(expressionConstant is IBooleanLanguageConstant);
-                ExpressionConstant.Item = expressionConstant;
-            }
-        }
         #endregion
 
         #region Compiler

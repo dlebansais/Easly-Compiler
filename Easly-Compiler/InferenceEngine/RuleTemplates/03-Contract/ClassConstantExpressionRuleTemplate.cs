@@ -23,7 +23,6 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceSourceTemplate<IClassConstantExpression, ILanguageConstant>(nameof(IExpression.ExpressionConstant), TemplateConstantStart.Default),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
@@ -122,7 +121,6 @@
                     ConstantTypeName = AsConstantFeature.ResolvedEntityTypeName.Item;
                     ConstantType = AsConstantFeature.ResolvedEntityType.Item;
 
-                    // This constant is assigned because the corresponding source template is ready.
                     IExpression ConstantValue = (IExpression)AsConstantFeature.ConstantValue;
                     constantSourceList.Add(ConstantValue);
                 }

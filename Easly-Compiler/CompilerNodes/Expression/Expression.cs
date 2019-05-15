@@ -35,12 +35,6 @@ namespace CompilerNode
         /// The constant expression, if assigned.
         /// </summary>
         OnceReference<ILanguageConstant> ExpressionConstant { get; }
-
-        /// <summary>
-        /// Sets the <see cref="IExpression.ExpressionConstant"/> property.
-        /// </summary>
-        /// <param name="expressionConstant">The expression constant.</param>
-        void SetExpressionConstant(ILanguageConstant expressionConstant);
     }
 
     /// <summary>
