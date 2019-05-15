@@ -1,31 +1,34 @@
 ﻿namespace EaslyCompiler
 {
+    using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
+    using Easly;
 
     /// <summary>
     /// A rule to process <see cref="IAssignmentArgument"/>.
     /// </summary>
-    public interface IAssignmentArgumentRuleTemplate : IRuleTemplate
+    public interface IAssignmentArgumentConstantRuleTemplate : IRuleTemplate
     {
     }
 
     /// <summary>
     /// A rule to process <see cref="IAssignmentArgument"/>.
     /// </summary>
-    public class AssignmentArgumentRuleTemplate : RuleTemplate<IAssignmentArgument, AssignmentArgumentRuleTemplate>, IAssignmentArgumentRuleTemplate
+    public class AssignmentArgumentConstantRuleTemplate : RuleTemplate<IAssignmentArgument, AssignmentArgumentConstantRuleTemplate>, IAssignmentArgumentConstantRuleTemplate
     {
         #region Init
-        static AssignmentArgumentRuleTemplate()
+        static AssignmentArgumentConstantRuleTemplate()
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceSourceTemplate<IAssignmentArgument, IList<IExpressionType>>(nameof(IAssignmentArgument.Source) + Dot + nameof(IExpression.ResolvedResult)),
+                new SealedTableSourceTemplate<IAssignmentArgument, IExpression, ILanguageConstant>(nameof(IAssignmentArgument.ConstantSourceList)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IAssignmentArgument, IList<IExpressionType>>(nameof(IAssignmentArgument.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IAssignmentArgument, IList<IExpressionType>>(nameof(IAssignmentArgument.ExpressionConstant)),
             };
         }
         #endregion
@@ -53,10 +56,12 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IAssignmentArgument node, object data)
         {
-            IExpression Source = (IExpression)node.Source;
-            node.ResolvedResult.Item = Source.ResolvedResult.Item;
-            node.ConstantSourceList.Add(Source);
-            node.ConstantSourceList.Seal();
+            IExpression SourceExpression = (IExpression)node.Source;
+
+            Debug.Assert(SourceExpression.ExpressionConstant.IsAssigned);
+            ILanguageConstant ExpressionConstant = SourceExpression.ExpressionConstant.Item;
+
+            node.ExpressionConstant.Item = ExpressionConstant;
         }
         #endregion
     }

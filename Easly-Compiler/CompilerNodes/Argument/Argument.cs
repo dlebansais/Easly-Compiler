@@ -22,9 +22,14 @@ namespace CompilerNode
         OnceReference<IList<IExpressionType>> ResolvedResult { get; }
 
         /// <summary>
-        /// True if the argument is a constant.
+        /// The list of sources for a constant, if any.
         /// </summary>
-        bool IsConstant { get; }
+        ListTableEx<IExpression> ConstantSourceList { get; }
+
+        /// <summary>
+        /// The constant expression, if assigned.
+        /// </summary>
+        OnceReference<ILanguageConstant> ExpressionConstant { get; }
     }
 
     /// <summary>

@@ -97,11 +97,7 @@
             int ExpressionErrorCount = 0;
             foreach (IAssignmentArgument AssignmentItem in AssignmentList)
             {
-                if (!AssignmentItem.IsConstant)
-                {
-                    errorList.AddError(new ErrorConstantExpected(AssignmentItem));
-                    ExpressionErrorCount++;
-                }
+                constantSourceList.Add((IExpression)AssignmentItem.Source);
 
                 IList<IExpressionType> ExpressionResult = AssignmentItem.ResolvedResult.Item;
                 if (ExpressionResult.Count < AssignmentItem.ParameterList.Count)
@@ -248,7 +244,6 @@
             node.ResolvedExceptions.Item = ResolvedExceptions;
             node.ConstantSourceList.AddRange(ConstantSourceList);
             node.ConstantSourceList.Seal();
-            node.ExpressionConstant.Item = ExpressionConstant;
 
             node.ResolvedClassTypeName.Item = InitializedObjectTypeName;
             node.ResolvedClassType.Item = InitializedObjectType;

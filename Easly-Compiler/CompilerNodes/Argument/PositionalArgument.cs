@@ -83,6 +83,8 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ConstantSourceList = new ListTableEx<IExpression>();
+                ExpressionConstant = new OnceReference<ILanguageConstant>();
                 IsHandled = true;
             }
 
@@ -127,9 +129,14 @@ namespace CompilerNode
         public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
 
         /// <summary>
-        /// True if the argument is a constant.
+        /// The list of sources for a constant, if any.
         /// </summary>
-        public bool IsConstant { get; private set; }
+        public ListTableEx<IExpression> ConstantSourceList { get; private set; } = new ListTableEx<IExpression>();
+
+        /// <summary>
+        /// The constant expression, if assigned.
+        /// </summary>
+        public OnceReference<ILanguageConstant> ExpressionConstant { get; private set; } = new OnceReference<ILanguageConstant>();
         #endregion
 
         #region Compiler

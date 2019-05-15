@@ -425,6 +425,9 @@
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\Miscellaneous\SingleClassGroup.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\Miscellaneous\TypeArgumentStyles.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\Miscellaneous\TypeInstancingRecord.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\InitializedObjectExpressionConstantRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\AssignmentArgumentConstantRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\PositionalArgumentConstantRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\Miscellaneous\NeutralLanguageConstant.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\UnaryNotExpressionConstantRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\ResultOfExpressionConstantRuleTemplate.cs" />
