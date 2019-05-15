@@ -425,6 +425,16 @@
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\Miscellaneous\SingleClassGroup.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\Miscellaneous\TypeArgumentStyles.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\Miscellaneous\TypeInstancingRecord.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\Miscellaneous\NeutralLanguageConstant.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\UnaryNotExpressionConstantRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\ResultOfExpressionConstantRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\PrecursorExpressionConstantRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\EqualityExpressionConstantRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\ClassConstantExpressionConstantRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\BinaryOperatorExpressionConstantRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\BinaryConditionalExpressionConstantRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\AssertionTagExpressionConstantRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\Miscellaneous\EntityLanguageConstant.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\Miscellaneous\AgentLanguageConstant.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\Miscellaneous\StringLanguageConstant.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\Miscellaneous\CharacterLanguageConstant.cs" />

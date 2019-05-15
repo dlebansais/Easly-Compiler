@@ -35,6 +35,11 @@
         }
 
         /// <summary>
+        /// True if the constant value is known.
+        /// </summary>
+        public override bool IsValueKnown { get { return Value.HasValue; } }
+
+        /// <summary>
         /// The constant value, if known.
         /// </summary>
         public char? Value { get; }
@@ -45,7 +50,7 @@
         /// <param name="other">The other instance.</param>
         public override bool IsCompatibleWith(ILanguageConstant other)
         {
-            return other is ICharacterLanguageConstant AsCharacterLanguageConstant && Value.HasValue && AsCharacterLanguageConstant.Value.HasValue;
+            return other is ICharacterLanguageConstant AsCharacterLanguageConstant && IsValueKnown && AsCharacterLanguageConstant.IsValueKnown;
         }
 
         /// <summary>

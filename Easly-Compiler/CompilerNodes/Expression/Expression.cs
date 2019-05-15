@@ -22,14 +22,19 @@ namespace CompilerNode
         OnceReference<IList<IExpressionType>> ResolvedResult { get; }
 
         /// <summary>
-        /// The constant expression, if assigned.
-        /// </summary>
-        OnceReference<ILanguageConstant> ExpressionConstant { get; }
-
-        /// <summary>
         /// List of exceptions the expression can throw.
         /// </summary>
         OnceReference<IList<IIdentifier>> ResolvedExceptions { get; }
+
+        /// <summary>
+        /// The list of sources for a constant, if any.
+        /// </summary>
+        ListTableEx<IExpression> ConstantSourceList { get; }
+
+        /// <summary>
+        /// The constant expression, if assigned.
+        /// </summary>
+        OnceReference<ILanguageConstant> ExpressionConstant { get; }
 
         /// <summary>
         /// Sets the <see cref="IExpression.ExpressionConstant"/> property.
@@ -43,6 +48,11 @@ namespace CompilerNode
     /// </summary>
     public static class Expression
     {
+        /// <summary>
+        /// Object that indicates there is no constant source for an expression.
+        /// </summary>
+        public static IExpression NoConstantSource { get; } = new NeutralExpression();
+
         /// <summary>
         /// Compares two expressions.
         /// </summary>

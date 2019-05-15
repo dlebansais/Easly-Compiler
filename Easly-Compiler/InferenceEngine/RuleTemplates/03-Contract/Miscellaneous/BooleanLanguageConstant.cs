@@ -35,6 +35,11 @@
         }
 
         /// <summary>
+        /// True if the constant value is known.
+        /// </summary>
+        public override bool IsValueKnown { get { return Value.HasValue; } }
+
+        /// <summary>
         /// The constant value, if known.
         /// </summary>
         public bool? Value { get; }
@@ -45,7 +50,7 @@
         /// <param name="other">The other instance.</param>
         public override bool IsCompatibleWith(ILanguageConstant other)
         {
-            return other is IBooleanLanguageConstant AsBooleanLanguageConstant && Value.HasValue && AsBooleanLanguageConstant.Value.HasValue;
+            return other is IBooleanLanguageConstant AsBooleanLanguageConstant && IsValueKnown && AsBooleanLanguageConstant.IsValueKnown;
         }
 
         /// <summary>

@@ -30,6 +30,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IBinaryConditionalExpression, IList<IExpressionType>>(nameof(IBinaryConditionalExpression.ResolvedResult)),
+                new UnsealedListDestinationTemplate<IBinaryConditionalExpression, IExpression>(nameof(IBinaryConditionalExpression.ConstantSourceList)),
             };
         }
         #endregion
@@ -47,9 +48,9 @@
             data = null;
             bool Success = true;
 
-            Success &= BinaryConditionalExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out IBooleanLanguageConstant ExpressionConstant);
+            Success &= BinaryConditionalExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out ListTableEx<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant);
             if (Success)
-                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, IBooleanLanguageConstant>(ResolvedResult, ResolvedExceptions, ExpressionConstant);
+                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>(ResolvedResult, ResolvedExceptions, ConstantSourceList, ExpressionConstant);
 
             return Success;
         }
@@ -61,12 +62,14 @@
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="resolvedResult">The expression result types upon return.</param>
         /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
         /// <param name="expressionConstant">The constant value upon return, if any.</param>
-        public static bool ResolveCompilerReferences(IBinaryConditionalExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out IBooleanLanguageConstant expressionConstant)
+        public static bool ResolveCompilerReferences(IBinaryConditionalExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant)
         {
             resolvedResult = null;
             resolvedExceptions = null;
-            expressionConstant = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
 
             IExpression LeftExpression = (IExpression)node.LeftExpression;
             BaseNode.ConditionalTypes Conditional = node.Conditional;
@@ -78,42 +81,30 @@
             if (!IsLeftClassType || !IsRightClassType)
                 return false;
 
-            if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName ResultTypeName, out ICompiledType ResultType))
+            if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType))
             {
                 errorList.AddError(new ErrorBooleanTypeMissing(node));
                 return false;
             }
 
-            if (LeftExpression.ExpressionConstant.IsAssigned && RightExpression.ExpressionConstant.IsAssigned)
+            if (LeftExpressionClassType != BooleanType)
             {
-                IBooleanLanguageConstant LeftConstant = LeftExpression.ExpressionConstant.Item as IBooleanLanguageConstant;
-                Debug.Assert(LeftConstant != null);
-                IBooleanLanguageConstant RightConstant = RightExpression.ExpressionConstant.Item as IBooleanLanguageConstant;
-                Debug.Assert(RightConstant != null);
-
-                bool? LeftConstantValue = LeftConstant.Value;
-                bool? RightConstantValue = RightConstant.Value;
-
-                if (LeftConstantValue.HasValue && RightConstantValue.HasValue)
-                {
-                    switch (node.Conditional)
-                    {
-                        case BaseNode.ConditionalTypes.And:
-                            expressionConstant = new BooleanLanguageConstant(LeftConstantValue.Value && RightConstantValue.Value);
-                            break;
-
-                        case BaseNode.ConditionalTypes.Or:
-                            expressionConstant = new BooleanLanguageConstant(LeftConstantValue.Value || RightConstantValue.Value);
-                            break;
-                    }
-
-                    Debug.Assert(expressionConstant != null);
-                }
+                errorList.AddError(new ErrorInvalidExpression(LeftExpression));
+                return false;
             }
+
+            if (RightExpressionClassType != BooleanType)
+            {
+                errorList.AddError(new ErrorInvalidExpression(RightExpression));
+                return false;
+            }
+
+            constantSourceList.Add(LeftExpression);
+            constantSourceList.Add(RightExpression);
 
             resolvedResult = new List<IExpressionType>()
             {
-                new ExpressionType(ResultTypeName, ResultType, string.Empty)
+                new ExpressionType(BooleanTypeName, BooleanType, string.Empty)
             };
 
             // TODO: always have ResolvedExceptions assigned.
@@ -135,13 +126,15 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IBinaryConditionalExpression node, object data)
         {
-            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, IBooleanLanguageConstant>)data).Item1;
-            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, IBooleanLanguageConstant>)data).Item2;
-            IBooleanLanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, IBooleanLanguageConstant>)data).Item3;
+            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item1;
+            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item2;
+            ListTableEx<IExpression> ConstantSourceList = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item3;
+            ILanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item4;
 
             node.ResolvedResult.Item = ResolvedResult;
             node.ResolvedExceptions.Item = ResolvedExceptions;
-            node.SetExpressionConstant(ExpressionConstant);
+            node.ConstantSourceList.AddRange(ConstantSourceList);
+            node.ConstantSourceList.Seal();
         }
         #endregion
     }

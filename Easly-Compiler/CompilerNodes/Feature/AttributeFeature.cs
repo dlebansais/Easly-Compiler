@@ -199,6 +199,11 @@ namespace CompilerNode
         /// Guid of the language type corresponding to the entity object for an instance of this class.
         /// </summary>
         public Guid EntityGuid { get { return LanguageClasses.AttributeEntity.Guid; } }
+
+        /// <summary>
+        /// The source node associated to this instance.
+        /// </summary>
+        public ISource Location { get { return this; } }
         #endregion
 
         #region Implementation of IFeature

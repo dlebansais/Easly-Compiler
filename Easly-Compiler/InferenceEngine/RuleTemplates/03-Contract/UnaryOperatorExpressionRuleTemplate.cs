@@ -29,6 +29,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IUnaryOperatorExpression, IList<IExpressionType>>(nameof(IUnaryOperatorExpression.ResolvedResult)),
+                new UnsealedListDestinationTemplate<IUnaryOperatorExpression, IExpression>(nameof(IUnaryOperatorExpression.ConstantSourceList)),
             };
         }
         #endregion
@@ -46,9 +47,9 @@
             data = null;
             bool Success = true;
 
-            Success &= UnaryOperatorExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out ILanguageConstant ExpressionConstant, out IFunctionFeature SelectedFeature, out IQueryOverload SelectedOverload, out IQueryOverloadType SelectedOverloadType);
+            Success &= UnaryOperatorExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out ListTableEx<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out IFunctionFeature SelectedFeature, out IQueryOverload SelectedOverload, out IQueryOverloadType SelectedOverloadType);
             if (Success)
-                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, IFunctionFeature, IQueryOverload, IQueryOverloadType>(ResolvedResult, ResolvedExceptions, ExpressionConstant, SelectedFeature, SelectedOverload, SelectedOverloadType);
+                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload, IQueryOverloadType>(ResolvedResult, ResolvedExceptions, ConstantSourceList, ExpressionConstant, SelectedFeature, SelectedOverload, SelectedOverloadType);
 
             return Success;
         }
@@ -60,15 +61,17 @@
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="resolvedResult">The expression result types upon return.</param>
         /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
         /// <param name="expressionConstant">The constant value upon return, if any.</param>
         /// <param name="selectedFeature">The matching feature upon return.</param>
         /// <param name="selectedOverload">The matching overload in <paramref name="selectedFeature"/> upon return.</param>
         /// <param name="selectedOverloadType">The matching overload type upon return.</param>
-        public static bool ResolveCompilerReferences(IUnaryOperatorExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out ILanguageConstant expressionConstant, out IFunctionFeature selectedFeature, out IQueryOverload selectedOverload, out IQueryOverloadType selectedOverloadType)
+        public static bool ResolveCompilerReferences(IUnaryOperatorExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFunctionFeature selectedFeature, out IQueryOverload selectedOverload, out IQueryOverloadType selectedOverloadType)
         {
             resolvedResult = null;
             resolvedExceptions = null;
-            expressionConstant = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
             selectedFeature = null;
             selectedOverload = null;
             selectedOverloadType = null;
@@ -169,16 +172,19 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IUnaryOperatorExpression node, object data)
         {
-            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, IFunctionFeature, IQueryOverload, IQueryOverloadType>)data).Item1;
-            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, IFunctionFeature, IQueryOverload, IQueryOverloadType>)data).Item2;
-            ILanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, IFunctionFeature, IQueryOverload, IQueryOverloadType>)data).Item3;
-            IFunctionFeature SelectedFeature = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, IFunctionFeature, IQueryOverload, IQueryOverloadType>)data).Item4;
-            IQueryOverload SelectedOverload = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, IFunctionFeature, IQueryOverload, IQueryOverloadType>)data).Item5;
-            IQueryOverloadType SelectedOverloadType = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant, IFunctionFeature, IQueryOverload, IQueryOverloadType>)data).Item6;
+            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload, IQueryOverloadType>)data).Item1;
+            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload, IQueryOverloadType>)data).Item2;
+            ListTableEx<IExpression> ConstantSourceList = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload, IQueryOverloadType>)data).Item3;
+            ILanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload, IQueryOverloadType>)data).Item4;
+            IFunctionFeature SelectedFeature = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload, IQueryOverloadType>)data).Item5;
+            IQueryOverload SelectedOverload = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload, IQueryOverloadType>)data).Item6;
+            IQueryOverloadType SelectedOverloadType = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload, IQueryOverloadType>)data).Item7;
 
             node.ResolvedResult.Item = ResolvedResult;
             node.ResolvedExceptions.Item = ResolvedExceptions;
-            node.SetExpressionConstant(ExpressionConstant);
+            node.ConstantSourceList.AddRange(ConstantSourceList);
+            node.ConstantSourceList.Seal();
+            node.ExpressionConstant.Item = ExpressionConstant;
             node.SelectedFeature.Item = SelectedFeature;
             node.SelectedOverload.Item = SelectedOverload;
             node.SelectedOverloadType.Item = SelectedOverloadType;

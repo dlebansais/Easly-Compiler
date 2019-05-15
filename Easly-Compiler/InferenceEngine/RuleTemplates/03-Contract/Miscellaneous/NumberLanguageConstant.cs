@@ -36,6 +36,11 @@
         }
 
         /// <summary>
+        /// True if the constant value is known.
+        /// </summary>
+        public override bool IsValueKnown { get { return Value != null; } }
+
+        /// <summary>
         /// The constant value, if known.
         /// </summary>
         public ICanonicalNumber Value { get; }
@@ -61,7 +66,7 @@
         /// <param name="other">The other instance.</param>
         public override bool IsCompatibleWith(ILanguageConstant other)
         {
-            return other is INumberLanguageConstant AsNumberLanguageConstant && Value != null && AsNumberLanguageConstant.Value != null;
+            return other is INumberLanguageConstant AsNumberLanguageConstant && IsValueKnown && AsNumberLanguageConstant.IsValueKnown;
         }
 
         /// <summary>

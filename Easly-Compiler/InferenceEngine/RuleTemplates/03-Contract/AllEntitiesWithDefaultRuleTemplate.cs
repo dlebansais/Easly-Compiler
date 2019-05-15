@@ -22,8 +22,8 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceCollectionSourceTemplate<IClass, IExpression, IList<IExpressionType>>(nameof(IClass.NodeWithDefaultList), nameof(IExpression.ResolvedResult)),
-                new OnceReferenceCollectionSourceTemplate<IClass, IExpression, IList<IExpressionType>>(nameof(IClass.NodeWithNumberConstantList), nameof(IExpression.ResolvedResult)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IExpression, ILanguageConstant>(nameof(IClass.NodeWithDefaultList), nameof(IExpression.ExpressionConstant)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IExpression, ILanguageConstant>(nameof(IClass.NodeWithNumberConstantList), nameof(IExpression.ExpressionConstant)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()

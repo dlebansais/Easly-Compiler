@@ -1,6 +1,8 @@
 ﻿namespace EaslyCompiler
 {
     using System.Diagnostics;
+    using CompilerNode;
+    using Easly;
 
     /// <summary>
     /// Represents an agent feature as some constant.
@@ -35,6 +37,11 @@
         }
 
         /// <summary>
+        /// True if the constant value is known.
+        /// </summary>
+        public override bool IsValueKnown { get { return Value != null; } }
+
+        /// <summary>
         /// The constant value, if known.
         /// </summary>
         public ICompiledFeature Value { get; }
@@ -45,7 +52,7 @@
         /// <param name="other">The other instance.</param>
         public override bool IsCompatibleWith(ILanguageConstant other)
         {
-            return other is IAgentLanguageConstant AsAgentLanguageConstant && Value != null && AsAgentLanguageConstant.Value != null;
+            return other is IAgentLanguageConstant AsAgentLanguageConstant && IsValueKnown && AsAgentLanguageConstant.IsValueKnown;
         }
 
         /// <summary>

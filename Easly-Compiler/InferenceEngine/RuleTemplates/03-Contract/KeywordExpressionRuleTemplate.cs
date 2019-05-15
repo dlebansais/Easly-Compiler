@@ -28,6 +28,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IKeywordExpression, IList<IExpressionType>>(nameof(IKeywordExpression.ResolvedResult)),
+                new UnsealedListDestinationTemplate<IKeywordExpression, IExpression>(nameof(IKeywordExpression.ConstantSourceList)),
             };
         }
         #endregion
@@ -45,10 +46,10 @@
             data = null;
             bool Success = true;
 
-            Success &= KeywordExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out ILanguageConstant ExpressionConstant);
+            Success &= KeywordExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out ListTableEx<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant);
 
             if (Success)
-                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant>(ResolvedResult, ResolvedExceptions, ExpressionConstant);
+                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>(ResolvedResult, ResolvedExceptions, ConstantSourceList, ExpressionConstant);
 
             return Success;
         }
@@ -60,12 +61,14 @@
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="resolvedResult">The expression result types upon return.</param>
         /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
         /// <param name="expressionConstant">The expression constant upon return.</param>
-        public static bool ResolveCompilerReferences(IKeywordExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out ILanguageConstant expressionConstant)
+        public static bool ResolveCompilerReferences(IKeywordExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant)
         {
             resolvedResult = null;
             resolvedExceptions = null;
-            expressionConstant = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
 
             IClass EmbeddingClass = node.EmbeddingClass;
             BaseNode.Keyword Value = node.Value;
@@ -111,13 +114,16 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IKeywordExpression node, object data)
         {
-            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant>)data).Item1;
-            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant>)data).Item2;
-            ILanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ILanguageConstant>)data).Item3;
+            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item1;
+            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item2;
+            ListTableEx<IExpression> ConstantSourceList = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item3;
+            ILanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item4;
 
             node.ResolvedResult.Item = ResolvedResult;
             node.ResolvedExceptions.Item = ResolvedExceptions;
-            node.SetExpressionConstant(ExpressionConstant);
+            node.ConstantSourceList.AddRange(ConstantSourceList);
+            node.ConstantSourceList.Seal();
+            node.ExpressionConstant.Item = ExpressionConstant;
         }
         #endregion
     }

@@ -30,6 +30,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IEqualityExpression, IList<IExpressionType>>(nameof(IEqualityExpression.ResolvedResult)),
+                new UnsealedListDestinationTemplate<IEqualityExpression, IExpression>(nameof(IEqualityExpression.ConstantSourceList)),
             };
         }
         #endregion
@@ -47,9 +48,9 @@
             data = null;
             bool Success = true;
 
-            Success &= EqualityExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out IBooleanLanguageConstant ExpressionConstant);
+            Success &= EqualityExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out ListTableEx<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant);
             if (Success)
-                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, IBooleanLanguageConstant>(ResolvedResult, ResolvedExceptions, ExpressionConstant);
+                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>(ResolvedResult, ResolvedExceptions, ConstantSourceList, ExpressionConstant);
 
             return Success;
         }
@@ -61,12 +62,14 @@
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="resolvedResult">The expression result types upon return.</param>
         /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
         /// <param name="expressionConstant">The constant value upon return, if any.</param>
-        public static bool ResolveCompilerReferences(IEqualityExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out IBooleanLanguageConstant expressionConstant)
+        public static bool ResolveCompilerReferences(IEqualityExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant)
         {
             resolvedResult = null;
             resolvedExceptions = null;
-            expressionConstant = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
 
             IExpression LeftExpression = (IExpression)node.LeftExpression;
             IExpression RightExpression = (IExpression)node.RightExpression;
@@ -130,27 +133,8 @@
                 new ExpressionType(ResultTypeName, ResultType, string.Empty)
             };
 
-            if (LeftExpression.ExpressionConstant.IsAssigned && RightExpression.ExpressionConstant.IsAssigned)
-            {
-                ILanguageConstant LeftConstant = LeftExpression.ExpressionConstant.Item;
-                ILanguageConstant RightConstant = RightExpression.ExpressionConstant.Item;
-
-                if (LeftConstant.IsCompatibleWith(RightConstant))
-                {
-                    switch (node.Comparison)
-                    {
-                        case BaseNode.ComparisonType.Equal:
-                            expressionConstant = new BooleanLanguageConstant(LeftConstant.IsConstantEqual(RightConstant));
-                            break;
-
-                        case BaseNode.ComparisonType.Different:
-                            expressionConstant = new BooleanLanguageConstant(!LeftConstant.IsConstantEqual(RightConstant));
-                            break;
-                    }
-
-                    Debug.Assert(expressionConstant != null);
-                }
-            }
+            constantSourceList.Add(LeftExpression);
+            constantSourceList.Add(RightExpression);
 
             if (LeftExpression.ResolvedExceptions.IsAssigned && RightExpression.ResolvedExceptions.IsAssigned)
             {
@@ -172,13 +156,15 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IEqualityExpression node, object data)
         {
-            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, IBooleanLanguageConstant>)data).Item1;
-            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, IBooleanLanguageConstant>)data).Item2;
-            IBooleanLanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, IBooleanLanguageConstant>)data).Item3;
+            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item1;
+            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item2;
+            ListTableEx<IExpression> ConstantSourceList = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item3;
+            ILanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item4;
 
             node.ResolvedResult.Item = ResolvedResult;
             node.ResolvedExceptions.Item = ResolvedExceptions;
-            node.SetExpressionConstant(ExpressionConstant);
+            node.ConstantSourceList.AddRange(ConstantSourceList);
+            node.ConstantSourceList.Seal();
         }
         #endregion
     }

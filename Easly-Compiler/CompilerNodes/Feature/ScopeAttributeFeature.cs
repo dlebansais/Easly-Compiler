@@ -12,11 +12,6 @@ namespace CompilerNode
     public interface IScopeAttributeFeature : IFeatureWithName, ICompiledFeature
     {
         /// <summary>
-        /// The source used to create this attribute.
-        /// </summary>
-        ISource Location { get; }
-
-        /// <summary>
         /// The resolved feature name.
         /// </summary>
         OnceReference<IFeatureName> ValidFeatureName { get; }
@@ -255,14 +250,14 @@ namespace CompilerNode
         /// Guid of the language type corresponding to the entity object for an instance of this class.
         /// </summary>
         public Guid EntityGuid { get { return LanguageClasses.LocalEntity.Guid; } }
+
+        /// <summary>
+        /// The source node associated to this instance.
+        /// </summary>
+        public ISource Location { get; }
         #endregion
 
         #region Properties
-        /// <summary>
-        /// The source used to create this name.
-        /// </summary>
-        public ISource Location { get; }
-
         /// <summary>
         /// The resolved feature name.
         /// </summary>

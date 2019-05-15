@@ -87,6 +87,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 IsHandled = true;
@@ -136,14 +137,19 @@ namespace CompilerNode
         public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
 
         /// <summary>
-        /// Specific constant number.
-        /// </summary>
-        public OnceReference<ILanguageConstant> ExpressionConstant { get; private set; } = new OnceReference<ILanguageConstant>();
-
-        /// <summary>
         /// List of exceptions the expression can throw.
         /// </summary>
         public OnceReference<IList<IIdentifier>> ResolvedExceptions { get; private set; } = new OnceReference<IList<IIdentifier>>();
+
+        /// <summary>
+        /// The list of sources for a constant, if any.
+        /// </summary>
+        public ListTableEx<IExpression> ConstantSourceList { get; private set; } = new ListTableEx<IExpression>();
+
+        /// <summary>
+        /// Specific constant number.
+        /// </summary>
+        public OnceReference<ILanguageConstant> ExpressionConstant { get; private set; } = new OnceReference<ILanguageConstant>();
 
         /// <summary>
         /// Sets the <see cref="IExpression.ExpressionConstant"/> property.

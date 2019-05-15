@@ -29,6 +29,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IUnaryNotExpression, IList<IExpressionType>>(nameof(IUnaryNotExpression.ResolvedResult)),
+                new UnsealedListDestinationTemplate<IUnaryNotExpression, IExpression>(nameof(IUnaryNotExpression.ConstantSourceList)),
             };
         }
         #endregion
@@ -46,9 +47,9 @@
             data = null;
             bool Success = true;
 
-            Success &= UnaryNotExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out IBooleanLanguageConstant ExpressionConstant);
+            Success &= UnaryNotExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out ListTableEx<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant);
             if (Success)
-                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, IBooleanLanguageConstant>(ResolvedResult, ResolvedExceptions, ExpressionConstant);
+                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>(ResolvedResult, ResolvedExceptions, ConstantSourceList, ExpressionConstant);
 
             return Success;
         }
@@ -60,12 +61,14 @@
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="resolvedResult">The expression result types upon return.</param>
         /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
         /// <param name="expressionConstant">The constant value upon return, if any.</param>
-        public static bool ResolveCompilerReferences(IUnaryNotExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out IBooleanLanguageConstant expressionConstant)
+        public static bool ResolveCompilerReferences(IUnaryNotExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant)
         {
             resolvedResult = null;
             resolvedExceptions = null;
-            expressionConstant = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
 
             IExpression RightExpression = (IExpression)node.RightExpression;
             IClass EmbeddingClass = node.EmbeddingClass;
@@ -80,15 +83,7 @@
                 return false;
             }
 
-            if (RightExpression.ExpressionConstant.IsAssigned)
-            {
-                IBooleanLanguageConstant RightConstant = RightExpression.ExpressionConstant.Item as IBooleanLanguageConstant;
-                Debug.Assert(RightConstant != null);
-
-                bool? RightConstantValue = RightConstant.Value;
-                if (RightConstantValue.HasValue)
-                    expressionConstant = new BooleanLanguageConstant(!RightConstantValue.Value);
-            }
+            constantSourceList.Add(RightExpression);
 
             resolvedResult = new List<IExpressionType>()
             {
@@ -113,13 +108,15 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IUnaryNotExpression node, object data)
         {
-            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, IBooleanLanguageConstant>)data).Item1;
-            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, IBooleanLanguageConstant>)data).Item2;
-            IBooleanLanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, IBooleanLanguageConstant>)data).Item3;
+            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item1;
+            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item2;
+            ListTableEx<IExpression> ConstantSourceList = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item3;
+            ILanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item4;
 
             node.ResolvedResult.Item = ResolvedResult;
             node.ResolvedExceptions.Item = ResolvedExceptions;
-            node.SetExpressionConstant(ExpressionConstant);
+            node.ConstantSourceList.AddRange(ConstantSourceList);
+            node.ConstantSourceList.Seal();
         }
         #endregion
     }

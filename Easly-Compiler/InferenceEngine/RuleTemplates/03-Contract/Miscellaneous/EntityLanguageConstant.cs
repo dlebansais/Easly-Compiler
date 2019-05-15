@@ -1,35 +1,45 @@
 ﻿namespace EaslyCompiler
 {
     using System.Diagnostics;
+    using CompilerNode;
 
     /// <summary>
-    /// Represents a string constant.
+    /// Represents an entity feature as some constant.
     /// </summary>
-    public interface IStringLanguageConstant : ILanguageConstant
+    public interface IEntityLanguageConstant : ILanguageConstant
     {
         /// <summary>
         /// The constant value, if known.
         /// </summary>
-        string Value { get; }
+        ISource Value { get; }
     }
 
     /// <summary>
-    /// Represents a string constant.
+    /// Represents an entity feature as some constant.
     /// </summary>
-    public class StringLanguageConstant : LanguageConstant, IStringLanguageConstant
+    public class EntityLanguageConstant : LanguageConstant, IEntityLanguageConstant
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="StringLanguageConstant"/> class.
+        /// Initializes a new instance of the <see cref="EntityLanguageConstant"/> class.
         /// </summary>
-        public StringLanguageConstant()
+        public EntityLanguageConstant()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StringLanguageConstant"/> class.
+        /// Initializes a new instance of the <see cref="EntityLanguageConstant"/> class.
         /// </summary>
         /// <param name="value">The constant value.</param>
-        public StringLanguageConstant(string value)
+        public EntityLanguageConstant(ICompiledFeature value)
+        {
+            Value = value.Location;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EntityLanguageConstant"/> class.
+        /// </summary>
+        /// <param name="value">The constant value.</param>
+        public EntityLanguageConstant(IDiscrete value)
         {
             Value = value;
         }
@@ -42,7 +52,7 @@
         /// <summary>
         /// The constant value, if known.
         /// </summary>
-        public string Value { get; }
+        public ISource Value { get; }
 
         /// <summary>
         /// Checks if another constant can be compared with this instance.
@@ -50,7 +60,7 @@
         /// <param name="other">The other instance.</param>
         public override bool IsCompatibleWith(ILanguageConstant other)
         {
-            return other is IStringLanguageConstant AsStringLanguageConstant && IsValueKnown && AsStringLanguageConstant.IsValueKnown;
+            return other is IEntityLanguageConstant AsEntityLanguageConstant && IsValueKnown && AsEntityLanguageConstant.IsValueKnown;
         }
 
         /// <summary>
@@ -59,14 +69,14 @@
         /// <param name="other">The other instance.</param>
         public override bool IsConstantEqual(ILanguageConstant other)
         {
-            return IsConstantEqual(other as IStringLanguageConstant);
+            return IsConstantEqual(other as IEntityLanguageConstant);
         }
 
         /// <summary>
         /// Checks if another constant is equal to this instance.
         /// </summary>
         /// <param name="other">The other instance.</param>
-        protected virtual bool IsConstantEqual(IStringLanguageConstant other)
+        protected virtual bool IsConstantEqual(IEntityLanguageConstant other)
         {
             Debug.Assert(other != null && Value != null && other.Value != null);
 

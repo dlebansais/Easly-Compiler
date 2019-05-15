@@ -36,6 +36,11 @@
         }
 
         /// <summary>
+        /// True if the constant value is known.
+        /// </summary>
+        public override bool IsValueKnown { get { return Discrete != null; } }
+
+        /// <summary>
         /// The discrete constant, if known.
         /// </summary>
         public IDiscrete Discrete { get; }
@@ -48,7 +53,7 @@
         {
             bool Result = false;
 
-            if (other is IDiscreteLanguageConstant AsDiscreteLanguageConstant && Discrete != null && AsDiscreteLanguageConstant.Discrete != null)
+            if (other is IDiscreteLanguageConstant AsDiscreteLanguageConstant && IsValueKnown && AsDiscreteLanguageConstant.IsValueKnown)
             {
                 IDiscrete OtherDiscrete = AsDiscreteLanguageConstant.Discrete;
                 Result = Discrete.EmbeddingClass == OtherDiscrete.EmbeddingClass;

@@ -9,6 +9,11 @@
     public interface ILanguageConstant
     {
         /// <summary>
+        /// True if the constant value is known.
+        /// </summary>
+        bool IsValueKnown { get; }
+
+        /// <summary>
         /// Checks if another constant can be compared with this instance.
         /// </summary>
         /// <param name="other">The other instance.</param>
@@ -26,6 +31,13 @@
     /// </summary>
     public abstract class LanguageConstant : ILanguageConstant
     {
+        #region Properties
+        /// <summary>
+        /// True if the constant value is known.
+        /// </summary>
+        public abstract bool IsValueKnown { get; }
+        #endregion
+
         #region Client Interface
         /// <summary>
         /// Checks if another constant can be compared with this instance.
