@@ -329,7 +329,7 @@
 
             foreach (IRuleTemplate Rule in RuleTemplateList)
             {
-                /*if (Rule is IAllLocalTypedefsRuleTemplate AsRuleTemplate)
+                /*if (Rule is IInheritanceTagRuleTemplate AsRuleTemplate)
                 {
 
                 }*/

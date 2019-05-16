@@ -89,12 +89,66 @@
             }
 
             IClass BaseClass = EmbeddingClass.ImportedClassTable[ValidText].Item;
+
+            Debug.Assert(BaseClass.ResolvedClassTypeName.IsAssigned);
+            Debug.Assert(BaseClass.ResolvedClassType.IsAssigned);
             initializedObjectTypeName = BaseClass.ResolvedClassTypeName.Item;
             initializedObjectType = BaseClass.ResolvedClassType.Item;
 
-            IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable = BaseClass.FeatureTable;
+            if (!CheckAssignemntList(node, errorList, BaseClass.FeatureTable, constantSourceList, assignedFeatureTable))
+                return false;
 
-            int ExpressionErrorCount = 0;
+            resolvedResult = new List<IExpressionType>()
+            {
+                new ExpressionType(initializedObjectTypeName, initializedObjectType, string.Empty)
+            };
+
+            if (initializedObjectType is IClassType AsClassType)
+            {
+                foreach (IAssignmentArgument AssignmentItem in AssignmentList)
+                {
+                    IList<IExpressionType> ExpressionResult = AssignmentItem.ResolvedResult.Item;
+
+                    for (int i = 0; i < AssignmentItem.ParameterList.Count; i++)
+                    {
+                        IIdentifier IdentifierItem = (IIdentifier)AssignmentItem.ParameterList[i];
+                        string ValidIdentifierText = IdentifierItem.ValidText.Item;
+                        ICompiledFeature TargetFeature = assignedFeatureTable[ValidIdentifierText];
+
+                        ICompiledType SourceType = ExpressionResult[i].ValueType;
+                        ICompiledType DestinationType = null;
+
+                        if (TargetFeature is IAttributeFeature AsAttributeFeature)
+                            DestinationType = AsAttributeFeature.ResolvedEntityType.Item;
+                        else if (TargetFeature is IPropertyFeature AsPropertyFeature)
+                            DestinationType = AsPropertyFeature.ResolvedEntityType.Item;
+
+                        Debug.Assert(DestinationType != null);
+
+                        IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
+                        if (!ObjectType.TypeConformToBase(SourceType, DestinationType, SubstitutionTypeTable, errorList, IdentifierItem))
+                        {
+                            errorList.AddError(new ErrorAssignmentMismatch(IdentifierItem));
+                            return false;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                //TODO: tuples
+            }
+
+            resolvedExceptions = new List<IIdentifier>();
+
+            return true;
+        }
+
+        private static bool CheckAssignemntList(IInitializedObjectExpression node, IErrorList errorList, IHashtableEx<IFeatureName, IFeatureInstance> featureTable, ListTableEx<IExpression> constantSourceList, IHashtableEx<string, ICompiledFeature> assignedFeatureTable)
+        {
+            bool Success = true;
+            IList<IAssignmentArgument> AssignmentList = node.AssignmentList;
+
             foreach (IAssignmentArgument AssignmentItem in AssignmentList)
             {
                 constantSourceList.Add((IExpression)AssignmentItem.Source);
@@ -103,7 +157,7 @@
                 if (ExpressionResult.Count < AssignmentItem.ParameterList.Count)
                 {
                     errorList.AddError(new ErrorInvalidInstruction(AssignmentItem));
-                    ExpressionErrorCount++;
+                    Success = false;
                 }
 
                 foreach (IIdentifier IdentifierItem in AssignmentItem.ParameterList)
@@ -113,11 +167,11 @@
                     if (assignedFeatureTable.ContainsKey(ValidIdentifierText))
                     {
                         errorList.AddError(new ErrorIdentifierAlreadyListed(IdentifierItem, ValidIdentifierText));
-                        ExpressionErrorCount++;
+                        Success = false;
                     }
                     else
                     {
-                        if (FeatureName.TableContain(FeatureTable, ValidIdentifierText, out IFeatureName Key, out IFeatureInstance FeatureItem))
+                        if (FeatureName.TableContain(featureTable, ValidIdentifierText, out IFeatureName Key, out IFeatureInstance FeatureItem))
                         {
                             bool ValidFeature;
 
@@ -158,71 +212,20 @@
                             else
                             {
                                 errorList.AddError(new ErrorAttributeOrPropertyRequired(IdentifierItem, ValidIdentifierText));
-                                ExpressionErrorCount++;
+                                Success = false;
                             }
 
                         }
                         else
                         {
                             errorList.AddError(new ErrorUnknownIdentifier(IdentifierItem, ValidIdentifierText));
-                            ExpressionErrorCount++;
+                            Success = false;
                         }
                     }
                 }
             }
 
-            if (ExpressionErrorCount > 0)
-                return false;
-
-            resolvedResult = new List<IExpressionType>()
-            {
-                new ExpressionType(initializedObjectTypeName, initializedObjectType, string.Empty)
-            };
-
-            if (node.ResolvedClassType.IsAssigned)
-            {
-                if (node.ResolvedClassType.Item is IClassType AsClassType)
-                {
-                    IClass InitializedClass = AsClassType.BaseClass;
-
-                    foreach (IAssignmentArgument AssignmentItem in AssignmentList)
-                    {
-                        IList<IExpressionType> ExpressionResult = AssignmentItem.ResolvedResult.Item;
-
-                        for (int i = 0; i < AssignmentItem.ParameterList.Count; i++)
-                        {
-                            IIdentifier IdentifierItem = (IIdentifier)AssignmentItem.ParameterList[i];
-                            string ValidIdentifierText = IdentifierItem.ValidText.Item;
-                            ICompiledFeature TargetFeature = assignedFeatureTable[ValidIdentifierText];
-
-                            ICompiledType SourceType = ExpressionResult[i].ValueType;
-                            ICompiledType DestinationType = null;
-
-                            if (TargetFeature is IAttributeFeature AsAttributeFeature)
-                                DestinationType = AsAttributeFeature.ResolvedEntityType.Item;
-                            else if (TargetFeature is IPropertyFeature AsPropertyFeature)
-                                DestinationType = AsPropertyFeature.ResolvedEntityType.Item;
-
-                            Debug.Assert(DestinationType != null);
-
-                            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-                            if (!ObjectType.TypeConformToBase(SourceType, DestinationType, SubstitutionTypeTable, errorList, IdentifierItem))
-                            {
-                                errorList.AddError(new ErrorAssignmentMismatch(IdentifierItem));
-                                return false;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    //TODO: tuples
-                }
-
-                resolvedExceptions = new List<IIdentifier>();
-            }
-
-            return true;
+            return Success;
         }
 
         /// <summary>

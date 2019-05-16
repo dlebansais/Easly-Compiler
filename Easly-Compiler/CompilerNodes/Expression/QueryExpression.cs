@@ -160,11 +160,11 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                IsResolved = ResolvedResult.IsAssigned && ResolvedExceptions.IsAssigned;
+                IsResolved = ExpressionConstant.IsAssigned;
 
-                Debug.Assert(!ExpressionConstant.IsAssigned || IsResolved);
-                Debug.Assert(ResolvedFinalFeature.IsAssigned || !IsResolved);
-                Debug.Assert(ResolvedArgumentList.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedResult.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedExceptions.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedFinalFeature.IsAssigned == ResolvedResult.IsAssigned);
 
                 IsHandled = true;
             }

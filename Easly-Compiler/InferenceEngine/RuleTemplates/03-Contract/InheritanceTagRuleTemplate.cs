@@ -57,7 +57,10 @@
             IClass BaseClass = ResolvedClassParentType.BaseClass;
             IList<IBody> ResolvedBodyTagList = BaseClass.ResolvedBodyTagList.Item;
 
+            IClass EmbeddingClass = node.EmbeddingClass;
+
             node.ResolvedBodyTagList.Item = ResolvedBodyTagList;
+            EmbeddingClass.InheritedBodyTagListTable.Add(ResolvedClassParentType, ResolvedBodyTagList);
         }
         #endregion
     }

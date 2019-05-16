@@ -269,24 +269,29 @@
         }
 
         private IInitializedObjectExpression CompilationDateTime;
-        private IInitializedObjectExpression CompilationUID;
+        private IUnaryOperatorExpression CompilationUID;
         private IManifestStringExpression CompilerVersion;
-        private IInitializedObjectExpression ConformanceToStandard;
-        private IInitializedObjectExpression Debugging;
+        private IKeywordExpression ConformanceToStandard;
+        private IKeywordExpression Debugging;
 
         /// <summary></summary>
         protected virtual void GenerateCompilationDateTime()
         {
             DateTime Now = DateTime.UtcNow;
             string IsoString = Now.ToString("u");
-            CompilationDateTime = InitializedStringExpression(LanguageClasses.DateAndTime.Name, nameof(DateAndTime.ToUtcDateTime), IsoString);
+            CompilationDateTime = InitializedStringExpression(LanguageClasses.DateAndTime.Name, nameof(DateAndTime.ToUtcDateAndTime), IsoString);
         }
 
         /// <summary></summary>
         protected virtual void GenerateCompilationUID()
         {
-            string NewGuidDigits = Guid.NewGuid().ToString("N");
-            CompilationUID = InitializedNumberExpression(LanguageClasses.UniversallyUniqueIdentifier.Name, "Value", NewGuidDigits + IntegerBase.Hexadecimal.Suffix);
+            string NewGuidDigits = Guid.NewGuid().ToString("N") + IntegerBase.Hexadecimal.Suffix;
+            //CompilationUID = InitializedNumberExpression(LanguageClasses.UniversallyUniqueIdentifier.Name, "Value", NewGuidDigits);
+
+            BaseNode.IIdentifier Operator = NodeHelper.CreateSimpleIdentifier("To UUID");
+            BaseNode.IManifestNumberExpression NumberExpression = NodeHelper.CreateSimpleManifestNumberExpression(NewGuidDigits);
+            BaseNode.IUnaryOperatorExpression Expression = NodeHelper.CreateUnaryOperatorExpression(Operator, NumberExpression);
+            CompilationUID = ToCompilerNode<BaseNode.IUnaryOperatorExpression, IUnaryOperatorExpression>(Expression);
         }
 
         /// <summary></summary>
@@ -298,13 +303,19 @@
         /// <summary></summary>
         protected virtual void GenerateConformanceToStandard()
         {
-            ConformanceToStandard = InitializedStringExpression(LanguageClasses.Boolean.Name, "Value", LanguageClasses.BooleanTrueString);
+            //ConformanceToStandard = InitializedStringExpression(LanguageClasses.Boolean.Name, "Value", LanguageClasses.BooleanTrueString);
+
+            BaseNode.IKeywordExpression Expression = NodeHelper.CreateKeywordExpression(BaseNode.Keyword.True);
+            ConformanceToStandard = ToCompilerNode<BaseNode.IKeywordExpression, IKeywordExpression>(Expression);
         }
 
         /// <summary></summary>
         protected virtual void GenerateDebugging()
         {
-            Debugging = InitializedStringExpression(LanguageClasses.Boolean.Name, "Value", LanguageClasses.BooleanFalseString);
+            //Debugging = InitializedStringExpression(LanguageClasses.Boolean.Name, "Value", LanguageClasses.BooleanFalseString);
+
+            BaseNode.IKeywordExpression Expression = NodeHelper.CreateKeywordExpression(BaseNode.Keyword.False);
+            Debugging = ToCompilerNode<BaseNode.IKeywordExpression, IKeywordExpression>(Expression);
         }
 
         /// <summary></summary>
@@ -391,7 +402,13 @@
 
                     case BaseNode.PreprocessorMacro.DiscreteClassIdentifier:
                         Debug.Assert(context.CurrentClass != null);
-                        IExpression ReplacementNode = InitializedNumberExpression(LanguageClasses.UniversallyUniqueIdentifier.Name, "Value", context.CurrentClass.ClassGuid.ToString("N") + IntegerBase.Hexadecimal.Suffix);
+
+                        string GlassGuidDigits = context.CurrentClass.ClassGuid.ToString("N") + IntegerBase.Hexadecimal.Suffix;
+                        BaseNode.IIdentifier Operator = NodeHelper.CreateSimpleIdentifier("To UUID");
+                        BaseNode.IManifestNumberExpression NumberExpression = NodeHelper.CreateSimpleManifestNumberExpression(GlassGuidDigits);
+                        BaseNode.IUnaryOperatorExpression Expression = NodeHelper.CreateUnaryOperatorExpression(Operator, NumberExpression);
+                        IExpression ReplacementNode = ToCompilerNode<BaseNode.IUnaryOperatorExpression, IUnaryOperatorExpression>(Expression);
+
                         NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ReplacementNode);
                         IsHandled = true;
                         break;

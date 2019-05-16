@@ -130,12 +130,13 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                IsResolved = ResolvedResult.IsAssigned && ResolvedExceptions.IsAssigned;
+                IsResolved = ExpressionConstant.IsAssigned;
 
-                Debug.Assert(!ExpressionConstant.IsAssigned || IsResolved);
-                Debug.Assert(SelectedFeature.IsAssigned || !IsResolved);
-                Debug.Assert(SelectedOverload.IsAssigned || !IsResolved);
-                Debug.Assert(SelectedOverloadType.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedResult.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedExceptions.IsAssigned || !IsResolved);
+                Debug.Assert(SelectedFeature.IsAssigned == ResolvedResult.IsAssigned);
+                Debug.Assert(SelectedOverload.IsAssigned == ResolvedResult.IsAssigned);
+                Debug.Assert(SelectedOverloadType.IsAssigned == ResolvedResult.IsAssigned);
 
                 IsHandled = true;
             }
@@ -203,7 +204,7 @@ namespace CompilerNode
         /// <summary>
         /// Gets a string representation of the expression.
         /// </summary>
-        public string ExpressionToString { get { return $"{Operator.Text}{((IExpression)RightExpression).ExpressionToString}"; } }
+        public string ExpressionToString { get { return $"{Operator.Text}({((IExpression)RightExpression).ExpressionToString})"; } }
 
         /// <summary></summary>
         public override string ToString()

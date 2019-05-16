@@ -211,6 +211,7 @@
             node.ConstantSourceList.AddRange(ConstantSourceList);
             node.ConstantSourceList.Seal();
             node.ExpressionConstant.Item = ExpressionConstant;
+            node.ResolvedFinalFeature.Item = ResolvedFinalFeature;
         }
         #endregion
     }

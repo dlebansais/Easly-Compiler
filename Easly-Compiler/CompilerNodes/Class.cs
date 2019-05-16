@@ -326,6 +326,7 @@ namespace CompilerNode
             BaseClass.ExportTable.Seal();
             BaseClass.TypedefTable.Seal();
             BaseClass.ValidSourceName = string.Empty;
+            BaseClass.ResolvedBodyTagList.Item = new List<IBody>();
 
             return BaseClass;
         }

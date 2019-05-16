@@ -11,6 +11,11 @@ namespace CompilerNode
     public interface IAssertionTagExpression : BaseNode.IAssertionTagExpression, IExpression
     {
         /// <summary>
+        /// The resolved embedding body.
+        /// </summary>
+        OnceReference<IBody> ResolvedBody { get; }
+
+        /// <summary>
         /// The resolved expression.
         /// </summary>
         OnceReference<IExpression> ResolvedBooleanExpression { get; }
@@ -81,6 +86,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
+                ResolvedBody = new OnceReference<IBody>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
@@ -113,15 +119,16 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                IsResolved = false;
+                IsResolved = ResolvedBody.IsAssigned;
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                IsResolved = ResolvedResult.IsAssigned && ResolvedExceptions.IsAssigned;
+                IsResolved = ExpressionConstant.IsAssigned;
 
-                Debug.Assert(!ExpressionConstant.IsAssigned);
-                Debug.Assert(ResolvedBooleanExpression.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedResult.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedExceptions.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedBooleanExpression.IsAssigned == ResolvedResult.IsAssigned);
 
                 IsHandled = true;
             }
@@ -158,6 +165,11 @@ namespace CompilerNode
         /// The resolved expression.
         /// </summary>
         public OnceReference<IExpression> ResolvedBooleanExpression { get; private set; } = new OnceReference<IExpression>();
+
+        /// <summary>
+        /// The resolved embedding body.
+        /// </summary>
+        public OnceReference<IBody> ResolvedBody { get; private set; } = new OnceReference<IBody>();
 
         /// <summary>
         /// Compares two expressions.
