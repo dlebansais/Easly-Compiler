@@ -31,6 +31,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IPrecursorExpression, IList<IExpressionType>>(nameof(IPrecursorExpression.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IPrecursorExpression, IList<IIdentifier>>(nameof(IPrecursorExpression.ResolvedExceptions)),
                 new UnsealedListDestinationTemplate<IPrecursorExpression, IExpression>(nameof(IPrecursorExpression.ConstantSourceList)),
             };
         }

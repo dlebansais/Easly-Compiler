@@ -21,11 +21,13 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceSourceTemplate<ICheckInstruction, IList<IExpressionType>>(nameof(ICheckInstruction.BooleanExpression) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<ICheckInstruction, IList<IIdentifier>>(nameof(ICheckInstruction.BooleanExpression) + Dot + nameof(IExpression.ResolvedExceptions)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<ICheckInstruction, IList<IExpressionType>>(nameof(ICheckInstruction.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<ICheckInstruction, IList<IIdentifier>>(nameof(ICheckInstruction.ResolvedExceptions)),
             };
         }
         #endregion
@@ -54,6 +56,7 @@
         public override void Apply(ICheckInstruction node, object data)
         {
             node.ResolvedResult.Item = new List<IExpressionType>();
+            node.ResolvedExceptions.Item = new List<IIdentifier>();
         }
         #endregion
     }

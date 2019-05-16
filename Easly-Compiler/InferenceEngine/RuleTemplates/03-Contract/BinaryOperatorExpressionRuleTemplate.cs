@@ -24,12 +24,15 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceSourceTemplate<IBinaryOperatorExpression, IList<IExpressionType>>(nameof(IBinaryOperatorExpression.LeftExpression) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IBinaryOperatorExpression, IList<IIdentifier>>(nameof(IBinaryOperatorExpression.LeftExpression) + Dot + nameof(IExpression.ResolvedExceptions)),
                 new OnceReferenceSourceTemplate<IBinaryOperatorExpression, IList<IExpressionType>>(nameof(IBinaryOperatorExpression.RightExpression) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IBinaryOperatorExpression, IList<IIdentifier>>(nameof(IBinaryOperatorExpression.RightExpression) + Dot + nameof(IExpression.ResolvedExceptions)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IBinaryOperatorExpression, IList<IExpressionType>>(nameof(IBinaryOperatorExpression.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IBinaryOperatorExpression, IList<IIdentifier>>(nameof(IBinaryOperatorExpression.ResolvedExceptions)),
                 new UnsealedListDestinationTemplate<IBinaryOperatorExpression, IExpression>(nameof(IBinaryOperatorExpression.ConstantSourceList)),
             };
         }

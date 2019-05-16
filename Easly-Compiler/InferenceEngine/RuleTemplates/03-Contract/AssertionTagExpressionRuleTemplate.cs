@@ -25,11 +25,13 @@
             {
                 new SealedTableSourceTemplate<IAssertionTagExpression, IClassType, IList<IBody>>(nameof(IClass.InheritedBodyTagListTable), TemplateClassStart<IAssertionTagExpression>.Default),
                 new OnceReferenceSourceTemplate<IAssertionTagExpression, IList<IExpressionType>>(nameof(IAssertionTagExpression.ResolvedBooleanExpression) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IAssertionTagExpression, IList<IIdentifier>>(nameof(IAssertionTagExpression.ResolvedBooleanExpression) + Dot + nameof(IExpression.ResolvedExceptions)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IAssertionTagExpression, IList<IExpressionType>>(nameof(IAssertionTagExpression.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IAssertionTagExpression, IList<IIdentifier>>(nameof(IAssertionTagExpression.ResolvedExceptions)),
                 new UnsealedListDestinationTemplate<IAssertionTagExpression, IExpression>(nameof(IAssertionTagExpression.ConstantSourceList)),
             };
         }
@@ -66,21 +68,16 @@
         /// <param name="expressionConstant">The constant value upon return, if any.</param>
         public static bool ResolveCompilerReferences(IAssertionTagExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant)
         {
-            resolvedResult = null;
-            resolvedExceptions = null;
-            constantSourceList = new ListTableEx<IExpression>();
-            expressionConstant = NeutralLanguageConstant.NotConstant;
-
-            IIdentifier TagIdentifier = (IIdentifier)node.TagIdentifier;
-            IBody ResolvedBody = node.ResolvedBody.Item;
             IExpression ResolvedBooleanExpression = node.ResolvedBooleanExpression.Item;
 
             resolvedResult = ResolvedBooleanExpression.ResolvedResult.Item;
+            resolvedExceptions = ResolvedBooleanExpression.ResolvedExceptions.Item;
+            expressionConstant = NeutralLanguageConstant.NotConstant;
 
-            constantSourceList.Add(ResolvedBooleanExpression);
-
-            if (ResolvedBooleanExpression.ResolvedExceptions.IsAssigned)
-                resolvedExceptions = ResolvedBooleanExpression.ResolvedExceptions.Item;
+            constantSourceList = new ListTableEx<IExpression>()
+            {
+                ResolvedBooleanExpression
+            };
 
             return true;
         }

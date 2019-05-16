@@ -26,6 +26,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<ICreateInstruction, IList<IExpressionType>>(nameof(ICreateInstruction.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<ICreateInstruction, IList<IIdentifier>>(nameof(ICreateInstruction.ResolvedExceptions)),
             };
         }
         #endregion
@@ -54,6 +55,7 @@
         public override void Apply(ICreateInstruction node, object data)
         {
             node.ResolvedResult.Item = new List<IExpressionType>();
+            node.ResolvedExceptions.Item = new List<IIdentifier>();
         }
         #endregion
     }

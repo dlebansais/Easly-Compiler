@@ -24,11 +24,13 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceSourceTemplate<IUnaryNotExpression, IList<IExpressionType>>(nameof(IUnaryNotExpression.RightExpression) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IUnaryNotExpression, IList<IIdentifier>>(nameof(IUnaryNotExpression.RightExpression) + Dot + nameof(IExpression.ResolvedExceptions)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IUnaryNotExpression, IList<IExpressionType>>(nameof(IUnaryNotExpression.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IUnaryNotExpression, IList<IIdentifier>>(nameof(IUnaryNotExpression.ResolvedExceptions)),
                 new UnsealedListDestinationTemplate<IUnaryNotExpression, IExpression>(nameof(IUnaryNotExpression.ConstantSourceList)),
             };
         }
@@ -90,13 +92,9 @@
                 new ExpressionType(BooleanTypeName, BooleanType, string.Empty)
             };
 
-            // TODO: always have ResolvedExceptions assigned.
-            if (RightExpression.ResolvedExceptions.IsAssigned)
-            {
-                List<IIdentifier> MergedExceptionList = new List<IIdentifier>();
-                MergedExceptionList.AddRange(RightExpression.ResolvedExceptions.Item);
-                resolvedExceptions = MergedExceptionList;
-            }
+            List<IIdentifier> MergedExceptionList = new List<IIdentifier>();
+            MergedExceptionList.AddRange(RightExpression.ResolvedExceptions.Item);
+            resolvedExceptions = MergedExceptionList;
 
             return true;
         }

@@ -24,12 +24,14 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceSourceTemplate<IIndexQueryExpression, IList<IExpressionType>>(nameof(IIndexQueryExpression.IndexedExpression) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IIndexQueryExpression, IList<IIdentifier>>(nameof(IIndexQueryExpression.IndexedExpression) + Dot + nameof(IExpression.ResolvedExceptions)),
                 new OnceReferenceCollectionSourceTemplate<IIndexQueryExpression, IArgument, IList<IExpressionType>>(nameof(IIndexQueryExpression.ArgumentList), nameof(IArgument.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IIndexQueryExpression, IList<IExpressionType>>(nameof(IIndexQueryExpression.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IIndexQueryExpression, IList<IIdentifier>>(nameof(IIndexQueryExpression.ResolvedExceptions)),
                 new UnsealedListDestinationTemplate<IIndexQueryExpression, IExpression>(nameof(IIndexQueryExpression.ConstantSourceList)),
             };
         }

@@ -21,11 +21,13 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceSourceTemplate<IKeywordAssignmentInstruction, IList<IExpressionType>>(nameof(IKeywordAssignmentInstruction.Source) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IKeywordAssignmentInstruction, IList<IIdentifier>>(nameof(IKeywordAssignmentInstruction.Source) + Dot + nameof(IExpression.ResolvedExceptions)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IKeywordAssignmentInstruction, IList<IExpressionType>>(nameof(IKeywordAssignmentInstruction.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IKeywordAssignmentInstruction, IList<IIdentifier>>(nameof(IKeywordAssignmentInstruction.ResolvedExceptions)),
             };
         }
         #endregion
@@ -54,6 +56,7 @@
         public override void Apply(IKeywordAssignmentInstruction node, object data)
         {
             node.ResolvedResult.Item = new List<IExpressionType>();
+            node.ResolvedExceptions.Item = new List<IIdentifier>();
         }
         #endregion
     }

@@ -21,6 +21,7 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceSourceTemplate<IInspectInstruction, IList<IExpressionType>>(nameof(IInspectInstruction.Source) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IInspectInstruction, IList<IIdentifier>>(nameof(IInspectInstruction.Source) + Dot + nameof(IExpression.ResolvedExceptions)),
                 new OnceReferenceCollectionSourceTemplate<IInspectInstruction, IWith, IList<IExpressionType>>(nameof(IInspectInstruction.WithList), nameof(IWith.ResolvedResult)),
                 new ConditionallyAssignedReferenceSourceTemplate<IInspectInstruction, IScope, IList<IExpressionType>>(nameof(IInspectInstruction.ElseInstructions), nameof(IScope.ResolvedResult)),
             };
@@ -28,6 +29,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IInspectInstruction, IList<IExpressionType>>(nameof(IInspectInstruction.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IInspectInstruction, IList<IIdentifier>>(nameof(IInspectInstruction.ResolvedExceptions)),
             };
         }
         #endregion
@@ -56,6 +58,7 @@
         public override void Apply(IInspectInstruction node, object data)
         {
             node.ResolvedResult.Item = new List<IExpressionType>();
+            node.ResolvedExceptions.Item = new List<IIdentifier>();
         }
         #endregion
     }

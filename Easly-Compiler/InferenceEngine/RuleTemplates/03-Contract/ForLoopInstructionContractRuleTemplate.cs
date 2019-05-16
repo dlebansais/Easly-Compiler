@@ -31,6 +31,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IForLoopInstruction, IList<IExpressionType>>(nameof(IForLoopInstruction.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IForLoopInstruction, IList<IIdentifier>>(nameof(IForLoopInstruction.ResolvedExceptions)),
             };
         }
         #endregion
@@ -59,6 +60,7 @@
         public override void Apply(IForLoopInstruction node, object data)
         {
             node.ResolvedResult.Item = new List<IExpressionType>();
+            node.ResolvedExceptions.Item = new List<IIdentifier>();
         }
         #endregion
     }

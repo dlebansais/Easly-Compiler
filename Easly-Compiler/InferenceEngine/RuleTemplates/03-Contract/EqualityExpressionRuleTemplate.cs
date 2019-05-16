@@ -24,12 +24,15 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceSourceTemplate<IEqualityExpression, IList<IExpressionType>>(nameof(IEqualityExpression.LeftExpression) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IEqualityExpression, IList<IIdentifier>>(nameof(IEqualityExpression.LeftExpression) + Dot + nameof(IExpression.ResolvedExceptions)),
                 new OnceReferenceSourceTemplate<IEqualityExpression, IList<IExpressionType>>(nameof(IEqualityExpression.RightExpression) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IEqualityExpression, IList<IIdentifier>>(nameof(IEqualityExpression.RightExpression) + Dot + nameof(IExpression.ResolvedExceptions)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IEqualityExpression, IList<IExpressionType>>(nameof(IEqualityExpression.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IEqualityExpression, IList<IIdentifier>>(nameof(IEqualityExpression.ResolvedExceptions)),
                 new UnsealedListDestinationTemplate<IEqualityExpression, IExpression>(nameof(IEqualityExpression.ConstantSourceList)),
             };
         }
@@ -136,15 +139,12 @@
             constantSourceList.Add(LeftExpression);
             constantSourceList.Add(RightExpression);
 
-            if (LeftExpression.ResolvedExceptions.IsAssigned && RightExpression.ResolvedExceptions.IsAssigned)
-            {
-                IList<IIdentifier> LeftException = LeftExpression.ResolvedExceptions.Item;
-                IList<IIdentifier> RightException = RightExpression.ResolvedExceptions.Item;
+            IList<IIdentifier> LeftException = LeftExpression.ResolvedExceptions.Item;
+            IList<IIdentifier> RightException = RightExpression.ResolvedExceptions.Item;
 
-                resolvedExceptions = new List<IIdentifier>();
-                Expression.MergeExceptions(resolvedExceptions, LeftException);
-                Expression.MergeExceptions(resolvedExceptions, RightException);
-            }
+            resolvedExceptions = new List<IIdentifier>();
+            Expression.MergeExceptions(resolvedExceptions, LeftException);
+            Expression.MergeExceptions(resolvedExceptions, RightException);
 
             return true;
         }

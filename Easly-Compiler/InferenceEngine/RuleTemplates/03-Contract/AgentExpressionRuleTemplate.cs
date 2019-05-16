@@ -28,6 +28,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IAgentExpression, IList<IExpressionType>>(nameof(IAgentExpression.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IAgentExpression, IList<IIdentifier>>(nameof(IAgentExpression.ResolvedExceptions)),
                 new OnceReferenceDestinationTemplate<IAgentExpression, ICompiledType>(nameof(IAgentExpression.ResolvedAncestorType)),
                 new UnsealedListDestinationTemplate<IAgentExpression, IExpression>(nameof(IAgentExpression.ConstantSourceList)),
             };
@@ -89,12 +90,12 @@
             Debug.Assert(Value.Feature.IsAssigned);
             resolvedFeature = Value.Feature.Item;
 
-            resolvedExceptions = new List<IIdentifier>();
             resolvedResult = new List<IExpressionType>
             {
                 new ExpressionType(resolvedFeature.ResolvedFeatureTypeName.Item, resolvedFeature.ResolvedFeatureType.Item, string.Empty)
             };
 
+            resolvedExceptions = new List<IIdentifier>();
             expressionConstant = new AgentLanguageConstant(resolvedFeature);
 
             return true;

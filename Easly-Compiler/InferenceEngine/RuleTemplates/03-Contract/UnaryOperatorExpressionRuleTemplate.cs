@@ -24,11 +24,13 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceSourceTemplate<IUnaryOperatorExpression, IList<IExpressionType>>(nameof(IUnaryOperatorExpression.RightExpression) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IUnaryOperatorExpression, IList<IIdentifier>>(nameof(IUnaryOperatorExpression.RightExpression) + Dot + nameof(IExpression.ResolvedExceptions)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IUnaryOperatorExpression, IList<IExpressionType>>(nameof(IUnaryOperatorExpression.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IUnaryOperatorExpression, IList<IIdentifier>>(nameof(IUnaryOperatorExpression.ResolvedExceptions)),
                 new UnsealedListDestinationTemplate<IUnaryOperatorExpression, IExpression>(nameof(IUnaryOperatorExpression.ConstantSourceList)),
             };
         }

@@ -26,6 +26,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IIndexAssignmentInstruction, IList<IExpressionType>>(nameof(IIndexAssignmentInstruction.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IIndexAssignmentInstruction, IList<IIdentifier>>(nameof(IIndexAssignmentInstruction.ResolvedExceptions)),
             };
         }
         #endregion
@@ -54,6 +55,7 @@
         public override void Apply(IIndexAssignmentInstruction node, object data)
         {
             node.ResolvedResult.Item = new List<IExpressionType>();
+            node.ResolvedExceptions.Item = new List<IIdentifier>();
         }
         #endregion
     }

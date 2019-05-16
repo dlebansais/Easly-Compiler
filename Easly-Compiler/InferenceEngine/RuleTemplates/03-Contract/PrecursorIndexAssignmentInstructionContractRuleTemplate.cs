@@ -22,11 +22,13 @@
             {
                 new OnceReferenceCollectionSourceTemplate<IPrecursorIndexAssignmentInstruction, IArgument, IList<IExpressionType>>(nameof(IPrecursorIndexAssignmentInstruction.ArgumentList), nameof(IArgument.ResolvedResult)),
                 new OnceReferenceSourceTemplate<IPrecursorIndexAssignmentInstruction, IList<IExpressionType>>(nameof(IPrecursorIndexAssignmentInstruction.Source) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IPrecursorIndexAssignmentInstruction, IList<IIdentifier>>(nameof(IPrecursorIndexAssignmentInstruction.Source) + Dot + nameof(IExpression.ResolvedExceptions)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IPrecursorIndexAssignmentInstruction, IList<IExpressionType>>(nameof(IPrecursorIndexAssignmentInstruction.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IPrecursorIndexAssignmentInstruction, IList<IIdentifier>>(nameof(IPrecursorIndexAssignmentInstruction.ResolvedExceptions)),
             };
         }
         #endregion
@@ -55,6 +57,7 @@
         public override void Apply(IPrecursorIndexAssignmentInstruction node, object data)
         {
             node.ResolvedResult.Item = new List<IExpressionType>();
+            node.ResolvedExceptions.Item = new List<IIdentifier>();
         }
         #endregion
     }

@@ -32,6 +32,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IQueryExpression, IList<IExpressionType>>(nameof(IQueryExpression.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IQueryExpression, IList<IIdentifier>>(nameof(IQueryExpression.ResolvedExceptions)),
                 new UnsealedListDestinationTemplate<IQueryExpression, IExpression>(nameof(IQueryExpression.ConstantSourceList)),
             };
         }

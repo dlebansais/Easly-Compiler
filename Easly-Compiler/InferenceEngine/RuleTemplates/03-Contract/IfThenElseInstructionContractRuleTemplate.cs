@@ -27,6 +27,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IIfThenElseInstruction, IList<IExpressionType>>(nameof(IIfThenElseInstruction.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IIfThenElseInstruction, IList<IIdentifier>>(nameof(IIfThenElseInstruction.ResolvedExceptions)),
             };
         }
         #endregion
@@ -55,6 +56,7 @@
         public override void Apply(IIfThenElseInstruction node, object data)
         {
             node.ResolvedResult.Item = new List<IExpressionType>();
+            node.ResolvedExceptions.Item = new List<IIdentifier>();
         }
         #endregion
     }

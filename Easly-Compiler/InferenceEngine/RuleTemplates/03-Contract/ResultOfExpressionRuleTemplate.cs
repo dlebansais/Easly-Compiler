@@ -24,11 +24,13 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceSourceTemplate<IResultOfExpression, IList<IExpressionType>>(nameof(IResultOfExpression.Source) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IResultOfExpression, IList<IIdentifier>>(nameof(IResultOfExpression.Source) + Dot + nameof(IExpression.ResolvedExceptions)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IResultOfExpression, IList<IExpressionType>>(nameof(IResultOfExpression.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IResultOfExpression, IList<IIdentifier>>(nameof(IResultOfExpression.ResolvedExceptions)),
                 new UnsealedListDestinationTemplate<IResultOfExpression, IExpression>(nameof(IResultOfExpression.ConstantSourceList)),
             };
         }
@@ -91,8 +93,7 @@
 
             constantSourceList.Add(Source);
 
-            if (Source.ResolvedExceptions.IsAssigned)
-                resolvedExceptions = Source.ResolvedExceptions.Item;
+            resolvedExceptions = Source.ResolvedExceptions.Item;
 
             return true;
         }

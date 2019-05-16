@@ -24,12 +24,15 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceSourceTemplate<IBinaryConditionalExpression, IList<IExpressionType>>(nameof(IBinaryConditionalExpression.LeftExpression) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IBinaryConditionalExpression, IList<IIdentifier>>(nameof(IBinaryConditionalExpression.LeftExpression) + Dot + nameof(IExpression.ResolvedExceptions)),
                 new OnceReferenceSourceTemplate<IBinaryConditionalExpression, IList<IExpressionType>>(nameof(IBinaryConditionalExpression.RightExpression) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IBinaryConditionalExpression, IList<IIdentifier>>(nameof(IBinaryConditionalExpression.RightExpression) + Dot + nameof(IExpression.ResolvedExceptions)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IBinaryConditionalExpression, IList<IExpressionType>>(nameof(IBinaryConditionalExpression.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IBinaryConditionalExpression, IList<IIdentifier>>(nameof(IBinaryConditionalExpression.ResolvedExceptions)),
                 new UnsealedListDestinationTemplate<IBinaryConditionalExpression, IExpression>(nameof(IBinaryConditionalExpression.ConstantSourceList)),
             };
         }
@@ -107,14 +110,10 @@
                 new ExpressionType(BooleanTypeName, BooleanType, string.Empty)
             };
 
-            // TODO: always have ResolvedExceptions assigned.
-            if (LeftExpression.ResolvedExceptions.IsAssigned && RightExpression.ResolvedExceptions.IsAssigned)
-            {
-                List<IIdentifier> MergedExceptionList = new List<IIdentifier>();
-                MergedExceptionList.AddRange(LeftExpression.ResolvedExceptions.Item);
-                MergedExceptionList.AddRange(RightExpression.ResolvedExceptions.Item);
-                resolvedExceptions = MergedExceptionList;
-            }
+            List<IIdentifier> MergedExceptionList = new List<IIdentifier>();
+            MergedExceptionList.AddRange(LeftExpression.ResolvedExceptions.Item);
+            MergedExceptionList.AddRange(RightExpression.ResolvedExceptions.Item);
+            resolvedExceptions = MergedExceptionList;
 
             return true;
         }

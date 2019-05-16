@@ -24,11 +24,13 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceSourceTemplate<ICloneOfExpression, IList<IExpressionType>>(nameof(ICloneOfExpression.Source) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<ICloneOfExpression, IList<IIdentifier>>(nameof(ICloneOfExpression.Source) + Dot + nameof(IExpression.ResolvedExceptions)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<ICloneOfExpression, IList<IExpressionType>>(nameof(ICloneOfExpression.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<ICloneOfExpression, IList<IIdentifier>>(nameof(ICloneOfExpression.ResolvedExceptions)),
                 new UnsealedListDestinationTemplate<ICloneOfExpression, IExpression>(nameof(ICloneOfExpression.ConstantSourceList)),
             };
         }
@@ -86,9 +88,7 @@
             }
 
             resolvedResult = ResolvedSourceResult;
-
-            if (Source.ResolvedExceptions.IsAssigned)
-                resolvedExceptions = Source.ResolvedExceptions.Item;
+            resolvedExceptions = Source.ResolvedExceptions.Item;
 
             return true;
         }

@@ -28,6 +28,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IClassConstantExpression, IList<IExpressionType>>(nameof(IClassConstantExpression.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IClassConstantExpression, IList<IIdentifier>>(nameof(IClassConstantExpression.ResolvedExceptions)),
                 new UnsealedListDestinationTemplate<IClassConstantExpression, IExpression>(nameof(IClassConstantExpression.ConstantSourceList)),
             };
         }
