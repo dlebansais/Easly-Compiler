@@ -125,12 +125,12 @@ namespace CompilerNode
                 LocalScope = new HashtableEx<string, IScopeAttributeFeature>();
                 InnerScopes = new List<IScopeHolder>();
                 FullScope = new HashtableEx<string, IScopeAttributeFeature>();
-                ResolvedResult = new OnceReference<IList<IExpressionType>>();
-                ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
+                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 IsHandled = true;
             }
 

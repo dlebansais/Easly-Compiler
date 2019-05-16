@@ -198,6 +198,11 @@
                         continue;
 
                     Result &= Rule.IsNoDestinationSet(Source);
+
+                    if (!Result)
+                    {
+
+                    }
                 }
             }
 
@@ -214,7 +219,7 @@
             {
                 IRuleTemplate Rule = RuleTemplateList[i];
 
-                /*if (Rule is ISimpleTypeClassRuleTemplate AsRuleTemplate)
+                /*if (Rule is IQueryOverloadTypeConformanceRuleTemplate AsRuleTemplate)
                 {
 
                 }*/
@@ -329,10 +334,10 @@
 
             foreach (IRuleTemplate Rule in RuleTemplateList)
             {
-                /*if (Rule is IInheritanceTagRuleTemplate AsRuleTemplate)
+                if (Rule is IQueryOverloadTypeConformanceRuleTemplate AsRuleTemplate)
                 {
 
-                }*/
+                }
 
                 foreach (ISource Source in unresolvedSourceList)
                 {

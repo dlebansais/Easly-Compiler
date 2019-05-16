@@ -212,11 +212,19 @@ namespace CompilerNode
         /// <param name="attributeType">The associated type.</param>
         public void FixFeatureType(ITypeName attributeTypeName, ICompiledType attributeType)
         {
-            Debug.Assert(!ResolvedFeatureTypeName.IsAssigned);
-            Debug.Assert(!ResolvedFeatureType.IsAssigned);
+            if (ResolvedFeatureTypeName.IsAssigned || ResolvedFeatureType.IsAssigned)
+            {
+                Debug.Assert(ResolvedFeatureTypeName.IsAssigned);
+                Debug.Assert(ResolvedFeatureType.IsAssigned);
 
-            ResolvedFeatureTypeName.Item = attributeTypeName;
-            ResolvedFeatureType.Item = attributeType;
+                Debug.Assert(ResolvedFeatureTypeName.Item == attributeTypeName);
+                Debug.Assert(ResolvedFeatureType.Item == attributeType);
+            }
+            else
+            {
+                ResolvedFeatureTypeName.Item = attributeTypeName;
+                ResolvedFeatureType.Item = attributeType;
+            }
         }
         #endregion
 

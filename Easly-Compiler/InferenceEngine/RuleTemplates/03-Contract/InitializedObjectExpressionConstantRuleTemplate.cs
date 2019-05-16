@@ -22,7 +22,7 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new SealedListSourceTemplate<IInitializedObjectExpression, IExpression>(nameof(IInitializedObjectExpression.ConstantSourceList)),
-                new OnceReferenceCollectionSourceTemplate<IInitializedObjectExpression, IExpression, ILanguageConstant>(nameof(IInitializedObjectExpression.ConstantSourceList), nameof(IExpression.ExpressionConstant)),
+                new OnceReferenceCollectionSourceTemplate<IInitializedObjectExpression, IAssignmentArgument, ILanguageConstant>(nameof(IInitializedObjectExpression.AssignmentList), nameof(IAssignmentArgument.ExpressionConstant)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()

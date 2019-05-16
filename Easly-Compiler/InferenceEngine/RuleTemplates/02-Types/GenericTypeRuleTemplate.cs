@@ -25,6 +25,7 @@
             {
                 new SealedTableSourceTemplate<IGenericType, string, IIdentifier>(nameof(IGenericType.ArgumentIdentifierTable)),
                 new SealedTableSourceTemplate<IGenericType, string, IImportedClass>(nameof(IClass.ImportedClassTable), TemplateClassStart<IGenericType>.Default),
+                new OnceReferenceTableSourceTemplate<IGenericType, string, IImportedClass, IClassType>(nameof(IClass.ImportedClassTable), nameof(IImportedClass.ResolvedClassType), TemplateClassStart<IGenericType>.Default),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
@@ -75,7 +76,7 @@
                 IImportedClass Imported = ImportedClassTable[ValidIdentifier];
                 IClass BaseClass = Imported.Item;
 
-                if (BaseClass.GenericTable.Count == 0)
+                if (BaseClass.GenericList.Count == 0)
                 {
                     AddSourceError(new ErrorGenericClass(node, ValidIdentifier));
                     Success = false;
@@ -154,20 +155,19 @@
             string ValidIdentifier = ClassIdentifier.ValidText.Item;
 
             int LastDefaultCount = 0;
-            foreach (KeyValuePair<string, ICompiledType> Entry in baseClass.GenericTable)
+            foreach (IGeneric Generic in baseClass.GenericList)
             {
-                IFormalGenericType FormalGeneric = (IFormalGenericType)Entry.Value;
-                if (FormalGeneric.FormalGeneric.DefaultValue.IsAssigned)
+                if (Generic.DefaultValue.IsAssigned)
                     LastDefaultCount++;
                 else
                     LastDefaultCount = 0;
             }
 
-            int MinimumArgumentCount = baseClass.GenericTable.Count - LastDefaultCount;
+            int MinimumArgumentCount = baseClass.GenericList.Count - LastDefaultCount;
 
-            if (node.TypeArgumentList.Count > baseClass.GenericTable.Count)
+            if (node.TypeArgumentList.Count > baseClass.GenericList.Count)
             {
-                AddSourceError(new ErrorTooManyTypeArguments(node, ValidIdentifier, baseClass.GenericTable.Count));
+                AddSourceError(new ErrorTooManyTypeArguments(node, ValidIdentifier, baseClass.GenericList.Count));
                 return false;
             }
             else if (node.TypeArgumentList.Count < MinimumArgumentCount)
@@ -193,6 +193,14 @@
         private bool CheckAssignmentTypeArgumentsValidity(IGenericType node, IClass baseClass, IHashtableEx<string, ICompiledType> resolvedTable, IHashtableEx<string, IObjectType> locationTable)
         {
             bool Result = true;
+            List<string> ValidNameList = new List<string>();
+
+            foreach (IGeneric Generic in baseClass.GenericList)
+            {
+                IName EntityName = (IName)Generic.EntityName;
+                string GenericName = EntityName.ValidText.Item;
+                ValidNameList.Add(GenericName);
+            }
 
             foreach (IAssignmentTypeArgument Item in node.TypeArgumentList)
             {
@@ -202,7 +210,7 @@
                 // This is checked in a separate rule.
                 Debug.Assert(!resolvedTable.ContainsKey(GenericName));
 
-                if (!baseClass.LocalGenericTable.ContainsKey(GenericName))
+                if (!ValidNameList.Contains(GenericName))
                 {
                     AddSourceError(new ErrorUnknownIdentifier(ParameterIdentifier, GenericName));
                     Result = false;
@@ -214,13 +222,14 @@
                 locationTable.Add(GenericName, (IObjectType)Item.Source);
             }
 
-            foreach (KeyValuePair<string, ICompiledType> Entry in baseClass.GenericTable)
+            foreach (IGeneric Generic in baseClass.GenericList)
             {
-                string GenericName = Entry.Key;
+                IName EntityName = (IName)Generic.EntityName;
+                string GenericName = EntityName.ValidText.Item;
+
                 if (!resolvedTable.ContainsKey(GenericName))
                 {
-                    FormalGenericType Generic = (FormalGenericType)Entry.Value;
-                    if (!Generic.FormalGeneric.DefaultValue.IsAssigned)
+                    if (!Generic.DefaultValue.IsAssigned)
                     {
                         AddSourceError(new ErrorMissingTypeArgument(node, GenericName));
                         Result = false;
