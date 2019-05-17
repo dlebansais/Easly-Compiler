@@ -58,10 +58,7 @@
             }
 
             if (Success)
-            {
-                //TODO: create the constant
-                data = NeutralLanguageConstant.NotConstant;
-            }
+                data = new ObjectLanguageConstant();
 
             return Success;
         }

@@ -280,5 +280,46 @@ namespace CompilerNode
                     mergedExceptions.Add(Item);
             }
         }
+
+        /// <summary>
+        /// Gets the final constant in a chain of expressions.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        public static ILanguageConstant FinalConstant(IExpression expression)
+        {
+            ILanguageConstant Result = null;
+
+            Debug.Assert(expression.ExpressionConstant.IsAssigned);
+            ILanguageConstant ExpressionConstant = expression.ExpressionConstant.Item;
+
+            if (ExpressionConstant == NeutralLanguageConstant.NotConstant)
+                Result = ExpressionConstant;
+            else
+            {
+                switch (ExpressionConstant)
+                {
+                    case IAgentLanguageConstant AsAgentLanguageConstant:
+                    case IBooleanLanguageConstant AsBooleanLanguageConstant:
+                    case ICharacterLanguageConstant AsCharacterLanguageConstant:
+                    case IEntityLanguageConstant AsEntityLanguageConstant:
+                    case INumberLanguageConstant AsNumberLanguageConstant:
+                    case IObjectLanguageConstant AsObjectLanguageConstant:
+                    case IStringLanguageConstant AsStringLanguageConstant:
+                        Result = ExpressionConstant;
+                        break;
+
+                    case IDiscreteLanguageConstant AsDiscreteLanguageConstant:
+                        if (AsDiscreteLanguageConstant.IsValueKnown && AsDiscreteLanguageConstant.Discrete.NumericValue.IsAssigned)
+                            Result = FinalConstant((IExpression)AsDiscreteLanguageConstant.Discrete.NumericValue);
+                        else
+                            Result = ExpressionConstant;
+                        break;
+                }
+
+                Debug.Assert(Result != null);
+            }
+
+            return Result;
+        }
     }
 }

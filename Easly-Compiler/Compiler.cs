@@ -286,7 +286,6 @@
         protected virtual void GenerateCompilationUID()
         {
             string NewGuidDigits = Guid.NewGuid().ToString("N") + IntegerBase.Hexadecimal.Suffix;
-            //CompilationUID = InitializedNumberExpression(LanguageClasses.UniversallyUniqueIdentifier.Name, "Value", NewGuidDigits);
 
             BaseNode.IIdentifier Operator = NodeHelper.CreateSimpleIdentifier("To UUID");
             BaseNode.IManifestNumberExpression NumberExpression = NodeHelper.CreateSimpleManifestNumberExpression(NewGuidDigits);
@@ -303,8 +302,6 @@
         /// <summary></summary>
         protected virtual void GenerateConformanceToStandard()
         {
-            //ConformanceToStandard = InitializedStringExpression(LanguageClasses.Boolean.Name, "Value", LanguageClasses.BooleanTrueString);
-
             BaseNode.IKeywordExpression Expression = NodeHelper.CreateKeywordExpression(BaseNode.Keyword.True);
             ConformanceToStandard = ToCompilerNode<BaseNode.IKeywordExpression, IKeywordExpression>(Expression);
         }
@@ -312,17 +309,8 @@
         /// <summary></summary>
         protected virtual void GenerateDebugging()
         {
-            //Debugging = InitializedStringExpression(LanguageClasses.Boolean.Name, "Value", LanguageClasses.BooleanFalseString);
-
             BaseNode.IKeywordExpression Expression = NodeHelper.CreateKeywordExpression(BaseNode.Keyword.False);
             Debugging = ToCompilerNode<BaseNode.IKeywordExpression, IKeywordExpression>(Expression);
-        }
-
-        /// <summary></summary>
-        protected virtual IInitializedObjectExpression InitializedNumberExpression(string className, string identifierName, string initialValue)
-        {
-            BaseNode.IManifestNumberExpression ManifestValue = NodeHelper.CreateSimpleManifestNumberExpression(initialValue);
-            return InitializedExpression(className, identifierName, ManifestValue);
         }
 
         /// <summary></summary>

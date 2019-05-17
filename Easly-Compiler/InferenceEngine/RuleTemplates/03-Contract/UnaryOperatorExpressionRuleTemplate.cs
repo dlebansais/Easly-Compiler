@@ -143,8 +143,7 @@
                         selectedOverloadType = OperatorOverloadList[SelectedOperatorIndex];
                         resolvedExceptions = selectedOverloadType.ExceptionIdentifierList;
 
-                        //TODO: check that the result is a number constant
-                        //ResultNumberConstant.Item = ??
+                        constantSourceList.Add(RightExpression);
                     }
                     else
                     {
@@ -186,7 +185,6 @@
             node.ResolvedExceptions.Item = ResolvedExceptions;
             node.ConstantSourceList.AddRange(ConstantSourceList);
             node.ConstantSourceList.Seal();
-            node.ExpressionConstant.Item = ExpressionConstant;
             node.SelectedFeature.Item = SelectedFeature;
             node.SelectedOverload.Item = SelectedOverload;
             node.SelectedOverloadType.Item = SelectedOverloadType;

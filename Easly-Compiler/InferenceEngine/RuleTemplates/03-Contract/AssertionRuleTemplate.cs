@@ -55,12 +55,12 @@
                 AddSourceError(new ErrorInvalidExpression(BooleanExpression));
                 Success = false;
             }
-            else if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName ResultTypeName, out ICompiledType ResultType))
+            else if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType))
             {
                 AddSourceError(new ErrorBooleanTypeMissing(node));
                 Success = false;
             }
-            else if (ResolvedResult[0].ValueType != ResultType)
+            else if (ResolvedResult[0].ValueType != BooleanType)
             {
                 AddSourceError(new ErrorInvalidExpression(BooleanExpression));
                 Success = false;

@@ -236,6 +236,7 @@
             new PrecursorIndexExpressionRuleTemplate(),
             new PrecursorInstructionContractRuleTemplate(),
             new QualifiedNameContractRuleTemplate(),
+            new QueryExpressionConstantRuleTemplate(),
             new QueryExpressionRuleTemplate(),
             new QueryOverloadContractRuleTemplate(),
             new RaiseEventInstructionContractRuleTemplate(),
@@ -247,6 +248,7 @@
             new ThrowInstructionContractRuleTemplate(),
             new UnaryNotExpressionConstantRuleTemplate(),
             new UnaryNotExpressionRuleTemplate(),
+            new UnaryOperatorExpressionConstantRuleTemplate(),
             new UnaryOperatorExpressionRuleTemplate(),
             new WithContractRuleTemplate(),
         };

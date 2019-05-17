@@ -428,6 +428,8 @@
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\Miscellaneous\TypeArgumentStyles.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\Miscellaneous\TypeInstancingRecord.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\AssertionTagExpressionSourceRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\Miscellaneous\ObjectLanguageConstant.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\QueryExpressionConstantRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\DeferredBodyRuleContractTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\ExternBodyRuleContractTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\ReleaseInstructionContractRuleTemplate.cs" />
@@ -436,6 +438,7 @@
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\AssignmentArgumentConstantRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\PositionalArgumentConstantRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\Miscellaneous\NeutralLanguageConstant.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\UnaryOperatorExpressionConstantRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\UnaryNotExpressionConstantRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\ResultOfExpressionConstantRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\PrecursorExpressionConstantRuleTemplate.cs" />

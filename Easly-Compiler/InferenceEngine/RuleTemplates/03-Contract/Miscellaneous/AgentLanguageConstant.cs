@@ -1,8 +1,6 @@
 ﻿namespace EaslyCompiler
 {
     using System.Diagnostics;
-    using CompilerNode;
-    using Easly;
 
     /// <summary>
     /// Represents an agent feature as some constant.

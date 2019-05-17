@@ -198,11 +198,6 @@
                         continue;
 
                     Result &= Rule.IsNoDestinationSet(Source);
-
-                    if (!Result)
-                    {
-
-                    }
                 }
             }
 
@@ -334,7 +329,7 @@
 
             foreach (IRuleTemplate Rule in RuleTemplateList)
             {
-                if (Rule is IQueryOverloadTypeConformanceRuleTemplate AsRuleTemplate)
+                if (Rule is IQueryExpressionConstantRuleTemplate AsRuleTemplate)
                 {
 
                 }

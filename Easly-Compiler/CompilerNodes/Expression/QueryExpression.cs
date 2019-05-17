@@ -25,6 +25,11 @@ namespace CompilerNode
         /// The list of resolved arguments.
         /// </summary>
         OnceReference<List<ExpressionType>> ResolvedArgumentList { get; }
+
+        /// <summary>
+        /// The resolved discrete at the end of the path.
+        /// </summary>
+        OnceReference<IDiscrete> ResolvedFinalDiscrete { get; }
     }
 
     /// <summary>
@@ -131,6 +136,7 @@ namespace CompilerNode
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
                 ResolvedFinalFeature = new OnceReference<ICompiledFeature>();
+                ResolvedFinalDiscrete = new OnceReference<IDiscrete>();
                 ResolvedArgumentList = new OnceReference<List<ExpressionType>>();
                 IsHandled = true;
             }
@@ -164,7 +170,7 @@ namespace CompilerNode
 
                 Debug.Assert(ResolvedResult.IsAssigned || !IsResolved);
                 Debug.Assert(ResolvedExceptions.IsAssigned || !IsResolved);
-                Debug.Assert(ResolvedFinalFeature.IsAssigned == ResolvedResult.IsAssigned);
+                Debug.Assert(ResolvedFinalFeature.IsAssigned || ResolvedFinalDiscrete.IsAssigned || !IsResolved);
 
                 IsHandled = true;
             }
@@ -206,6 +212,11 @@ namespace CompilerNode
         /// The list of resolved arguments.
         /// </summary>
         public OnceReference<List<ExpressionType>> ResolvedArgumentList { get; private set; } = new OnceReference<List<ExpressionType>>();
+
+        /// <summary>
+        /// The resolved discrete at the end of the path.
+        /// </summary>
+        public OnceReference<IDiscrete> ResolvedFinalDiscrete { get; private set; } = new OnceReference<IDiscrete>();
 
         /// <summary>
         /// Compares two expressions.
