@@ -114,32 +114,24 @@
                     Debug.Assert(OperatorFeature.ResolvedFeatureType.IsAssigned);
                     ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
 
-                    if (OperatorType is FunctionType AsFunctionType)
+                    if (OperatorType is FunctionType AsFunctionType && OperatorFeature is IFunctionFeature AsFunctionFeature)
                     {
-                        if (OperatorFeature is IFunctionFeature AsFunctionFeature)
-                        {
-                            IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
-                            foreach (IQueryOverloadType Overload in AsFunctionType.OverloadList)
-                                ParameterTableList.Add(Overload.ParameterTable);
+                        IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+                        foreach (IQueryOverloadType Overload in AsFunctionType.OverloadList)
+                            ParameterTableList.Add(Overload.ParameterTable);
 
-                            IList<IExpressionType> RightResult = RightExpression.ResolvedResult.Item;
-                            if (!Argument.ArgumentsConformToParameters(ParameterTableList, RightResult, TypeArgumentStyles.Positional, errorList, Operator, out int SelectedIndex))
-                                return false;
-
-                            IQueryOverloadType SelectedOverloadType = AsFunctionType.OverloadList[SelectedIndex];
-                            resolvedResult = SelectedOverloadType.Result;
-                            selectedFeature = AsFunctionFeature;
-                            selectedOverload = AsFunctionFeature.OverloadList[SelectedIndex];
-                            resolvedExceptions = SelectedOverloadType.ExceptionIdentifierList;
-
-                            constantSourceList.Add(LeftExpression);
-                            constantSourceList.Add(RightExpression);
-                        }
-                        else
-                        {
-                            errorList.AddError(new ErrorInvalidOperator(Operator, OperatorName));
+                        IList<IExpressionType> RightResult = RightExpression.ResolvedResult.Item;
+                        if (!Argument.ArgumentsConformToParameters(ParameterTableList, RightResult, TypeArgumentStyles.Positional, errorList, Operator, out int SelectedIndex))
                             return false;
-                        }
+
+                        IQueryOverloadType SelectedOverloadType = AsFunctionType.OverloadList[SelectedIndex];
+                        resolvedResult = SelectedOverloadType.Result;
+                        selectedFeature = AsFunctionFeature;
+                        selectedOverload = AsFunctionFeature.OverloadList[SelectedIndex];
+                        resolvedExceptions = SelectedOverloadType.ExceptionIdentifierList;
+
+                        constantSourceList.Add(LeftExpression);
+                        constantSourceList.Add(RightExpression);
                     }
                     else
                     {

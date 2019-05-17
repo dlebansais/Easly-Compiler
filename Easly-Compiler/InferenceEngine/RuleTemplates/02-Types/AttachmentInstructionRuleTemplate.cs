@@ -53,8 +53,10 @@
             for (int i = 0; i < node.AttachmentList.Count; i++)
                 CheckedScopeList.Add(new HashtableEx<string, IScopeAttributeFeature>());
 
-            foreach (IName Item in node.EntityNameList)
+            for (int Index = 0; Index < node.EntityNameList.Count; Index++)
             {
+                IName Item = node.EntityNameList[Index];
+
                 Debug.Assert(Item.ValidText.IsAssigned);
                 string ValidText = Item.ValidText.Item;
 
@@ -62,16 +64,24 @@
                 {
                     AddSourceError(new ErrorVariableAlreadyDefined(Item, ValidText));
                     Success = false;
+                    continue;
                 }
-                else
-                    for (int i = 0; i < node.AttachmentList.Count; i++)
-                    {
-                        Attachment AttachmentItem = (Attachment)node.AttachmentList[i];
-                        IHashtableEx<string, IScopeAttributeFeature> CheckedScope = CheckedScopeList[i];
 
-                        IScopeAttributeFeature NewEntity = ScopeAttributeFeature.Create(Item, ValidText);
-                        CheckedScope.Add(ValidText, NewEntity);
-                    }
+                for (int i = 0; i < node.AttachmentList.Count; i++)
+                {
+                    Attachment AttachmentItem = (Attachment)node.AttachmentList[i];
+                    IHashtableEx<string, IScopeAttributeFeature> CheckedScope = CheckedScopeList[i];
+
+                    Debug.Assert(Index < AttachmentItem.AttachTypeList.Count);
+                    IObjectType AttachedType = AttachmentItem.AttachTypeList[Index];
+
+                    Debug.Assert(AttachedType.ResolvedTypeName.IsAssigned);
+                    Debug.Assert(AttachedType.ResolvedType.IsAssigned);
+
+                    //IScopeAttributeFeature NewEntity = ScopeAttributeFeature.Create(Item, ValidText);
+                    IScopeAttributeFeature NewEntity = ScopeAttributeFeature.Create(Item, ValidText, AttachedType.ResolvedTypeName.Item, AttachedType.ResolvedType.Item);
+                    CheckedScope.Add(ValidText, NewEntity);
+                }
             }
 
             IList<string> ConflictList = new List<string>();

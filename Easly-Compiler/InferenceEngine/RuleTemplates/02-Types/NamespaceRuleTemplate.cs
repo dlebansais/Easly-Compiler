@@ -27,6 +27,7 @@
                 new SealedTableSourceTemplate<IClass, IFeatureName, IHashtableEx<string, IClass>>(nameof(IClass.ExportTable)),
                 new SealedTableSourceTemplate<IClass, IFeatureName, ITypedefType>(nameof(IClass.TypedefTable)),
                 new SealedTableSourceTemplate<IClass, IFeatureName, IDiscrete>(nameof(IClass.DiscreteTable)),
+                new SealedTableSourceTemplate<IClass, IFeatureName, IExpression>(nameof(IClass.DiscreteWithValueTable)),
                 new SealedTableSourceTemplate<IClass, IFeatureName, IFeatureInstance>(nameof(IClass.FeatureTable)),
                 new SealedTableSourceTemplate<IClass, string, IHashtableEx>(nameof(IClass.LocalNamespaceTable)),
                 new SealedTableSourceTemplate<IClass, ITypeName, IClassType>(nameof(IClass.ResolvedImportedClassTable)),

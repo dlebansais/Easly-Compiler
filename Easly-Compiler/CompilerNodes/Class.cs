@@ -152,6 +152,11 @@ namespace CompilerNode
         IHashtableEx<IFeatureName, IDiscrete> DiscreteTable { get; }
 
         /// <summary>
+        /// Table of all resolved discretes in this class, direct or inherited.
+        /// </summary>
+        IHashtableEx<IFeatureName, IExpression> DiscreteWithValueTable { get; }
+
+        /// <summary>
         /// Table of resolved typedefs defined in this class.
         /// </summary>
         IHashtableEx<IFeatureName, ITypedefType> LocalTypedefTable { get; }
@@ -318,6 +323,7 @@ namespace CompilerNode
             BaseClass.ClassGroupList.Seal();
             BaseClass.ClassGroup.Item = new SingleClassGroup(BaseClass);
             BaseClass.DiscreteTable.Seal();
+            BaseClass.DiscreteWithValueTable.Seal();
             BaseClass.FeatureTable.Seal();
             BaseClass.FullClassPath = string.Empty; // TODO
             BaseClass.GenericTable.Seal();
@@ -560,6 +566,7 @@ namespace CompilerNode
                 GenericTable = new HashtableEx<string, ICompiledType>();
                 LocalDiscreteTable = new HashtableEx<IFeatureName, IDiscrete>();
                 DiscreteTable = new HashtableEx<IFeatureName, IDiscrete>();
+                DiscreteWithValueTable = new HashtableEx<IFeatureName, IExpression>();
                 LocalTypedefTable = new HashtableEx<IFeatureName, ITypedefType>();
                 TypedefTable = new HashtableEx<IFeatureName, ITypedefType>();
                 LocalFeatureTable = new HashtableEx<IFeatureName, IFeatureInstance>();
@@ -936,6 +943,11 @@ namespace CompilerNode
         /// Table of all resolved discretes in this class, direct or inherited.
         /// </summary>
         public IHashtableEx<IFeatureName, IDiscrete> DiscreteTable { get; private set; } = new HashtableEx<IFeatureName, IDiscrete>();
+
+        /// <summary>
+        /// Table of all resolved discretes in this class, direct or inherited.
+        /// </summary>
+        public IHashtableEx<IFeatureName, IExpression> DiscreteWithValueTable { get; private set; } = new HashtableEx<IFeatureName, IExpression>();
 
         /// <summary>
         /// Table of resolved typedefs defined in this class.

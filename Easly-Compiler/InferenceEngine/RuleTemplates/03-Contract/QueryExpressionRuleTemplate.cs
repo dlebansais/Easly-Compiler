@@ -252,10 +252,7 @@
             node.ConstantSourceList.Seal();
 
             if (node.ConstantSourceList.Count == 0)
-            {
-                Debug.Assert(ExpressionConstant == NeutralLanguageConstant.NotConstant);
                 node.ExpressionConstant.Item = ExpressionConstant;
-            }
 
             Debug.Assert(ResolvedFinalFeature != null || ResolvedFinalDiscrete != null);
 

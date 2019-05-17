@@ -31,6 +31,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new UnsealedTableDestinationTemplate<IClass, IFeatureName, IDiscrete>(nameof(IClass.DiscreteTable)),
+                new UnsealedTableDestinationTemplate<IClass, IFeatureName, IExpression>(nameof(IClass.DiscreteWithValueTable)),
             };
         }
         #endregion
@@ -116,6 +117,16 @@
 
             node.DiscreteTable.Merge(MergedDiscreteTable);
             node.DiscreteTable.Seal();
+
+            Debug.Assert(node.DiscreteWithValueTable.Count == 0);
+            foreach (KeyValuePair<IFeatureName, IDiscrete> Entry in node.DiscreteTable)
+                if (Entry.Value.NumericValue.IsAssigned)
+                {
+                    IExpression NumericValue = (IExpression)Entry.Value.NumericValue.Item;
+                    node.DiscreteWithValueTable.Add(Entry.Key, NumericValue);
+                }
+
+            node.DiscreteWithValueTable.Seal();
 
             foreach (IClassType Item in node.GenericInstanceList)
             {

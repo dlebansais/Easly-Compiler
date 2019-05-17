@@ -70,6 +70,8 @@
             Debug.Assert(classAny.FeatureTable.Count == 0);
             Debug.Assert(classAny.DiscreteTable.IsSealed);
             Debug.Assert(classAny.DiscreteTable.Count == 0);
+            Debug.Assert(classAny.DiscreteWithValueTable.IsSealed);
+            Debug.Assert(classAny.DiscreteWithValueTable.Count == 0);
             Debug.Assert(classAny.ExportTable.IsSealed);
             Debug.Assert(classAny.ExportTable.Count == 0);
             Debug.Assert(classAny.TypedefTable.IsSealed);

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
     using Easly;
 
@@ -23,6 +24,7 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceSourceTemplate<IAttachmentInstruction, IList<IExpressionType>>(nameof(IAttachmentInstruction.Source) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceCollectionSourceTemplate<IAttachmentInstruction, IAttachment, IList<IExpressionType>>(nameof(IAttachmentInstruction.AttachmentList), nameof(IAttachment.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()

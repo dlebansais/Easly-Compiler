@@ -24,6 +24,7 @@
             {
                 new OnceReferenceCollectionSourceTemplate<IClass, IExpression, ILanguageConstant>(nameof(IClass.NodeWithDefaultList), nameof(IExpression.ExpressionConstant)),
                 new OnceReferenceCollectionSourceTemplate<IClass, IExpression, ILanguageConstant>(nameof(IClass.NodeWithNumberConstantList), nameof(IExpression.ExpressionConstant)),
+                new OnceReferenceTableSourceTemplate<IClass, IFeatureName, IExpression, ILanguageConstant>(nameof(IClass.DiscreteWithValueTable), nameof(IExpression.ExpressionConstant)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
@@ -81,32 +82,30 @@
             bool Success = true;
             combinedDiscreteNumericValueList = new Dictionary<ICanonicalNumber, IDiscrete>();
 
-            foreach (KeyValuePair<IFeatureName, IDiscrete> Entry in node.DiscreteTable)
+            foreach (KeyValuePair<IFeatureName, IExpression> Entry in node.DiscreteWithValueTable)
             {
-                IDiscrete DiscreteItem = Entry.Value;
+                Debug.Assert(node.DiscreteTable.ContainsKey(Entry.Key));
+                IDiscrete DiscreteItem = node.DiscreteTable[Entry.Key];
 
-                if (DiscreteItem.NumericValue.IsAssigned)
+                IExpression NumericValue = (IExpression)DiscreteItem.NumericValue.Item;
+                ILanguageConstant ExpressionConstant = Expression.FinalConstant(NumericValue);
+
+                if (ExpressionConstant is INumberLanguageConstant AsNumberLanguageConstant && AsNumberLanguageConstant.IsValueKnown)
                 {
-                    IExpression NumericValue = (IExpression)DiscreteItem.NumericValue.Item;
-                    ILanguageConstant ExpressionConstant = Expression.FinalConstant(NumericValue);
+                    ICanonicalNumber NumberConstant = AsNumberLanguageConstant.Value;
 
-                    if (ExpressionConstant is INumberLanguageConstant AsNumberLanguageConstant && AsNumberLanguageConstant.IsValueKnown)
+                    if (combinedDiscreteNumericValueList.ContainsKey(NumberConstant))
                     {
-                        ICanonicalNumber NumberConstant = AsNumberLanguageConstant.Value;
-
-                        if (combinedDiscreteNumericValueList.ContainsKey(NumberConstant))
-                        {
-                            AddSourceError(new ErrorMultipleIdenticalDiscrete(DiscreteItem, NumberConstant));
-                            Success = false;
-                        }
-                        else
-                            combinedDiscreteNumericValueList.Add(AsNumberLanguageConstant.Value, DiscreteItem);
-                    }
-                    else
-                    {
-                        AddSourceError(new ErrorInvalidExpression(NumericValue));
+                        AddSourceError(new ErrorMultipleIdenticalDiscrete(DiscreteItem, NumberConstant));
                         Success = false;
                     }
+                    else
+                        combinedDiscreteNumericValueList.Add(AsNumberLanguageConstant.Value, DiscreteItem);
+                }
+                else
+                {
+                    AddSourceError(new ErrorInvalidExpression(NumericValue));
+                    Success = false;
                 }
             }
 
