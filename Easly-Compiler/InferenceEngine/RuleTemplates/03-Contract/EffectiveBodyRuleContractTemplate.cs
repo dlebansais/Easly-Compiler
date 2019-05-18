@@ -61,26 +61,6 @@
             data = null;
             bool Success = true;
 
-            IHashtableEx<string, IScopeAttributeFeature> LocalEntityTable = new HashtableEx<string, IScopeAttributeFeature>();
-
-            foreach (IEntityDeclaration Item in node.EntityDeclarationList)
-            {
-                IName FieldName = (IName)Item.EntityName;
-                string ValidText = FieldName.ValidText.Item;
-                IScopeAttributeFeature FieldAttribute = Item.ValidEntity.Item;
-
-                if (LocalEntityTable.ContainsKey(ValidText))
-                {
-                    AddSourceError(new ErrorDuplicateName(FieldName, ValidText));
-                    Success = false;
-                }
-                else
-                    LocalEntityTable.Add(ValidText, FieldAttribute);
-            }
-
-            if (Success)
-                data = LocalEntityTable;
-
             return Success;
         }
 
@@ -91,8 +71,6 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(TBody node, object data)
         {
-            IHashtableEx<string, IScopeAttributeFeature> LocalEntityTable = (IHashtableEx<string, IScopeAttributeFeature>)data;
-
             node.ResolvedResult.Item = new List<IExpressionType>();
         }
         #endregion

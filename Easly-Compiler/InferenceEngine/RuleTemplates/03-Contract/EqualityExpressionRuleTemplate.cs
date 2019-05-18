@@ -109,19 +109,13 @@
                             ICompiledType RightExpressionType = RightItem.ValueType;
 
                             if (!ObjectType.TypeConformToBase(LeftExpressionType, RightExpressionType, EmptySubstitutionTypeTable) && !ObjectType.TypeConformToBase(RightExpressionType, LeftExpressionType, EmptySubstitutionTypeTable))
-                            {
-                                errorList.AddError(new ErrorExpressionResultMismatch(node));
                                 MismatchingResultCount++;
-                            }
 
                             break;
                         }
 
                     if (!MatchingNameFound)
-                    {
-                        errorList.AddError(new ErrorExpressionResultMismatch(node));
                         MismatchingResultCount++;
-                    }
                 }
 
                 if (MismatchingResultCount > 0)

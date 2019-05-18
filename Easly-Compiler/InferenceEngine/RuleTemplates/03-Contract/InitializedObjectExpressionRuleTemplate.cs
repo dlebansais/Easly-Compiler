@@ -174,39 +174,33 @@
                     {
                         if (FeatureName.TableContain(featureTable, ValidIdentifierText, out IFeatureName Key, out IFeatureInstance FeatureItem))
                         {
-                            bool ValidFeature;
+                            bool ValidFeature = false;
 
                             if (FeatureItem.Feature.Item is AttributeFeature AsAttributeFeature)
                                 ValidFeature = true;
-
                             else if (FeatureItem.Feature.Item is IPropertyFeature AsPropertyFeature)
                             {
+                                bool IsHandled = false;
                                 switch (AsPropertyFeature.PropertyKind)
                                 {
                                     case BaseNode.UtilityType.ReadOnly:
-                                        if (AsPropertyFeature.GetterBody.IsAssigned)
-                                            ValidFeature = false;
-                                        else
-                                            ValidFeature = true;
+                                        ValidFeature = !AsPropertyFeature.GetterBody.IsAssigned;
+                                        IsHandled = true;
                                         break;
 
                                     case BaseNode.UtilityType.ReadWrite:
-                                        if (AsPropertyFeature.GetterBody.IsAssigned && !AsPropertyFeature.SetterBody.IsAssigned)
-                                            ValidFeature = false;
-                                        else
-                                            ValidFeature = true;
+                                        ValidFeature = !(AsPropertyFeature.GetterBody.IsAssigned && !AsPropertyFeature.SetterBody.IsAssigned);
+                                        IsHandled = true;
                                         break;
 
                                     case BaseNode.UtilityType.WriteOnly:
                                         ValidFeature = true;
+                                        IsHandled = true;
                                         break;
-
-                                    default:
-                                        throw new ArgumentOutOfRangeException();
                                 }
+
+                                Debug.Assert(IsHandled);
                             }
-                            else
-                                ValidFeature = false;
 
                             if (ValidFeature)
                                 assignedFeatureTable.Add(ValidIdentifierText, FeatureItem.Feature.Item);
@@ -215,7 +209,6 @@
                                 errorList.AddError(new ErrorAttributeOrPropertyRequired(IdentifierItem, ValidIdentifierText));
                                 Success = false;
                             }
-
                         }
                         else
                         {

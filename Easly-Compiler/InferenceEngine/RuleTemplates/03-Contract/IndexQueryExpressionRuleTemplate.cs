@@ -84,15 +84,12 @@
             IList<IExpressionType> ResolvedIndexerResult = IndexedExpression.ResolvedResult.Item;
 
             OnceReference<ICompiledType> IndexedExpressionType = new OnceReference<ICompiledType>();
-            if (ResolvedIndexerResult.Count == 1)
-                IndexedExpressionType.Item = ResolvedIndexerResult[0].ValueType;
-            else
-                foreach (IExpressionType Item in ResolvedIndexerResult)
-                    if (Item.Name == nameof(BaseNode.Keyword.Result))
-                    {
-                        IndexedExpressionType.Item = Item.ValueType;
-                        break;
-                    }
+            foreach (IExpressionType Item in ResolvedIndexerResult)
+                if (Item.Name == nameof(BaseNode.Keyword.Result) || ResolvedIndexerResult.Count == 1)
+                {
+                    IndexedExpressionType.Item = Item.ValueType;
+                    break;
+                }
 
             if (!IndexedExpressionType.IsAssigned)
             {
