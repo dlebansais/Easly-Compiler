@@ -135,10 +135,8 @@
                         ISource MostAccurateSource;
                         if (Index1 < 0 && Index2 < 0)
                             MostAccurateSource = node;
-                        else if (Index2 >= 0)
-                            MostAccurateSource = Discrete2;
                         else
-                            MostAccurateSource = Discrete1;
+                            MostAccurateSource = (Index2 >= 0) ? Discrete2 : Discrete1;
 
                         // Prevents having the same error twice.
                         ErroneousConstantList.Add(Number1);

@@ -96,18 +96,15 @@
                     Success = false;
                 }
             }
+            else if (PrecursorList.Count > 1)
+            {
+                AddSourceError(new ErrorInvalidPrecursor(node));
+                Success = false;
+            }
             else
             {
-                if (PrecursorList.Count == 0)
-                {
-                    AddSourceError(new ErrorInvalidPrecursor(node));
-                    Success = false;
-                }
-                else
-                {
-                    AncestorTypeName = PrecursorList[0].Ancestor.BaseClass.ResolvedClassTypeName.Item;
-                    AncestorType = PrecursorList[0].Ancestor.BaseClass.ResolvedClassType.Item;
-                }
+                AncestorTypeName = PrecursorList[0].Ancestor.BaseClass.ResolvedClassTypeName.Item;
+                AncestorType = PrecursorList[0].Ancestor.BaseClass.ResolvedClassType.Item;
             }
 
             if (Success)

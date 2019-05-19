@@ -169,7 +169,8 @@
 
             if (ConstantSourceList.Count == 0)
             {
-                Debug.Assert(ExpressionConstant is IDiscreteLanguageConstant AsDiscreteLanguageConstant && AsDiscreteLanguageConstant.IsValueKnown);
+                IDiscreteLanguageConstant DiscreteLanguageConstant = ExpressionConstant as IDiscreteLanguageConstant;
+                Debug.Assert(DiscreteLanguageConstant != null && DiscreteLanguageConstant.IsValueKnown);
                 node.ExpressionConstant.Item = ExpressionConstant;
             }
             else

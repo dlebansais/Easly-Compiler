@@ -98,11 +98,13 @@
                                                     ConformantToEnumerable = true;
                                                     IndexTypeName = IndexResultTypeName;
                                                     IndexType = IndexResultType;
-                                                    break;
                                                 }
                                             }
                                         }
                                     }
+
+                                    if (ConformantToEnumerable)
+                                        break;
                                 }
 
                                 if (ConformantToEnumerable)

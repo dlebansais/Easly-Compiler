@@ -24,7 +24,7 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceTableSourceTemplate<IOldExpression, string, IScopeAttributeFeature, ITypeName>(nameof(IScopeHolder.FullScope), nameof(IScopeAttributeFeature.ResolvedFeatureTypeName), TemplateScopeStart<IOldExpression>.Default),
-                new OnceReferenceTableSourceTemplate<IOldExpression, string, IScopeAttributeFeature, ICompiledType>(nameof(IScopeHolder.FullScope), nameof(IScopeAttributeFeature.ResolvedFeatureTypeName), TemplateScopeStart<IOldExpression>.Default),
+                new OnceReferenceTableSourceTemplate<IOldExpression, string, IScopeAttributeFeature, ICompiledType>(nameof(IScopeHolder.FullScope), nameof(IScopeAttributeFeature.ResolvedFeatureType), TemplateScopeStart<IOldExpression>.Default),
                 new OnceReferenceSourceTemplate<IOldExpression, IList<IExpressionType>>(nameof(IOldExpression.Query) + Dot + nameof(IQualifiedName.ValidResultTypePath)),
             };
 
@@ -88,9 +88,11 @@
             }
 
             IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
-            if (LocalScope == null)
+            Debug.Assert(LocalScope != null);
+
+            if (node.EmbeddingBody == null && node.EmbeddingAssertion == null)
             {
-                errorList.AddError(new ErrorInvalidIdentifierContext(node, "old expression!!"));
+                errorList.AddError(new ErrorInvalidOldExpression(node));
                 return false;
             }
 
@@ -99,7 +101,7 @@
 
             if (FinalFeature == null)
             {
-                errorList.AddError(new ErrorConstantNewExpression(node));
+                errorList.AddError(new ErrorInvalidOldExpression(node));
                 return false;
             }
 

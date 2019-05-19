@@ -86,7 +86,8 @@
                             break;
                     }
 
-                    Debug.Assert(ExpressionConstant is IBooleanLanguageConstant && ExpressionConstant.IsValueKnown);
+                    IBooleanLanguageConstant BooleanLanguageConstant = ExpressionConstant as IBooleanLanguageConstant;
+                    Debug.Assert(BooleanLanguageConstant != null && BooleanLanguageConstant.IsValueKnown);
                 }
                 else
                     ExpressionConstant = new BooleanLanguageConstant();

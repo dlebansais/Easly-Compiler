@@ -86,9 +86,7 @@
             OnceReference<IFeatureInstance> SelectedPrecursor = new OnceReference<IFeatureInstance>();
             IFeature InnerFeature = (IFeature)node.EmbeddingFeature;
 
-            IndexerFeature AsIndexerFeature;
-
-            if ((AsIndexerFeature = InnerFeature as IndexerFeature) != null)
+            if (InnerFeature is IndexerFeature)
             {
                 errorList.AddError(new ErrorPrecursorNotAllowedInIndexer(node));
                 return false;

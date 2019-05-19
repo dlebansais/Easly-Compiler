@@ -270,6 +270,7 @@
     <Compile Include="Errors\Inference\02-Types\ErrorDiscreteNameConflict.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorNotAnchor.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorReservedName.cs" />
+    <Compile Include="Errors\Inference\03-Contract\ErrorInvalidOldExpression.cs" />
     <Compile Include="Errors\Inference\03-Contract\ErrorIncompatibleRangeBounds.cs" />
     <Compile Include="Errors\Inference\03-Contract\ErrorConstantQueryExpression.cs" />
     <Compile Include="Errors\Inference\03-Contract\ErrorNoPrecursor.cs" />
