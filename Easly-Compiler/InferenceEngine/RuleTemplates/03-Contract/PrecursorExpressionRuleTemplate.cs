@@ -114,16 +114,18 @@
                     return false;
                 }
             }
-            else
+            else if (Instance.PrecursorList.Count == 0)
             {
-                if (Instance.PrecursorList.Count > 0)
-                    SelectedPrecursor.Item = Instance.PrecursorList[0].Precursor;
-                else
-                {
-                    errorList.AddError(new ErrorNoPrecursor(node));
-                    return false;
-                }
+                errorList.AddError(new ErrorNoPrecursor(node));
+                return false;
             }
+            else if (Instance.PrecursorList.Count > 1)
+            {
+                errorList.AddError(new ErrorInvalidPrecursor(node));
+                return false;
+            }
+            else
+                SelectedPrecursor.Item = Instance.PrecursorList[0].Precursor;
 
             List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
             if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, errorList))
@@ -195,13 +197,13 @@
                         new ExpressionType(AsPropertyType.ResolvedEntityTypeName.Item, AsPropertyType.ResolvedEntityType.Item, PropertyName)
                     };
 
+                    resolvedExceptions = new List<IIdentifier>();
+
                     if (Property.GetterBody.IsAssigned)
                     {
                         IBody GetterBody = (IBody)Property.GetterBody.Item;
                         resolvedExceptions = GetterBody.ExceptionIdentifierList;
                     }
-                    else
-                        resolvedExceptions = new List<IIdentifier>();
 
                     selectedParameterList = new ListTableEx<IParameter>();
                     resolvedArgumentList = new List<IExpressionType>();

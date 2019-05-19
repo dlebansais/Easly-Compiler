@@ -110,69 +110,53 @@
                         return false;
                     }
                 }
-                else
+                else if (Instance.PrecursorList.Count == 0)
                 {
-                    if (Instance.PrecursorList.Count > 0)
-                        SelectedPrecursor.Item = Instance.PrecursorList[0].Precursor;
-                    else
-                    {
-                        errorList.AddError(new ErrorNoPrecursor(node));
-                        return false;
-                    }
+                    errorList.AddError(new ErrorNoPrecursor(node));
+                    return false;
                 }
-
-                ICompiledFeature OperatorFeature = SelectedPrecursor.Item.Feature.Item;
-                ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
+                else if (Instance.PrecursorList.Count > 1)
+                {
+                    errorList.AddError(new ErrorInvalidPrecursor(node));
+                    return false;
+                }
+                else
+                    SelectedPrecursor.Item = Instance.PrecursorList[0].Precursor;
 
                 List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
                 if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, errorList))
                     return false;
 
+                IIndexerFeature OperatorFeature = SelectedPrecursor.Item.Feature.Item as IIndexerFeature;
+                Debug.Assert(OperatorFeature != null);
+                IIndexerType OperatorType = OperatorFeature.ResolvedFeatureType.Item as IIndexerType;
+                Debug.Assert(OperatorType != null);
+
                 IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
-                bool IsHandled = false;
-                bool Success = false;
+                ParameterTableList.Add(OperatorType.ParameterTable);
 
-                switch (OperatorType)
+                int SelectedIndex;
+                if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, ArgumentStyle, errorList, node, out SelectedIndex))
+                    return false;
+
+                resolvedResult = new List<IExpressionType>()
                 {
-                    case IFunctionType AsFunctionType:
-                    case IProcedureType AsProcedureType:
-                    case IPropertyType AsPropertyType:
-                    case IClassType AsClassType:
-                        errorList.AddError(new ErrorInvalidExpression(node));
-                        IsHandled = true;
-                        break;
+                    new ExpressionType(OperatorType .ResolvedEntityTypeName.Item, OperatorType .ResolvedEntityType.Item, string.Empty)
+                };
 
-                    case IIndexerType AsIndexerType:
-                        ParameterTableList.Add(AsIndexerType.ParameterTable);
-
-                        int SelectedIndex;
-                        if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, ArgumentStyle, errorList, node, out SelectedIndex))
-                            return false;
-
-                        resolvedResult = new List<IExpressionType>()
-                        {
-                            new ExpressionType(AsIndexerType.ResolvedEntityTypeName.Item, AsIndexerType.ResolvedEntityType.Item, string.Empty)
-                        };
-
-                        resolvedExceptions = AsIndexerType.GetExceptionIdentifierList;
-                        selectedParameterList = ParameterTableList[SelectedIndex];
-                        resolvedArgumentList = MergedArgumentList;
-                        Success = true;
-                        IsHandled = true;
-                        break;
-                }
-
-                Debug.Assert(IsHandled);
+                resolvedExceptions = OperatorType.GetExceptionIdentifierList;
+                selectedParameterList = ParameterTableList[SelectedIndex];
+                resolvedArgumentList = MergedArgumentList;
 
                 //IsResultConstant = false;
                 //TODO: check if the precursor is a constant
                 //TODO: check if the precursor is a constant number
                 //ResultNumberConstant.Item = ??
-                return Success;
+                return true;
             }
             else
             {
-                errorList.AddError(new ErrorPrecursorNotAllowedInIndexer(node));
+                errorList.AddError(new ErrorIndexPrecursorNotAllowedOutsideIndexer(node));
                 return false;
             }
         }

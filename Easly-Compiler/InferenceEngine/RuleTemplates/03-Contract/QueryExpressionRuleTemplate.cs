@@ -95,14 +95,12 @@
             IList<IIdentifier> ValidPath = Query.ValidPath.Item;
 
             IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
-            if (LocalScope == null)
-            {
-                errorList.AddError(new ErrorInvalidExpression(node));
-                return false;
-            }
+            Debug.Assert(LocalScope != null);
 
             if (!ObjectType.GetQualifiedPathFinalType(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, errorList, out ICompiledFeature FinalFeature, out IDiscrete FinalDiscrete, out ITypeName FinalTypeName, out ICompiledType FinalType, out bool InheritBySideAttribute))
                 return false;
+
+            Debug.Assert(FinalFeature != null || FinalDiscrete != null);
 
             if (FinalFeature != null)
             {
@@ -193,15 +191,15 @@
                         break;
                 }
             }
-            else if (FinalDiscrete != null)
+            else
             {
+                Debug.Assert(FinalDiscrete != null);
+
                 resolvedFinalDiscrete = FinalDiscrete;
 
-                if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName NumberTypeName, out ICompiledType NumberType))
-                {
-                    errorList.AddError(new ErrorNumberTypeMissing(node));
-                    return false;
-                }
+                // This is enforced by the code above.
+                bool IsNumberTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName NumberTypeName, out ICompiledType NumberType);
+                Debug.Assert(IsNumberTypeAvailable);
 
                 resolvedResult = new List<IExpressionType>()
                 {
@@ -217,11 +215,6 @@
                 }
                 else
                     expressionConstant = new DiscreteLanguageConstant(FinalDiscrete);
-            }
-            else
-            {
-                errorList.AddError(new ErrorConstantQueryExpression(node));
-                return false;
             }
 
             return true;

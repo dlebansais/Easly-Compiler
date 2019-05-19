@@ -75,15 +75,15 @@
             IExpression RightExpression = (IExpression)node.RightExpression;
             IClass EmbeddingClass = node.EmbeddingClass;
 
-            bool IsRightClassType = Expression.GetClassTypeOfExpression(RightExpression, errorList, out IClassType RightExpressionClassType);
-            if (!IsRightClassType)
-                return false;
-
             if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType))
             {
                 errorList.AddError(new ErrorBooleanTypeMissing(node));
                 return false;
             }
+
+            bool IsRightClassType = Expression.GetClassTypeOfExpression(RightExpression, errorList, out IClassType RightExpressionClassType);
+            if (!IsRightClassType)
+                return false;
 
             constantSourceList.Add(RightExpression);
 

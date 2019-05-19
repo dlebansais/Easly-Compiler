@@ -274,6 +274,7 @@
     <Compile Include="Errors\Inference\03-Contract\ErrorIncompatibleRangeBounds.cs" />
     <Compile Include="Errors\Inference\03-Contract\ErrorConstantQueryExpression.cs" />
     <Compile Include="Errors\Inference\03-Contract\ErrorNoPrecursor.cs" />
+    <Compile Include="Errors\Inference\03-Contract\ErrorIndexPrecursorNotAllowedOutsideIndexer.cs" />
     <Compile Include="Errors\Inference\03-Contract\ErrorPrecursorNotAllowedInIndexer.cs" />
     <Compile Include="Errors\Inference\03-Contract\ErrorInvalidPrecursor.cs" />
     <Compile Include="Errors\Inference\03-Contract\ErrorInvalidOverSourceType.cs" />
