@@ -71,6 +71,11 @@
             Debug.Assert(RightConstantSource.ExpressionConstant.IsAssigned);
             ILanguageConstant RightExpressionConstant = RightConstantSource.ExpressionConstant.Item;
 
+            if (node.Comparison == BaseNode.ComparisonType.Different)
+            {
+
+            }
+
             if (LeftExpressionConstant != NeutralLanguageConstant.NotConstant && RightExpressionConstant != NeutralLanguageConstant.NotConstant)
             {
                 if (LeftExpressionConstant.IsCompatibleWith(RightExpressionConstant) && LeftExpressionConstant.IsValueKnown && RightExpressionConstant.IsValueKnown)

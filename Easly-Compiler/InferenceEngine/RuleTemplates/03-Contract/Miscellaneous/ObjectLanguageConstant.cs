@@ -1,5 +1,7 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Diagnostics;
+
     /// <summary>
     /// Represents an object feature as some constant.
     /// </summary>
@@ -17,12 +19,17 @@
         /// </summary>
         public ObjectLanguageConstant()
         {
+            GlobalInstance++;
+            ConstantInstance = GlobalInstance;
         }
+
+        private int ConstantInstance;
+        private static int GlobalInstance;
 
         /// <summary>
         /// True if the constant value is known.
         /// </summary>
-        public override bool IsValueKnown { get { return false; } }
+        public override bool IsValueKnown { get { return true; } }
 
         /// <summary>
         /// Checks if another constant can be compared with this instance.
@@ -30,7 +37,7 @@
         /// <param name="other">The other instance.</param>
         public override bool IsCompatibleWith(ILanguageConstant other)
         {
-            return false;
+            return other is IObjectLanguageConstant AsObjectLanguageConstant && IsValueKnown && AsObjectLanguageConstant.IsValueKnown;
         }
 
         /// <summary>
@@ -39,7 +46,18 @@
         /// <param name="other">The other instance.</param>
         public override bool IsConstantEqual(ILanguageConstant other)
         {
-            return false;
+            return IsConstantEqual(other as ObjectLanguageConstant);
+        }
+
+        /// <summary>
+        /// Checks if another constant is equal to this instance.
+        /// </summary>
+        /// <param name="other">The other instance.</param>
+        protected virtual bool IsConstantEqual(ObjectLanguageConstant other)
+        {
+            Debug.Assert(other != null);
+
+            return ConstantInstance == other.ConstantInstance;
         }
     }
 }

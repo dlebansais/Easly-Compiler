@@ -104,41 +104,8 @@
                 new ExpressionType(initializedObjectTypeName, initializedObjectType, string.Empty)
             };
 
-            if (initializedObjectType is IClassType AsClassType)
-            {
-                foreach (IAssignmentArgument AssignmentItem in AssignmentList)
-                {
-                    IList<IExpressionType> ExpressionResult = AssignmentItem.ResolvedResult.Item;
-
-                    for (int i = 0; i < AssignmentItem.ParameterList.Count; i++)
-                    {
-                        IIdentifier IdentifierItem = (IIdentifier)AssignmentItem.ParameterList[i];
-                        string ValidIdentifierText = IdentifierItem.ValidText.Item;
-                        ICompiledFeature TargetFeature = assignedFeatureTable[ValidIdentifierText];
-
-                        ICompiledType SourceType = ExpressionResult[i].ValueType;
-                        ICompiledType DestinationType = null;
-
-                        if (TargetFeature is IAttributeFeature AsAttributeFeature)
-                            DestinationType = AsAttributeFeature.ResolvedEntityType.Item;
-                        else if (TargetFeature is IPropertyFeature AsPropertyFeature)
-                            DestinationType = AsPropertyFeature.ResolvedEntityType.Item;
-
-                        Debug.Assert(DestinationType != null);
-
-                        IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-                        if (!ObjectType.TypeConformToBase(SourceType, DestinationType, SubstitutionTypeTable, errorList, IdentifierItem))
-                        {
-                            errorList.AddError(new ErrorAssignmentMismatch(IdentifierItem));
-                            return false;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                //TODO: tuples
-            }
+            if (!ResolveObjectInitialization(node, errorList, assignedFeatureTable))
+                return false;
 
             resolvedExceptions = new List<IIdentifier>();
 
@@ -220,6 +187,42 @@
             }
 
             return Success;
+        }
+
+        private static bool ResolveObjectInitialization(IInitializedObjectExpression node, IErrorList errorList, IHashtableEx<string, ICompiledFeature> assignedFeatureTable)
+        {
+            IList<IAssignmentArgument> AssignmentList = node.AssignmentList;
+
+            foreach (IAssignmentArgument AssignmentItem in AssignmentList)
+            {
+                IList<IExpressionType> ExpressionResult = AssignmentItem.ResolvedResult.Item;
+
+                for (int i = 0; i < AssignmentItem.ParameterList.Count; i++)
+                {
+                    IIdentifier IdentifierItem = (IIdentifier)AssignmentItem.ParameterList[i];
+                    string ValidIdentifierText = IdentifierItem.ValidText.Item;
+                    ICompiledFeature TargetFeature = assignedFeatureTable[ValidIdentifierText];
+
+                    ICompiledType SourceType = ExpressionResult[i].ValueType;
+                    ICompiledType DestinationType = null;
+
+                    if (TargetFeature is IAttributeFeature AsAttributeFeature)
+                        DestinationType = AsAttributeFeature.ResolvedEntityType.Item;
+                    else if (TargetFeature is IPropertyFeature AsPropertyFeature)
+                        DestinationType = AsPropertyFeature.ResolvedEntityType.Item;
+
+                    Debug.Assert(DestinationType != null);
+
+                    IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
+                    if (!ObjectType.TypeConformToBase(SourceType, DestinationType, SubstitutionTypeTable, errorList, IdentifierItem))
+                    {
+                        errorList.AddError(new ErrorAssignmentMismatch(IdentifierItem));
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         /// <summary>

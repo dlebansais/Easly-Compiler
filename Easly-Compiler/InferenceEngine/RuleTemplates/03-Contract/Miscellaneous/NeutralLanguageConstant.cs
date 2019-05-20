@@ -19,6 +19,9 @@
         /// </summary>
         private NeutralLanguageConstant()
         {
+            Debug.Assert(!IsValueKnown);
+            Debug.Assert(!IsCompatibleWith(this));
+            Debug.Assert(!IsConstantEqual(this));
         }
 
         /// <summary>

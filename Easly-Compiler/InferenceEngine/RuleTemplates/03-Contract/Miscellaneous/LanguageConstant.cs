@@ -57,7 +57,7 @@
         /// <param name="constant">The constant to parse.</param>
         /// <param name="value">The integer value upon return if successful.</param>
         /// <returns>True if the constant could be parsed as an integer; Otherwise, false.</returns>
-        public static bool TryParseInt(ILanguageConstant constant, out int value)
+        /*public static bool TryParseInt(ILanguageConstant constant, out int value)
         {
             value = 0;
             bool Result = false;
@@ -69,7 +69,7 @@
             }
 
             return Result;
-        }
+        }*/
 
         /// <summary>
         /// Tries to parse an expression as a constant number.

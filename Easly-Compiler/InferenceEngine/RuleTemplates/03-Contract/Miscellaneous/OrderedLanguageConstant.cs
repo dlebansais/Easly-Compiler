@@ -9,6 +9,6 @@
         /// Checks if another constant is greater than this instance.
         /// </summary>
         /// <param name="other">The other instance.</param>
-        bool IsConstantGreater(IOrderedLanguageConstant other);
+        //bool IsConstantGreater(IOrderedLanguageConstant other);
     }
 }

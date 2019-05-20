@@ -21,13 +21,6 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="AgentLanguageConstant"/> class.
         /// </summary>
-        public AgentLanguageConstant()
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AgentLanguageConstant"/> class.
-        /// </summary>
         /// <param name="value">The constant value.</param>
         public AgentLanguageConstant(ICompiledFeature value)
         {
