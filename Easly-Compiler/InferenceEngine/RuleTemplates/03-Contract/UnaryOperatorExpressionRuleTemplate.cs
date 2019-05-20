@@ -114,42 +114,34 @@
                 ICompiledFeature OperatorFeature = Value.Feature.Item;
                 ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
 
-                if (OperatorType is IFunctionType AsFunctionType)
+                if (OperatorFeature is IFunctionFeature AsFunctionFeature && OperatorType is IFunctionType AsFunctionType)
                 {
-                    if (OperatorFeature is IFunctionFeature AsFunctionFeature)
+                    IList<IQueryOverloadType> OperatorOverloadList = AsFunctionType.OverloadList;
+
+                    int SelectedOperatorIndex = -1;
+                    for (int i = 0; i < OperatorOverloadList.Count; i++)
                     {
-                        IList<IQueryOverloadType> OperatorOverloadList = AsFunctionType.OverloadList;
-
-                        int SelectedOperatorIndex = -1;
-                        for (int i = 0; i < OperatorOverloadList.Count; i++)
+                        IQueryOverloadType Overload = OperatorOverloadList[i];
+                        if (Overload.ParameterList.Count == 0 && Overload.ResultList.Count == 1)
                         {
-                            IQueryOverloadType Overload = OperatorOverloadList[i];
-                            if (Overload.ParameterList.Count == 0 && Overload.ResultList.Count == 1)
-                            {
-                                SelectedOperatorIndex = i;
-                                break;
-                            }
+                            SelectedOperatorIndex = i;
+                            break;
                         }
-
-                        if (SelectedOperatorIndex < 0)
-                        {
-                            errorList.AddError(new ErrorInvalidOperator(Operator, ValidText));
-                            return false;
-                        }
-
-                        resolvedResult = Feature.CommonResultType(AsFunctionType.OverloadList);
-                        selectedFeature = AsFunctionFeature;
-                        selectedOverload = AsFunctionFeature.OverloadList[SelectedOperatorIndex];
-                        selectedOverloadType = OperatorOverloadList[SelectedOperatorIndex];
-                        resolvedExceptions = selectedOverloadType.ExceptionIdentifierList;
-
-                        constantSourceList.Add(RightExpression);
                     }
-                    else
+
+                    if (SelectedOperatorIndex < 0)
                     {
                         errorList.AddError(new ErrorInvalidOperator(Operator, ValidText));
                         return false;
                     }
+
+                    resolvedResult = Feature.CommonResultType(AsFunctionType.OverloadList);
+                    selectedFeature = AsFunctionFeature;
+                    selectedOverload = AsFunctionFeature.OverloadList[SelectedOperatorIndex];
+                    selectedOverloadType = OperatorOverloadList[SelectedOperatorIndex];
+                    resolvedExceptions = selectedOverloadType.ExceptionIdentifierList;
+
+                    constantSourceList.Add(RightExpression);
                 }
                 else
                 {
