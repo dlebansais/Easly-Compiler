@@ -146,6 +146,10 @@ namespace CompilerNode
             }
             else
                 DefaultValue = BaseNodeHelper.OptionalReferenceHelper<IExpression>.CreateEmptyReference();
+
+            Debug.Assert(!IsDeferredFeature);
+            Debug.Assert(!HasExternBody);
+            Debug.Assert(!HasPrecursorBody);
         }
 
         /// <summary>

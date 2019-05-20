@@ -329,10 +329,10 @@
 
             foreach (IRuleTemplate Rule in RuleTemplateList)
             {
-                if (Rule is IQueryExpressionConstantRuleTemplate AsRuleTemplate)
+                /*if (Rule is IQueryExpressionConstantRuleTemplate AsRuleTemplate)
                 {
 
-                }
+                }*/
 
                 foreach (ISource Source in unresolvedSourceList)
                 {
