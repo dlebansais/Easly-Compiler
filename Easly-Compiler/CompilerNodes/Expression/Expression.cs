@@ -233,21 +233,7 @@ namespace CompilerNode
 
             if (BooleanOrEventExpressionType is IClassType AsClassType)
             {
-                bool IsBooleanAvailable = IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, booleanOrEventExpression, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
-                bool IsEventAvailable = IsLanguageTypeAvailable(LanguageClasses.Event.Guid, booleanOrEventExpression, out ITypeName EventTypeName, out ICompiledType EventType);
-
-                if (!IsBooleanAvailable && !IsEventAvailable)
-                {
-                    if (AsClassType.BaseClass.EntityName.Text != LanguageClasses.Event.Name)
-                        errorList.AddError(new ErrorBooleanTypeMissing(booleanOrEventExpression));
-                    if (AsClassType.BaseClass.EntityName.Text != LanguageClasses.Boolean.Name)
-                        errorList.AddError(new ErrorEventTypeMissing(booleanOrEventExpression));
-
-                    Debug.Assert(!errorList.IsEmpty);
-                }
-                else if ((!IsBooleanAvailable || AsClassType != BooleanType) && (!IsEventAvailable || AsClassType != EventType))
-                    errorList.AddError(new ErrorInvalidExpression(booleanOrEventExpression));
-                else
+                if (CheckForBooleanOrEventType(booleanOrEventExpression, AsClassType, errorList))
                 {
                     expressionClassType = AsClassType;
                     Result = true;
@@ -257,6 +243,35 @@ namespace CompilerNode
                 errorList.AddError(new ErrorInvalidExpression(booleanOrEventExpression));
 
             return Result;
+        }
+
+        /// <summary>
+        /// Checks that the expected type, either boolean or event, is available.
+        /// </summary>
+        /// <param name="booleanOrEventExpression">The expression to check.</param>
+        /// <param name="expectedType">The expected type.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        public static bool CheckForBooleanOrEventType(IExpression booleanOrEventExpression, IClassType expectedType, IErrorList errorList)
+        {
+            bool IsTypeFound = false;
+            bool IsBooleanAvailable = IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, booleanOrEventExpression, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
+            bool IsEventAvailable = IsLanguageTypeAvailable(LanguageClasses.Event.Guid, booleanOrEventExpression, out ITypeName EventTypeName, out ICompiledType EventType);
+
+            if (!IsBooleanAvailable && !IsEventAvailable)
+            {
+                if (expectedType.BaseClass.EntityName.Text != LanguageClasses.Event.Name)
+                    errorList.AddError(new ErrorBooleanTypeMissing(booleanOrEventExpression));
+                if (expectedType.BaseClass.EntityName.Text != LanguageClasses.Boolean.Name)
+                    errorList.AddError(new ErrorEventTypeMissing(booleanOrEventExpression));
+
+                Debug.Assert(!errorList.IsEmpty);
+            }
+            else if ((!IsBooleanAvailable || expectedType != BooleanType) && (!IsEventAvailable || expectedType != EventType))
+                errorList.AddError(new ErrorInvalidExpression(booleanOrEventExpression));
+            else
+                IsTypeFound = true;
+
+            return IsTypeFound;
         }
 
         /// <summary>

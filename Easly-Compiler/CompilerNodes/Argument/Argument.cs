@@ -173,21 +173,9 @@ namespace CompilerNode
                 case TypeArgumentStyles.Positional:
                     for (int i = 0; i < argumentList.Count; i++)
                     {
-                        IArgument Argument = argumentList[i];
-                        IExpression Source = null;
-
-                        switch (Argument)
-                        {
-                            case IPositionalArgument AsPositionalArgument:
-                                Source = (IExpression)AsPositionalArgument.Source;
-                                break;
-
-                            case IAssignmentArgument AsAssignmentArgument:
-                                Source = (IExpression)AsAssignmentArgument.Source;
-                                break;
-                        }
-
-                        Debug.Assert(Source != null);
+                        IPositionalArgument Argument = argumentList[i] as IPositionalArgument;
+                        Debug.Assert(Argument != null);
+                        IExpression Source = (IExpression)Argument.Source;
 
                         for (int j = 0; j < Argument.ResolvedResult.Item.Count; j++)
                         {
@@ -203,43 +191,23 @@ namespace CompilerNode
                 case TypeArgumentStyles.Assignment:
                     for (int i = 0; i < argumentList.Count; i++)
                     {
-                        IArgument Argument = argumentList[i];
-                        IExpression Source = null;
-                        IList<IIdentifier> ParameterList;
+                        IAssignmentArgument Argument = argumentList[i] as IAssignmentArgument;
+                        Debug.Assert(Argument != null);
+                        IExpression Source = (IExpression)Argument.Source;
+                        IList<IIdentifier> ParameterList = Argument.ParameterList;
 
-                        switch (Argument)
+                        for (int j = 0; j < Argument.ResolvedResult.Item.Count; j++)
                         {
-                            case IPositionalArgument AsPositionalArgument:
-                                Source = (IExpression)AsPositionalArgument.Source;
+                            IExpressionType Item = Argument.ResolvedResult.Item[j];
+                            Item.SetName(ParameterList[j].ValidText.Item);
 
-                                for (int j = 0; j < Argument.ResolvedResult.Item.Count; j++)
-                                {
-                                    IExpressionType Item = Argument.ResolvedResult.Item[j];
-                                    Item.SetSource(Source, j);
-                                    mergedArgumentList.Add(Item);
-                                }
-                                break;
+                            if (mergedArgumentList.Exists((IExpressionType other) => { return Item.Name == other.Name; }))
+                                if (!DuplicateNameTable.ContainsKey(Item.Name))
+                                    DuplicateNameTable.Add(Item.Name, Argument);
 
-                            case IAssignmentArgument AsAssignmentArgument:
-                                Source = (IExpression)AsAssignmentArgument.Source;
-                                ParameterList = AsAssignmentArgument.ParameterList;
-
-                                for (int j = 0; j < Argument.ResolvedResult.Item.Count; j++)
-                                {
-                                    IExpressionType Item = Argument.ResolvedResult.Item[j];
-                                    Item.SetName(ParameterList[j].ValidText.Item);
-
-                                    if (mergedArgumentList.Exists((IExpressionType other) => { return Item.Name == other.Name; }))
-                                        if (!DuplicateNameTable.ContainsKey(Item.Name))
-                                            DuplicateNameTable.Add(Item.Name, Argument);
-
-                                    Item.SetSource(Source, j);
-                                    mergedArgumentList.Add(Item);
-                                }
-                                break;
+                            Item.SetSource(Source, j);
+                            mergedArgumentList.Add(Item);
                         }
-
-                        Debug.Assert(Source != null);
                     }
 
                     if (DuplicateNameTable.Count > 0)
@@ -327,26 +295,16 @@ namespace CompilerNode
                     switch (OverloadParameter.ResolvedParameter.ResolvedFeatureType.Item)
                     {
                         case IFunctionType AsFunctionType:
-                            ParameterType = AsFunctionType;
-                            break;
-
                         case IProcedureType AsProcedureType:
-                            ParameterType = AsProcedureType;
-                            break;
-
                         case IClassType AsClassType:
-                            ParameterType = AsClassType;
-                            break;
-
                         case IFormalGenericType AsFormalGenericType:
-                            ParameterType = AsFormalGenericType;
+                            ParameterType = OverloadParameter.ResolvedParameter.ResolvedFeatureType.Item;
                             break;
                     }
 
                     Debug.Assert(ParameterType != null);
 
-                    IErrorList CheckErrorList = new ErrorList();
-                    IsMatching &= ObjectType.TypeConformToBase(ArgumentType, ParameterType, SubstitutionTypeTable, CheckErrorList, source);
+                    IsMatching &= ObjectType.TypeConformToBase(ArgumentType, ParameterType, SubstitutionTypeTable);
                 }
 
                 if (IsMatching)
@@ -359,16 +317,12 @@ namespace CompilerNode
                 }
 
                 if (IsMatching)
-                    if (SelectedOverload.IsAssigned)
-                    {
-                        errorList.AddError(new ErrorInvalidExpression(source));
-                        return false;
-                    }
-                    else
-                    {
-                        SelectedOverload.Item = OverloadParameterList;
-                        selectedIndex = i;
-                    }
+                {
+                    Debug.Assert(!SelectedOverload.IsAssigned);
+
+                    SelectedOverload.Item = OverloadParameterList;
+                    selectedIndex = i;
+                }
             }
 
             if (!SelectedOverload.IsAssigned)
@@ -395,6 +349,7 @@ namespace CompilerNode
             for (int i = 0; i < parameterTableList.Count; i++)
             {
                 ListTableEx<IParameter> OverloadParameterList = parameterTableList[i];
+                List<IParameter> UnassignedParameters = new List<IParameter>(OverloadParameterList);
 
                 bool IsMatching = true;
                 for (int j = 0; j < arguments.Count && IsMatching; j++)
@@ -417,23 +372,22 @@ namespace CompilerNode
                     }
 
                     IParameter OverloadParameter = MatchingParameter.Item;
-                    ICompiledType ParameterType = OverloadParameter.ResolvedParameter.ResolvedFeatureType.Item;
+                    UnassignedParameters.Remove(OverloadParameter);
 
-                    IErrorList CheckErrorList = new ErrorList();
-                    IsMatching &= ObjectType.TypeConformToBase(ArgumentType, ParameterType, SubstitutionTypeTable, CheckErrorList, source);
+                    ICompiledType ParameterType = OverloadParameter.ResolvedParameter.ResolvedFeatureType.Item;
+                    IsMatching &= ObjectType.TypeConformToBase(ArgumentType, ParameterType, SubstitutionTypeTable);
                 }
 
+                foreach (IParameter OverloadParameter in UnassignedParameters)
+                    IsMatching &= OverloadParameter.ResolvedParameter.DefaultValue.IsAssigned;
+
                 if (IsMatching)
-                    if (SelectedOverload.IsAssigned)
-                    {
-                        errorList.AddError(new ErrorInvalidExpression(source));
-                        return false;
-                    }
-                    else
-                    {
-                        SelectedOverload.Item = OverloadParameterList;
-                        selectedIndex = i;
-                    }
+                {
+                    Debug.Assert(!SelectedOverload.IsAssigned);
+
+                    SelectedOverload.Item = OverloadParameterList;
+                    selectedIndex = i;
+                }
             }
 
             if (!SelectedOverload.IsAssigned)

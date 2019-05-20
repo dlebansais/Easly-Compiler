@@ -79,26 +79,29 @@
             IExpression RightExpression = (IExpression)node.RightExpression;
             IClass EmbeddingClass = node.EmbeddingClass;
 
-            if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType))
-            {
-                errorList.AddError(new ErrorBooleanTypeMissing(node));
-                return false;
-            }
-
             bool IsLeftClassType = Expression.GetClassTypeOfExpression(LeftExpression, errorList, out IClassType LeftExpressionClassType);
             bool IsRightClassType = Expression.GetClassTypeOfExpression(RightExpression, errorList, out IClassType RightExpressionClassType);
             if (!IsLeftClassType || !IsRightClassType)
                 return false;
 
-            if (LeftExpressionClassType != BooleanType)
+            Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
+            Expression.IsLanguageTypeAvailable(LanguageClasses.Event.Guid, node, out ITypeName EventTypeName, out ICompiledType EventType);
+
+            if (LeftExpressionClassType != BooleanType && LeftExpressionClassType != EventType)
             {
                 errorList.AddError(new ErrorInvalidExpression(LeftExpression));
                 return false;
             }
 
-            if (RightExpressionClassType != BooleanType)
+            if (RightExpressionClassType != BooleanType && RightExpressionClassType != EventType)
             {
                 errorList.AddError(new ErrorInvalidExpression(RightExpression));
+                return false;
+            }
+
+            if (LeftExpressionClassType != RightExpressionClassType)
+            {
+                errorList.AddError(new ErrorInvalidExpression(LeftExpression));
                 return false;
             }
 
