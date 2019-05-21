@@ -156,7 +156,7 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsHandled = true;
             }
@@ -174,10 +174,6 @@ namespace CompilerNode
                 ConformanceTable = new HashtableEx<ITypeName, ICompiledType>();
                 InstancingRecordList = new List<TypeInstancingRecord>();
                 OriginatingTypedef = new OnceReference<ITypedef>();
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Contract)
-            {
                 IsHandled = true;
             }
 

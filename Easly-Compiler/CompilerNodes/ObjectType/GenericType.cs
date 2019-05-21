@@ -137,7 +137,7 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsHandled = true;
             }
@@ -150,10 +150,6 @@ namespace CompilerNode
                 ArgumentIdentifierTable = new HashtableEx<string, IIdentifier>();
                 ResolvedTypeArgumentTable = new OnceReference<IHashtableEx<string, ICompiledType>>();
                 ResolvedArgumentLocationTable = new OnceReference<IHashtableEx<string, IObjectType>>();
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Contract)
-            {
                 IsHandled = true;
             }
 

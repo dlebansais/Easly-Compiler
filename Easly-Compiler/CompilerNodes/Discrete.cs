@@ -75,17 +75,13 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 ValidDiscreteName = new OnceReference<IFeatureName>();
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Contract)
-            {
                 IsHandled = true;
             }
 

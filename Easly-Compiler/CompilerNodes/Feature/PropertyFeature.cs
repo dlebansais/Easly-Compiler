@@ -112,7 +112,7 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsHandled = true;
             }
@@ -133,10 +133,6 @@ namespace CompilerNode
                 FullScope = new HashtableEx<string, IScopeAttributeFeature>();
                 FullGetScope = new HashtableEx<string, IScopeAttributeFeature>();
                 FullSetScope = new HashtableEx<string, IScopeAttributeFeature>();
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Contract)
-            {
                 IsHandled = true;
             }
 

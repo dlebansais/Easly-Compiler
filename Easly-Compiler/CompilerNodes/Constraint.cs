@@ -136,7 +136,7 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsHandled = true;
             }
@@ -148,10 +148,6 @@ namespace CompilerNode
                 ResolvedConformingType = new OnceReference<ICompiledType>();
                 RenameTable = new HashtableEx<IIdentifier, IIdentifier>();
                 ResolvedTypeWithRename = new OnceReference<ICompiledType>();
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Contract)
-            {
                 IsHandled = true;
             }
 

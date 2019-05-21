@@ -116,7 +116,7 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsHandled = true;
             }
@@ -124,10 +124,6 @@ namespace CompilerNode
             {
                 ValidExportName = new OnceReference<IFeatureName>();
                 ExportClassTable = new OnceReference<IHashtableEx<string, IClass>>();
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Contract)
-            {
                 IsHandled = true;
             }
 

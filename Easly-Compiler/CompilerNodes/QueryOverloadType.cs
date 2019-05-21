@@ -216,7 +216,7 @@
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsHandled = true;
             }
@@ -227,10 +227,6 @@
                 ResultTable = new ListTableEx<IParameter>();
                 ConformantResultTable = new ListTableEx<ICompiledType>();
                 Result = new List<IExpressionType>();
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Contract)
-            {
                 IsHandled = true;
             }
 

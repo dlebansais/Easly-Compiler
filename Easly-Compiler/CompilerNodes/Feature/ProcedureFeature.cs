@@ -107,7 +107,7 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsHandled = true;
             }
@@ -117,10 +117,6 @@ namespace CompilerNode
                 ResolvedFeatureType = new OnceReference<ICompiledType>();
                 ValidFeatureName = new OnceReference<IFeatureName>();
                 ResolvedFeature = new OnceReference<ICompiledFeature>();
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Contract)
-            {
                 IsHandled = true;
             }
 

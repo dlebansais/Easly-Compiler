@@ -108,11 +108,7 @@
                 ValidText = new OnceReference<string>();
                 IsHandled = true;
             }
-            else if (ruleTemplateList == RuleTemplateSet.Types)
-            {
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            else if (ruleTemplateList == RuleTemplateSet.Types || ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsHandled = true;
             }

@@ -149,10 +149,6 @@
 
                 }
             }
-            else
-            {
-
-            }
 
             IClassType ClassType = new ClassType(baseClass, typeArgumentTable, instancingClassType, ConformanceTable);
             return ClassType;
