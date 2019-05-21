@@ -82,11 +82,7 @@
             Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
             Expression.IsLanguageTypeAvailable(LanguageClasses.Event.Guid, node, out ITypeName EventTypeName, out ICompiledType EventType);
 
-            if (RightExpressionClassType != BooleanType && RightExpressionClassType != EventType)
-            {
-                errorList.AddError(new ErrorBooleanTypeMissing(node));
-                return false;
-            }
+            Debug.Assert(RightExpressionClassType == BooleanType || RightExpressionClassType == EventType);
 
             constantSourceList.Add(RightExpression);
 

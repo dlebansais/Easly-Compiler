@@ -11,6 +11,16 @@ namespace CompilerNode
     public interface IClassConstantExpression : BaseNode.IClassConstantExpression, IExpression
     {
         /// <summary>
+        /// The resolved feature.
+        /// </summary>
+        OnceReference<ICompiledFeature> ResolvedFinalFeature { get; }
+
+        /// <summary>
+        /// The resolved discrete.
+        /// </summary>
+        OnceReference<IDiscrete> ResolvedFinalDiscrete { get; }
+
+        /// <summary>
         /// The class type name.
         /// </summary>
         OnceReference<ITypeName> ResolvedClassTypeName { get; }
@@ -94,6 +104,8 @@ namespace CompilerNode
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
+                ResolvedFinalFeature = new OnceReference<ICompiledFeature>();
+                ResolvedFinalDiscrete = new OnceReference<IDiscrete>();
                 ResolvedClassTypeName = new OnceReference<ITypeName>();
                 ResolvedClassType = new OnceReference<ICompiledType>();
                 IsHandled = true;
@@ -128,6 +140,7 @@ namespace CompilerNode
 
                 Debug.Assert(ResolvedResult.IsAssigned || !IsResolved);
                 Debug.Assert(ResolvedExceptions.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedFinalFeature.IsAssigned || ResolvedFinalDiscrete.IsAssigned || !IsResolved);
                 Debug.Assert(ResolvedClassTypeName.IsAssigned == ResolvedResult.IsAssigned);
                 Debug.Assert(ResolvedClassType.IsAssigned == ResolvedResult.IsAssigned);
 
@@ -162,6 +175,16 @@ namespace CompilerNode
         #endregion
 
         #region Compiler
+        /// <summary>
+        /// The resolved feature.
+        /// </summary>
+        public OnceReference<ICompiledFeature> ResolvedFinalFeature { get; private set; } = new OnceReference<ICompiledFeature>();
+
+        /// <summary>
+        /// The resolved discrete.
+        /// </summary>
+        public OnceReference<IDiscrete> ResolvedFinalDiscrete { get; private set; } = new OnceReference<IDiscrete>();
+
         /// <summary>
         /// The class type name.
         /// </summary>

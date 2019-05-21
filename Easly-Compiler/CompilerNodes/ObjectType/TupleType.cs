@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler ITupleType.
     /// </summary>
-    public interface ITupleType : BaseNode.ITupleType, IObjectType, INodeWithReplicatedBlocks, ICompiledType
+    public interface ITupleType : BaseNode.ITupleType, IObjectType, INodeWithReplicatedBlocks, ICompiledType, IPathParticipatingType
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.TupleType.EntityDeclarationBlocks"/>.

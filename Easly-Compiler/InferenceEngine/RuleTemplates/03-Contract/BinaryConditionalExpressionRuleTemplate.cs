@@ -87,17 +87,8 @@
             Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
             Expression.IsLanguageTypeAvailable(LanguageClasses.Event.Guid, node, out ITypeName EventTypeName, out ICompiledType EventType);
 
-            if (LeftExpressionClassType != BooleanType && LeftExpressionClassType != EventType)
-            {
-                errorList.AddError(new ErrorInvalidExpression(LeftExpression));
-                return false;
-            }
-
-            if (RightExpressionClassType != BooleanType && RightExpressionClassType != EventType)
-            {
-                errorList.AddError(new ErrorInvalidExpression(RightExpression));
-                return false;
-            }
+            Debug.Assert(LeftExpressionClassType == BooleanType || LeftExpressionClassType == EventType);
+            Debug.Assert(RightExpressionClassType == BooleanType || RightExpressionClassType == EventType);
 
             if (LeftExpressionClassType != RightExpressionClassType)
             {

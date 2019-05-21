@@ -43,11 +43,6 @@ namespace CompilerNode
     public static class Expression
     {
         /// <summary>
-        /// Object that indicates there is no constant source for an expression.
-        /// </summary>
-        public static IExpression NoConstantSource { get; } = new NeutralExpression();
-
-        /// <summary>
         /// Compares two expressions.
         /// </summary>
         /// <param name="expression1">The first expression.</param>
@@ -325,7 +320,7 @@ namespace CompilerNode
 
                     case IDiscreteLanguageConstant AsDiscreteLanguageConstant:
                         if (AsDiscreteLanguageConstant.IsValueKnown && AsDiscreteLanguageConstant.Discrete.NumericValue.IsAssigned)
-                            Result = FinalConstant((IExpression)AsDiscreteLanguageConstant.Discrete.NumericValue);
+                            Result = FinalConstant((IExpression)AsDiscreteLanguageConstant.Discrete.NumericValue.Item);
                         else
                             Result = ExpressionConstant;
                         break;

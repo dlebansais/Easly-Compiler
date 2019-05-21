@@ -1364,7 +1364,7 @@
             IFeatureName Key;
             IFeatureInstance Instance;
 
-            if (index == 0 && localScope.ContainsKey(ValidText))
+            if (localScope.ContainsKey(ValidText))
             {
                 if (index + 1 < validPath.Count)
                 {
@@ -1374,7 +1374,8 @@
                     ICompiledType ResolvedFeatureType = localScope[ValidText].ResolvedFeatureType.Item;
                     ResolvedFeatureType.InstanciateType(baseClass.ResolvedClassType.Item, ref ResolvedFeatureTypeName, ref ResolvedFeatureType);
 
-                    return GetQualifiedPathFinalType(baseClass, ResolvedFeatureType, null, validPath, index + 1, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
+                    IHashtableEx<string, IScopeAttributeFeature> NewScope = ScopeFromType(ResolvedFeatureType);
+                    return GetQualifiedPathFinalType(baseClass, ResolvedFeatureType, NewScope, validPath, index + 1, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
                 }
                 else
                 {
@@ -1390,13 +1391,19 @@
                 ITypeName ResolvedFeatureTypeName = SourceFeature.ResolvedFeatureTypeName.Item;
                 ICompiledType ResolvedFeatureType = SourceFeature.ResolvedFeatureType.Item;
 
-                ResolvedFeatureType = ResolvedFeatureType.TypeAsDestinationOrSource;
+                IPathParticipatingType PathParticipatingType = ResolvedFeatureType as IPathParticipatingType;
+                Debug.Assert(PathParticipatingType != null);
+
+                ResolvedFeatureType = PathParticipatingType.TypeAsDestinationOrSource;
 
                 Debug.Assert(baseType is IClassType);
                 ResolvedFeatureType.InstanciateType((IClassType)baseType, ref ResolvedFeatureTypeName, ref ResolvedFeatureType);
 
                 if (index + 1 < validPath.Count)
-                    return GetQualifiedPathFinalType(baseClass, ResolvedFeatureType, null, validPath, index + 1, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
+                {
+                    IHashtableEx<string, IScopeAttributeFeature> NewScope = ScopeFromType(ResolvedFeatureType);
+                    return GetQualifiedPathFinalType(baseClass, ResolvedFeatureType, NewScope, validPath, index + 1, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
+                }
                 else
                 {
                     finalFeature = SourceFeature;
@@ -1413,7 +1420,8 @@
                 ICompiledType ResolvedFeatureType = Imported.ResolvedClassType.Item;
                 ResolvedFeatureType.InstanciateType(baseClass.ResolvedClassType.Item, ref ResolvedFeatureTypeName, ref ResolvedFeatureType);
 
-                return GetQualifiedPathFinalType(baseClass, ResolvedFeatureType, null, validPath, index + 1, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
+                IHashtableEx<string, IScopeAttributeFeature> NewScope = ScopeFromType(ResolvedFeatureType);
+                return GetQualifiedPathFinalType(baseClass, ResolvedFeatureType, NewScope, validPath, index + 1, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
             }
             else if (index + 1 == validPath.Count)
             {
@@ -1448,6 +1456,25 @@
             }
         }
 
+        private static IHashtableEx<string, IScopeAttributeFeature> ScopeFromType(ICompiledType type)
+        {
+            IHashtableEx<string, IScopeAttributeFeature> Result = new HashtableEx<string, IScopeAttributeFeature>();
+
+            if (type is ITupleType AsTupleType)
+            {
+                foreach (IEntityDeclaration Item in AsTupleType.EntityDeclarationList)
+                {
+                    IName EntityName = (IName)Item.EntityName;
+                    string Name = EntityName.ValidText.Item;
+                    IScopeAttributeFeature Attribute = Item.ValidEntity.Item;
+
+                    Result.Add(Name, Attribute);
+                }
+            }
+
+            return Result;
+        }
+
         /// <summary>
         /// Update all elements along a path with their type, previously validated.
         /// </summary>
@@ -1480,7 +1507,10 @@
                 ITypeName ResolvedFeatureTypeName = SourceFeature.ResolvedFeatureTypeName.Item;
                 ICompiledType ResolvedFeatureType = SourceFeature.ResolvedFeatureType.Item;
 
-                ResolvedFeatureType = ResolvedFeatureType.TypeAsDestinationOrSource;
+                IPathParticipatingType PathParticipatingType = ResolvedFeatureType as IPathParticipatingType;
+                Debug.Assert(PathParticipatingType != null);
+
+                ResolvedFeatureType = PathParticipatingType.TypeAsDestinationOrSource;
 
                 Debug.Assert(baseType is IClassType);
                 ResolvedFeatureType.InstanciateType((IClassType)baseType, ref ResolvedFeatureTypeName, ref ResolvedFeatureType);

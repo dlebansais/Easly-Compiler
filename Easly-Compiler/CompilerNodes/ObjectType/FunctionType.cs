@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IFunctionType.
     /// </summary>
-    public interface IFunctionType : BaseNode.IFunctionType, IObjectType, INodeWithReplicatedBlocks, ICompiledType
+    public interface IFunctionType : BaseNode.IFunctionType, IObjectType, INodeWithReplicatedBlocks, ICompiledType, IPathParticipatingType
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.FunctionType.OverloadBlocks"/>.

@@ -62,9 +62,16 @@
                 foreach (IIdentifier Identifier in Path)
                     Debug.Assert(Identifier.ValidText.IsAssigned);
 
+                List<IEntityDeclaration> LocalEntityList = new List<IEntityDeclaration>();
+                if (node.EmbeddingBody is IEffectiveBody AsEffectiveBody)
+                    LocalEntityList.AddRange(AsEffectiveBody.EntityDeclarationList);
+
                 IClass Class = node.EmbeddingClass;
+                IHashtableEx<IFeatureName, IFeatureInstance> LocalFeatureTable = Class.LocalFeatureTable;
+                IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable = Class.FeatureTable;
+
                 IErrorList ErrorList = new ErrorList();
-                if (IsPathReady(Path, Class.LocalFeatureTable, Class.FeatureTable, ErrorList, out ITypeName ResolvedPathTypeName, out ICompiledType ResolvedPathType))
+                if (IsPathReady(Path, LocalEntityList, LocalFeatureTable, FeatureTable, ErrorList, out ITypeName ResolvedPathTypeName, out ICompiledType ResolvedPathType))
                 {
                     data = new Tuple<IErrorList, ITypeName, ICompiledType>(ErrorList, ResolvedPathTypeName, ResolvedPathType);
                     Result = true;
@@ -78,13 +85,14 @@
         /// Checks if a path to a target type is made of resolved elements.
         /// </summary>
         /// <param name="path">The path to the target.</param>
-        /// <param name="startingLocalFeatureTable">The local feature table at the begining of the path.</param>
-        /// <param name="startingFeatureTable">The feature table at the begining of the path.</param>
+        /// <param name="localEntityList">The list of available local variables.</param>
+        /// <param name="localFeatureTable">The local feature table at the begining of the path.</param>
+        /// <param name="featureTable">The feature table at the begining of the path.</param>
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="resolvedPathTypeName">The target type name upon return.</param>
         /// <param name="resolvedPathType">The target type upon return.</param>
         /// <returns>True if the path could be resolved to the target.</returns>
-        public static bool IsPathReady(IList<IIdentifier> path, IHashtableEx<IFeatureName, IFeatureInstance> startingLocalFeatureTable, IHashtableEx<IFeatureName, IFeatureInstance> startingFeatureTable, IErrorList errorList, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
+        public static bool IsPathReady(IList<IIdentifier> path, List<IEntityDeclaration> localEntityList, IHashtableEx<IFeatureName, IFeatureInstance> localFeatureTable, IHashtableEx<IFeatureName, IFeatureInstance> featureTable, IErrorList errorList, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
         {
             resolvedPathTypeName = null;
             resolvedPathType = null;
@@ -93,16 +101,16 @@
 
             // We start with a feature table. The full table if available, the local table otherwise.
             /*
-            if (startingFeatureTable.IsSealed)
-                FeatureTable = startingFeatureTable;
-            else if (startingLocalFeatureTable.IsSealed)
-                FeatureTable = startingLocalFeatureTable;
+            if (featureTable.IsSealed)
+                FeatureTable = featureTable;
+            else if (localFeatureTable.IsSealed)
+                FeatureTable = localFeatureTable;
             else
                 return false;
             */
 
-            if (startingLocalFeatureTable.IsSealed)
-                FeatureTable = startingLocalFeatureTable;
+            if (localFeatureTable.IsSealed)
+                FeatureTable = localFeatureTable;
             else
                 return false;
 
@@ -114,11 +122,11 @@
 
             // If an error is found, the error will be processed in CheckConsistency.
             for (; i + 1 < path.Count && !IsInterrupted && IsReady; i++)
-                IsReady &= IsPathItemReady(path[i], path[i + 1], ref FeatureTable, errorList, ref IsInterrupted, out resolvedPathTypeName, out resolvedPathType);
+                IsReady &= IsPathItemReady(path[i], path[i + 1], ref localEntityList, ref FeatureTable, errorList, ref IsInterrupted);
 
             // This loop executes once if IsReady is true, and doesn't otherwise.
             for (; i < path.Count && !IsInterrupted && IsReady; i++)
-                IsReady &= IsLastPathItemReady(path[i], FeatureTable, errorList, ref IsInterrupted, out resolvedPathTypeName, out resolvedPathType);
+                IsReady &= IsLastPathItemReady(path[i], localEntityList, FeatureTable, errorList, ref IsInterrupted, out resolvedPathTypeName, out resolvedPathType);
 
             return IsReady || IsInterrupted;
         }
@@ -128,80 +136,87 @@
         /// </summary>
         /// <param name="item">The current step.</param>
         /// <param name="nextItem">The step after <paramref name="item"/>.</param>
+        /// <param name="localEntityList">The list of available local variables.</param>
         /// <param name="featureTable">The feature table to use.</param>
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="isInterrupted">Set if an error is found.</param>
-        /// <param name="resolvedPathTypeName">The target type name upon return.</param>
-        /// <param name="resolvedPathType">The target type upon return.</param>
         /// <returns>False to stop; True to continue with the next step.</returns>
-        public static bool IsPathItemReady(IIdentifier item, IIdentifier nextItem, ref IHashtableEx<IFeatureName, IFeatureInstance> featureTable, IErrorList errorList, ref bool isInterrupted, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
+        public static bool IsPathItemReady(IIdentifier item, IIdentifier nextItem, ref List<IEntityDeclaration> localEntityList, ref IHashtableEx<IFeatureName, IFeatureInstance> featureTable, IErrorList errorList, ref bool isInterrupted)
         {
             Debug.Assert(featureTable.IsSealed);
             Debug.Assert(item.ValidText.IsAssigned);
 
-            resolvedPathTypeName = null;
-            resolvedPathType = null;
-
             string Text = item.ValidText.Item;
+            bool IsLocal = IsLocalEntity(Text, localEntityList, out IEntityDeclaration Entity);
+            bool IsFeature = FeatureName.TableContain(featureTable, Text, out IFeatureName ItemName, out IFeatureInstance ItemInstance);
 
             // Check that the name is known in the table of features for the current step.
-            if (!FeatureName.TableContain(featureTable, Text, out IFeatureName ItemName, out IFeatureInstance ItemInstance))
+            if (!IsLocal && !IsFeature)
             {
                 errorList.AddError(new ErrorUnknownIdentifier(item, Text));
                 isInterrupted = true;
                 return false;
             }
 
-            ICompiledType ItemType = null;
-            ICompiledFeature ItemFeature = ItemInstance.Feature.Item;
-
-            Debug.Assert(nextItem != null);
-            Debug.Assert(nextItem.ValidText.IsAssigned);
-            string NextItemText = nextItem.ValidText.Item;
-
             bool IsReady = false;
-            bool IsHandled = false;
-            switch (ItemFeature)
+            ICompiledType ItemType = null;
+
+            if (IsLocal)
             {
-                case IAttributeFeature AsAttributeFeature:
-                    IsReady = AsAttributeFeature.ResolvedEntityType.IsAssigned;
-                    ItemType = IsReady ? AsAttributeFeature.ResolvedEntityType.Item : null;
-                    IsHandled = true;
-                    break;
-
-                case IConstantFeature AsConstantFeature:
-                    IsReady = AsConstantFeature.ResolvedEntityType.IsAssigned;
-                    ItemType = IsReady ? AsConstantFeature.ResolvedEntityType.Item : null;
-                    IsHandled = true;
-                    break;
-
-                // Creation and procedure features don't return anything.
-                case ICreationFeature AsCreationFeature:
-                case IProcedureFeature AsProcedureFeature:
-                    errorList.AddError(new ErrorUnknownIdentifier(nextItem, NextItemText));
-                    isInterrupted = true;
-                    return false;
-
-                case IFunctionFeature AsFunctionFeature:
-                    IsReady = AsFunctionFeature.MostCommonType.IsAssigned;
-                    ItemType = IsReady ? AsFunctionFeature.MostCommonType.Item : null;
-                    IsHandled = true;
-                    break;
-
-                case IPropertyFeature AsPropertyFeature:
-                    IsReady = AsPropertyFeature.ResolvedEntityType.IsAssigned;
-                    ItemType = IsReady ? AsPropertyFeature.ResolvedEntityType.Item : null;
-                    IsHandled = true;
-                    break;
-
-                case IIndexerFeature AsIndexerFeature:
-                    IsReady = AsIndexerFeature.ResolvedEntityType.IsAssigned;
-                    ItemType = IsReady ? AsIndexerFeature.ResolvedEntityType.Item : null;
-                    IsHandled = true;
-                    break;
+                IsReady = Entity.ValidEntity.IsAssigned && Entity.ValidEntity.Item.ResolvedFeatureType.IsAssigned;
+                ItemType = IsReady ? Entity.ValidEntity.Item.ResolvedFeatureType.Item : null;
             }
+            else
+            {
+                ICompiledFeature ItemFeature = ItemInstance.Feature.Item;
 
-            Debug.Assert(IsHandled);
+                Debug.Assert(nextItem != null);
+                Debug.Assert(nextItem.ValidText.IsAssigned);
+                string NextItemText = nextItem.ValidText.Item;
+
+                bool IsHandled = false;
+                switch (ItemFeature)
+                {
+                    case IAttributeFeature AsAttributeFeature:
+                        IsReady = AsAttributeFeature.ResolvedEntityType.IsAssigned;
+                        ItemType = IsReady ? AsAttributeFeature.ResolvedEntityType.Item : null;
+                        IsHandled = true;
+                        break;
+
+                    case IConstantFeature AsConstantFeature:
+                        IsReady = AsConstantFeature.ResolvedEntityType.IsAssigned;
+                        ItemType = IsReady ? AsConstantFeature.ResolvedEntityType.Item : null;
+                        IsHandled = true;
+                        break;
+
+                    // Creation and procedure features don't return anything.
+                    case ICreationFeature AsCreationFeature:
+                    case IProcedureFeature AsProcedureFeature:
+                        errorList.AddError(new ErrorUnknownIdentifier(nextItem, NextItemText));
+                        isInterrupted = true;
+                        return false;
+
+                    case IFunctionFeature AsFunctionFeature:
+                        IsReady = AsFunctionFeature.MostCommonType.IsAssigned;
+                        ItemType = IsReady ? AsFunctionFeature.MostCommonType.Item : null;
+                        IsHandled = true;
+                        break;
+
+                    case IPropertyFeature AsPropertyFeature:
+                        IsReady = AsPropertyFeature.ResolvedEntityType.IsAssigned;
+                        ItemType = IsReady ? AsPropertyFeature.ResolvedEntityType.Item : null;
+                        IsHandled = true;
+                        break;
+
+                    case IIndexerFeature AsIndexerFeature:
+                        IsReady = AsIndexerFeature.ResolvedEntityType.IsAssigned;
+                        ItemType = IsReady ? AsIndexerFeature.ResolvedEntityType.Item : null;
+                        IsHandled = true;
+                        break;
+                }
+
+                Debug.Assert(IsHandled);
+            }
 
             if (IsReady)
             {
@@ -218,13 +233,14 @@
         /// Checks if the last step in a path to a target type is resolved.
         /// </summary>
         /// <param name="item">The last step.</param>
+        /// <param name="localEntityList">The list of available local variables.</param>
         /// <param name="featureTable">The feature table to use.</param>
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="isInterrupted">Set if an error is found.</param>
         /// <param name="resolvedPathTypeName">The target type name upon return.</param>
         /// <param name="resolvedPathType">The target type upon return.</param>
         /// <returns>True if the path step could be resolved, or an error was found.</returns>
-        public static bool IsLastPathItemReady(IIdentifier item, IHashtableEx<IFeatureName, IFeatureInstance> featureTable, IErrorList errorList, ref bool isInterrupted, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
+        public static bool IsLastPathItemReady(IIdentifier item, List<IEntityDeclaration> localEntityList, IHashtableEx<IFeatureName, IFeatureInstance> featureTable, IErrorList errorList, ref bool isInterrupted, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
         {
             Debug.Assert(featureTable.IsSealed);
             Debug.Assert(item.ValidText.IsAssigned);
@@ -233,54 +249,89 @@
             resolvedPathType = null;
 
             string Text = item.ValidText.Item;
+            bool IsLocal = IsLocalEntity(Text, localEntityList, out IEntityDeclaration Entity);
+            bool IsFeature = FeatureName.TableContain(featureTable, Text, out IFeatureName ItemName, out IFeatureInstance ItemInstance);
 
-            if (!FeatureName.TableContain(featureTable, Text, out IFeatureName ItemName, out IFeatureInstance ItemInstance))
+            // Check that the name is known in the table of features for the current step.
+            if (!IsLocal && !IsFeature)
             {
                 errorList.AddError(new ErrorUnknownIdentifier(item, Text));
                 isInterrupted = true;
                 return false;
             }
 
-            ICompiledFeature ItemFeature = ItemInstance.Feature.Item;
             bool Result = false;
-            bool IsHandled = false;
 
-            switch (ItemFeature)
+            if (IsLocal)
             {
-                case IAttributeFeature AsAttributeFeature:
-                    Result = IsAttributeFeatureReady(AsAttributeFeature, out resolvedPathTypeName, out resolvedPathType);
-                    IsHandled = true;
-                    break;
+                if (Entity.ValidEntity.IsAssigned && Entity.ValidEntity.Item.ResolvedFeatureType.IsAssigned)
+                {
+                    resolvedPathTypeName = Entity.ValidEntity.Item.ResolvedFeatureTypeName.Item;
+                    resolvedPathType = Entity.ValidEntity.Item.ResolvedFeatureType.Item;
+                    Result = true;
+                }
+            }
+            else
+            {
+                ICompiledFeature ItemFeature = ItemInstance.Feature.Item;
+                bool IsHandled = false;
 
-                case IConstantFeature AsConstantFeature:
-                    Result = IsConstantFeatureReady(AsConstantFeature, out resolvedPathTypeName, out resolvedPathType);
-                    IsHandled = true;
-                    break;
+                switch (ItemFeature)
+                {
+                    case IAttributeFeature AsAttributeFeature:
+                        Result = IsAttributeFeatureReady(AsAttributeFeature, out resolvedPathTypeName, out resolvedPathType);
+                        IsHandled = true;
+                        break;
 
-                case ICreationFeature AsCreationFeature:
-                case IProcedureFeature AsProcedureFeature:
-                    errorList.AddError(new ErrorNotAnchor(item, Text));
-                    isInterrupted = true;
-                    return false;
+                    case IConstantFeature AsConstantFeature:
+                        Result = IsConstantFeatureReady(AsConstantFeature, out resolvedPathTypeName, out resolvedPathType);
+                        IsHandled = true;
+                        break;
 
-                case IFunctionFeature AsFunctionFeature:
-                    Result = IsFunctionFeatureReady(AsFunctionFeature, out resolvedPathTypeName, out resolvedPathType);
-                    IsHandled = true;
-                    break;
+                    case ICreationFeature AsCreationFeature:
+                    case IProcedureFeature AsProcedureFeature:
+                        errorList.AddError(new ErrorNotAnchor(item, Text));
+                        isInterrupted = true;
+                        return false;
 
-                case IPropertyFeature AsPropertyFeature:
-                    Result = IsPropertyFeatureReady(AsPropertyFeature, out resolvedPathTypeName, out resolvedPathType);
-                    IsHandled = true;
-                    break;
+                    case IFunctionFeature AsFunctionFeature:
+                        Result = IsFunctionFeatureReady(AsFunctionFeature, out resolvedPathTypeName, out resolvedPathType);
+                        IsHandled = true;
+                        break;
 
-                case IIndexerFeature AsIndexerFeature:
-                    Result = IsIndexerFeatureReady(AsIndexerFeature, out resolvedPathTypeName, out resolvedPathType);
-                    IsHandled = true;
-                    break;
+                    case IPropertyFeature AsPropertyFeature:
+                        Result = IsPropertyFeatureReady(AsPropertyFeature, out resolvedPathTypeName, out resolvedPathType);
+                        IsHandled = true;
+                        break;
+
+                    case IIndexerFeature AsIndexerFeature:
+                        Result = IsIndexerFeatureReady(AsIndexerFeature, out resolvedPathTypeName, out resolvedPathType);
+                        IsHandled = true;
+                        break;
+                }
+
+                Debug.Assert(IsHandled);
             }
 
-            Debug.Assert(IsHandled);
             return Result;
+        }
+
+        private static bool IsLocalEntity(string text, List<IEntityDeclaration> localEntityList, out IEntityDeclaration entity)
+        {
+            entity = null;
+
+            foreach (IEntityDeclaration Item in localEntityList)
+            {
+                IName EntityName = (IName)Item.EntityName;
+                Debug.Assert(EntityName.ValidText.IsAssigned);
+                if (text == EntityName.ValidText.Item)
+                {
+                    entity = Item;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static bool IsAttributeFeatureReady(IAttributeFeature feature, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)

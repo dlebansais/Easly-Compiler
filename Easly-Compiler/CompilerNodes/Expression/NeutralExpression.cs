@@ -1,5 +1,6 @@
 namespace CompilerNode
 {
+#if NONE
     using System.Collections.Generic;
     using System.Diagnostics;
     using Easly;
@@ -8,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler-specific expression
     /// </summary>
-    public interface INeutralExpression : IExpression
+    public interface INeutralExpression : BaseNode.IExpression
     {
     }
 
@@ -23,6 +24,14 @@ namespace CompilerNode
         /// </summary>
         public NeutralExpression()
         {
+            Debug.Assert(Documentation == null);
+            Debug.Assert(ParentSource == this);
+            Debug.Assert(EmbeddingClass == null);
+            Debug.Assert(EmbeddingFeature == null);
+            Debug.Assert(EmbeddingOverload == null);
+            Debug.Assert(EmbeddingBody == null);
+            Debug.Assert(EmbeddingAssertion == null);
+            Debug.Assert(EmbeddingClass == null);
         }
         #endregion
 
@@ -177,4 +186,5 @@ namespace CompilerNode
         }
         #endregion
     }
+#endif
 }

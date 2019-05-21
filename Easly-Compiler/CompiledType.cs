@@ -55,11 +55,6 @@
         OnceReference<ITypedef> OriginatingTypedef { get; }
 
         /// <summary>
-        /// The type to use instead of this type for a source or destination type, for the purpose of path searching.
-        /// </summary>
-        ICompiledType TypeAsDestinationOrSource { get; }
-
-        /// <summary>
         /// Creates an instance of a class type, or reuse an existing instance.
         /// </summary>
         /// <param name="instancingClassType">The class type to instanciate.</param>

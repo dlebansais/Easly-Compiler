@@ -61,7 +61,11 @@
             IExpression ConstantSource = node.ConstantSourceList[0];
 
             Debug.Assert(ConstantSource.ExpressionConstant.IsAssigned);
-            ExpressionConstant = ConstantSource.ExpressionConstant.Item;
+
+            if (node.ResolvedFinalDiscrete.IsAssigned)
+                ExpressionConstant = new DiscreteLanguageConstant(node.ResolvedFinalDiscrete.Item);
+            else
+                ExpressionConstant = ConstantSource.ExpressionConstant.Item;
 
             node.ExpressionConstant.Item = ExpressionConstant;
         }

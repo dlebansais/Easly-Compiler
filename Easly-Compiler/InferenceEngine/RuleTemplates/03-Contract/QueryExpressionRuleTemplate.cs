@@ -168,6 +168,32 @@
                         resolvedArgumentList = MergedArgumentList;
                         IsHandled = true;
                         break;
+
+                    case IFormalGenericType AsFormalGenericType:
+                        resolvedResult = new List<IExpressionType>()
+                        {
+                            new ExpressionType(FinalTypeName, AsFormalGenericType, ValidText)
+                        };
+
+                        resolvedExceptions = new List<IIdentifier>();
+                        selectedParameterList = new ListTableEx<IParameter>();
+                        selectedResultList = new ListTableEx<IParameter>();
+                        resolvedArgumentList = MergedArgumentList;
+                        IsHandled = true;
+                        break;
+
+                    case ITupleType AsTupleType:
+                        resolvedResult = new List<IExpressionType>()
+                        {
+                            new ExpressionType(FinalTypeName, AsTupleType, ValidText)
+                        };
+
+                        resolvedExceptions = new List<IIdentifier>();
+                        selectedParameterList = new ListTableEx<IParameter>();
+                        selectedResultList = new ListTableEx<IParameter>();
+                        resolvedArgumentList = MergedArgumentList;
+                        IsHandled = true;
+                        break;
                 }
 
                 Debug.Assert(IsHandled);

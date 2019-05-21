@@ -227,20 +227,24 @@ namespace CompilerNode
                         IsHandled = true;
                         break;
 
+                    /* Can't possibly be in a continuation, it's either in the continuation scope or in one of the cleanup instructions.
                     case IContinuation AsContinuation:
                         Result = AsContinuation.FullScope;
                         IsHandled = true;
                         break;
+                        */
 
                     case IConditional AsConditional:
                         Result = AsConditional.FullScope;
                         IsHandled = true;
                         break;
 
+                    /* Can't possibly be in an attachment, it would be in the attachment scope.
                     case IAttachment AsAttachment:
                         Result = AsAttachment.FullScope;
                         IsHandled = true;
                         break;
+                        */
 
                     case IInstruction AsInstruction:
                         Result = AsInstruction.FullScope;

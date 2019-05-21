@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IProcedureType.
     /// </summary>
-    public interface IProcedureType : BaseNode.IProcedureType, IObjectType, INodeWithReplicatedBlocks, ICompiledType
+    public interface IProcedureType : BaseNode.IProcedureType, IObjectType, INodeWithReplicatedBlocks, ICompiledType, IPathParticipatingType
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.ProcedureType.OverloadBlocks"/>.

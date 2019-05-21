@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompiledBody.cs" />
+    <Compile Include="PathParticipatingType.cs" />
     <Compile Include="Compiler.cs" />
     <Compile Include="CompilerNodes\Argument\Argument.cs" />
     <Compile Include="CompilerNodes\Argument\AssignmentArgument.cs" />
