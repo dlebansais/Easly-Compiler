@@ -213,7 +213,7 @@
                         break;
 
                     default:
-                        IsHandled = true; //TODO: handle other features to try to get a constant.
+                        IsHandled = true; // TODO: handle IFunctionFeature or the indexer to try to get a constant.
                         break;
                 }
             }

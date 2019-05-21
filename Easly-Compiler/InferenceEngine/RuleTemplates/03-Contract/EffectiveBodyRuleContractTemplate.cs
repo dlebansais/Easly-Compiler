@@ -42,7 +42,6 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                //new UnsealedTableDestinationTemplate<TBody, string, IScopeAttributeFeature>(nameof(IEffectiveBody.LocalEntityTable)),
                 new OnceReferenceDestinationTemplate<TBody, IList<IExpressionType>>(nameof(IEffectiveBody.ResolvedResult)),
             };
         }

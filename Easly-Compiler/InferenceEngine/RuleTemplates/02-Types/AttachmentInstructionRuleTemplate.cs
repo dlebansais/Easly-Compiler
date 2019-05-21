@@ -78,7 +78,6 @@
                     Debug.Assert(AttachedType.ResolvedTypeName.IsAssigned);
                     Debug.Assert(AttachedType.ResolvedType.IsAssigned);
 
-                    //IScopeAttributeFeature NewEntity = ScopeAttributeFeature.Create(Item, ValidText);
                     IScopeAttributeFeature NewEntity = ScopeAttributeFeature.Create(Item, ValidText, AttachedType.ResolvedTypeName.Item, AttachedType.ResolvedType.Item);
                     CheckedScope.Add(ValidText, NewEntity);
                 }

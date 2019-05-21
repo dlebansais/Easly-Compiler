@@ -214,10 +214,7 @@
 
             Debug.Assert(IsHandled);
 
-            //IsResultConstant = false; // TODO: check if the precursor is a constant
-            //TODO: check if the precursor is a constant number
-            //ExpressionConstant.Item = ??
-
+            // TODO: check if the precursor is a constant number
             return Success;
         }
 

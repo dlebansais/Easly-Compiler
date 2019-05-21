@@ -81,7 +81,7 @@
                 if (DeclaredAncestor.ResolvedType.Item is IClassType AsClassTypeAncestor)
                 {
                     foreach (IPrecursorInstance Item in PrecursorList)
-                        if (Item.Ancestor.BaseClass == AsClassTypeAncestor.BaseClass) // TODO compare entire type instead of just the base class
+                        if (Item.Ancestor.BaseClass == AsClassTypeAncestor.BaseClass)
                         {
                             Found = true;
                             AncestorTypeName = Item.Ancestor.BaseClass.ResolvedClassTypeName.Item;

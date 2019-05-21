@@ -26,7 +26,6 @@
                 new OnceReferenceSourceTemplate<IPropertyFeature, IClassType>(nameof(IClass.ResolvedClassType), TemplateClassStart<IPropertyFeature>.Default),
                 new OnceReferenceSourceTemplate<IPropertyFeature, ITypeName>(nameof(IPropertyFeature.EntityType) + Dot + nameof(IObjectType.ResolvedTypeName)),
                 new OnceReferenceSourceTemplate<IPropertyFeature, ICompiledType>(nameof(IPropertyFeature.EntityType) + Dot + nameof(IObjectType.ResolvedType)),
-                // TODO getter and setter bodies local scope
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()

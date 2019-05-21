@@ -167,8 +167,6 @@
 
         private void GetGenericType(IFormalGenericType genericSource, out ITypeName validTypeName, out ICompiledType validType)
         {
-            // TODO check: Debug.Assert(c.TypeTable.Contains(FormalGeneric.ResolvedTypeName));
-
             validTypeName = genericSource.ResolvedTypeName;
             validType = genericSource;
 

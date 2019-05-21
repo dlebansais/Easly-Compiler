@@ -133,9 +133,7 @@
                 selectedParameterList = ParameterTableList[SelectedIndex];
                 resolvedArgumentList = MergedArgumentList;
 
-                //isResultConstant = false; // TODO: check if the result is a constant
-                //TODO: check if the result is a constant number
-                //ExpressionConstant.Item = ??
+                // TODO: check if the result is a constant number
             }
             else
             {

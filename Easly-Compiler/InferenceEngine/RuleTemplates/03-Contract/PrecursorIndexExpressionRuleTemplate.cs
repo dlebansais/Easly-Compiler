@@ -141,17 +141,14 @@
 
                 resolvedResult = new List<IExpressionType>()
                 {
-                    new ExpressionType(OperatorType .ResolvedEntityTypeName.Item, OperatorType .ResolvedEntityType.Item, string.Empty)
+                    new ExpressionType(OperatorType.ResolvedEntityTypeName.Item, OperatorType.ResolvedEntityType.Item, string.Empty)
                 };
 
                 resolvedExceptions = OperatorType.GetExceptionIdentifierList;
                 selectedParameterList = ParameterTableList[SelectedIndex];
                 resolvedArgumentList = MergedArgumentList;
 
-                //IsResultConstant = false;
-                //TODO: check if the precursor is a constant
-                //TODO: check if the precursor is a constant number
-                //ResultNumberConstant.Item = ??
+                // TODO: check if the precursor is a constant
                 return true;
             }
             else

@@ -319,6 +319,7 @@
         private static bool IsLocalEntity(string text, List<IEntityDeclaration> localEntityList, out IEntityDeclaration entity)
         {
             entity = null;
+            bool Result = false;
 
             foreach (IEntityDeclaration Item in localEntityList)
             {
@@ -326,12 +327,14 @@
                 Debug.Assert(EntityName.ValidText.IsAssigned);
                 if (text == EntityName.ValidText.Item)
                 {
+                    Debug.Assert(entity == null);
+
                     entity = Item;
-                    return true;
+                    Result = true;
                 }
             }
 
-            return false;
+            return Result;
         }
 
         private static bool IsAttributeFeatureReady(IAttributeFeature feature, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)

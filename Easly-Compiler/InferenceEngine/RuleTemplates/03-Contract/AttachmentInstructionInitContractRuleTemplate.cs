@@ -61,8 +61,6 @@
             }
             else
             {
-                //IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-
                 for (int i = 0; i < node.EntityNameList.Count; i++)
                 {
                     IList<ITypeName> AttachmentTypeNameList = new List<ITypeName>();

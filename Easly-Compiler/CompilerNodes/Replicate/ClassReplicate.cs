@@ -101,11 +101,7 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
-            {
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Types)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Types || ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsHandled = true;
             }

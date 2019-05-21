@@ -1427,20 +1427,10 @@
             {
                 IHashtableEx<IFeatureName, IDiscrete> DiscreteTable = baseType.DiscreteTable;
 
-                if (FeatureName.TableContain(DiscreteTable, ValidText, out Key, out IDiscrete Constant))
+                if (FeatureName.TableContain(DiscreteTable, ValidText, out Key, out IDiscrete Discrete))
                 {
-                    if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, ValidIdentifier, out ITypeName ResultTypeName, out ICompiledType ResultType))
-                    {
-                        errorList.AddError(new ErrorNumberTypeMissing(ValidIdentifier));
-                        return false;
-                    }
-                    else
-                    {
-                        finalDiscrete = Constant;
-                        finalTypeName = ResultTypeName;
-                        finalType = ResultType;
-                        return true;
-                    }
+                    finalDiscrete = Discrete;
+                    return Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, ValidIdentifier, out finalTypeName, out finalType);
                 }
                 else
                 {
@@ -1448,7 +1438,6 @@
                     return false;
                 }
             }
-
             else
             {
                 errorList.AddError(new ErrorUnknownIdentifier(ValidIdentifier, ValidText));

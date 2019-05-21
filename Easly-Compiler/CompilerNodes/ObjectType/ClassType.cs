@@ -144,10 +144,6 @@
 
                     ConformanceTable.Seal();
                 }
-                else
-                {
-
-                }
             }
 
             IClassType ClassType = new ClassType(baseClass, typeArgumentTable, instancingClassType, ConformanceTable);
