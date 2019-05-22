@@ -22,13 +22,12 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceCollectionSourceTemplate<IWith, IRange, IConstantRange>(nameof(IWith.RangeList), nameof(IRange.ResolvedRange)),
-                new OnceReferenceSourceTemplate<IWith, IList<IExpressionType>>(nameof(IWith.Instructions) + Dot + nameof(IScope.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IWith, IResultType>(nameof(IWith.Instructions) + Dot + nameof(IScope.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IWith, IList<IExpressionType>>(nameof(IWith.ResolvedResult)),
-                new OnceReferenceDestinationTemplate<IWith, IList<IIdentifier>>(nameof(IWith.ResolvedExceptions)),
+                new OnceReferenceDestinationTemplate<IWith, IResultType>(nameof(IWith.ResolvedResult)),
             };
         }
         #endregion
@@ -56,8 +55,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IWith node, object data)
         {
-            node.ResolvedResult.Item = new List<IExpressionType>();
-            node.ResolvedExceptions.Item = new List<IIdentifier>();
+            node.ResolvedResult.Item = ResultType.Empty;
         }
         #endregion
     }

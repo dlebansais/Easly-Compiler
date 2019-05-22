@@ -116,7 +116,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedResult = new OnceReference<IResultType>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
@@ -165,7 +165,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of expression results.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+        public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
 
         /// <summary>
         /// List of exceptions the expression can throw.
@@ -197,6 +197,89 @@ namespace CompilerNode
             Result &= Argument.IsArgumentListEqual(expression1.ArgumentList, expression2.ArgumentList);
 
             return Result;
+        }
+
+        /// <summary>
+        /// Finds the matching nodes of a <see cref="IIndexQueryExpression"/>.
+        /// </summary>
+        /// <param name="node">The agent expression to check.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="resolvedResult">The expression result types upon return.</param>
+        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
+        /// <param name="expressionConstant">The expression constant upon return.</param>
+        /// <param name="selectedParameterList">The selected parameters.</param>
+        /// <param name="resolvedArgumentList">The list of arguments corresponding to selected parameters.</param>
+        public static bool ResolveCompilerReferences(IIndexQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        {
+            resolvedResult = null;
+            resolvedExceptions = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+            selectedParameterList = null;
+            resolvedArgumentList = null;
+
+            IExpression IndexedExpression = (IExpression)node.IndexedExpression;
+            IList<IArgument> ArgumentList = (IList<IArgument>)node.ArgumentList;
+            IClass EmbeddingClass = node.EmbeddingClass;
+            IResultType ResolvedIndexerResult = IndexedExpression.ResolvedResult.Item;
+
+            OnceReference<ICompiledType> IndexedExpressionType = new OnceReference<ICompiledType>();
+            foreach (IExpressionType Item in ResolvedIndexerResult)
+                if (Item.Name == nameof(BaseNode.Keyword.Result) || ResolvedIndexerResult.Count == 1)
+                {
+                    IndexedExpressionType.Item = Item.ValueType;
+                    break;
+                }
+
+            if (!IndexedExpressionType.IsAssigned)
+            {
+                errorList.AddError(new ErrorInvalidExpression(node));
+                return false;
+            }
+
+            if (IndexedExpressionType.Item is IClassType AsClassType)
+            {
+                IClass IndexedBaseClass = AsClassType.BaseClass;
+                IHashtableEx<IFeatureName, IFeatureInstance> IndexedFeatureTable = IndexedBaseClass.FeatureTable;
+
+                if (!IndexedFeatureTable.ContainsKey(FeatureName.IndexerFeatureName))
+                {
+                    errorList.AddError(new ErrorMissingIndexer(node));
+                    return false;
+                }
+
+                IFeatureInstance IndexerInstance = IndexedFeatureTable[FeatureName.IndexerFeatureName];
+                IIndexerFeature Indexer = (IndexerFeature)IndexerInstance.Feature.Item;
+                IIndexerType AsIndexerType = (IndexerType)Indexer.ResolvedFeatureType.Item;
+
+                List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
+                TypeArgumentStyles ArgumentStyle;
+                if (!Argument.Validate(ArgumentList, MergedArgumentList, out ArgumentStyle, errorList))
+                    return false;
+
+                IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+                ParameterTableList.Add(AsIndexerType.ParameterTable);
+
+                int SelectedIndex;
+                if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, ArgumentStyle, errorList, node, out SelectedIndex))
+                    return false;
+
+                resolvedResult = new ResultType(AsIndexerType.ResolvedEntityTypeName.Item, AsIndexerType.ResolvedEntityType.Item, string.Empty);
+
+                resolvedExceptions = AsIndexerType.GetExceptionIdentifierList;
+                selectedParameterList = ParameterTableList[SelectedIndex];
+                resolvedArgumentList = MergedArgumentList;
+
+                // TODO: check if the result is a constant number
+            }
+            else
+            {
+                errorList.AddError(new ErrorInvalidExpression(node));
+                return false;
+            }
+
+            return true;
         }
         #endregion
 

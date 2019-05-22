@@ -21,14 +21,13 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceSourceTemplate<IConditional, IList<IExpressionType>>(nameof(IConditional.BooleanExpression) + Dot + nameof(IExpression.ResolvedResult)),
-                new OnceReferenceSourceTemplate<IConditional, IList<IExpressionType>>(nameof(IConditional.Instructions) + Dot + nameof(IScope.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IConditional, IResultType>(nameof(IConditional.BooleanExpression) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IConditional, IResultType>(nameof(IConditional.Instructions) + Dot + nameof(IScope.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IConditional, IList<IExpressionType>>(nameof(IConditional.ResolvedResult)),
-                new OnceReferenceDestinationTemplate<IConditional, IList<IIdentifier>>(nameof(IConditional.ResolvedExceptions)),
+                new OnceReferenceDestinationTemplate<IConditional, IResultType>(nameof(IConditional.ResolvedResult)),
             };
         }
         #endregion
@@ -56,8 +55,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IConditional node, object data)
         {
-            node.ResolvedResult.Item = new List<IExpressionType>();
-            node.ResolvedExceptions.Item = new List<IIdentifier>();
+            node.ResolvedResult.Item = ResultType.Empty;
         }
         #endregion
     }

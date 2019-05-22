@@ -20,14 +20,12 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceSourceTemplate<ICheckInstruction, IList<IExpressionType>>(nameof(ICheckInstruction.BooleanExpression) + Dot + nameof(IExpression.ResolvedResult)),
-                new OnceReferenceSourceTemplate<ICheckInstruction, IList<IIdentifier>>(nameof(ICheckInstruction.BooleanExpression) + Dot + nameof(IExpression.ResolvedExceptions)),
+                new OnceReferenceSourceTemplate<ICheckInstruction, IResultType>(nameof(ICheckInstruction.BooleanExpression) + Dot + nameof(IExpression.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<ICheckInstruction, IList<IExpressionType>>(nameof(ICheckInstruction.ResolvedResult)),
-                new OnceReferenceDestinationTemplate<ICheckInstruction, IList<IIdentifier>>(nameof(ICheckInstruction.ResolvedExceptions)),
+                new OnceReferenceDestinationTemplate<ICheckInstruction, IResultType>(nameof(ICheckInstruction.ResolvedResult)),
             };
         }
         #endregion
@@ -55,8 +53,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(ICheckInstruction node, object data)
         {
-            node.ResolvedResult.Item = new List<IExpressionType>();
-            node.ResolvedExceptions.Item = new List<IIdentifier>();
+            node.ResolvedResult.Item = ResultType.Empty;
         }
         #endregion
     }

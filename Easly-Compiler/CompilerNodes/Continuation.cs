@@ -19,7 +19,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of results of the continuation.
         /// </summary>
-        OnceReference<IList<IExpressionType>> ResolvedResult { get; }
+        OnceReference<IResultType> ResolvedResult { get; }
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedResult = new OnceReference<IResultType>();
                 IsHandled = true;
             }
 
@@ -184,7 +184,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of results of the continuation.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+        public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
         #endregion
     }
 }

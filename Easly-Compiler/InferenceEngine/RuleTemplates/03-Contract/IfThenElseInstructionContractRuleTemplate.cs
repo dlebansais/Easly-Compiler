@@ -20,14 +20,13 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceCollectionSourceTemplate<IIfThenElseInstruction, IConditional, IList<IExpressionType>>(nameof(IIfThenElseInstruction.ConditionalList), nameof(IConditional.ResolvedResult)),
-                new ConditionallyAssignedReferenceSourceTemplate<IIfThenElseInstruction, IScope, IList<IExpressionType>>(nameof(IIfThenElseInstruction.ElseInstructions), nameof(IScope.ResolvedResult)),
+                new OnceReferenceCollectionSourceTemplate<IIfThenElseInstruction, IConditional, IResultType>(nameof(IIfThenElseInstruction.ConditionalList), nameof(IConditional.ResolvedResult)),
+                new ConditionallyAssignedReferenceSourceTemplate<IIfThenElseInstruction, IScope, IResultType>(nameof(IIfThenElseInstruction.ElseInstructions), nameof(IScope.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IIfThenElseInstruction, IList<IExpressionType>>(nameof(IIfThenElseInstruction.ResolvedResult)),
-                new OnceReferenceDestinationTemplate<IIfThenElseInstruction, IList<IIdentifier>>(nameof(IIfThenElseInstruction.ResolvedExceptions)),
+                new OnceReferenceDestinationTemplate<IIfThenElseInstruction, IResultType>(nameof(IIfThenElseInstruction.ResolvedResult)),
             };
         }
         #endregion
@@ -55,8 +54,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IIfThenElseInstruction node, object data)
         {
-            node.ResolvedResult.Item = new List<IExpressionType>();
-            node.ResolvedExceptions.Item = new List<IIdentifier>();
+            node.ResolvedResult.Item = ResultType.Empty;
         }
         #endregion
     }

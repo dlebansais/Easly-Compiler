@@ -91,7 +91,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedResult = new OnceReference<IResultType>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
@@ -142,7 +142,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of expression results.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+        public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
 
         /// <summary>
         /// List of exceptions the expression can throw.
@@ -183,6 +183,31 @@ namespace CompilerNode
             Result &= expression1.TagIdentifier.Text == expression2.TagIdentifier.Text;
 
             return Result;
+        }
+
+        /// <summary>
+        /// Finds the matching nodes of a <see cref="IAssertionTagExpression"/>.
+        /// </summary>
+        /// <param name="node">The agent expression to check.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="resolvedResult">The expression result types upon return.</param>
+        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
+        /// <param name="expressionConstant">The constant value upon return, if any.</param>
+        public static bool ResolveCompilerReferences(IAssertionTagExpression node, IErrorList errorList, out IResultType resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant)
+        {
+            IExpression ResolvedBooleanExpression = node.ResolvedBooleanExpression.Item;
+
+            resolvedResult = ResolvedBooleanExpression.ResolvedResult.Item;
+            resolvedExceptions = ResolvedBooleanExpression.ResolvedExceptions.Item;
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+
+            constantSourceList = new ListTableEx<IExpression>()
+            {
+                ResolvedBooleanExpression
+            };
+
+            return true;
         }
         #endregion
 

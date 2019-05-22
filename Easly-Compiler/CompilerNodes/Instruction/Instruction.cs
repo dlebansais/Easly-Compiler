@@ -12,7 +12,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of results of the instruction.
         /// </summary>
-        OnceReference<IList<IExpressionType>> ResolvedResult { get; }
+        OnceReference<IResultType> ResolvedResult { get; }
 
         /// <summary>
         /// List of exceptions the instruction can throw.

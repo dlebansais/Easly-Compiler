@@ -82,7 +82,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedResult = new OnceReference<IResultType>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
@@ -131,7 +131,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of expression results.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+        public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
 
         /// <summary>
         /// List of exceptions the expression can throw.
@@ -309,6 +309,56 @@ namespace CompilerNode
 
             errorList.AddError(new ErrorResultUsedOutsideGetter(source));
             return false;
+        }
+
+        /// <summary>
+        /// Finds the matching nodes of a <see cref="IKeywordExpression"/>.
+        /// </summary>
+        /// <param name="node">The agent expression to check.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="resolvedResult">The expression result types upon return.</param>
+        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
+        /// <param name="expressionConstant">The expression constant upon return.</param>
+        public static bool ResolveCompilerReferences(IKeywordExpression node, IErrorList errorList, out IResultType resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant)
+        {
+            resolvedResult = null;
+            resolvedExceptions = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+
+            IClass EmbeddingClass = node.EmbeddingClass;
+            BaseNode.Keyword Value = node.Value;
+
+            if (!KeywordExpression.IsKeywordAvailable(Value, node, errorList, out ITypeName KeywordTypeName, out ICompiledType KeywordType))
+                return false;
+
+            resolvedResult = new ResultType(KeywordTypeName, KeywordType, Value.ToString());
+
+            resolvedExceptions = new List<IIdentifier>();
+
+            bool IsHandled = false;
+
+            switch (Value)
+            {
+                case BaseNode.Keyword.True:
+                case BaseNode.Keyword.False:
+                    expressionConstant = new BooleanLanguageConstant(Value == BaseNode.Keyword.True);
+                    IsHandled = true;
+                    break;
+
+                case BaseNode.Keyword.Current:
+                case BaseNode.Keyword.Value:
+                case BaseNode.Keyword.Result:
+                case BaseNode.Keyword.Retry:
+                case BaseNode.Keyword.Exception:
+                    IsHandled = true;
+                    break;
+            }
+
+            Debug.Assert(IsHandled);
+
+            return true;
         }
         #endregion
 

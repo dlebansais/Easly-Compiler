@@ -95,7 +95,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedResult = new OnceReference<IResultType>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
@@ -150,7 +150,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of expression results.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+        public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
 
         /// <summary>
         /// List of exceptions the expression can throw.
@@ -197,6 +197,97 @@ namespace CompilerNode
             Result &= expression1.Operator.Text == expression2.Operator.Text;
 
             return Result;
+        }
+
+        /// <summary>
+        /// Finds the matching nodes of a <see cref="IUnaryOperatorExpression"/>.
+        /// </summary>
+        /// <param name="node">The agent expression to check.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="resolvedResult">The expression result types upon return.</param>
+        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
+        /// <param name="expressionConstant">The constant value upon return, if any.</param>
+        /// <param name="selectedFeature">The matching feature upon return.</param>
+        /// <param name="selectedOverload">The matching overload in <paramref name="selectedFeature"/> upon return.</param>
+        /// <param name="selectedOverloadType">The matching overload type upon return.</param>
+        public static bool ResolveCompilerReferences(IUnaryOperatorExpression node, IErrorList errorList, out IResultType resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFunctionFeature selectedFeature, out IQueryOverload selectedOverload, out IQueryOverloadType selectedOverloadType)
+        {
+            resolvedResult = null;
+            resolvedExceptions = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+            selectedFeature = null;
+            selectedOverload = null;
+            selectedOverloadType = null;
+
+            IIdentifier Operator = (IIdentifier)node.Operator;
+            string ValidText = Operator.ValidText.Item;
+            IExpression RightExpression = (IExpression)node.RightExpression;
+            IResultType RightResult = RightExpression.ResolvedResult.Item;
+
+            if (!RightResult.TryGetResult(out ICompiledType RightExpressionType))
+            {
+                errorList.AddError(new ErrorInvalidExpression(RightExpression));
+                return false;
+            }
+
+            if (RightExpressionType is IClassType AsClassType)
+            {
+                IClass RightBaseClass = AsClassType.BaseClass;
+                IHashtableEx<IFeatureName, IFeatureInstance> RightFeatureTable = RightBaseClass.FeatureTable;
+
+                if (!FeatureName.TableContain(RightFeatureTable, ValidText, out IFeatureName Key, out IFeatureInstance Value))
+                {
+                    errorList.AddError(new ErrorUnknownIdentifier(RightExpression, ValidText));
+                    return false;
+                }
+
+                ICompiledFeature OperatorFeature = Value.Feature.Item;
+                ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
+
+                if (OperatorFeature is IFunctionFeature AsFunctionFeature && OperatorType is IFunctionType AsFunctionType)
+                {
+                    IList<IQueryOverloadType> OperatorOverloadList = AsFunctionType.OverloadList;
+
+                    int SelectedOperatorIndex = -1;
+                    for (int i = 0; i < OperatorOverloadList.Count; i++)
+                    {
+                        IQueryOverloadType Overload = OperatorOverloadList[i];
+                        if (Overload.ParameterList.Count == 0 && Overload.ResultList.Count == 1)
+                        {
+                            SelectedOperatorIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (SelectedOperatorIndex < 0)
+                    {
+                        errorList.AddError(new ErrorInvalidOperator(Operator, ValidText));
+                        return false;
+                    }
+
+                    resolvedResult = Feature.CommonResultType(AsFunctionType.OverloadList);
+                    selectedFeature = AsFunctionFeature;
+                    selectedOverload = AsFunctionFeature.OverloadList[SelectedOperatorIndex];
+                    selectedOverloadType = OperatorOverloadList[SelectedOperatorIndex];
+                    resolvedExceptions = selectedOverloadType.ExceptionIdentifierList;
+
+                    constantSourceList.Add(RightExpression);
+                }
+                else
+                {
+                    errorList.AddError(new ErrorInvalidOperator(Operator, ValidText));
+                    return false;
+                }
+            }
+            else
+            {
+                errorList.AddError(new ErrorInvalidExpression(RightExpression));
+                return false;
+            }
+
+            return true;
         }
         #endregion
 

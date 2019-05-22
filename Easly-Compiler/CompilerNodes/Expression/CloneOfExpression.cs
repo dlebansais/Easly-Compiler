@@ -81,7 +81,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedResult = new OnceReference<IResultType>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
@@ -130,7 +130,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of expression results.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+        public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
 
         /// <summary>
         /// List of exceptions the expression can throw.
@@ -161,6 +161,42 @@ namespace CompilerNode
             Result &= expression1.Source == expression2.Source;
 
             return Result;
+        }
+
+        /// <summary>
+        /// Finds the matching nodes of a <see cref="ICloneOfExpression"/>.
+        /// </summary>
+        /// <param name="node">The agent expression to check.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="resolvedResult">The expression result types upon return.</param>
+        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
+        /// <param name="expressionConstant">The expression constant upon return.</param>
+        public static bool ResolveCompilerReferences(ICloneOfExpression node, IErrorList errorList, out IResultType resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant)
+        {
+            resolvedResult = null;
+            resolvedExceptions = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+
+            IExpression Source = (IExpression)node.Source;
+            IResultType ResolvedSourceResult = Source.ResolvedResult.Item;
+
+            foreach (IExpressionType Item in ResolvedSourceResult)
+            {
+                if (Item.ValueType is IClassType AsClassType)
+                    AsClassType.MarkAsCloned();
+                else
+                {
+                    errorList.AddError(new ErrorClassTypeRequired(node));
+                    return false;
+                }
+            }
+
+            resolvedResult = ResolvedSourceResult;
+            resolvedExceptions = Source.ResolvedExceptions.Item;
+
+            return true;
         }
         #endregion
 

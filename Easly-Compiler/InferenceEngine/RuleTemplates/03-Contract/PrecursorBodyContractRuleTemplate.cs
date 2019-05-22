@@ -45,7 +45,7 @@
             {
                 new OnceReferenceDestinationTemplate<TBody, ITypeName>(nameof(IPrecursorBody.ResolvedAncestorTypeName)),
                 new OnceReferenceDestinationTemplate<TBody, ICompiledType>(nameof(IPrecursorBody.ResolvedAncestorType)),
-                new OnceReferenceDestinationTemplate<TBody, IList<IExpressionType>>(nameof(IPrecursorBody.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<TBody, IResultType>(nameof(IPrecursorBody.ResolvedResult)),
             };
         }
         #endregion
@@ -125,7 +125,7 @@
 
             node.ResolvedAncestorTypeName.Item = AncestorTypeName;
             node.ResolvedAncestorType.Item = AncestorType;
-            node.ResolvedResult.Item = new List<IExpressionType>();
+            node.ResolvedResult.Item = ResultType.Empty;
         }
         #endregion
     }

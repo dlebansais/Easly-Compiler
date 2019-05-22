@@ -173,10 +173,8 @@
         /// Gets the most common type of all overloads.
         /// </summary>
         /// <param name="overloadList">The list of overloads.</param>
-        public static IList<IExpressionType> CommonResultType(IList<IQueryOverloadType> overloadList)
+        public static IResultType CommonResultType(IList<IQueryOverloadType> overloadList)
         {
-            IList<IExpressionType> Result = new List<IExpressionType>();
-
             int MaxResult = 0;
             int MaxResultIndex = 0;
             for (int i = 0; i < overloadList.Count; i++)
@@ -189,14 +187,15 @@
                 }
             }
 
+            IList<IExpressionType> ResultList = new List<IExpressionType>();
             for (int i = 0; i < MaxResult; i++)
             {
                 GetCommonResultType(overloadList, i, out ITypeName ResultTypeName, out ICompiledType ResultType);
                 IExpressionType NewExpressionType = new ExpressionType(ResultTypeName, ResultType, overloadList[MaxResultIndex].ResultTable[i].Name);
-                Result.Add(NewExpressionType);
+                ResultList.Add(NewExpressionType);
             }
 
-            return Result;
+            return new ResultType(ResultList);
         }
 
         private static void GetCommonResultType(IList<IQueryOverloadType> overloadList, int index, out ITypeName resultTypeName, out ICompiledType resultType)

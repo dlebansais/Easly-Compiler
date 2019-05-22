@@ -17,7 +17,7 @@
         OnceReference<IList<IIdentifier>> ValidPath { get; }
 
         /// <summary>
-        /// Result types of the feature at the end of the path.
+        /// Result types of features along the path.
         /// </summary>
         OnceReference<IList<IExpressionType>> ValidResultTypePath { get; }
 
@@ -142,7 +142,7 @@
         public OnceReference<IList<IIdentifier>> ValidPath { get; private set; } = new OnceReference<IList<IIdentifier>>();
 
         /// <summary>
-        /// Result types of the feature at the end of the path.
+        /// Result types of features along the path.
         /// </summary>
         public OnceReference<IList<IExpressionType>> ValidResultTypePath { get; private set; } = new OnceReference<IList<IExpressionType>>();
 

@@ -20,15 +20,14 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceSourceTemplate<IAttachmentInstruction, IList<IExpressionType>>(nameof(IAttachmentInstruction.ResolvedInitResult)),
-                new OnceReferenceCollectionSourceTemplate<IAttachmentInstruction, IAttachment, IList<IExpressionType>>(nameof(IAttachmentInstruction.AttachmentList), nameof(IAttachment.ResolvedResult)),
-                new ConditionallyAssignedReferenceSourceTemplate<IAttachmentInstruction, IScope, IList<IExpressionType>>(nameof(IAttachmentInstruction.ElseInstructions), nameof(IScope.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IAttachmentInstruction, IResultType>(nameof(IAttachmentInstruction.ResolvedInitResult)),
+                new OnceReferenceCollectionSourceTemplate<IAttachmentInstruction, IAttachment, IResultType>(nameof(IAttachmentInstruction.AttachmentList), nameof(IAttachment.ResolvedResult)),
+                new ConditionallyAssignedReferenceSourceTemplate<IAttachmentInstruction, IScope, IResultType>(nameof(IAttachmentInstruction.ElseInstructions), nameof(IScope.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IAttachmentInstruction, IList<IExpressionType>>(nameof(IAttachmentInstruction.ResolvedResult)),
-                new OnceReferenceDestinationTemplate<IAttachmentInstruction, IList<IIdentifier>>(nameof(IAttachmentInstruction.ResolvedExceptions)),
+                new OnceReferenceDestinationTemplate<IAttachmentInstruction, IResultType>(nameof(IAttachmentInstruction.ResolvedResult)),
             };
         }
         #endregion
@@ -56,8 +55,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IAttachmentInstruction node, object data)
         {
-            node.ResolvedResult.Item = new List<IExpressionType>();
-            node.ResolvedExceptions.Item = new List<IIdentifier>();
+            node.ResolvedResult.Item = ResultType.Empty;
         }
         #endregion
     }

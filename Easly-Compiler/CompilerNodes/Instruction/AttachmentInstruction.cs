@@ -24,7 +24,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of results of init instructions.
         /// </summary>
-        OnceReference<IList<IExpressionType>> ResolvedInitResult { get; }
+        OnceReference<IResultType> ResolvedInitResult { get; }
     }
 
     /// <summary>
@@ -138,9 +138,9 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedResult = new OnceReference<IResultType>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
-                ResolvedInitResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedInitResult = new OnceReference<IResultType>();
                 IsHandled = true;
             }
 
@@ -183,7 +183,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of results of the instruction.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+        public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
 
         /// <summary>
         /// List of exceptions the instruction can throw.
@@ -212,7 +212,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of results of init instructions.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedInitResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+        public OnceReference<IResultType> ResolvedInitResult { get; private set; } = new OnceReference<IResultType>();
         #endregion
 
         #region Debugging

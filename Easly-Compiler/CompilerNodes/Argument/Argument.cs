@@ -19,7 +19,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of expression results for the argument.
         /// </summary>
-        OnceReference<IList<IExpressionType>> ResolvedResult { get; }
+        OnceReference<IResultType> ResolvedResult { get; }
 
         /// <summary>
         /// The list of sources for a constant, if any.
@@ -179,7 +179,7 @@ namespace CompilerNode
 
                         for (int j = 0; j < Argument.ResolvedResult.Item.Count; j++)
                         {
-                            IExpressionType Item = Argument.ResolvedResult.Item[j];
+                            IExpressionType Item = Argument.ResolvedResult.Item.At(j);
                             Item.SetSource(Source, j);
                             mergedArgumentList.Add(Item);
                         }
@@ -198,7 +198,7 @@ namespace CompilerNode
 
                         for (int j = 0; j < Argument.ResolvedResult.Item.Count; j++)
                         {
-                            IExpressionType Item = Argument.ResolvedResult.Item[j];
+                            IExpressionType Item = Argument.ResolvedResult.Item.At(j);
                             Item.SetName(ParameterList[j].ValidText.Item);
 
                             if (mergedArgumentList.Exists((IExpressionType other) => { return Item.Name == other.Name; }))
@@ -236,7 +236,7 @@ namespace CompilerNode
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="source">The source to use for errors.</param>
         /// <param name="selectedIndex">The selected index in the list of overloads upon return.</param>
-        public static bool ArgumentsConformToParameters(IList<ListTableEx<IParameter>> parameterTableList, IList<IExpressionType> arguments, TypeArgumentStyles argumentStyle, IErrorList errorList, ISource source, out int selectedIndex)
+        public static bool ArgumentsConformToParameters(IList<ListTableEx<IParameter>> parameterTableList, IReadOnlyList<IExpressionType> arguments, TypeArgumentStyles argumentStyle, IErrorList errorList, ISource source, out int selectedIndex)
         {
             selectedIndex = -1;
             bool Result = false;
@@ -266,14 +266,14 @@ namespace CompilerNode
             return Result;
         }
 
-        private static bool NoneArgumentsConformToParameters(IList<ListTableEx<IParameter>> parameterTableList, IList<IExpressionType> arguments, IErrorList errorList, ISource source, out int selectedIndex)
+        private static bool NoneArgumentsConformToParameters(IList<ListTableEx<IParameter>> parameterTableList, IReadOnlyList<IExpressionType> arguments, IErrorList errorList, ISource source, out int selectedIndex)
         {
             Debug.Assert(arguments.Count <= 1);
 
             return PositionalArgumentsConformToParameters(parameterTableList, arguments, errorList, source, out selectedIndex);
         }
 
-        private static bool PositionalArgumentsConformToParameters(IList<ListTableEx<IParameter>> parameterTableList, IList<IExpressionType> arguments, IErrorList errorList, ISource source, out int selectedIndex)
+        private static bool PositionalArgumentsConformToParameters(IList<ListTableEx<IParameter>> parameterTableList, IReadOnlyList<IExpressionType> arguments, IErrorList errorList, ISource source, out int selectedIndex)
         {
             OnceReference<ListTableEx<IParameter>> SelectedOverload = new OnceReference<ListTableEx<IParameter>>();
             selectedIndex = -1;
@@ -340,7 +340,7 @@ namespace CompilerNode
             return true;
         }
 
-        private static bool AssignmentArgumentsConformToParameters(IList<ListTableEx<IParameter>> parameterTableList, IList<IExpressionType> arguments, IErrorList errorList, ISource source, out int selectedIndex)
+        private static bool AssignmentArgumentsConformToParameters(IList<ListTableEx<IParameter>> parameterTableList, IReadOnlyList<IExpressionType> arguments, IErrorList errorList, ISource source, out int selectedIndex)
         {
             OnceReference<ListTableEx<IParameter>> SelectedOverload = new OnceReference<ListTableEx<IParameter>>();
             selectedIndex = -1;

@@ -20,13 +20,12 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceSourceTemplate<IAttachment, IList<IExpressionType>>(nameof(IAttachment.Instructions) + Dot + nameof(IScope.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IAttachment, IResultType>(nameof(IAttachment.Instructions) + Dot + nameof(IScope.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IAttachment, IList<IExpressionType>>(nameof(IAttachment.ResolvedResult)),
-                new OnceReferenceDestinationTemplate<IAttachment, IList<IIdentifier>>(nameof(IAttachment.ResolvedExceptions)),
+                new OnceReferenceDestinationTemplate<IAttachment, IResultType>(nameof(IAttachment.ResolvedResult)),
             };
         }
         #endregion
@@ -54,8 +53,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IAttachment node, object data)
         {
-            node.ResolvedResult.Item = new List<IExpressionType>();
-            node.ResolvedExceptions.Item = new List<IIdentifier>();
+            node.ResolvedResult.Item = ResultType.Empty;
         }
         #endregion
     }

@@ -20,18 +20,17 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceCollectionSourceTemplate<IForLoopInstruction, IInstruction, IList<IExpressionType>>(nameof(IForLoopInstruction.InitInstructionList), nameof(IInstruction.ResolvedResult)),
-                new OnceReferenceSourceTemplate<IForLoopInstruction, IList<IExpressionType>>(nameof(IForLoopInstruction.WhileCondition) + Dot + nameof(IExpression.ResolvedResult)),
-                new OnceReferenceCollectionSourceTemplate<IForLoopInstruction, IInstruction, IList<IExpressionType>>(nameof(IForLoopInstruction.LoopInstructionList), nameof(IInstruction.ResolvedResult)),
-                new OnceReferenceCollectionSourceTemplate<IForLoopInstruction, IInstruction, IList<IExpressionType>>(nameof(IForLoopInstruction.IterationInstructionList), nameof(IInstruction.ResolvedResult)),
+                new OnceReferenceCollectionSourceTemplate<IForLoopInstruction, IInstruction, IResultType>(nameof(IForLoopInstruction.InitInstructionList), nameof(IInstruction.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IForLoopInstruction, IResultType>(nameof(IForLoopInstruction.WhileCondition) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceCollectionSourceTemplate<IForLoopInstruction, IInstruction, IResultType>(nameof(IForLoopInstruction.LoopInstructionList), nameof(IInstruction.ResolvedResult)),
+                new OnceReferenceCollectionSourceTemplate<IForLoopInstruction, IInstruction, IResultType>(nameof(IForLoopInstruction.IterationInstructionList), nameof(IInstruction.ResolvedResult)),
                 new OnceReferenceCollectionSourceTemplate<IForLoopInstruction, IAssertion, ITaggedContract>(nameof(IForLoopInstruction.InvariantList), nameof(IAssertion.ResolvedContract)),
-                new ConditionallyAssignedReferenceSourceTemplate<IForLoopInstruction, IExpression, IList<IExpressionType>>(nameof(IForLoopInstruction.Variant), nameof(IExpression.ResolvedResult)),
+                new ConditionallyAssignedReferenceSourceTemplate<IForLoopInstruction, IExpression, IResultType>(nameof(IForLoopInstruction.Variant), nameof(IExpression.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IForLoopInstruction, IList<IExpressionType>>(nameof(IForLoopInstruction.ResolvedResult)),
-                new OnceReferenceDestinationTemplate<IForLoopInstruction, IList<IIdentifier>>(nameof(IForLoopInstruction.ResolvedExceptions)),
+                new OnceReferenceDestinationTemplate<IForLoopInstruction, IResultType>(nameof(IForLoopInstruction.ResolvedResult)),
             };
         }
         #endregion
@@ -59,8 +58,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IForLoopInstruction node, object data)
         {
-            node.ResolvedResult.Item = new List<IExpressionType>();
-            node.ResolvedExceptions.Item = new List<IIdentifier>();
+            node.ResolvedResult.Item = ResultType.Empty;
         }
         #endregion
     }

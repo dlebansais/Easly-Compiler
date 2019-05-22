@@ -24,8 +24,7 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IRaiseEventInstruction, IList<IExpressionType>>(nameof(IRaiseEventInstruction.ResolvedResult)),
-                new OnceReferenceDestinationTemplate<IRaiseEventInstruction, IList<IIdentifier>>(nameof(IRaiseEventInstruction.ResolvedExceptions)),
+                new OnceReferenceDestinationTemplate<IRaiseEventInstruction, IResultType>(nameof(IRaiseEventInstruction.ResolvedResult)),
             };
         }
         #endregion
@@ -53,8 +52,7 @@
         /// <param name="data">Private data from RaiseEventConsistency().</param>
         public override void Apply(IRaiseEventInstruction node, object data)
         {
-            node.ResolvedResult.Item = new List<IExpressionType>();
-            node.ResolvedExceptions.Item = new List<IIdentifier>();
+            node.ResolvedResult.Item = ResultType.Empty;
         }
         #endregion
     }

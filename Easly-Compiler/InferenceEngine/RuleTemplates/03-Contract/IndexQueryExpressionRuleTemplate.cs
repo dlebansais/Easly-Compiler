@@ -23,15 +23,13 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceSourceTemplate<IIndexQueryExpression, IList<IExpressionType>>(nameof(IIndexQueryExpression.IndexedExpression) + Dot + nameof(IExpression.ResolvedResult)),
-                new OnceReferenceSourceTemplate<IIndexQueryExpression, IList<IIdentifier>>(nameof(IIndexQueryExpression.IndexedExpression) + Dot + nameof(IExpression.ResolvedExceptions)),
-                new OnceReferenceCollectionSourceTemplate<IIndexQueryExpression, IArgument, IList<IExpressionType>>(nameof(IIndexQueryExpression.ArgumentList), nameof(IArgument.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IIndexQueryExpression, IResultType>(nameof(IIndexQueryExpression.IndexedExpression) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceCollectionSourceTemplate<IIndexQueryExpression, IArgument, IResultType>(nameof(IIndexQueryExpression.ArgumentList), nameof(IArgument.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IIndexQueryExpression, IList<IExpressionType>>(nameof(IIndexQueryExpression.ResolvedResult)),
-                new OnceReferenceDestinationTemplate<IIndexQueryExpression, IList<IIdentifier>>(nameof(IIndexQueryExpression.ResolvedExceptions)),
+                new OnceReferenceDestinationTemplate<IIndexQueryExpression, IResultType>(nameof(IIndexQueryExpression.ResolvedResult)),
                 new UnsealedListDestinationTemplate<IIndexQueryExpression, IExpression>(nameof(IIndexQueryExpression.ConstantSourceList)),
             };
         }
@@ -50,98 +48,12 @@
             data = null;
             bool Success = true;
 
-            Success &= IndexQueryExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out ListTableEx<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out ListTableEx<IParameter> SelectedParameterList, out IList<IExpressionType> ResolvedArgumentList);
+            Success &= IndexQueryExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out ListTableEx<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out ListTableEx<IParameter> SelectedParameterList, out List<IExpressionType> ResolvedArgumentList);
 
             if (Success)
-                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ListTableEx<IParameter>, IList<IExpressionType>>(ResolvedResult, ResolvedExceptions, ConstantSourceList, ExpressionConstant, SelectedParameterList, ResolvedArgumentList);
+                data = new Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ListTableEx<IParameter>, List<IExpressionType>>(ResolvedResult, ResolvedExceptions, ConstantSourceList, ExpressionConstant, SelectedParameterList, ResolvedArgumentList);
 
             return Success;
-        }
-
-        /// <summary>
-        /// Finds the matching nodes of a <see cref="IIndexQueryExpression"/>.
-        /// </summary>
-        /// <param name="node">The agent expression to check.</param>
-        /// <param name="errorList">The list of errors found.</param>
-        /// <param name="resolvedResult">The expression result types upon return.</param>
-        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
-        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
-        /// <param name="expressionConstant">The expression constant upon return.</param>
-        /// <param name="selectedParameterList">The selected parameters.</param>
-        /// <param name="resolvedArgumentList">The list of arguments corresponding to selected parameters.</param>
-        public static bool ResolveCompilerReferences(IIndexQueryExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out IList<IExpressionType> resolvedArgumentList)
-        {
-            resolvedResult = null;
-            resolvedExceptions = null;
-            constantSourceList = new ListTableEx<IExpression>();
-            expressionConstant = NeutralLanguageConstant.NotConstant;
-            selectedParameterList = null;
-            resolvedArgumentList = null;
-
-            IExpression IndexedExpression = (IExpression)node.IndexedExpression;
-            IList<IArgument> ArgumentList = (IList<IArgument>)node.ArgumentList;
-            IClass EmbeddingClass = node.EmbeddingClass;
-            IList<IExpressionType> ResolvedIndexerResult = IndexedExpression.ResolvedResult.Item;
-
-            OnceReference<ICompiledType> IndexedExpressionType = new OnceReference<ICompiledType>();
-            foreach (IExpressionType Item in ResolvedIndexerResult)
-                if (Item.Name == nameof(BaseNode.Keyword.Result) || ResolvedIndexerResult.Count == 1)
-                {
-                    IndexedExpressionType.Item = Item.ValueType;
-                    break;
-                }
-
-            if (!IndexedExpressionType.IsAssigned)
-            {
-                errorList.AddError(new ErrorInvalidExpression(node));
-                return false;
-            }
-
-            if (IndexedExpressionType.Item is IClassType AsClassType)
-            {
-                IClass IndexedBaseClass = AsClassType.BaseClass;
-                IHashtableEx<IFeatureName, IFeatureInstance> IndexedFeatureTable = IndexedBaseClass.FeatureTable;
-
-                if (!IndexedFeatureTable.ContainsKey(FeatureName.IndexerFeatureName))
-                {
-                    errorList.AddError(new ErrorMissingIndexer(node));
-                    return false;
-                }
-
-                IFeatureInstance IndexerInstance = IndexedFeatureTable[FeatureName.IndexerFeatureName];
-                IIndexerFeature Indexer = (IndexerFeature)IndexerInstance.Feature.Item;
-                IIndexerType AsIndexerType = (IndexerType)Indexer.ResolvedFeatureType.Item;
-
-                List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
-                TypeArgumentStyles ArgumentStyle;
-                if (!Argument.Validate(ArgumentList, MergedArgumentList, out ArgumentStyle, errorList))
-                    return false;
-
-                IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
-                ParameterTableList.Add(AsIndexerType.ParameterTable);
-
-                int SelectedIndex;
-                if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, ArgumentStyle, errorList, node, out SelectedIndex))
-                    return false;
-
-                resolvedResult = new List<IExpressionType>()
-                {
-                    new ExpressionType(AsIndexerType.ResolvedEntityTypeName.Item, AsIndexerType.ResolvedEntityType.Item, string.Empty)
-                };
-
-                resolvedExceptions = AsIndexerType.GetExceptionIdentifierList;
-                selectedParameterList = ParameterTableList[SelectedIndex];
-                resolvedArgumentList = MergedArgumentList;
-
-                // TODO: check if the result is a constant number
-            }
-            else
-            {
-                errorList.AddError(new ErrorInvalidExpression(node));
-                return false;
-            }
-
-            return true;
         }
 
         /// <summary>
@@ -151,15 +63,14 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IIndexQueryExpression node, object data)
         {
-            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ListTableEx<IParameter>, IList<IExpressionType>>)data).Item1;
-            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ListTableEx<IParameter>, IList<IExpressionType>>)data).Item2;
-            ListTableEx<IExpression> ConstantSourceList = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ListTableEx<IParameter>, IList<IExpressionType>>)data).Item3;
-            ILanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ListTableEx<IParameter>, IList<IExpressionType>>)data).Item4;
-            ListTableEx<IParameter> SelectedParameterList = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ListTableEx<IParameter>, IList<IExpressionType>>)data).Item5;
-            IList<IExpressionType> ResolvedArgumentList = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ListTableEx<IParameter>, IList<IExpressionType>>)data).Item6;
+            IResultType ResolvedResult = ((Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ListTableEx<IParameter>, List<IExpressionType>>)data).Item1;
+            IList<IIdentifier> ResolvedExceptions = ((Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ListTableEx<IParameter>, List<IExpressionType>>)data).Item2;
+            ListTableEx<IExpression> ConstantSourceList = ((Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ListTableEx<IParameter>, List<IExpressionType>>)data).Item3;
+            ILanguageConstant ExpressionConstant = ((Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ListTableEx<IParameter>, List<IExpressionType>>)data).Item4;
+            ListTableEx<IParameter> SelectedParameterList = ((Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ListTableEx<IParameter>, List<IExpressionType>>)data).Item5;
+            List<IExpressionType> ResolvedArgumentList = ((Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ListTableEx<IParameter>, List<IExpressionType>>)data).Item6;
 
             node.ResolvedResult.Item = ResolvedResult;
-            node.ResolvedExceptions.Item = ResolvedExceptions;
             node.ConstantSourceList.AddRange(ConstantSourceList);
             node.ConstantSourceList.Seal();
             node.ExpressionConstant.Item = ExpressionConstant;

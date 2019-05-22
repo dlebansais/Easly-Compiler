@@ -86,7 +86,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedResult = new OnceReference<IResultType>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
@@ -135,7 +135,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of expression results.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+        public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
 
         /// <summary>
         /// List of exceptions the expression can throw.
@@ -171,6 +171,41 @@ namespace CompilerNode
             Result &= expression1.ValidText.Item == expression2.ValidText.Item;
 
             return Result;
+        }
+
+        /// <summary>
+        /// Finds the matching nodes of a <see cref="IManifestCharacterExpression"/>.
+        /// </summary>
+        /// <param name="node">The agent expression to check.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="resolvedResult">The expression result types upon return.</param>
+        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
+        /// <param name="expressionConstant">The expression constant upon return.</param>
+        public static bool ResolveCompilerReferences(IManifestCharacterExpression node, IErrorList errorList, out IResultType resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant)
+        {
+            resolvedResult = null;
+            resolvedExceptions = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+
+            IClass EmbeddingClass = node.EmbeddingClass;
+            string ValidText = node.ValidText.Item;
+            Debug.Assert(ValidText.Length == 1);
+            char ValidChar = ValidText[0];
+
+            if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Character.Guid, node, out ITypeName CharacterTypeName, out ICompiledType CharacterType))
+            {
+                errorList.AddError(new ErrorCharacterTypeMissing(node));
+                return false;
+            }
+
+            resolvedResult = new ResultType(CharacterTypeName, CharacterType, string.Empty);
+
+            resolvedExceptions = new List<IIdentifier>();
+            expressionConstant = new CharacterLanguageConstant(ValidChar);
+
+            return true;
         }
         #endregion
 

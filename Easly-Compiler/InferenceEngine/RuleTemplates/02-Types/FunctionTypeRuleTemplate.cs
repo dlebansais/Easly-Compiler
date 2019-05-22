@@ -69,7 +69,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IFunctionType node, object data)
         {
-            IList<IExpressionType> CommonResults = (IList<IExpressionType>)data;
+            IResultType CommonResults = (IResultType)data;
 
             IClass EmbeddingClass = node.EmbeddingClass;
             IObjectType BaseTypeItem = (IObjectType)node.BaseType;

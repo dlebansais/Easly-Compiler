@@ -20,12 +20,12 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceSourceTemplate<IPositionalArgument, IList<IExpressionType>>(nameof(IPositionalArgument.Source) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IPositionalArgument, IResultType>(nameof(IPositionalArgument.Source) + Dot + nameof(IExpression.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IPositionalArgument, IList<IExpressionType>>(nameof(IPositionalArgument.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IPositionalArgument, IResultType>(nameof(IPositionalArgument.ResolvedResult)),
             };
         }
         #endregion

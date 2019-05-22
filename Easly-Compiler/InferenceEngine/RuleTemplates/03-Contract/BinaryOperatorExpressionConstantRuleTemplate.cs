@@ -74,11 +74,11 @@
             if (LeftExpressionConstant != NeutralLanguageConstant.NotConstant && RightExpressionConstant != NeutralLanguageConstant.NotConstant)
             {
                 Debug.Assert(node.ResolvedResult.IsAssigned);
-                IList<IExpressionType> ResolvedResult = node.ResolvedResult.Item;
+                IResultType ResolvedResult = node.ResolvedResult.Item;
 
                 if (ResolvedResult.Count == 1)
                 {
-                    IExpressionType ConstantType = ResolvedResult[0];
+                    IExpressionType ConstantType = ResolvedResult.At(0);
 
                     bool IsBooleanTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
                     bool IsNumberTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName NumberTypeName, out ICompiledType NumberType);

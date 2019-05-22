@@ -482,7 +482,7 @@ namespace CompilerNode
                     string EntityName = Entity.ValidEntity.Item.ValidFeatureName.Item.Name;
 
                     IExpressionType ResultExpressionType = new ExpressionType(EntityTypeName, EntityType, EntityName);
-                    Item.Result.Add(ResultExpressionType);
+                    Item.ResultTypeList.Add(ResultExpressionType);
                 }
 
             resolvedTypeName = new TypeName(ResolvedFunctionType.TypeFriendlyName);

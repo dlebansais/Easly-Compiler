@@ -116,7 +116,7 @@
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedResult = new OnceReference<IResultType>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
@@ -165,7 +165,7 @@
         /// <summary>
         /// Types of expression results.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+        public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
 
         /// <summary>
         /// List of exceptions the expression can throw.
@@ -201,6 +201,44 @@
             Result &= expression1.ValidText.Item == expression2.ValidText.Item;
 
             return Result;
+        }
+
+        /// <summary>
+        /// Finds the matching nodes of a <see cref="IManifestNumberExpression"/>.
+        /// </summary>
+        /// <param name="node">The agent expression to check.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="resolvedResult">The expression result types upon return.</param>
+        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
+        /// <param name="expressionConstant">The constant type upon return.</param>
+        public static bool ResolveCompilerReferences(IManifestNumberExpression node, IErrorList errorList, out IResultType resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant)
+        {
+            resolvedResult = null;
+            resolvedExceptions = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+
+            IClass EmbeddingClass = node.EmbeddingClass;
+            string NumberText = node.ValidText.Item;
+            IHashtableEx<ITypeName, ICompiledType> TypeTable = EmbeddingClass.TypeTable;
+
+            if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName NumberTypeName, out ICompiledType NumberType))
+            {
+                errorList.AddError(new ErrorNumberTypeMissing(node));
+                return false;
+            }
+
+            resolvedResult = new ResultType(NumberTypeName, NumberType, string.Empty);
+
+            resolvedExceptions = new List<IIdentifier>();
+
+            BaseNodeHelper.IFormattedNumber FormattedNumber = BaseNodeHelper.FormattedNumber.Parse(NumberText, false);
+            Debug.Assert(string.IsNullOrEmpty(FormattedNumber.InvalidText));
+
+            expressionConstant = new NumberLanguageConstant(FormattedNumber.Canonical);
+
+            return true;
         }
         #endregion
 

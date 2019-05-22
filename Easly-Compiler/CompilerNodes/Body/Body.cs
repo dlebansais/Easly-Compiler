@@ -37,7 +37,7 @@
         /// <summary>
         /// Types of results.
         /// </summary>
-        OnceReference<IList<IExpressionType>> ResolvedResult { get; }
+        OnceReference<IResultType> ResolvedResult { get; }
 
         /// <summary>
         /// Resolved list of require assertions.

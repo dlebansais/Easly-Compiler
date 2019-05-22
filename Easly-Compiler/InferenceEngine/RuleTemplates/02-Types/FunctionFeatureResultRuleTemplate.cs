@@ -62,11 +62,11 @@
                 OverloadTypeList.Add(OverloadType);
             }
 
-            IList<IExpressionType> CommonResults = Feature.CommonResultType(OverloadTypeList);
+            IResultType CommonResults = Feature.CommonResultType(OverloadTypeList);
 
             IErrorList CheckErrorList = new ErrorList();
             for (int i = 0; i < CommonResults.Count; i++)
-                Success &= Feature.JoinedResultCheck(OverloadTypeList, i, CommonResults[i].ValueType, node, CheckErrorList);
+                Success &= Feature.JoinedResultCheck(OverloadTypeList, i, CommonResults.At(i).ValueType, node, CheckErrorList);
 
             if (!Success)
             {
@@ -87,7 +87,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IFunctionFeature node, object data)
         {
-            IList<IExpressionType> CommonResults = (IList<IExpressionType>)data;
+            IResultType CommonResults = (IResultType)data;
 
             ITypeName MostCommonTypeName = null;
             ICompiledType MostCommonType = null;

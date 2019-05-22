@@ -20,15 +20,14 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceSourceTemplate<IOverLoopInstruction, IList<IExpressionType>>(nameof(IOverLoopInstruction.ResolvedInitResult)),
-                new OnceReferenceSourceTemplate<IOverLoopInstruction, IList<IExpressionType>>(nameof(IOverLoopInstruction.LoopInstructions) + Dot + nameof(IScope.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IOverLoopInstruction, IResultType>(nameof(IOverLoopInstruction.ResolvedInitResult)),
+                new OnceReferenceSourceTemplate<IOverLoopInstruction, IResultType>(nameof(IOverLoopInstruction.LoopInstructions) + Dot + nameof(IScope.ResolvedResult)),
                 new OnceReferenceCollectionSourceTemplate<IOverLoopInstruction, IAssertion, ITaggedContract>(nameof(IOverLoopInstruction.InvariantList), nameof(IAssertion.ResolvedContract)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IOverLoopInstruction, IList<IExpressionType>>(nameof(IOverLoopInstruction.ResolvedResult)),
-                new OnceReferenceDestinationTemplate<IOverLoopInstruction, IList<IIdentifier>>(nameof(IOverLoopInstruction.ResolvedExceptions)),
+                new OnceReferenceDestinationTemplate<IOverLoopInstruction, IResultType>(nameof(IOverLoopInstruction.ResolvedResult)),
             };
         }
         #endregion
@@ -56,8 +55,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IOverLoopInstruction node, object data)
         {
-            node.ResolvedResult.Item = new List<IExpressionType>();
-            node.ResolvedExceptions.Item = new List<IIdentifier>();
+            node.ResolvedResult.Item = ResultType.Empty;
         }
         #endregion
     }

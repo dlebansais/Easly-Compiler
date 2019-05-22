@@ -20,12 +20,12 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceCollectionSourceTemplate<IScope, IInstruction, IList<IExpressionType>>(nameof(IScope.InstructionList), nameof(IInstruction.ResolvedResult)),
+                new OnceReferenceCollectionSourceTemplate<IScope, IInstruction, IResultType>(nameof(IScope.InstructionList), nameof(IInstruction.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IScope, IList<IExpressionType>>(nameof(IScope.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<IScope, IResultType>(nameof(IScope.ResolvedResult)),
             };
         }
         #endregion
@@ -53,7 +53,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IScope node, object data)
         {
-            node.ResolvedResult.Item = new List<IExpressionType>();
+            node.ResolvedResult.Item = ResultType.Empty;
         }
         #endregion
     }

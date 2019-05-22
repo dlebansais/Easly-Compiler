@@ -175,7 +175,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedTagTable = new HashtableEx<string, IExpression>();
-                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedResult = new OnceReference<IResultType>();
                 ResolvedRequireList = new OnceReference<IList<IAssertion>>();
                 ResolvedEnsureList = new OnceReference<IList<IAssertion>>();
                 ResolvedExceptionIdentifierList = new OnceReference<IList<IIdentifier>>();
@@ -225,7 +225,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of results.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+        public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
 
         /// <summary>
         /// Resolved list of require assertions.

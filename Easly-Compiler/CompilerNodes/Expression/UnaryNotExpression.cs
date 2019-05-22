@@ -81,7 +81,7 @@
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedResult = new OnceReference<IResultType>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
@@ -130,7 +130,7 @@
         /// <summary>
         /// Types of expression results.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+        public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
 
         /// <summary>
         /// List of exceptions the expression can throw.
@@ -161,6 +161,45 @@
             Result &= Expression.IsExpressionEqual((IExpression)expression1.RightExpression, (IExpression)expression2.RightExpression);
 
             return Result;
+        }
+
+        /// <summary>
+        /// Finds the matching nodes of a <see cref="IUnaryNotExpression"/>.
+        /// </summary>
+        /// <param name="node">The agent expression to check.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="resolvedResult">The expression result types upon return.</param>
+        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
+        /// <param name="expressionConstant">The constant value upon return, if any.</param>
+        public static bool ResolveCompilerReferences(IUnaryNotExpression node, IErrorList errorList, out IResultType resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant)
+        {
+            resolvedResult = null;
+            resolvedExceptions = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+
+            IExpression RightExpression = (IExpression)node.RightExpression;
+            IClass EmbeddingClass = node.EmbeddingClass;
+
+            bool IsRightClassType = Expression.GetClassTypeOfExpression(RightExpression, errorList, out IClassType RightExpressionClassType);
+            if (!IsRightClassType)
+                return false;
+
+            Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
+            Expression.IsLanguageTypeAvailable(LanguageClasses.Event.Guid, node, out ITypeName EventTypeName, out ICompiledType EventType);
+
+            Debug.Assert(RightExpressionClassType == BooleanType || RightExpressionClassType == EventType);
+
+            constantSourceList.Add(RightExpression);
+
+            resolvedResult = new ResultType(BooleanTypeName, BooleanType, string.Empty);
+
+            List<IIdentifier> MergedExceptionList = new List<IIdentifier>();
+            MergedExceptionList.AddRange(RightExpression.ResolvedExceptions.Item);
+            resolvedExceptions = MergedExceptionList;
+
+            return true;
         }
         #endregion
 

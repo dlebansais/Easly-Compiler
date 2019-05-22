@@ -81,7 +81,7 @@
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedResult = new OnceReference<IResultType>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
@@ -130,7 +130,7 @@
         /// <summary>
         /// Types of expression results.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+        public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
 
         /// <summary>
         /// List of exceptions the expression can throw.
@@ -164,6 +164,88 @@
             Result &= Expression.IsExpressionEqual((IExpression)expression1.RightExpression, (IExpression)expression2.RightExpression);
 
             return Result;
+        }
+
+        /// <summary>
+        /// Finds the matching nodes of a <see cref="IEqualityExpression"/>.
+        /// </summary>
+        /// <param name="node">The agent expression to check.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="resolvedResult">The expression result types upon return.</param>
+        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
+        /// <param name="expressionConstant">The constant value upon return, if any.</param>
+        public static bool ResolveCompilerReferences(IEqualityExpression node, IErrorList errorList, out IResultType resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant)
+        {
+            resolvedResult = null;
+            resolvedExceptions = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+
+            IExpression LeftExpression = (IExpression)node.LeftExpression;
+            IExpression RightExpression = (IExpression)node.RightExpression;
+            IClass EmbeddingClass = node.EmbeddingClass;
+            IResultType LeftResult = LeftExpression.ResolvedResult.Item;
+            IResultType RightResult = RightExpression.ResolvedResult.Item;
+
+            if (LeftResult.Count != RightResult.Count)
+            {
+                errorList.AddError(new ErrorExpressionResultMismatch(node));
+                return false;
+            }
+
+            if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName ResultTypeName, out ICompiledType ResultType))
+            {
+                errorList.AddError(new ErrorBooleanTypeMissing(node));
+                return false;
+            }
+
+            if (LeftResult.Count > 1)
+            {
+                IHashtableEx<ICompiledType, ICompiledType> EmptySubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
+
+                int MismatchingResultCount = 0;
+                foreach (IExpressionType LeftItem in LeftResult)
+                {
+                    ICompiledType LeftExpressionType = LeftItem.ValueType;
+
+                    bool MatchingNameFound = false;
+                    foreach (IExpressionType RightItem in RightResult)
+                        if (LeftItem.Name == RightItem.Name)
+                        {
+                            MatchingNameFound = true;
+                            ICompiledType RightExpressionType = RightItem.ValueType;
+
+                            if (!ObjectType.TypeConformToBase(LeftExpressionType, RightExpressionType, EmptySubstitutionTypeTable) && !ObjectType.TypeConformToBase(RightExpressionType, LeftExpressionType, EmptySubstitutionTypeTable))
+                                MismatchingResultCount++;
+
+                            break;
+                        }
+
+                    if (!MatchingNameFound)
+                        MismatchingResultCount++;
+                }
+
+                if (MismatchingResultCount > 0)
+                {
+                    errorList.AddError(new ErrorExpressionResultMismatch(node));
+                    return false;
+                }
+            }
+
+            resolvedResult = new ResultType(ResultTypeName, ResultType, string.Empty);
+
+            constantSourceList.Add(LeftExpression);
+            constantSourceList.Add(RightExpression);
+
+            IList<IIdentifier> LeftException = LeftExpression.ResolvedExceptions.Item;
+            IList<IIdentifier> RightException = RightExpression.ResolvedExceptions.Item;
+
+            resolvedExceptions = new List<IIdentifier>();
+            Expression.MergeExceptions(resolvedExceptions, LeftException);
+            Expression.MergeExceptions(resolvedExceptions, RightException);
+
+            return true;
         }
         #endregion
 

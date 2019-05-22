@@ -47,7 +47,6 @@
             data = null;
             bool Success = true;
 
-            IList<IExpressionType> CommonResults = new List<IExpressionType>();
             IName EntityName = (IName)((IFeatureWithName)node).EntityName;
 
             // This is ensured because the root node is valid.

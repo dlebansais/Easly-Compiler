@@ -24,8 +24,7 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IReleaseInstruction, IList<IExpressionType>>(nameof(IReleaseInstruction.ResolvedResult)),
-                new OnceReferenceDestinationTemplate<IReleaseInstruction, IList<IIdentifier>>(nameof(IReleaseInstruction.ResolvedExceptions)),
+                new OnceReferenceDestinationTemplate<IReleaseInstruction, IResultType>(nameof(IReleaseInstruction.ResolvedResult)),
             };
         }
         #endregion
@@ -53,8 +52,7 @@
         /// <param name="data">Private data from ReleaseConsistency().</param>
         public override void Apply(IReleaseInstruction node, object data)
         {
-            node.ResolvedResult.Item = new List<IExpressionType>();
-            node.ResolvedExceptions.Item = new List<IIdentifier>();
+            node.ResolvedResult.Item = ResultType.Empty;
         }
         #endregion
     }

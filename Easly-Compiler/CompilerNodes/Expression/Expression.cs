@@ -19,7 +19,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of results of the expression.
         /// </summary>
-        OnceReference<IList<IExpressionType>> ResolvedResult { get; }
+        OnceReference<IResultType> ResolvedResult { get; }
 
         /// <summary>
         /// List of exceptions the expression can throw.
@@ -212,21 +212,9 @@ namespace CompilerNode
             bool Result = false;
 
             IClass EmbeddingClass = booleanOrEventExpression.EmbeddingClass;
-            IList<IExpressionType> ExpressionResult = booleanOrEventExpression.ResolvedResult.Item;
+            IResultType ExpressionResult = booleanOrEventExpression.ResolvedResult.Item;
 
-            ICompiledType BooleanOrEventExpressionType = null;
-
-            if (ExpressionResult.Count == 1)
-                BooleanOrEventExpressionType = ExpressionResult[0].ValueType;
-            else
-                foreach (IExpressionType Item in ExpressionResult)
-                    if (Item.Name == nameof(BaseNode.Keyword.Result))
-                    {
-                        BooleanOrEventExpressionType = Item.ValueType;
-                        break;
-                    }
-
-            if (BooleanOrEventExpressionType is IClassType AsClassType)
+            if (ExpressionResult.TryGetResult(out ICompiledType BooleanOrEventExpressionType) && BooleanOrEventExpressionType is IClassType AsClassType)
             {
                 if (CheckForBooleanOrEventType(booleanOrEventExpression, AsClassType, errorList))
                 {

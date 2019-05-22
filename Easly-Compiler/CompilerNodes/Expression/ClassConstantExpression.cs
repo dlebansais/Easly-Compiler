@@ -100,7 +100,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedResult = new OnceReference<IResultType>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
@@ -156,7 +156,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of expression results.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+        public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
 
         /// <summary>
         /// List of exceptions the expression can throw.
@@ -208,6 +208,101 @@ namespace CompilerNode
             Result &= expression1.ConstantIdentifier.Text == expression2.ConstantIdentifier.Text;
 
             return Result;
+        }
+
+        /// <summary>
+        /// Finds the matching nodes of a <see cref="IClassConstantExpression"/>.
+        /// </summary>
+        /// <param name="node">The agent expression to check.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="resolvedResult">The expression result types upon return.</param>
+        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
+        /// <param name="expressionConstant">The expression constant upon return.</param>
+        /// <param name="resolvedFinalFeature">The feature if the end of the path is a feature.</param>
+        /// <param name="resolvedFinalDiscrete">The discrete if the end of the path is a discrete.</param>
+        /// <param name="resolvedClassTypeName">The class type name upon return.</param>
+        /// <param name="resolvedClassType">The class name upon return.</param>
+        public static bool ResolveCompilerReferences(IClassConstantExpression node, IErrorList errorList, out IResultType resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out ITypeName resolvedClassTypeName, out ICompiledType resolvedClassType)
+        {
+            resolvedResult = null;
+            resolvedExceptions = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+            resolvedFinalFeature = null;
+            resolvedFinalDiscrete = null;
+            resolvedClassTypeName = null;
+            resolvedClassType = null;
+
+            IIdentifier ClassIdentifier = (IIdentifier)node.ClassIdentifier;
+            IIdentifier ConstantIdentifier = (IIdentifier)node.ConstantIdentifier;
+            IClass EmbeddingClass = node.EmbeddingClass;
+            string ValidClassText = ClassIdentifier.ValidText.Item;
+            string ValidConstantText = ConstantIdentifier.ValidText.Item;
+            IHashtableEx<string, IImportedClass> ClassTable = EmbeddingClass.ImportedClassTable;
+
+            if (!ClassTable.ContainsKey(ValidClassText))
+            {
+                errorList.AddError(new ErrorUnknownIdentifier(ClassIdentifier, ValidClassText));
+                return false;
+            }
+
+            IClass BaseClass = ClassTable[ValidClassText].Item;
+            resolvedClassTypeName = BaseClass.ResolvedClassTypeName.Item;
+            resolvedClassType = BaseClass.ResolvedClassType.Item;
+
+            ITypeName ConstantTypeName;
+            ICompiledType ConstantType;
+
+            IHashtableEx<IFeatureName, IDiscrete> DiscreteTable = BaseClass.DiscreteTable;
+            IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable = BaseClass.FeatureTable;
+
+            if (FeatureName.TableContain(DiscreteTable, ValidConstantText, out IFeatureName Key, out IDiscrete Discrete))
+            {
+                if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName NumberTypeName, out ICompiledType NumberType))
+                {
+                    errorList.AddError(new ErrorNumberTypeMissing(node));
+                    return false;
+                }
+
+                if (Discrete.NumericValue.IsAssigned)
+                    constantSourceList.Add((IExpression)Discrete.NumericValue.Item);
+                else
+                    expressionConstant = new DiscreteLanguageConstant(Discrete);
+
+                resolvedFinalDiscrete = Discrete;
+                ConstantTypeName = NumberTypeName;
+                ConstantType = NumberType;
+            }
+            else if (FeatureName.TableContain(FeatureTable, ValidConstantText, out Key, out IFeatureInstance FeatureInstance))
+            {
+                if (FeatureInstance.Feature.Item is IConstantFeature AsConstantFeature)
+                {
+                    resolvedFinalFeature = AsConstantFeature;
+                    ConstantTypeName = AsConstantFeature.ResolvedEntityTypeName.Item;
+                    ConstantType = AsConstantFeature.ResolvedEntityType.Item;
+
+                    IExpression ConstantValue = (IExpression)AsConstantFeature.ConstantValue;
+                    constantSourceList.Add(ConstantValue);
+                }
+                else
+                {
+                    errorList.AddError(new ErrorConstantRequired(ConstantIdentifier, ValidConstantText));
+                    return false;
+                }
+            }
+
+            else
+            {
+                errorList.AddError(new ErrorUnknownIdentifier(ConstantIdentifier, ValidConstantText));
+                return false;
+            }
+
+            resolvedResult = new ResultType(ConstantTypeName, ConstantType, ValidConstantText);
+
+            resolvedExceptions = new List<IIdentifier>();
+
+            return true;
         }
         #endregion
 

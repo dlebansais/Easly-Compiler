@@ -50,8 +50,6 @@
             // This is ensured because the root node is valid.
             Debug.Assert(node.OverloadList.Count > 0);
 
-            IList<IExpressionType> CommonResults = new List<IExpressionType>();
-
             if (!Feature.DisjoinedParameterCheck(node.OverloadList, ErrorList))
             {
                 Debug.Assert(!ErrorList.IsEmpty);
@@ -68,8 +66,6 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IProcedureType node, object data)
         {
-            IList<IExpressionType> CommonResults = (IList<IExpressionType>)data;
-
             IClass EmbeddingClass = node.EmbeddingClass;
             IObjectType BaseTypeItem = (IObjectType)node.BaseType;
             ITypeName BaseTypeName = BaseTypeItem.ResolvedTypeName.Item;

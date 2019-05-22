@@ -20,8 +20,8 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceSourceTemplate<IRange, IList<IExpressionType>>(nameof(IRange.LeftExpression) + Dot + nameof(IExpression.ResolvedResult)),
-                new ConditionallyAssignedReferenceSourceTemplate<IRange, IExpression, IList<IExpressionType>>(nameof(IRange.RightExpression), nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IRange, IResultType>(nameof(IRange.LeftExpression) + Dot + nameof(IExpression.ResolvedResult)),
+                new ConditionallyAssignedReferenceSourceTemplate<IRange, IExpression, IResultType>(nameof(IRange.RightExpression), nameof(IExpression.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()

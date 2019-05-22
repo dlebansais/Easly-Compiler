@@ -59,7 +59,7 @@
         /// <summary>
         /// List of result types for each results.
         /// </summary>
-        IList<IExpressionType> Result { get; }
+        IList<IExpressionType> ResultTypeList { get; }
     }
 
     /// <summary>
@@ -226,7 +226,7 @@
                 ParameterTable = new ListTableEx<IParameter>();
                 ResultTable = new ListTableEx<IParameter>();
                 ConformantResultTable = new ListTableEx<ICompiledType>();
-                Result = new List<IExpressionType>();
+                ResultTypeList = new List<IExpressionType>();
                 IsHandled = true;
             }
 
@@ -290,7 +290,7 @@
         /// <summary>
         /// List of result types for each results.
         /// </summary>
-        public IList<IExpressionType> Result { get; private set; } = new List<IExpressionType>();
+        public IList<IExpressionType> ResultTypeList { get; private set; } = new List<IExpressionType>();
 
         /// <summary>
         /// Finds or creates an overload type with the corresponding parameters.

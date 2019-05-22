@@ -20,13 +20,12 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceCollectionSourceTemplate<IThrowInstruction, IArgument, IList<IExpressionType>>(nameof(IThrowInstruction.ArgumentList), nameof(IArgument.ResolvedResult)),
+                new OnceReferenceCollectionSourceTemplate<IThrowInstruction, IArgument, IResultType>(nameof(IThrowInstruction.ArgumentList), nameof(IArgument.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IThrowInstruction, IList<IExpressionType>>(nameof(IThrowInstruction.ResolvedResult)),
-                new OnceReferenceDestinationTemplate<IThrowInstruction, IList<IIdentifier>>(nameof(IThrowInstruction.ResolvedExceptions)),
+                new OnceReferenceDestinationTemplate<IThrowInstruction, IResultType>(nameof(IThrowInstruction.ResolvedResult)),
             };
         }
         #endregion
@@ -54,8 +53,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IThrowInstruction node, object data)
         {
-            node.ResolvedResult.Item = new List<IExpressionType>();
-            node.ResolvedExceptions.Item = new List<IIdentifier>();
+            node.ResolvedResult.Item = ResultType.Empty;
         }
         #endregion
     }

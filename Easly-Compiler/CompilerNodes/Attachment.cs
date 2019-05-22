@@ -19,7 +19,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of results of the attachment.
         /// </summary>
-        OnceReference<IList<IExpressionType>> ResolvedResult { get; }
+        OnceReference<IResultType> ResolvedResult { get; }
 
         /// <summary>
         /// List of exceptions the attachment can throw.
@@ -134,7 +134,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedResult = new OnceReference<IResultType>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 ResolvedLocalEntitiesList = new List<IScopeAttributeFeature>();
                 IsHandled = true;
@@ -195,7 +195,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of results of the attachment.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+        public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
 
         /// <summary>
         /// List of exceptions the attachment can throw.

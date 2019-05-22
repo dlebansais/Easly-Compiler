@@ -37,12 +37,12 @@
                 new OnceReferenceSourceTemplate<TBody, IList<IAssertion>>(nameof(IEffectiveBody.ResolvedEnsureList)),
                 new OnceReferenceSourceTemplate<TBody, IList<IIdentifier>>(nameof(IEffectiveBody.ResolvedExceptionIdentifierList)),
                 new OnceReferenceCollectionSourceTemplate<TBody, IEntityDeclaration, IScopeAttributeFeature>(nameof(IEffectiveBody.EntityDeclarationList), nameof(IEntityDeclaration.ValidEntity)),
-                new OnceReferenceCollectionSourceTemplate<TBody, IInstruction, IList<IExpressionType>>(nameof(IEffectiveBody.BodyInstructionList), nameof(IInstruction.ResolvedResult)),
+                new OnceReferenceCollectionSourceTemplate<TBody, IInstruction, IResultType>(nameof(IEffectiveBody.BodyInstructionList), nameof(IInstruction.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<TBody, IList<IExpressionType>>(nameof(IEffectiveBody.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<TBody, IResultType>(nameof(IEffectiveBody.ResolvedResult)),
             };
         }
         #endregion
@@ -70,7 +70,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(TBody node, object data)
         {
-            node.ResolvedResult.Item = new List<IExpressionType>();
+            node.ResolvedResult.Item = ResultType.Empty;
         }
         #endregion
     }

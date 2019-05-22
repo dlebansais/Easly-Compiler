@@ -20,14 +20,12 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceSourceTemplate<IKeywordAssignmentInstruction, IList<IExpressionType>>(nameof(IKeywordAssignmentInstruction.Source) + Dot + nameof(IExpression.ResolvedResult)),
-                new OnceReferenceSourceTemplate<IKeywordAssignmentInstruction, IList<IIdentifier>>(nameof(IKeywordAssignmentInstruction.Source) + Dot + nameof(IExpression.ResolvedExceptions)),
+                new OnceReferenceSourceTemplate<IKeywordAssignmentInstruction, IResultType>(nameof(IKeywordAssignmentInstruction.Source) + Dot + nameof(IExpression.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IKeywordAssignmentInstruction, IList<IExpressionType>>(nameof(IKeywordAssignmentInstruction.ResolvedResult)),
-                new OnceReferenceDestinationTemplate<IKeywordAssignmentInstruction, IList<IIdentifier>>(nameof(IKeywordAssignmentInstruction.ResolvedExceptions)),
+                new OnceReferenceDestinationTemplate<IKeywordAssignmentInstruction, IResultType>(nameof(IKeywordAssignmentInstruction.ResolvedResult)),
             };
         }
         #endregion
@@ -55,8 +53,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IKeywordAssignmentInstruction node, object data)
         {
-            node.ResolvedResult.Item = new List<IExpressionType>();
-            node.ResolvedExceptions.Item = new List<IIdentifier>();
+            node.ResolvedResult.Item = ResultType.Empty;
         }
         #endregion
     }

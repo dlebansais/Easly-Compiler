@@ -24,14 +24,12 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new SealedTableSourceTemplate<IAssertionTagExpression, IClassType, IList<IBody>>(nameof(IClass.InheritedBodyTagListTable), TemplateClassStart<IAssertionTagExpression>.Default),
-                new OnceReferenceSourceTemplate<IAssertionTagExpression, IList<IExpressionType>>(nameof(IAssertionTagExpression.ResolvedBooleanExpression) + Dot + nameof(IExpression.ResolvedResult)),
-                new OnceReferenceSourceTemplate<IAssertionTagExpression, IList<IIdentifier>>(nameof(IAssertionTagExpression.ResolvedBooleanExpression) + Dot + nameof(IExpression.ResolvedExceptions)),
+                new OnceReferenceSourceTemplate<IAssertionTagExpression, IResultType>(nameof(IAssertionTagExpression.ResolvedBooleanExpression) + Dot + nameof(IExpression.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IAssertionTagExpression, IList<IExpressionType>>(nameof(IAssertionTagExpression.ResolvedResult)),
-                new OnceReferenceDestinationTemplate<IAssertionTagExpression, IList<IIdentifier>>(nameof(IAssertionTagExpression.ResolvedExceptions)),
+                new OnceReferenceDestinationTemplate<IAssertionTagExpression, IResultType>(nameof(IAssertionTagExpression.ResolvedResult)),
                 new UnsealedListDestinationTemplate<IAssertionTagExpression, IExpression>(nameof(IAssertionTagExpression.ConstantSourceList)),
             };
         }
@@ -50,36 +48,11 @@
             data = null;
             bool Success = true;
 
-            Success &= AssertionTagExpressionRuleTemplate.ResolveCompilerReferences(node, ErrorList, out IList<IExpressionType> ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out ListTableEx<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant);
+            Success &= AssertionTagExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out ListTableEx<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant);
             if (Success)
-                data = new Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>(ResolvedResult, ResolvedExceptions, ConstantSourceList, ExpressionConstant);
+                data = new Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>(ResolvedResult, ResolvedExceptions, ConstantSourceList, ExpressionConstant);
 
             return Success;
-        }
-
-        /// <summary>
-        /// Finds the matching nodes of a <see cref="IAssertionTagExpression"/>.
-        /// </summary>
-        /// <param name="node">The agent expression to check.</param>
-        /// <param name="errorList">The list of errors found.</param>
-        /// <param name="resolvedResult">The expression result types upon return.</param>
-        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
-        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
-        /// <param name="expressionConstant">The constant value upon return, if any.</param>
-        public static bool ResolveCompilerReferences(IAssertionTagExpression node, IErrorList errorList, out IList<IExpressionType> resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant)
-        {
-            IExpression ResolvedBooleanExpression = node.ResolvedBooleanExpression.Item;
-
-            resolvedResult = ResolvedBooleanExpression.ResolvedResult.Item;
-            resolvedExceptions = ResolvedBooleanExpression.ResolvedExceptions.Item;
-            expressionConstant = NeutralLanguageConstant.NotConstant;
-
-            constantSourceList = new ListTableEx<IExpression>()
-            {
-                ResolvedBooleanExpression
-            };
-
-            return true;
         }
 
         /// <summary>
@@ -89,13 +62,12 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IAssertionTagExpression node, object data)
         {
-            IList<IExpressionType> ResolvedResult = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item1;
-            IList<IIdentifier> ResolvedExceptions = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item2;
-            ListTableEx<IExpression> ConstantSourceList = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item3;
-            ILanguageConstant ExpressionConstant = ((Tuple<IList<IExpressionType>, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item4;
+            IResultType ResolvedResult = ((Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item1;
+            IList<IIdentifier> ResolvedExceptions = ((Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item2;
+            ListTableEx<IExpression> ConstantSourceList = ((Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item3;
+            ILanguageConstant ExpressionConstant = ((Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant>)data).Item4;
 
             node.ResolvedResult.Item = ResolvedResult;
-            node.ResolvedExceptions.Item = ResolvedExceptions;
             node.ConstantSourceList.AddRange(ConstantSourceList);
             node.ConstantSourceList.Seal();
         }

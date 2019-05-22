@@ -21,7 +21,7 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new SealedTableCollectionSourceTemplate<IClass, IBody, string, IExpression>(nameof(IClass.BodyList), nameof(IBody.ResolvedTagTable)),
-                new OnceReferenceCollectionSourceTemplate<IClass, IBody, IList<IExpressionType>>(nameof(IClass.BodyList), nameof(IBody.ResolvedResult)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IBody, IResultType>(nameof(IClass.BodyList), nameof(IBody.ResolvedResult)),
                 new OnceReferenceCollectionSourceTemplate<IClass, ICommandOverload, ICompiledBody>(nameof(IClass.CommandOverloadList), nameof(ICommandOverload.ResolvedBody)),
                 new OnceReferenceCollectionSourceTemplate<IClass, IQueryOverload, ICompiledBody>(nameof(IClass.QueryOverloadList), nameof(IQueryOverload.ResolvedBody)),
             };

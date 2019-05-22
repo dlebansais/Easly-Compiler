@@ -61,7 +61,7 @@
 
             foreach (IExpression Item in node.NodeWithDefaultList)
             {
-                IList<IExpressionType> ResolvedResult = Item.ResolvedResult.Item;
+                IResultType ResolvedResult = Item.ResolvedResult.Item;
                 if (ResolvedResult.Count != 1)
                 {
                     AddSourceError(new ErrorInvalidExpression(Item));

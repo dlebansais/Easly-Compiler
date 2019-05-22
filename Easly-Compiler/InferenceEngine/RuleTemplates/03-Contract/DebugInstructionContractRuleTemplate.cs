@@ -20,13 +20,12 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceSourceTemplate<IDebugInstruction, IList<IExpressionType>>(nameof(IDebugInstruction.Instructions) + Dot + nameof(IScope.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IDebugInstruction, IResultType>(nameof(IDebugInstruction.Instructions) + Dot + nameof(IScope.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IDebugInstruction, IList<IExpressionType>>(nameof(IDebugInstruction.ResolvedResult)),
-                new OnceReferenceDestinationTemplate<IDebugInstruction, IList<IIdentifier>>(nameof(IDebugInstruction.ResolvedExceptions)),
+                new OnceReferenceDestinationTemplate<IDebugInstruction, IResultType>(nameof(IDebugInstruction.ResolvedResult)),
             };
         }
         #endregion
@@ -54,8 +53,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IDebugInstruction node, object data)
         {
-            node.ResolvedResult.Item = new List<IExpressionType>();
-            node.ResolvedExceptions.Item = new List<IIdentifier>();
+            node.ResolvedResult.Item = ResultType.Empty;
         }
         #endregion
     }

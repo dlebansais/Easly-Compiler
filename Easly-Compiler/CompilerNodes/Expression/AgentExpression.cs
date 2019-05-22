@@ -95,7 +95,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedResult = new OnceReference<IResultType>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
@@ -150,7 +150,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of expression results.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+        public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
 
         /// <summary>
         /// List of exceptions the expression can throw.
@@ -196,6 +196,48 @@ namespace CompilerNode
             Result &= expression1.Delegated.Text == expression2.Delegated.Text;
 
             return Result;
+        }
+
+        /// <summary>
+        /// Finds the matching nodes of a <see cref="IAgentExpression"/>.
+        /// </summary>
+        /// <param name="node">The agent expression to check.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="resolvedResult">The expression result types upon return.</param>
+        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
+        /// <param name="expressionConstant">The constant value upon return, if any.</param>
+        /// <param name="resolvedFeature">The feature found upon return.</param>
+        public static bool ResolveCompilerReferences(IAgentExpression node, IErrorList errorList, out IResultType resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFeature)
+        {
+            resolvedResult = null;
+            resolvedExceptions = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+            resolvedFeature = null;
+
+            IIdentifier Delegated = (IIdentifier)node.Delegated;
+
+            IClass EmbeddingClass = node.EmbeddingClass;
+            IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable = EmbeddingClass.FeatureTable;
+            Debug.Assert(Delegated.ValidText.IsAssigned);
+            string ValidText = Delegated.ValidText.Item;
+
+            if (!FeatureName.TableContain(FeatureTable, ValidText, out IFeatureName Key, out IFeatureInstance Value))
+            {
+                errorList.AddError(new ErrorUnknownIdentifier(node, ValidText));
+                return false;
+            }
+
+            Debug.Assert(Value.Feature.IsAssigned);
+            resolvedFeature = Value.Feature.Item;
+
+            resolvedResult = new ResultType(resolvedFeature.ResolvedFeatureTypeName.Item, resolvedFeature.ResolvedFeatureType.Item, string.Empty);
+
+            resolvedExceptions = new List<IIdentifier>();
+            expressionConstant = new AgentLanguageConstant(resolvedFeature);
+
+            return true;
         }
         #endregion
 

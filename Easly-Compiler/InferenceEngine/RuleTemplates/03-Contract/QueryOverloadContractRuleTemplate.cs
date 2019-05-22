@@ -24,7 +24,7 @@
                 new OnceReferenceSourceTemplate<IQueryOverload, IList<IAssertion>>(nameof(IQueryOverload.QueryBody) + Dot + nameof(IBody.ResolvedRequireList)),
                 new OnceReferenceSourceTemplate<IQueryOverload, IList<IAssertion>>(nameof(IQueryOverload.QueryBody) + Dot + nameof(IBody.ResolvedEnsureList)),
                 new OnceReferenceSourceTemplate<IQueryOverload, IList<IIdentifier>>(nameof(IQueryOverload.QueryBody) + Dot + nameof(IBody.ResolvedExceptionIdentifierList)),
-                new OnceReferenceSourceTemplate<IQueryOverload, IList<IExpressionType>>(nameof(IQueryOverload.QueryBody) + Dot + nameof(IBody.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IQueryOverload, IResultType>(nameof(IQueryOverload.QueryBody) + Dot + nameof(IBody.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()

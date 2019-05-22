@@ -21,7 +21,7 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceSourceTemplate<IAssertion, IList<IExpressionType>>(nameof(IAssertion.BooleanExpression) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IAssertion, IResultType>(nameof(IAssertion.BooleanExpression) + Dot + nameof(IExpression.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
@@ -48,7 +48,7 @@
             IExpression BooleanExpression = (IExpression)node.BooleanExpression;
 
             Debug.Assert(BooleanExpression.ResolvedResult.IsAssigned);
-            IList<IExpressionType> ResolvedResult = BooleanExpression.ResolvedResult.Item;
+            IResultType ResolvedResult = BooleanExpression.ResolvedResult.Item;
 
             if (ResolvedResult.Count != 1)
             {
@@ -60,7 +60,7 @@
                 AddSourceError(new ErrorBooleanTypeMissing(node));
                 Success = false;
             }
-            else if (ResolvedResult[0].ValueType != BooleanType)
+            else if (ResolvedResult.At(0).ValueType != BooleanType)
             {
                 AddSourceError(new ErrorInvalidExpression(BooleanExpression));
                 Success = false;

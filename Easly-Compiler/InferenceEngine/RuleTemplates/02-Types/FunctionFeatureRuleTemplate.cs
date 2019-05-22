@@ -49,7 +49,6 @@
             data = null;
             bool Success = true;
 
-            IList<IExpressionType> CommonResults = new List<IExpressionType>();
             IName EntityName = (IName)((IFeatureWithName)node).EntityName;
 
             // This is ensured because the root node is valid.
@@ -99,7 +98,7 @@
             IClass EmbeddingClass = node.EmbeddingClass;
             ITypeName BaseTypeName = EmbeddingClass.ResolvedClassTypeName.Item;
             IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;
-            IList<IExpressionType> CommonResults = (IList<IExpressionType>)data;
+            IResultType CommonResults = (IResultType)data;
 
             IList<IQueryOverloadType> OverloadList = new List<IQueryOverloadType>();
             foreach (IQueryOverload Overload in node.OverloadList)

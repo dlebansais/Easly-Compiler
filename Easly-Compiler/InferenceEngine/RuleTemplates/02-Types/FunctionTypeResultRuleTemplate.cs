@@ -50,11 +50,11 @@
             // This is ensured because the root node is valid.
             Debug.Assert(node.OverloadList.Count > 0);
 
-            IList<IExpressionType> CommonResults = Feature.CommonResultType(node.OverloadList);
+            IResultType CommonResults = Feature.CommonResultType(node.OverloadList);
 
             IErrorList CheckErrorList = new ErrorList();
             for (int i = 0; i < CommonResults.Count; i++)
-                Success &= Feature.JoinedResultCheck(node.OverloadList, i, CommonResults[i].ValueType, node, CheckErrorList);
+                Success &= Feature.JoinedResultCheck(node.OverloadList, i, CommonResults.At(i).ValueType, node, CheckErrorList);
 
             if (!Success)
             {
@@ -75,7 +75,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IFunctionType node, object data)
         {
-            IList<IExpressionType> CommonResults = (IList<IExpressionType>)data;
+            IResultType CommonResults = (IResultType)data;
 
             ITypeName MostCommonTypeName = null;
             ICompiledType MostCommonType = null;

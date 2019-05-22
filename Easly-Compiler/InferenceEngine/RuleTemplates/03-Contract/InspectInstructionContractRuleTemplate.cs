@@ -20,16 +20,14 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceSourceTemplate<IInspectInstruction, IList<IExpressionType>>(nameof(IInspectInstruction.Source) + Dot + nameof(IExpression.ResolvedResult)),
-                new OnceReferenceSourceTemplate<IInspectInstruction, IList<IIdentifier>>(nameof(IInspectInstruction.Source) + Dot + nameof(IExpression.ResolvedExceptions)),
-                new OnceReferenceCollectionSourceTemplate<IInspectInstruction, IWith, IList<IExpressionType>>(nameof(IInspectInstruction.WithList), nameof(IWith.ResolvedResult)),
-                new ConditionallyAssignedReferenceSourceTemplate<IInspectInstruction, IScope, IList<IExpressionType>>(nameof(IInspectInstruction.ElseInstructions), nameof(IScope.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IInspectInstruction, IResultType>(nameof(IInspectInstruction.Source) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceCollectionSourceTemplate<IInspectInstruction, IWith, IResultType>(nameof(IInspectInstruction.WithList), nameof(IWith.ResolvedResult)),
+                new ConditionallyAssignedReferenceSourceTemplate<IInspectInstruction, IScope, IResultType>(nameof(IInspectInstruction.ElseInstructions), nameof(IScope.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IInspectInstruction, IList<IExpressionType>>(nameof(IInspectInstruction.ResolvedResult)),
-                new OnceReferenceDestinationTemplate<IInspectInstruction, IList<IIdentifier>>(nameof(IInspectInstruction.ResolvedExceptions)),
+                new OnceReferenceDestinationTemplate<IInspectInstruction, IResultType>(nameof(IInspectInstruction.ResolvedResult)),
             };
         }
         #endregion
@@ -57,8 +55,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IInspectInstruction node, object data)
         {
-            node.ResolvedResult.Item = new List<IExpressionType>();
-            node.ResolvedExceptions.Item = new List<IIdentifier>();
+            node.ResolvedResult.Item = ResultType.Empty;
         }
         #endregion
     }

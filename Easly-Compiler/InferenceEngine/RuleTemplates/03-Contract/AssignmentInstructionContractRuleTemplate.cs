@@ -20,14 +20,12 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceSourceTemplate<IAssignmentInstruction, IList<IExpressionType>>(nameof(IAssignmentInstruction.Source) + Dot + nameof(IExpression.ResolvedResult)),
-                new OnceReferenceSourceTemplate<IAssignmentInstruction, IList<IIdentifier>>(nameof(IAssignmentInstruction.Source) + Dot + nameof(IExpression.ResolvedExceptions)),
+                new OnceReferenceSourceTemplate<IAssignmentInstruction, IResultType>(nameof(IAssignmentInstruction.Source) + Dot + nameof(IExpression.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IAssignmentInstruction, IList<IExpressionType>>(nameof(IAssignmentInstruction.ResolvedResult)),
-                new OnceReferenceDestinationTemplate<IAssignmentInstruction, IList<IIdentifier>>(nameof(IAssignmentInstruction.ResolvedExceptions)),
+                new OnceReferenceDestinationTemplate<IAssignmentInstruction, IResultType>(nameof(IAssignmentInstruction.ResolvedResult)),
             };
         }
         #endregion
@@ -57,7 +55,6 @@
         {
             IExpression Source = (IExpression)node.Source;
             node.ResolvedResult.Item = Source.ResolvedResult.Item;
-            node.ResolvedExceptions.Item = Source.ResolvedExceptions.Item;
         }
         #endregion
     }

@@ -20,13 +20,12 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceCollectionSourceTemplate<IIndexAssignmentInstruction, IArgument, IList<IExpressionType>>(nameof(IIndexAssignmentInstruction.ArgumentList), nameof(IArgument.ResolvedResult)),
+                new OnceReferenceCollectionSourceTemplate<IIndexAssignmentInstruction, IArgument, IResultType>(nameof(IIndexAssignmentInstruction.ArgumentList), nameof(IArgument.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IIndexAssignmentInstruction, IList<IExpressionType>>(nameof(IIndexAssignmentInstruction.ResolvedResult)),
-                new OnceReferenceDestinationTemplate<IIndexAssignmentInstruction, IList<IIdentifier>>(nameof(IIndexAssignmentInstruction.ResolvedExceptions)),
+                new OnceReferenceDestinationTemplate<IIndexAssignmentInstruction, IResultType>(nameof(IIndexAssignmentInstruction.ResolvedResult)),
             };
         }
         #endregion
@@ -54,8 +53,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IIndexAssignmentInstruction node, object data)
         {
-            node.ResolvedResult.Item = new List<IExpressionType>();
-            node.ResolvedExceptions.Item = new List<IIdentifier>();
+            node.ResolvedResult.Item = ResultType.Empty;
         }
         #endregion
     }

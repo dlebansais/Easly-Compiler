@@ -23,13 +23,13 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceSourceTemplate<IAttachmentInstruction, IList<IExpressionType>>(nameof(IAttachmentInstruction.Source) + Dot + nameof(IExpression.ResolvedResult)),
-                new OnceReferenceCollectionSourceTemplate<IAttachmentInstruction, IAttachment, IList<IExpressionType>>(nameof(IAttachmentInstruction.AttachmentList), nameof(IAttachment.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IAttachmentInstruction, IResultType>(nameof(IAttachmentInstruction.Source) + Dot + nameof(IExpression.ResolvedResult)),
+                new OnceReferenceCollectionSourceTemplate<IAttachmentInstruction, IAttachment, IResultType>(nameof(IAttachmentInstruction.AttachmentList), nameof(IAttachment.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IAttachmentInstruction, IList<IExpressionType>>(nameof(IAttachmentInstruction.ResolvedInitResult)),
+                new OnceReferenceDestinationTemplate<IAttachmentInstruction, IResultType>(nameof(IAttachmentInstruction.ResolvedInitResult)),
             };
         }
         #endregion
@@ -48,7 +48,7 @@
             bool Success = true;
 
             IExpression AttachmentSource = (IExpression)node.Source;
-            IList<IExpressionType> SourceTypeList = AttachmentSource.ResolvedResult.Item;
+            IResultType SourceTypeList = AttachmentSource.ResolvedResult.Item;
             IClass EmbeddingClass = node.EmbeddingClass;
 
             IList<IList<ITypeName>> FullAttachmentTypeNameList = new List<IList<ITypeName>>();
@@ -72,7 +72,7 @@
 
                 for (int i = 0; i < node.EntityNameList.Count; i++)
                 {
-                    IExpressionType Item = SourceTypeList[i];
+                    IExpressionType Item = SourceTypeList.At(i);
                     IName ItemName = node.EntityNameList[i];
                     IList<ITypeName> AttachmentTypeNameList = FullAttachmentTypeNameList[i];
                     IList<ICompiledType> AttachmentTypeList = FullAttachmentTypeList[i];
@@ -109,7 +109,7 @@
         public override void Apply(IAttachmentInstruction node, object data)
         {
             IExpression AttachmentSource = (IExpression)node.Source;
-            IList<IExpressionType> SourceTypeList = AttachmentSource.ResolvedResult.Item;
+            IResultType SourceTypeList = AttachmentSource.ResolvedResult.Item;
             IClass EmbeddingClass = node.EmbeddingClass;
 
             IList<IList<ITypeName>> FullAttachmentTypeNameList = ((Tuple<IList<IList<ITypeName>>, IList<IList<ICompiledType>>>)data).Item1;
@@ -117,7 +117,7 @@
 
             for (int i = 0; i < node.EntityNameList.Count; i++)
             {
-                IExpressionType Item = SourceTypeList[i];
+                IExpressionType Item = SourceTypeList.At(i);
                 IName ItemName = node.EntityNameList[i];
                 string ValidText = ItemName.ValidText.Item;
                 IList<ITypeName> AttachmentTypeNameList = FullAttachmentTypeNameList[i];
@@ -136,7 +136,7 @@
                 }
             }
 
-            node.ResolvedInitResult.Item = new List<IExpressionType>();
+            node.ResolvedInitResult.Item = ResultType.Empty;
         }
         #endregion
     }

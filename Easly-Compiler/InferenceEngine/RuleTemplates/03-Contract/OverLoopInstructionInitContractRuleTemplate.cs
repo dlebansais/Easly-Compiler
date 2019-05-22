@@ -23,12 +23,12 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceSourceTemplate<IOverLoopInstruction, IList<IExpressionType>>(nameof(IOverLoopInstruction.OverList) + Dot + nameof(IScope.ResolvedResult)),
+                new OnceReferenceSourceTemplate<IOverLoopInstruction, IResultType>(nameof(IOverLoopInstruction.OverList) + Dot + nameof(IScope.ResolvedResult)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IOverLoopInstruction, IList<IExpressionType>>(nameof(IOverLoopInstruction.ResolvedInitResult)),
+                new OnceReferenceDestinationTemplate<IOverLoopInstruction, IResultType>(nameof(IOverLoopInstruction.ResolvedInitResult)),
             };
         }
         #endregion
@@ -47,7 +47,7 @@
             bool Success = true;
 
             IExpression OverList = (IExpression)node.OverList;
-            IList<IExpressionType> OverTypeList = OverList.ResolvedResult.Item;
+            IResultType OverTypeList = OverList.ResolvedResult.Item;
             IClass EmbeddingClass = node.EmbeddingClass;
 
             IList<ITypeName> IndexTypeNameList = new List<ITypeName>();
@@ -211,7 +211,7 @@
                 TypeFixedEntity.FixFeatureType(ItemTypeName, ItemType);
             }
 
-            node.ResolvedInitResult.Item = new List<IExpressionType>();
+            node.ResolvedInitResult.Item = ResultType.Empty;
         }
         #endregion
     }

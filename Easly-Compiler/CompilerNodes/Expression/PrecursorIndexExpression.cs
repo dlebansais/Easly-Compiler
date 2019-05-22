@@ -116,7 +116,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedResult = new OnceReference<IResultType>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
@@ -165,7 +165,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of expression results.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+        public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
 
         /// <summary>
         /// List of exceptions the expression can throw.
@@ -207,6 +207,103 @@ namespace CompilerNode
             return Result;
         }
         */
+
+        /// <summary>
+        /// Finds the matching nodes of a <see cref="IPrecursorIndexExpression"/>.
+        /// </summary>
+        /// <param name="node">The agent expression to check.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="resolvedResult">The expression result types upon return.</param>
+        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
+        /// <param name="expressionConstant">The expression constant upon return.</param>
+        /// <param name="selectedParameterList">The selected parameters.</param>
+        /// <param name="resolvedArgumentList">The list of arguments corresponding to selected parameters.</param>
+        public static bool ResolveCompilerReferences(IPrecursorIndexExpression node, IErrorList errorList, out IResultType resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        {
+            resolvedResult = null;
+            resolvedExceptions = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+            selectedParameterList = null;
+            resolvedArgumentList = null;
+
+            IOptionalReference<BaseNode.IObjectType> AncestorType = node.AncestorType;
+            IList<IArgument> ArgumentList = node.ArgumentList;
+            IClass EmbeddingClass = node.EmbeddingClass;
+
+            IHashtableEx<string, IImportedClass> ClassTable = EmbeddingClass.ImportedClassTable;
+            IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable = EmbeddingClass.FeatureTable;
+            OnceReference<IFeatureInstance> SelectedPrecursor = new OnceReference<IFeatureInstance>();
+            IFeature InnerFeature = node.EmbeddingFeature;
+
+            if (InnerFeature is IIndexerFeature AsIndexerFeature)
+            {
+                IFeatureInstance Instance = FeatureTable[FeatureName.IndexerFeatureName];
+
+                if (AncestorType.IsAssigned)
+                {
+                    IObjectType AssignedAncestorType = (IObjectType)AncestorType.Item;
+                    IClassType Ancestor = AssignedAncestorType.ResolvedType.Item as IClassType;
+                    Debug.Assert(Ancestor != null);
+
+                    foreach (IPrecursorInstance PrecursorItem in Instance.PrecursorList)
+                        if (PrecursorItem.Ancestor.BaseClass == Ancestor.BaseClass)
+                        {
+                            SelectedPrecursor.Item = PrecursorItem.Precursor;
+                            break;
+                        }
+
+                    if (!SelectedPrecursor.IsAssigned)
+                    {
+                        errorList.AddError(new ErrorInvalidPrecursor(AssignedAncestorType));
+                        return false;
+                    }
+                }
+                else if (Instance.PrecursorList.Count == 0)
+                {
+                    errorList.AddError(new ErrorNoPrecursor(node));
+                    return false;
+                }
+                else if (Instance.PrecursorList.Count > 1)
+                {
+                    errorList.AddError(new ErrorInvalidPrecursor(node));
+                    return false;
+                }
+                else
+                    SelectedPrecursor.Item = Instance.PrecursorList[0].Precursor;
+
+                List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
+                if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, errorList))
+                    return false;
+
+                IIndexerFeature OperatorFeature = SelectedPrecursor.Item.Feature.Item as IIndexerFeature;
+                Debug.Assert(OperatorFeature != null);
+                IIndexerType OperatorType = OperatorFeature.ResolvedFeatureType.Item as IIndexerType;
+                Debug.Assert(OperatorType != null);
+
+                IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+                ParameterTableList.Add(OperatorType.ParameterTable);
+
+                int SelectedIndex;
+                if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, ArgumentStyle, errorList, node, out SelectedIndex))
+                    return false;
+
+                resolvedResult = new ResultType(OperatorType.ResolvedEntityTypeName.Item, OperatorType.ResolvedEntityType.Item, string.Empty);
+
+                resolvedExceptions = OperatorType.GetExceptionIdentifierList;
+                selectedParameterList = ParameterTableList[SelectedIndex];
+                resolvedArgumentList = MergedArgumentList;
+
+                // TODO: check if the precursor is a constant
+                return true;
+            }
+            else
+            {
+                errorList.AddError(new ErrorIndexPrecursorNotAllowedOutsideIndexer(node));
+                return false;
+            }
+        }
         #endregion
 
         #region Debugging

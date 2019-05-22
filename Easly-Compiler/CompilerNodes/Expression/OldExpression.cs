@@ -81,7 +81,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedResult = new OnceReference<IResultType>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
@@ -130,7 +130,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of expression results.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+        public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
 
         /// <summary>
         /// List of exceptions the expression can throw.
@@ -161,6 +161,63 @@ namespace CompilerNode
             Result &= QualifiedName.IsQualifiedNameEqual((IQualifiedName)expression1.Query, (IQualifiedName)expression2.Query);
 
             return Result;
+        }
+
+        /// <summary>
+        /// Finds the matching nodes of a <see cref="IOldExpression"/>.
+        /// </summary>
+        /// <param name="node">The agent expression to check.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="resolvedResult">The expression result types upon return.</param>
+        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
+        /// <param name="expressionConstant">The expression constant upon return.</param>
+        /// <param name="resolvedFinalFeature">The matching feature upon return.</param>
+        public static bool ResolveCompilerReferences(IOldExpression node, IErrorList errorList, out IResultType resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature)
+        {
+            resolvedResult = null;
+            resolvedExceptions = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+            resolvedFinalFeature = null;
+
+            IClass EmbeddingClass = node.EmbeddingClass;
+            IQualifiedName Query = (IQualifiedName)node.Query;
+            IList<IIdentifier> ValidPath = Query.ValidPath.Item;
+            IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;
+
+            if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType))
+            {
+                errorList.AddError(new ErrorBooleanTypeMissing(node));
+                return false;
+            }
+
+            IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
+            Debug.Assert(LocalScope != null);
+
+            if (node.EmbeddingBody == null && node.EmbeddingAssertion == null)
+            {
+                errorList.AddError(new ErrorInvalidOldExpression(node));
+                return false;
+            }
+
+            if (!ObjectType.GetQualifiedPathFinalType(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, errorList, out ICompiledFeature FinalFeature, out IDiscrete FinalDiscrete, out ITypeName FinalTypeName, out ICompiledType FinalType, out bool InheritBySideAttribute))
+                return false;
+
+            if (FinalFeature == null)
+            {
+                errorList.AddError(new ErrorInvalidOldExpression(node));
+                return false;
+            }
+
+            ObjectType.FillResultPath(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, Query.ValidResultTypePath.Item);
+
+            resolvedResult = new ResultType(FinalTypeName, FinalType, string.Empty);
+
+            resolvedExceptions = new List<IIdentifier>();
+            resolvedFinalFeature = FinalFeature;
+
+            return true;
         }
         #endregion
 

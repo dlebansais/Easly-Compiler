@@ -38,7 +38,7 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<TBody, IList<IExpressionType>>(nameof(IDeferredBody.ResolvedResult)),
+                new OnceReferenceDestinationTemplate<TBody, IResultType>(nameof(IDeferredBody.ResolvedResult)),
             };
         }
         #endregion
@@ -66,7 +66,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(TBody node, object data)
         {
-            node.ResolvedResult.Item = new List<IExpressionType>();
+            node.ResolvedResult.Item = ResultType.Empty;
         }
         #endregion
     }

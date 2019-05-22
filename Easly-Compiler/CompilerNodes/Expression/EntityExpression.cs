@@ -1,5 +1,6 @@
 namespace CompilerNode
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using Easly;
@@ -81,7 +82,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                ResolvedResult = new OnceReference<IList<IExpressionType>>();
+                ResolvedResult = new OnceReference<IResultType>();
                 ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
@@ -130,7 +131,7 @@ namespace CompilerNode
         /// <summary>
         /// Types of expression results.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedResult { get; private set; } = new OnceReference<IList<IExpressionType>>();
+        public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
 
         /// <summary>
         /// List of exceptions the expression can throw.
@@ -161,6 +162,76 @@ namespace CompilerNode
             Result &= QualifiedName.IsQualifiedNameEqual((IQualifiedName)expression1.Query, (IQualifiedName)expression2.Query);
 
             return Result;
+        }
+
+        /// <summary>
+        /// Finds the matching nodes of a <see cref="IEntityExpression"/>.
+        /// </summary>
+        /// <param name="node">The agent expression to check.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="resolvedResult">The expression result types upon return.</param>
+        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
+        /// <param name="expressionConstant">The expression constant upon return.</param>
+        /// <param name="resolvedFinalFeature">The feature if the end of the path is a feature.</param>
+        /// <param name="resolvedFinalDiscrete">The discrete if the end of the path is a discrete.</param>
+        public static bool ResolveCompilerReferences(IEntityExpression node, IErrorList errorList, out IResultType resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete)
+        {
+            resolvedResult = null;
+            resolvedExceptions = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+            resolvedFinalFeature = null;
+            resolvedFinalDiscrete = null;
+
+            IQualifiedName Query = (IQualifiedName)node.Query;
+
+            IClass EmbeddingClass = (Class)node.EmbeddingClass;
+            IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;
+
+            if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Entity.Guid, node, out ITypeName ResultTypeName, out ICompiledType ResultType))
+            {
+                errorList.AddError(new ErrorEntityTypeMissing(node));
+                return false;
+            }
+
+            IList<IIdentifier> ValidPath = Query.ValidPath.Item;
+            IIdentifier LastIdentifier = ValidPath[ValidPath.Count - 1];
+            string ValidText = LastIdentifier.ValidText.Item;
+
+            IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
+
+            if (!ObjectType.GetQualifiedPathFinalType(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, errorList, out ICompiledFeature FinalFeature, out IDiscrete FinalDiscrete, out ITypeName FinalTypeName, out ICompiledType FinalType, out bool InheritBySideAttribute))
+                return false;
+
+            Guid EntityGuid;
+
+            if (FinalFeature != null)
+            {
+                ObjectType.FillResultPath(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, Query.ValidResultTypePath.Item);
+                resolvedFinalFeature = FinalFeature;
+                EntityGuid = FinalFeature.EntityGuid;
+
+                expressionConstant = new EntityLanguageConstant(resolvedFinalFeature);
+            }
+            else
+            {
+                Debug.Assert(FinalDiscrete != null);
+
+                resolvedFinalDiscrete = FinalDiscrete;
+                EntityGuid = LanguageClasses.NamedFeatureEntity.Guid;
+
+                expressionConstant = new EntityLanguageConstant(resolvedFinalDiscrete);
+            }
+
+            ITypeName EntityTypeName = EmbeddingClass.ImportedLanguageTypeTable[EntityGuid].Item1;
+            ICompiledType EntityType = EmbeddingClass.ImportedLanguageTypeTable[EntityGuid].Item2;
+
+            resolvedResult = new ResultType(EntityTypeName, EntityType, ValidText);
+
+            resolvedExceptions = new List<IIdentifier>();
+
+            return true;
         }
         #endregion
 
