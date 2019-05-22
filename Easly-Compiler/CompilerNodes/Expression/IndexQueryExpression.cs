@@ -15,6 +15,16 @@ namespace CompilerNode
         /// Replicated list from <see cref="BaseNode.IndexQueryExpression.ArgumentBlocks"/>.
         /// </summary>
         IList<IArgument> ArgumentList { get; }
+
+        /// <summary>
+        /// List of parameters from the selected overload.
+        /// </summary>
+        ListTableEx<IParameter> SelectedParameterList { get; }
+
+        /// <summary>
+        /// Resolved arguments of the call.
+        /// </summary>
+        OnceReference<IList<IExpressionType>> ResolvedArgumentList { get; }
     }
 
     /// <summary>
@@ -106,20 +116,22 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
-            {
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Types)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Types)
             {
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IResultType>();
-                ResolvedException = new OnceReference<IResultException>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                ResolvedException = new OnceReference<IResultException>();
+                SelectedParameterList = new ListTableEx<IParameter>();
+                ResolvedArgumentList = new OnceReference<IList<IExpressionType>>();
                 IsHandled = true;
             }
 
@@ -154,6 +166,15 @@ namespace CompilerNode
 
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                IsResolved = ResolvedException.IsAssigned;
+
+                Debug.Assert(SelectedParameterList.IsSealed || !IsResolved);
+                Debug.Assert(ResolvedArgumentList.IsAssigned || !IsResolved);
+
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
             return IsResolved;
@@ -183,6 +204,16 @@ namespace CompilerNode
         #endregion
 
         #region Compiler
+        /// <summary>
+        /// List of parameters from the selected overload.
+        /// </summary>
+        public ListTableEx<IParameter> SelectedParameterList { get; private set; } = new ListTableEx<IParameter>();
+
+        /// <summary>
+        /// Resolved arguments of the call.
+        /// </summary>
+        public OnceReference<IList<IExpressionType>> ResolvedArgumentList { get; private set; } = new OnceReference<IList<IExpressionType>>();
+
         /// <summary>
         /// Compares two expressions.
         /// </summary>

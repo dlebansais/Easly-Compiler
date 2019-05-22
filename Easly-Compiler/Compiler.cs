@@ -170,7 +170,7 @@
 
                     if (CheckClassAndLibraryNames(root))
                     {
-                        if (ResolveIdentifiers(root) && ResolveTypes(root) && ResolveContract(root))
+                        if (ResolveIdentifiers(root) && ResolveTypes(root) && ResolveContract(root) && ResolveBody(root))
                         {
                         }
                     }
@@ -996,6 +996,12 @@
         protected virtual bool ResolveContract(IRoot root)
         {
             return Resolve(root, RuleTemplateSet.Contract);
+        }
+
+        /// <summary></summary>
+        protected virtual bool ResolveBody(IRoot root)
+        {
+            return Resolve(root, RuleTemplateSet.Body);
         }
 
         /// <summary></summary>

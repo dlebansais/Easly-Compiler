@@ -11,6 +11,15 @@ namespace CompilerNode
     /// </summary>
     public interface IEntityExpression : BaseNode.IEntityExpression, IExpression
     {
+        /// <summary>
+        /// The resolved feature.
+        /// </summary>
+        OnceReference<ICompiledFeature> ResolvedFinalFeature { get; }
+
+        /// <summary>
+        /// The resolved discrete.
+        /// </summary>
+        OnceReference<IDiscrete> ResolvedFinalDiscrete { get; }
     }
 
     /// <summary>
@@ -72,20 +81,22 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
-            {
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Types)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Types)
             {
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IResultType>();
-                ResolvedException = new OnceReference<IResultException>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                ResolvedException = new OnceReference<IResultException>();
+                ResolvedFinalFeature = new OnceReference<ICompiledFeature>();
+                ResolvedFinalDiscrete = new OnceReference<IDiscrete>();
                 IsHandled = true;
             }
 
@@ -120,6 +131,12 @@ namespace CompilerNode
 
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                IsResolved = ResolvedException.IsAssigned;
+                Debug.Assert(ResolvedFinalFeature.IsAssigned || ResolvedFinalDiscrete.IsAssigned || !IsResolved);
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
             return IsResolved;
@@ -149,6 +166,16 @@ namespace CompilerNode
         #endregion
 
         #region Compiler
+        /// <summary>
+        /// The resolved feature.
+        /// </summary>
+        public OnceReference<ICompiledFeature> ResolvedFinalFeature { get; private set; } = new OnceReference<ICompiledFeature>();
+
+        /// <summary>
+        /// The resolved discrete.
+        /// </summary>
+        public OnceReference<IDiscrete> ResolvedFinalDiscrete { get; private set; } = new OnceReference<IDiscrete>();
+
         /// <summary>
         /// Compares two expressions.
         /// </summary>

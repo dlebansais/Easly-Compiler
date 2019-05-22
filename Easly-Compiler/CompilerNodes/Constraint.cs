@@ -150,6 +150,10 @@ namespace CompilerNode
                 ResolvedTypeWithRename = new OnceReference<ICompiledType>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -175,6 +179,11 @@ namespace CompilerNode
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                IsResolved = false;
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsResolved = false;
                 IsHandled = true;

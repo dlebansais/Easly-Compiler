@@ -123,6 +123,10 @@ namespace CompilerNode
                 ResolvedException = new OnceReference<IResultException>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -150,6 +154,11 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsResolved = ResolvedResult.IsAssigned;
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                IsResolved = false;
                 IsHandled = true;
             }
 

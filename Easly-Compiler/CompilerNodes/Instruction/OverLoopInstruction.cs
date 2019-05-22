@@ -149,6 +149,10 @@ namespace CompilerNode
                 ResolvedInitResult = new OnceReference<IResultType>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -178,6 +182,11 @@ namespace CompilerNode
                 IsResolved = ResolvedResult.IsAssigned;
                 Debug.Assert(ResolvedInitResult.IsAssigned || !IsResolved);
 
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                IsResolved = false;
                 IsHandled = true;
             }
 

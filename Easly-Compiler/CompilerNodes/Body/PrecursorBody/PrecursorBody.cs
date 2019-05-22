@@ -158,6 +158,10 @@ namespace CompilerNode
                 ResolvedAncestorType = new OnceReference<ICompiledType>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -188,6 +192,11 @@ namespace CompilerNode
                 Debug.Assert(ResolvedAncestorTypeName.IsAssigned || !IsResolved);
                 Debug.Assert(ResolvedAncestorType.IsAssigned || !IsResolved);
 
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                IsResolved = false;
                 IsHandled = true;
             }
 

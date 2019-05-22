@@ -90,24 +90,24 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
-            {
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Types)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Types)
             {
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IResultType>();
-                ResolvedException = new OnceReference<IResultException>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
                 ResolvedFinalFeature = new OnceReference<ICompiledFeature>();
                 ResolvedFinalDiscrete = new OnceReference<IDiscrete>();
                 ResolvedClassTypeName = new OnceReference<ITypeName>();
                 ResolvedClassType = new OnceReference<ICompiledType>();
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                ResolvedException = new OnceReference<IResultException>();
                 IsHandled = true;
             }
 
@@ -143,6 +143,11 @@ namespace CompilerNode
                 Debug.Assert(ResolvedClassTypeName.IsAssigned == ResolvedResult.IsAssigned);
                 Debug.Assert(ResolvedClassType.IsAssigned == ResolvedResult.IsAssigned);
 
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                IsResolved = ResolvedException.IsAssigned;
                 IsHandled = true;
             }
 

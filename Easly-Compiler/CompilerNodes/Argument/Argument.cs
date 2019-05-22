@@ -30,6 +30,11 @@ namespace CompilerNode
         /// The constant expression, if assigned.
         /// </summary>
         OnceReference<ILanguageConstant> ExpressionConstant { get; }
+
+        /// <summary>
+        /// List of exceptions the argument can throw.
+        /// </summary>
+        OnceReference<IResultException> ResolvedException { get; }
     }
 
     /// <summary>

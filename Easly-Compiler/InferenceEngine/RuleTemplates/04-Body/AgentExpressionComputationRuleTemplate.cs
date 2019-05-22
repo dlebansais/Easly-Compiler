@@ -23,11 +23,12 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
+                new SealedTableSourceTemplate<IAgentExpression, string, IScopeAttributeFeature>(nameof(IScopeHolder.LocalScope), TemplateScopeStart<IAgentExpression>.Default),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IAgentExpression, IList<IIdentifier>>(nameof(IAgentExpression.ResolvedException)),
+                new OnceReferenceDestinationTemplate<IAgentExpression, IResultException>(nameof(IAgentExpression.ResolvedException)),
             };
         }
         #endregion

@@ -22,14 +22,24 @@ namespace CompilerNode
         OnceReference<ICompiledFeature> ResolvedFinalFeature { get; }
 
         /// <summary>
-        /// The list of resolved arguments.
-        /// </summary>
-        OnceReference<List<ExpressionType>> ResolvedArgumentList { get; }
-
-        /// <summary>
         /// The resolved discrete at the end of the path.
         /// </summary>
         OnceReference<IDiscrete> ResolvedFinalDiscrete { get; }
+
+        /// <summary>
+        /// List of parameters from the selected overload.
+        /// </summary>
+        ListTableEx<IParameter> SelectedParameterList { get; }
+
+        /// <summary>
+        /// List of results from the selected overload.
+        /// </summary>
+        ListTableEx<IParameter> SelectedResultList { get; }
+
+        /// <summary>
+        /// Resolved arguments of the call.
+        /// </summary>
+        OnceReference<IList<IExpressionType>> ResolvedArgumentList { get; }
     }
 
     /// <summary>
@@ -121,23 +131,25 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
-            {
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Types)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Types)
             {
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IResultType>();
-                ResolvedException = new OnceReference<IResultException>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
                 ResolvedFinalFeature = new OnceReference<ICompiledFeature>();
                 ResolvedFinalDiscrete = new OnceReference<IDiscrete>();
-                ResolvedArgumentList = new OnceReference<List<ExpressionType>>();
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                ResolvedException = new OnceReference<IResultException>();
+                SelectedParameterList = new ListTableEx<IParameter>();
+                SelectedResultList = new ListTableEx<IParameter>();
+                ResolvedArgumentList = new OnceReference<IList<IExpressionType>>();
                 IsHandled = true;
             }
 
@@ -170,6 +182,16 @@ namespace CompilerNode
 
                 Debug.Assert(ResolvedResult.IsAssigned || !IsResolved);
                 Debug.Assert(ResolvedFinalFeature.IsAssigned || ResolvedFinalDiscrete.IsAssigned || !IsResolved);
+
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                IsResolved = ResolvedException.IsAssigned;
+
+                Debug.Assert(SelectedParameterList.IsSealed || !IsResolved);
+                Debug.Assert(SelectedResultList.IsSealed || !IsResolved);
+                Debug.Assert(ResolvedArgumentList.IsAssigned || !IsResolved);
 
                 IsHandled = true;
             }
@@ -208,14 +230,24 @@ namespace CompilerNode
         public OnceReference<ICompiledFeature> ResolvedFinalFeature { get; private set; } = new OnceReference<ICompiledFeature>();
 
         /// <summary>
-        /// The list of resolved arguments.
-        /// </summary>
-        public OnceReference<List<ExpressionType>> ResolvedArgumentList { get; private set; } = new OnceReference<List<ExpressionType>>();
-
-        /// <summary>
         /// The resolved discrete at the end of the path.
         /// </summary>
         public OnceReference<IDiscrete> ResolvedFinalDiscrete { get; private set; } = new OnceReference<IDiscrete>();
+
+        /// <summary>
+        /// List of parameters from the selected overload.
+        /// </summary>
+        public ListTableEx<IParameter> SelectedParameterList { get; private set; } = new ListTableEx<IParameter>();
+
+        /// <summary>
+        /// List of results from the selected overload.
+        /// </summary>
+        public ListTableEx<IParameter> SelectedResultList { get; private set; } = new ListTableEx<IParameter>();
+
+        /// <summary>
+        /// Resolved arguments of the call.
+        /// </summary>
+        public OnceReference<IList<IExpressionType>> ResolvedArgumentList { get; private set; } = new OnceReference<IList<IExpressionType>>();
 
         /// <summary>
         /// Compares two expressions.
@@ -395,6 +427,10 @@ namespace CompilerNode
                 }
                 else
                     expressionConstant = new DiscreteLanguageConstant(FinalDiscrete);
+
+                selectedParameterList = new ListTableEx<IParameter>();
+                selectedResultList = new ListTableEx<IParameter>();
+                resolvedArgumentList = new List<IExpressionType>();
             }
 
             return true;

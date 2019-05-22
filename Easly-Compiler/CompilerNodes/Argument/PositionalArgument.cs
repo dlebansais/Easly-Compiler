@@ -87,6 +87,11 @@ namespace CompilerNode
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                ResolvedException = new OnceReference<IResultException>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -116,6 +121,11 @@ namespace CompilerNode
                 IsResolved = ResolvedResult.IsAssigned;
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                IsResolved = ResolvedException.IsAssigned;
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
             return IsResolved;
@@ -137,6 +147,11 @@ namespace CompilerNode
         /// The constant expression, if assigned.
         /// </summary>
         public OnceReference<ILanguageConstant> ExpressionConstant { get; private set; } = new OnceReference<ILanguageConstant>();
+
+        /// <summary>
+        /// List of exceptions the argument can throw.
+        /// </summary>
+        public OnceReference<IResultException> ResolvedException { get; private set; } = new OnceReference<IResultException>();
         #endregion
 
         #region Compiler

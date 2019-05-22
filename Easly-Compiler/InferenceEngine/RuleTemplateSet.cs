@@ -252,5 +252,36 @@
             new UnaryOperatorExpressionRuleTemplate(),
             new WithContractRuleTemplate(),
         };
+
+        /// <summary>
+        /// Rules for the body inference pass.
+        /// </summary>
+        public static IList<IRuleTemplate> Body { get; } = new List<IRuleTemplate>()
+        {
+            new AgentExpressionComputationRuleTemplate(),
+            new AssertionTagExpressionComputationRuleTemplate(),
+            new AssignmentArgumentComputationRuleTemplate(),
+            new BinaryConditionalExpressionComputationRuleTemplate(),
+            new BinaryOperatorExpressionComputationRuleTemplate(),
+            new ClassConstantExpressionComputationRuleTemplate(),
+            new CloneOfExpressionComputationRuleTemplate(),
+            new EntityExpressionComputationRuleTemplate(),
+            new EqualityExpressionComputationRuleTemplate(),
+            new IndexQueryExpressionComputationRuleTemplate(),
+            new InitializedObjectExpressionComputationRuleTemplate(),
+            new KeywordExpressionComputationRuleTemplate(),
+            new ManifestCharacterExpressionComputationRuleTemplate(),
+            new ManifestNumberExpressionComputationRuleTemplate(),
+            new ManifestStringExpressionComputationRuleTemplate(),
+            new NewExpressionComputationRuleTemplate(),
+            new OldExpressionComputationRuleTemplate(),
+            new PositionalArgumentComputationRuleTemplate(),
+            new PrecursorExpressionComputationRuleTemplate(),
+            new PrecursorIndexExpressionComputationRuleTemplate(),
+            new QueryExpressionComputationRuleTemplate(),
+            new ResultOfExpressionComputationRuleTemplate(),
+            new UnaryNotExpressionComputationRuleTemplate(),
+            new UnaryOperatorExpressionComputationRuleTemplate(),
+        };
     }
 }

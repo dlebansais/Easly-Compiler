@@ -100,6 +100,10 @@
                 ValidResultTypePath = new OnceReference<IList<IExpressionType>>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -127,6 +131,11 @@
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsResolved = ValidResultTypePath.IsAssigned;
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                IsResolved = false;
                 IsHandled = true;
             }
 
