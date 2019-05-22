@@ -82,7 +82,7 @@
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IResultType>();
-                ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
+                ResolvedException = new OnceReference<IResultException>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
                 IsHandled = true;
@@ -116,7 +116,6 @@
                 IsResolved = ExpressionConstant.IsAssigned;
 
                 Debug.Assert(ResolvedResult.IsAssigned || !IsResolved);
-                Debug.Assert(ResolvedExceptions.IsAssigned || !IsResolved);
 
                 IsHandled = true;
             }
@@ -135,7 +134,7 @@
         /// <summary>
         /// List of exceptions the expression can throw.
         /// </summary>
-        public OnceReference<IList<IIdentifier>> ResolvedExceptions { get; private set; } = new OnceReference<IList<IIdentifier>>();
+        public OnceReference<IResultException> ResolvedException { get; private set; } = new OnceReference<IResultException>();
 
         /// <summary>
         /// The list of sources for a constant, if any.
@@ -171,13 +170,13 @@
         /// <param name="node">The agent expression to check.</param>
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="resolvedResult">The expression result types upon return.</param>
-        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="resolvedException">Exceptions the expression can throw upon return.</param>
         /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
         /// <param name="expressionConstant">The constant value upon return, if any.</param>
-        public static bool ResolveCompilerReferences(IBinaryConditionalExpression node, IErrorList errorList, out IResultType resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant)
+        public static bool ResolveCompilerReferences(IBinaryConditionalExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant)
         {
             resolvedResult = null;
-            resolvedExceptions = null;
+            resolvedException = null;
             constantSourceList = new ListTableEx<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
 
@@ -208,10 +207,7 @@
 
             resolvedResult = new ResultType(BooleanTypeName, BooleanType, string.Empty);
 
-            List<IIdentifier> MergedExceptionList = new List<IIdentifier>();
-            MergedExceptionList.AddRange(LeftExpression.ResolvedExceptions.Item);
-            MergedExceptionList.AddRange(RightExpression.ResolvedExceptions.Item);
-            resolvedExceptions = MergedExceptionList;
+            ResultException.Merge(LeftExpression.ResolvedException, RightExpression.ResolvedException, out resolvedException);
 
             return true;
         }

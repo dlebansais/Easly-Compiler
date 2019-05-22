@@ -18,7 +18,7 @@ namespace CompilerNode
         /// <summary>
         /// List of exceptions the conditional can throw.
         /// </summary>
-        OnceReference<IList<IIdentifier>> ResolvedExceptions { get; }
+        OnceReference<IResultException> ResolvedException { get; }
     }
 
     /// <summary>
@@ -94,7 +94,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IResultType>();
-                ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
+                ResolvedException = new OnceReference<IResultException>();
                 IsHandled = true;
             }
 
@@ -123,7 +123,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                IsResolved = ResolvedResult.IsAssigned && ResolvedExceptions.IsAssigned;
+                IsResolved = ResolvedResult.IsAssigned;
                 IsHandled = true;
             }
 
@@ -141,7 +141,7 @@ namespace CompilerNode
         /// <summary>
         /// List of exceptions the conditional can throw.
         /// </summary>
-        public OnceReference<IList<IIdentifier>> ResolvedExceptions { get; private set; } = new OnceReference<IList<IIdentifier>>();
+        public OnceReference<IResultException> ResolvedException { get; private set; } = new OnceReference<IResultException>();
         #endregion
 
         #region Implementation of IScopeHolder

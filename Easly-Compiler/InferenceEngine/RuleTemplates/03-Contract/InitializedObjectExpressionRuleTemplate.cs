@@ -47,10 +47,10 @@
             data = null;
             bool Success = true;
 
-            Success &= InitializedObjectExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IList<IIdentifier> ResolvedExceptions, out ListTableEx<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out ITypeName InitializedObjectTypeName, out ICompiledType InitializedObjectType, out IHashtableEx<string, ICompiledFeature> AssignedFeatureTable);
+            Success &= InitializedObjectExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IResultException ResolvedException, out ListTableEx<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out ITypeName InitializedObjectTypeName, out ICompiledType InitializedObjectType, out IHashtableEx<string, ICompiledFeature> AssignedFeatureTable);
 
             if (Success)
-                data = new Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>(ResolvedResult, ResolvedExceptions, ConstantSourceList, ExpressionConstant, InitializedObjectTypeName, InitializedObjectType, AssignedFeatureTable);
+                data = new Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>(ResolvedResult, ResolvedException, ConstantSourceList, ExpressionConstant, InitializedObjectTypeName, InitializedObjectType, AssignedFeatureTable);
 
             return Success;
         }
@@ -62,13 +62,13 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IInitializedObjectExpression node, object data)
         {
-            IResultType ResolvedResult = ((Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item1;
-            IList<IIdentifier> ResolvedExceptions = ((Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item2;
-            ListTableEx<IExpression> ConstantSourceList = ((Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item3;
-            ILanguageConstant ExpressionConstant = ((Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item4;
-            ITypeName InitializedObjectTypeName = ((Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item5;
-            ICompiledType InitializedObjectType = ((Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item6;
-            IHashtableEx<string, ICompiledFeature> AssignedFeatureTable = ((Tuple<IResultType, IList<IIdentifier>, ListTableEx<IExpression>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item7;
+            IResultType ResolvedResult = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item1;
+            IResultException ResolvedException = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item2;
+            ListTableEx<IExpression> ConstantSourceList = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item3;
+            ILanguageConstant ExpressionConstant = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item4;
+            ITypeName InitializedObjectTypeName = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item5;
+            ICompiledType InitializedObjectType = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item6;
+            IHashtableEx<string, ICompiledFeature> AssignedFeatureTable = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, ITypeName, ICompiledType, IHashtableEx<string, ICompiledFeature>>)data).Item7;
 
             node.ResolvedResult.Item = ResolvedResult;
             node.ConstantSourceList.AddRange(ConstantSourceList);

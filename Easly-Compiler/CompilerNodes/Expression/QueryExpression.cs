@@ -132,7 +132,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IResultType>();
-                ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
+                ResolvedException = new OnceReference<IResultException>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
                 ResolvedFinalFeature = new OnceReference<ICompiledFeature>();
@@ -169,7 +169,6 @@ namespace CompilerNode
                 IsResolved = ExpressionConstant.IsAssigned;
 
                 Debug.Assert(ResolvedResult.IsAssigned || !IsResolved);
-                Debug.Assert(ResolvedExceptions.IsAssigned || !IsResolved);
                 Debug.Assert(ResolvedFinalFeature.IsAssigned || ResolvedFinalDiscrete.IsAssigned || !IsResolved);
 
                 IsHandled = true;
@@ -189,7 +188,7 @@ namespace CompilerNode
         /// <summary>
         /// List of exceptions the expression can throw.
         /// </summary>
-        public OnceReference<IList<IIdentifier>> ResolvedExceptions { get; private set; } = new OnceReference<IList<IIdentifier>>();
+        public OnceReference<IResultException> ResolvedException { get; private set; } = new OnceReference<IResultException>();
 
         /// <summary>
         /// The list of sources for a constant, if any.
@@ -239,7 +238,7 @@ namespace CompilerNode
         /// <param name="node">The agent expression to check.</param>
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="resolvedResult">The expression result types upon return.</param>
-        /// <param name="resolvedExceptions">Exceptions the expression can throw upon return.</param>
+        /// <param name="resolvedException">Exceptions the expression can throw upon return.</param>
         /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
         /// <param name="expressionConstant">The expression constant upon return.</param>
         /// <param name="resolvedFinalFeature">The feature if the end of the path is a feature.</param>
@@ -247,10 +246,10 @@ namespace CompilerNode
         /// <param name="selectedParameterList">The selected parameters.</param>
         /// <param name="selectedResultList">The selected results.</param>
         /// <param name="resolvedArgumentList">The list of arguments corresponding to selected parameters.</param>
-        public static bool ResolveCompilerReferences(IQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IList<IIdentifier> resolvedExceptions, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out ListTableEx<IParameter> selectedParameterList, out ListTableEx<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList)
+        public static bool ResolveCompilerReferences(IQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out ListTableEx<IParameter> selectedParameterList, out ListTableEx<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList)
         {
             resolvedResult = null;
-            resolvedExceptions = null;
+            resolvedException = null;
             constantSourceList = new ListTableEx<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
             resolvedFinalFeature = null;
@@ -300,7 +299,7 @@ namespace CompilerNode
 
                         IQueryOverloadType SelectedOverload = AsFunctionType.OverloadList[SelectedIndex];
                         resolvedResult = new ResultType(SelectedOverload.ResultTypeList);
-                        resolvedExceptions = SelectedOverload.ExceptionIdentifierList;
+                        resolvedException = new ResultException(SelectedOverload.ExceptionIdentifierList);
                         selectedParameterList = SelectedOverload.ParameterTable;
                         selectedResultList = SelectedOverload.ResultTable;
                         resolvedArgumentList = MergedArgumentList;
@@ -317,7 +316,7 @@ namespace CompilerNode
                     case IPropertyType AsPropertyType:
                         resolvedResult = new ResultType(AsPropertyType.ResolvedEntityTypeName.Item, AsPropertyType.ResolvedEntityType.Item, ValidText);
 
-                        resolvedExceptions = AsPropertyType.GetExceptionIdentifierList;
+                        resolvedException = new ResultException(AsPropertyType.GetExceptionIdentifierList);
                         selectedParameterList = new ListTableEx<IParameter>();
                         selectedResultList = new ListTableEx<IParameter>();
                         resolvedArgumentList = new List<IExpressionType>();
@@ -327,7 +326,7 @@ namespace CompilerNode
                     case IClassType AsClassType:
                         resolvedResult = new ResultType(FinalTypeName, AsClassType, ValidText);
 
-                        resolvedExceptions = new List<IIdentifier>();
+                        resolvedException = new ResultException();
                         selectedParameterList = new ListTableEx<IParameter>();
                         selectedResultList = new ListTableEx<IParameter>();
                         resolvedArgumentList = MergedArgumentList;
@@ -337,7 +336,7 @@ namespace CompilerNode
                     case IFormalGenericType AsFormalGenericType:
                         resolvedResult = new ResultType(FinalTypeName, AsFormalGenericType, ValidText);
 
-                        resolvedExceptions = new List<IIdentifier>();
+                        resolvedException = new ResultException();
                         selectedParameterList = new ListTableEx<IParameter>();
                         selectedResultList = new ListTableEx<IParameter>();
                         resolvedArgumentList = MergedArgumentList;
@@ -347,7 +346,7 @@ namespace CompilerNode
                     case ITupleType AsTupleType:
                         resolvedResult = new ResultType(FinalTypeName, AsTupleType, ValidText);
 
-                        resolvedExceptions = new List<IIdentifier>();
+                        resolvedException = new ResultException();
                         selectedParameterList = new ListTableEx<IParameter>();
                         selectedResultList = new ListTableEx<IParameter>();
                         resolvedArgumentList = MergedArgumentList;
@@ -387,8 +386,7 @@ namespace CompilerNode
                 Debug.Assert(IsNumberTypeAvailable);
 
                 resolvedResult = new ResultType(NumberTypeName, NumberType, FinalDiscrete.ValidDiscreteName.Item.Name);
-
-                resolvedExceptions = new List<IIdentifier>();
+                resolvedException = new ResultException();
 
                 if (FinalDiscrete.NumericValue.IsAssigned)
                 {

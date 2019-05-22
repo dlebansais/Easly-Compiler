@@ -116,7 +116,7 @@
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IResultType>();
-                ResolvedExceptions = new OnceReference<IList<IIdentifier>>();
+                ResolvedException = new OnceReference<IResultException>();
                 IsHandled = true;
             }
 
@@ -145,7 +145,7 @@
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                IsResolved = ResolvedResult.IsAssigned && ResolvedExceptions.IsAssigned;
+                IsResolved = ResolvedResult.IsAssigned;
                 IsHandled = true;
             }
 
@@ -163,7 +163,7 @@
         /// <summary>
         /// List of exceptions the instruction can throw.
         /// </summary>
-        public OnceReference<IList<IIdentifier>> ResolvedExceptions { get; private set; } = new OnceReference<IList<IIdentifier>>();
+        public OnceReference<IResultException> ResolvedException { get; private set; } = new OnceReference<IResultException>();
         #endregion
 
         #region Implementation of IScopeHolder

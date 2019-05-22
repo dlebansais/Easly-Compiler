@@ -24,7 +24,7 @@ namespace CompilerNode
         /// <summary>
         /// List of exceptions the expression can throw.
         /// </summary>
-        OnceReference<IList<IIdentifier>> ResolvedExceptions { get; }
+        OnceReference<IResultException> ResolvedException { get; }
 
         /// <summary>
         /// The list of sources for a constant, if any.

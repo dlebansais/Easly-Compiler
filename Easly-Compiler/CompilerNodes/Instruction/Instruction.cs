@@ -17,7 +17,7 @@ namespace CompilerNode
         /// <summary>
         /// List of exceptions the instruction can throw.
         /// </summary>
-        OnceReference<IList<IIdentifier>> ResolvedExceptions { get; }
+        OnceReference<IResultException> ResolvedException { get; }
 
         /// <summary>
         /// Gets a string representation of the instruction.
