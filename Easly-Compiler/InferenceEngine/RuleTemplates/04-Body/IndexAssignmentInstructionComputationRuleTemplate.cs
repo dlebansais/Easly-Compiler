@@ -63,8 +63,21 @@
 
             Debug.Assert(FinalFeature != null);
 
-            if (FinalType is IIndexerType AsIndexerType)
+            if (FinalType is IClassType AsClassType)
             {
+                IClass IndexedBaseClass = AsClassType.BaseClass;
+                IHashtableEx<IFeatureName, IFeatureInstance> IndexedFeatureTable = IndexedBaseClass.FeatureTable;
+
+                if (!IndexedFeatureTable.ContainsKey(FeatureName.IndexerFeatureName))
+                {
+                    AddSourceError(new ErrorMissingIndexer(node));
+                    return false;
+                }
+
+                IFeatureInstance IndexerInstance = IndexedFeatureTable[FeatureName.IndexerFeatureName];
+                IIndexerFeature Indexer = (IndexerFeature)IndexerInstance.Feature.Item;
+                IIndexerType AsIndexerType = (IndexerType)Indexer.ResolvedFeatureType.Item;
+
                 List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
                 IErrorList ArgumentErrorList = new ErrorList();
                 if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, ArgumentErrorList))

@@ -57,11 +57,12 @@
             else
             {
                 IExpressionType ContractType = ResolvedResult.At(0);
+                ICompiledType ConditionalType = ContractType.ValueType;
 
                 bool IsBooleanTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
                 bool IsEventTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Event.Guid, node, out ITypeName EventTypeName, out ICompiledType EventType);
 
-                if (!(IsBooleanTypeAvailable && ContractType == BooleanType) && !(IsEventTypeAvailable && ContractType == EventType))
+                if (!(IsBooleanTypeAvailable && ConditionalType == BooleanType) && !(IsEventTypeAvailable && ConditionalType == EventType))
                 {
                     AddSourceError(new ErrorBooleanTypeMissing(node));
                     Success = false;

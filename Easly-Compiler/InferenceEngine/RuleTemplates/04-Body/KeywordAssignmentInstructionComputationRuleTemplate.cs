@@ -66,6 +66,8 @@
             {
                 if (node.EmbeddingFeature is IPropertyFeature AsPropertyFeature)
                     DestinationType = AsPropertyFeature.ResolvedEntityType.Item;
+                else if (node.EmbeddingFeature is IIndexerFeature AsIndexerFeature)
+                    DestinationType = AsIndexerFeature.ResolvedEntityType.Item;
                 else
                 {
                     AddSourceError(new ErrorInvalidAssignment(node));

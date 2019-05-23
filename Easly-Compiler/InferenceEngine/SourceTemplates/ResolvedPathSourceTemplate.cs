@@ -63,6 +63,15 @@
                     Debug.Assert(Identifier.ValidText.IsAssigned);
 
                 List<IEntityDeclaration> LocalEntityList = new List<IEntityDeclaration>();
+
+                if (node.EmbeddingOverload is ICommandOverload AsCommandOverload)
+                    LocalEntityList.AddRange(AsCommandOverload.ParameterList);
+                else if (node.EmbeddingOverload is IQueryOverload AsQueryOverload)
+                {
+                    LocalEntityList.AddRange(AsQueryOverload.ParameterList);
+                    LocalEntityList.AddRange(AsQueryOverload.ResultList);
+                }
+
                 if (node.EmbeddingBody is IEffectiveBody AsEffectiveBody)
                     LocalEntityList.AddRange(AsEffectiveBody.EntityDeclarationList);
 

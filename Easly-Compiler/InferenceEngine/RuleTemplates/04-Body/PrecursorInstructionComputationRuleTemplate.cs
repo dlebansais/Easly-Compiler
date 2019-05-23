@@ -55,24 +55,33 @@
 
             if (InnerFeature is IIndexerFeature AsIndexerFeature)
             {
+                AddSourceError(new ErrorPrecursorNotAllowedInIndexer(node));
+                return false;
+            }
+            else
+            {
                 IFeature AsNamedFeature = InnerFeature;
                 IFeatureInstance Instance = FeatureTable[AsNamedFeature.ValidFeatureName.Item];
                 OnceReference<IFeatureInstance> SelectedPrecursor = new OnceReference<IFeatureInstance>();
+                IList<IPrecursorInstance> PrecursorList = Instance.PrecursorList;
 
                 if (node.AncestorType.IsAssigned)
                 {
-                    IObjectType AncestorType = (IObjectType)node.AncestorType.Item;
+                    IObjectType DeclaredAncestor = (IObjectType)node.AncestorType.Item;
 
-                    foreach (IPrecursorInstance PrecursorItem in Instance.PrecursorList)
-                        if (PrecursorItem.Ancestor == AncestorType)
-                        {
-                            SelectedPrecursor.Item = PrecursorItem.Precursor;
-                            break;
-                        }
+                    if (DeclaredAncestor.ResolvedType.Item is IClassType AsClassTypeAncestor)
+                    {
+                        foreach (IPrecursorInstance Item in PrecursorList)
+                            if (Item.Ancestor.BaseClass == AsClassTypeAncestor.BaseClass)
+                            {
+                                SelectedPrecursor.Item = Item.Precursor;
+                                break;
+                            }
+                    }
 
                     if (!SelectedPrecursor.IsAssigned)
                     {
-                        AddSourceError(new ErrorInvalidPrecursor(AncestorType));
+                        AddSourceError(new ErrorInvalidPrecursor(DeclaredAncestor));
                         return false;
                     }
                 }
@@ -151,11 +160,6 @@
 
                     data = new Tuple<IResultException, ListTableEx<IParameter>>(ResolvedException, SelectedParameterList);
                 }
-            }
-            else
-            {
-                AddSourceError(new ErrorPrecursorNotAllowedInIndexer(node));
-                return false;
             }
 
             return Success;

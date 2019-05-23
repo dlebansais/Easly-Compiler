@@ -74,11 +74,9 @@
                     {
                         IQualifiedName Destination = (QualifiedName)node.DestinationList[i];
                         IList<IIdentifier> ValidPath = Destination.ValidPath.Item;
-
                         IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
 
-                        bool InheritBySideAttribute;
-                        if (!ObjectType.GetQualifiedPathFinalType(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, ErrorList, out ICompiledFeature FinalFeature, out IDiscrete FinalDiscrete, out ITypeName FinalTypeName, out ICompiledType FinalType, out InheritBySideAttribute))
+                        if (!ObjectType.GetQualifiedPathFinalType(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, ErrorList, out ICompiledFeature FinalFeature, out IDiscrete FinalDiscrete, out ITypeName FinalTypeName, out ICompiledType FinalType, out bool InheritBySideAttribute))
                             Success = false;
                         else
                         {
@@ -88,18 +86,18 @@
                             IPathParticipatingType DestinationType = FinalType as IPathParticipatingType;
                             Debug.Assert(DestinationType != null);
 
-                            if (!ObjectType.TypeConformToBase(SourceType, DestinationType.TypeAsDestinationOrSource, SubstitutionTypeTable, ErrorList, Destination))
+                            if (!ObjectType.TypeConformToBase(SourceType, DestinationType.TypeAsDestinationOrSource, SubstitutionTypeTable))
                             {
                                 AddSourceError(new ErrorAssignmentMismatch(Destination));
                                 Success = false;
                             }
                             else
-                            {
                                 ObjectType.FillResultPath(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, Destination.ValidResultTypePath.Item);
-                                data = SourceExpression.ResolvedException.Item;
-                            }
                         }
                     }
+
+                    if (Success)
+                        data = SourceExpression.ResolvedException.Item;
                 }
             }
 
