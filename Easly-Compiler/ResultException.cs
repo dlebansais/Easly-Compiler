@@ -1,7 +1,6 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
-    using System.Diagnostics;
     using CompilerNode;
     using Easly;
 
@@ -15,6 +14,12 @@
         /// </summary>
         /// <param name="index">The index.</param>
         IIdentifier At(int index);
+
+        /// <summary>
+        /// Adds an exception identifier.
+        /// </summary>
+        /// <param name="text">The identifier text.</param>
+        void Add(string text);
     }
 
     /// <summary>
@@ -51,6 +56,16 @@
         }
 
         /// <summary>
+        /// Adds an exception identifier.
+        /// </summary>
+        /// <param name="text">The identifier text.</param>
+        public virtual void Add(string text)
+        {
+            IIdentifier ExceptionIdentifier = new Identifier(text);
+            Add(ExceptionIdentifier);
+        }
+
+        /// <summary>
         /// Propagates a list of exceptions if they are available.
         /// </summary>
         /// <param name="other">The optionally assigned list of exception.</param>
@@ -66,24 +81,25 @@
         /// <summary>
         /// Merges two lists of exceptions if they are available.
         /// </summary>
-        /// <param name="other1">The first optionally assigned list of exception.</param>
-        /// <param name="other2">The second optionally assigned list of exception.</param>
-        /// <param name="result">The list of exceptions if available; Otherwise, null.</param>
-        public static void Merge(OnceReference<IResultException> other1, OnceReference<IResultException> other2, out IResultException result)
+        /// <param name="mergedResult">The list of exceptions to update.</param>
+        /// <param name="other">The optional list of exceptions to merge.</param>
+        public static void Merge(IResultException mergedResult, OnceReference<IResultException> other)
         {
-            if (other1.IsAssigned && other2.IsAssigned)
-            {
-                IList<IIdentifier> MergedList = new List<IIdentifier>();
-                MergeIdentifierList(MergedList, other1.Item);
-                MergeIdentifierList(MergedList, other2.Item);
-
-                result = new ResultException(MergedList);
-            }
-            else
-                result = null;
+            if (other.IsAssigned)
+                Merge(mergedResult, other.Item);
         }
 
-        private static void MergeIdentifierList(IList<IIdentifier> mergedList, IResultException otherList)
+        /// <summary>
+        /// Merges two lists of exceptions if they are available.
+        /// </summary>
+        /// <param name="mergedResult">The list of exceptions to update.</param>
+        /// <param name="otherList">The list of exceptions to merge.</param>
+        public static void Merge(IResultException mergedResult, IEnumerable<IIdentifier> otherList)
+        {
+            MergeIdentifierList((List<IIdentifier>)mergedResult, otherList);
+        }
+
+        private static void MergeIdentifierList(List<IIdentifier> mergedList, IEnumerable<IIdentifier> otherList)
         {
             foreach (IIdentifier OtherItem in otherList)
             {

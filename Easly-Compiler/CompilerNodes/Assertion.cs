@@ -14,6 +14,11 @@ namespace CompilerNode
         /// The resolved contract with the associated tag.
         /// </summary>
         OnceReference<ITaggedContract> ResolvedContract { get; }
+
+        /// <summary>
+        /// List of exceptions the assertion can throw.
+        /// </summary>
+        OnceReference<IResultException> ResolvedException { get; }
     }
 
     /// <summary>
@@ -90,6 +95,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
+                ResolvedException = new OnceReference<IResultException>();
                 IsHandled = true;
             }
 
@@ -123,7 +129,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
-                IsResolved = false;
+                IsResolved = ResolvedException.IsAssigned;
                 IsHandled = true;
             }
 
@@ -137,6 +143,11 @@ namespace CompilerNode
         /// The resolved contract with the associated tag.
         /// </summary>
         public OnceReference<ITaggedContract> ResolvedContract { get; private set; } = new OnceReference<ITaggedContract>();
+
+        /// <summary>
+        /// List of exceptions the assertion can throw.
+        /// </summary>
+        public OnceReference<IResultException> ResolvedException { get; private set; } = new OnceReference<IResultException>();
 
         /// <summary>
         /// Checks that two lists of assertions are equal.

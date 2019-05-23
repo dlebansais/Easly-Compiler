@@ -21,7 +21,8 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new SealedTableSourceTemplate<IAttachment, string, IScopeAttributeFeature>(nameof(IAttachment.Instructions) + Dot + nameof(IInstruction.LocalScope)),
-                new OnceReferenceCollectionSourceTemplate<IAttachment, IObjectType, ICompiledType>(nameof(IAttachment.AttachTypeList), nameof(IObjectType.ResolvedType))
+                new OnceReferenceCollectionSourceTemplate<IAttachment, IObjectType, ITypeName>(nameof(IAttachment.AttachTypeList), nameof(IObjectType.ResolvedTypeName)),
+                new OnceReferenceCollectionSourceTemplate<IAttachment, IObjectType, ICompiledType>(nameof(IAttachment.AttachTypeList), nameof(IObjectType.ResolvedType)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()

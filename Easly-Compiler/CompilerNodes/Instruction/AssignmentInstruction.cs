@@ -11,6 +11,10 @@
     /// </summary>
     public interface IAssignmentInstruction : BaseNode.IAssignmentInstruction, IInstruction, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Replicated list from <see cref="BaseNode.AssignmentInstruction.DestinationBlocks"/>.
+        /// </summary>
+        IList<IQualifiedName> DestinationList { get; }
     }
 
     /// <summary>

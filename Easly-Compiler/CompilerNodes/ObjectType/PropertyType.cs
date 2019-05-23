@@ -271,7 +271,6 @@
                 IsHandled = true;
             }
 
-
             Debug.Assert(IsHandled);
             return IsResolved;
         }

@@ -1336,6 +1336,37 @@
         }
 
         /// <summary>
+        /// Checks if two types have a common descendant.
+        /// </summary>
+        /// <param name="embeddingClass">The embedding class with all registered types.</param>
+        /// <param name="type1">The first type.</param>
+        /// <param name="type2">The second type.</param>
+        /// <param name="substitutionTypeTable">The substitution table.</param>
+        public static bool TypesHaveCommonDescendant(IClass embeddingClass, ICompiledType type1, ICompiledType type2, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable)
+        {
+            if (TypeConformToBase(type1, type2, substitutionTypeTable))
+                return true;
+
+            if (TypeConformToBase(type2, type1, substitutionTypeTable))
+                return false; // Acceptable, but useless. Change this to a warning.
+
+            foreach (KeyValuePair<ITypeName, ICompiledType> Entry in embeddingClass.TypeTable)
+            {
+                ICompiledType Descendant = Entry.Value;
+
+                if (TypeConformToBase(Descendant, type1, substitutionTypeTable))
+                    if (TypeConformToBase(Descendant, type2, substitutionTypeTable))
+                        return true;
+
+                if (TypeConformToBase(Descendant, type2, substitutionTypeTable))
+                    if (TypeConformToBase(Descendant, type1, substitutionTypeTable))
+                        return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Gets the object a path is refering to.
         /// </summary>
         /// <param name="baseClass">The class where the path is used.</param>

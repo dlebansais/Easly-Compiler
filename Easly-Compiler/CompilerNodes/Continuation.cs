@@ -20,6 +20,11 @@ namespace CompilerNode
         /// Types of results of the continuation.
         /// </summary>
         OnceReference<IResultType> ResolvedResult { get; }
+
+        /// <summary>
+        /// List of exceptions the continuation can throw.
+        /// </summary>
+        OnceReference<IResultException> ResolvedException { get; }
     }
 
     /// <summary>
@@ -129,6 +134,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
+                ResolvedException = new OnceReference<IResultException>();
                 IsHandled = true;
             }
 
@@ -162,7 +168,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
-                IsResolved = false;
+                IsResolved = ResolvedException.IsAssigned;
                 IsHandled = true;
             }
 
@@ -194,6 +200,11 @@ namespace CompilerNode
         /// Types of results of the continuation.
         /// </summary>
         public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
+
+        /// <summary>
+        /// List of exceptions the continuation can throw.
+        /// </summary>
+        public OnceReference<IResultException> ResolvedException { get; private set; } = new OnceReference<IResultException>();
         #endregion
     }
 }

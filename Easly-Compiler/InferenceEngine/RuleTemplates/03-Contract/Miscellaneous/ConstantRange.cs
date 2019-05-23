@@ -22,7 +22,7 @@
         /// Checks if two ranges intersect.
         /// </summary>
         /// <param name="other">The other range.</param>
-        //bool IsIntersecting(IConstantRange other);
+        bool IsIntersecting(IConstantRange other);
     }
 
     /// <summary>
@@ -97,7 +97,7 @@
         /// Checks if two ranges intersect.
         /// </summary>
         /// <param name="other">The other range.</param>
-        /*public bool IsIntersecting(IConstantRange other)
+        public bool IsIntersecting(IConstantRange other)
         {
             if (!Minimum.IsCompatibleWith(other.Maximum) || !other.Minimum.IsCompatibleWith(Maximum))
                 return false;
@@ -106,7 +106,7 @@
                 return false;
 
             return true;
-        }*/
+        }
         #endregion
     }
 }

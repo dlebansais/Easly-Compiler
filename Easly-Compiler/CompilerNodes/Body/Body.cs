@@ -53,5 +53,10 @@
         /// Resolved list of exceptions the body can throw.
         /// </summary>
         OnceReference<IList<IIdentifier>> ResolvedExceptionIdentifierList { get; }
+
+        /// <summary>
+        /// Resolved list of instructions in the body.
+        /// </summary>
+        OnceReference<IList<IInstruction>> ResolvedInstructionList { get; }
     }
 }

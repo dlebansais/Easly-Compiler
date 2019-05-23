@@ -160,6 +160,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
+                ResolvedInstructionList = new OnceReference<IList<IInstruction>>();
                 IsHandled = true;
             }
 
@@ -196,7 +197,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
-                IsResolved = false;
+                IsResolved = ResolvedInstructionList.IsAssigned;
                 IsHandled = true;
             }
 
@@ -230,6 +231,11 @@ namespace CompilerNode
         /// Resolved list of exceptions the body can throw.
         /// </summary>
         public OnceReference<IList<IIdentifier>> ResolvedExceptionIdentifierList { get; private set; } = new OnceReference<IList<IIdentifier>>();
+
+        /// <summary>
+        /// Resolved list of instructions in the body.
+        /// </summary>
+        public OnceReference<IList<IInstruction>> ResolvedInstructionList { get; private set; } = new OnceReference<IList<IInstruction>>();
         #endregion
 
         #region Implementation of ICompiledBody

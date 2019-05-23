@@ -14,6 +14,11 @@ namespace CompilerNode
         /// The resolved range as a constant.
         /// </summary>
         OnceReference<IConstantRange> ResolvedRange { get; }
+
+        /// <summary>
+        /// List of exceptions the range can throw.
+        /// </summary>
+        OnceReference<IResultException> ResolvedException { get; }
     }
 
     /// <summary>
@@ -90,6 +95,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
+                ResolvedException = new OnceReference<IResultException>();
                 IsHandled = true;
             }
 
@@ -123,7 +129,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
-                IsResolved = false;
+                IsResolved = ResolvedException.IsAssigned;
                 IsHandled = true;
             }
 
@@ -137,6 +143,11 @@ namespace CompilerNode
         /// The resolved range as a constant.
         /// </summary>
         public OnceReference<IConstantRange> ResolvedRange { get; private set; } = new OnceReference<IConstantRange>();
+
+        /// <summary>
+        /// List of exceptions the range can throw.
+        /// </summary>
+        public OnceReference<IResultException> ResolvedException { get; private set; } = new OnceReference<IResultException>();
         #endregion
     }
 }

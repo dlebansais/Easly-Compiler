@@ -29,6 +29,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IPrecursorIndexExpression, IResultException>(nameof(IPrecursorIndexExpression.ResolvedException)),
+                new UnsealedListDestinationTemplate<IPrecursorIndexExpression, IParameter>(nameof(IPrecursorIndexExpression.SelectedParameterList)),
             };
         }
         #endregion

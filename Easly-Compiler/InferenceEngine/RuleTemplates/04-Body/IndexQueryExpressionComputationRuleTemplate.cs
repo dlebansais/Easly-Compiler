@@ -30,6 +30,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IIndexQueryExpression, IResultException>(nameof(IIndexQueryExpression.ResolvedException)),
+                new UnsealedListDestinationTemplate<IIndexQueryExpression, IParameter>(nameof(IIndexQueryExpression.SelectedParameterList)),
             };
         }
         #endregion

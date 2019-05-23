@@ -15,6 +15,26 @@ namespace CompilerNode
         /// Replicated list from <see cref="BaseNode.CommandInstruction.ArgumentBlocks"/>.
         /// </summary>
         IList<IArgument> ArgumentList { get; }
+
+        /// <summary>
+        /// The resolved called feature.
+        /// </summary>
+        OnceReference<ICompiledFeature> SelectedFeature { get; }
+
+        /// <summary>
+        /// The selected overload in the called feature.
+        /// </summary>
+        OnceReference<ICommandOverloadType> SelectedOverload { get; }
+
+        /// <summary>
+        /// The list of resolved arguments.
+        /// </summary>
+        OnceReference<IList<IExpressionType>> MergedArgumentList { get; }
+
+        /// <summary>
+        /// The resolved type corresponding to the called feature.
+        /// </summary>
+        OnceReference<IProcedureType> CommandFinalType { get; }
     }
 
     /// <summary>
@@ -125,6 +145,10 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
+                SelectedFeature = new OnceReference<ICompiledFeature>();
+                SelectedOverload = new OnceReference<ICommandOverloadType>();
+                MergedArgumentList = new OnceReference<IList<IExpressionType>>();
+                CommandFinalType = new OnceReference<IProcedureType>();
                 IsHandled = true;
             }
 
@@ -158,7 +182,13 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
-                IsResolved = false;
+                IsResolved = ResolvedException.IsAssigned;
+
+                Debug.Assert(SelectedFeature.IsAssigned || !IsResolved);
+                Debug.Assert(SelectedOverload.IsAssigned || !IsResolved);
+                Debug.Assert(MergedArgumentList.IsAssigned || !IsResolved);
+                Debug.Assert(CommandFinalType.IsAssigned || !IsResolved);
+
                 IsHandled = true;
             }
 
@@ -194,6 +224,28 @@ namespace CompilerNode
         /// All reachable entities.
         /// </summary>
         public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// The resolved called feature.
+        /// </summary>
+        public OnceReference<ICompiledFeature> SelectedFeature { get; private set; } = new OnceReference<ICompiledFeature>();
+
+        /// <summary>
+        /// The selected overload in the called feature.
+        /// </summary>
+        public OnceReference<ICommandOverloadType> SelectedOverload { get; private set; } = new OnceReference<ICommandOverloadType>();
+
+        /// <summary>
+        /// The list of resolved arguments.
+        /// </summary>
+        public OnceReference<IList<IExpressionType>> MergedArgumentList { get; private set; } = new OnceReference<IList<IExpressionType>>();
+
+        /// <summary>
+        /// The resolved type corresponding to the called feature.
+        /// </summary>
+        public OnceReference<IProcedureType> CommandFinalType { get; private set; } = new OnceReference<IProcedureType>();
         #endregion
 
         #region Debugging

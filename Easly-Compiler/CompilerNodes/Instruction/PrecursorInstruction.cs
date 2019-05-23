@@ -15,6 +15,11 @@ namespace CompilerNode
         /// Replicated list from <see cref="BaseNode.PrecursorInstruction.ArgumentBlocks"/>.
         /// </summary>
         IList<IArgument> ArgumentList { get; }
+
+        /// <summary>
+        /// List of parameters from the selected overload.
+        /// </summary>
+        ListTableEx<IParameter> SelectedParameterList { get; }
     }
 
     /// <summary>
@@ -120,11 +125,12 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IResultType>();
-                ResolvedException = new OnceReference<IResultException>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
+                ResolvedException = new OnceReference<IResultException>();
+                SelectedParameterList = new ListTableEx<IParameter>();
                 IsHandled = true;
             }
 
@@ -158,7 +164,10 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
-                IsResolved = false;
+                IsResolved = ResolvedException.IsAssigned;
+
+                Debug.Assert(SelectedParameterList.IsSealed || !IsResolved);
+
                 IsHandled = true;
             }
 
@@ -194,6 +203,13 @@ namespace CompilerNode
         /// All reachable entities.
         /// </summary>
         public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// List of parameters from the selected overload.
+        /// </summary>
+        public ListTableEx<IParameter> SelectedParameterList { get; private set; } = new ListTableEx<IParameter>();
         #endregion
 
         #region Debugging

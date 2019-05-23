@@ -21,6 +21,27 @@
     /// </summary>
     public class Identifier : BaseNode.Identifier, IIdentifier
     {
+        #region Init
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Identifier"/> class.
+        /// This constructor is required for deserialization.
+        /// </summary>
+        public Identifier()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Identifier"/> class.
+        /// </summary>
+        /// <param name="text">The identifier text.</param>
+        public Identifier(string text)
+        {
+            Text = text;
+            ValidText = new OnceReference<string>();
+            ValidText.Item = Text;
+        }
+        #endregion
+
         #region Implementation of ISource
         /// <summary>
         /// The parent node, null if root.

@@ -90,16 +90,16 @@
         /// Checks if another constant is greater than this instance.
         /// </summary>
         /// <param name="other">The other instance.</param>
-        /*public virtual bool IsConstantGreater(IOrderedLanguageConstant other)
+        public virtual bool IsConstantGreater(IOrderedLanguageConstant other)
         {
             return IsConstantGreater(other as IDiscreteLanguageConstant);
-        }*/
+        }
 
         /// <summary>
         /// Checks if another constant is greater than this instance.
         /// </summary>
         /// <param name="other">The other instance.</param>
-        /*protected virtual bool IsConstantGreater(IDiscreteLanguageConstant other)
+        protected virtual bool IsConstantGreater(IDiscreteLanguageConstant other)
         {
             Debug.Assert(other != null && Discrete != null && other.Discrete != null);
 
@@ -115,6 +115,6 @@
             Debug.Assert(ThisDiscreteIndex != -1 && OtherDiscreteIndex != -1);
 
             return ThisDiscreteIndex > OtherDiscreteIndex;
-        }*/
+        }
     }
 }

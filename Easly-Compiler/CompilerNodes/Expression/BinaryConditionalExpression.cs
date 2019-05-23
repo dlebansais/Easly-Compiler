@@ -216,7 +216,9 @@
 
             resolvedResult = new ResultType(BooleanTypeName, BooleanType, string.Empty);
 
-            ResultException.Merge(LeftExpression.ResolvedException, RightExpression.ResolvedException, out resolvedException);
+            resolvedException = new ResultException();
+            ResultException.Merge(resolvedException, LeftExpression.ResolvedException);
+            ResultException.Merge(resolvedException, RightExpression.ResolvedException);
 
             return true;
         }

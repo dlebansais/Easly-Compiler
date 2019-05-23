@@ -15,6 +15,21 @@ namespace CompilerNode
         /// Replicated list from <see cref="BaseNode.CreateInstruction.ArgumentBlocks"/>.
         /// </summary>
         IList<IArgument> ArgumentList { get; }
+
+        /// <summary>
+        /// The selected overload in the called feature.
+        /// </summary>
+        OnceReference<ICommandOverloadType> SelectedOverload { get; }
+
+        /// <summary>
+        /// The created object type name.
+        /// </summary>
+        OnceReference<ITypeName> ResolvedEntityTypeName { get; }
+
+        /// <summary>
+        /// The created object type.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedEntityType { get; }
     }
 
     /// <summary>
@@ -120,11 +135,14 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IResultType>();
-                ResolvedException = new OnceReference<IResultException>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
+                ResolvedException = new OnceReference<IResultException>();
+                SelectedOverload = new OnceReference<ICommandOverloadType>();
+                ResolvedEntityTypeName = new OnceReference<ITypeName>();
+                ResolvedEntityType = new OnceReference<ICompiledType>();
                 IsHandled = true;
             }
 
@@ -158,7 +176,12 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
-                IsResolved = false;
+                IsResolved = ResolvedException.IsAssigned;
+
+                Debug.Assert(SelectedOverload.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedEntityTypeName.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedEntityType.IsAssigned || !IsResolved);
+
                 IsHandled = true;
             }
 
@@ -194,6 +217,23 @@ namespace CompilerNode
         /// All reachable entities.
         /// </summary>
         public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// The selected overload in the called feature.
+        /// </summary>
+        public OnceReference<ICommandOverloadType> SelectedOverload { get; private set; } = new OnceReference<ICommandOverloadType>();
+
+        /// <summary>
+        /// The created object type name.
+        /// </summary>
+        public OnceReference<ITypeName> ResolvedEntityTypeName { get; private set; } = new OnceReference<ITypeName>();
+
+        /// <summary>
+        /// The created object type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedEntityType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
 
         #region Debugging

@@ -25,6 +25,11 @@ namespace CompilerNode
         /// Types of results of the scope.
         /// </summary>
         OnceReference<IResultType> ResolvedResult { get; }
+
+        /// <summary>
+        /// List of exceptions the scope can throw.
+        /// </summary>
+        OnceReference<IResultException> ResolvedException { get; }
     }
 
     /// <summary>
@@ -143,6 +148,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
+                ResolvedException = new OnceReference<IResultException>();
                 IsHandled = true;
             }
 
@@ -176,7 +182,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
-                IsResolved = false;
+                IsResolved = ResolvedException.IsAssigned;
                 IsHandled = true;
             }
 
@@ -207,6 +213,11 @@ namespace CompilerNode
         /// Types of results of the scope.
         /// </summary>
         public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
+
+        /// <summary>
+        /// List of exceptions the scope can throw.
+        /// </summary>
+        public OnceReference<IResultException> ResolvedException { get; private set; } = new OnceReference<IResultException>();
 
         /// <summary>
         /// Gets the scope associated to a node.

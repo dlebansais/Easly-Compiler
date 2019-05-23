@@ -114,6 +114,11 @@ namespace CompilerNode
         IHashtableEx<string, IImportedClass> ImportedClassTable { get; }
 
         /// <summary>
+        /// True if the class is an enumeration (inherits from one of the enumeration language classes).
+        /// </summary>
+        bool IsEnumeration { get; }
+
+        /// <summary>
         /// Validates the class name and class source name, and update <see cref="ValidClassName"/> and <see cref="ValidSourceName"/>.
         /// </summary>
         /// <param name="classTable">Table of valid class names and their sources, updated upon return.</param>
@@ -296,6 +301,11 @@ namespace CompilerNode
         /// Table of inherited bodies.
         /// </summary>
         IHashtableEx<IClassType, IList<IBody>> InheritedBodyTagListTable { get; }
+
+        /// <summary>
+        /// List of bodies with resolved instructions
+        /// </summary>
+        OnceReference<IList<IBody>> ResolvedBodyList { get; }
     }
 
     /// <summary>
@@ -388,6 +398,33 @@ namespace CompilerNode
         public virtual void IncrementClassCounter()
         {
             ClassCounter++;
+        }
+
+        /// <summary>
+        /// True if the class is an enumeration (inherits from one of the enumeration language classes).
+        /// </summary>
+        public bool IsEnumeration
+        {
+            get
+            {
+                bool IsInheritingEnumeration = false;
+
+                if (GenericTable.Count == 0 && ExportTable.Count == 0 && TypedefTable.Count == 0 && DiscreteTable.Count > 0)
+                {
+                    IHashtableEx<ITypeName, ICompiledType> ConformanceTable = ResolvedClassType.Item.ConformanceTable;
+                    foreach (KeyValuePair<ITypeName, ICompiledType> Entry in ConformanceTable)
+                        if (Entry.Value is IClassType AsClassType)
+                            if (AsClassType.BaseClass.ClassGuid == LanguageClasses.Enumeration.Guid)
+                            {
+                                if (ConformanceTable.Count == 1)
+                                    IsInheritingEnumeration = true;
+
+                                break;
+                            }
+                }
+
+                return IsInheritingEnumeration;
+            }
         }
         #endregion
 
@@ -606,6 +643,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
+                ResolvedBodyList = new OnceReference<IList<IBody>>();
                 IsHandled = true;
             }
 
@@ -639,7 +677,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
-                IsResolved = false;
+                IsResolved = ResolvedBodyList.IsAssigned;
                 IsHandled = true;
             }
 
@@ -1115,6 +1153,11 @@ namespace CompilerNode
         /// Table of inherited bodies.
         /// </summary>
         public IHashtableEx<IClassType, IList<IBody>> InheritedBodyTagListTable { get; private set; } = new HashtableEx<IClassType, IList<IBody>>();
+
+        /// <summary>
+        /// List of bodies with resolved instructions
+        /// </summary>
+        public OnceReference<IList<IBody>> ResolvedBodyList { get; private set; } = new OnceReference<IList<IBody>>();
         #endregion
 
         #region Debugging

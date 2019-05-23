@@ -93,20 +93,20 @@
         /// Checks if this instance is greater than another constant.
         /// </summary>
         /// <param name="other">The other instance.</param>
-        /*public virtual bool IsConstantGreater(IOrderedLanguageConstant other)
+        public virtual bool IsConstantGreater(IOrderedLanguageConstant other)
         {
             return IsConstantGreater(other as INumberLanguageConstant);
-        }*/
+        }
 
         /// <summary>
         /// Checks if another constant is greater than this instance.
         /// </summary>
         /// <param name="other">The other instance.</param>
-        /*protected virtual bool IsConstantGreater(INumberLanguageConstant other)
+        protected virtual bool IsConstantGreater(INumberLanguageConstant other)
         {
             Debug.Assert(other != null && Value != null && other.Value != null);
 
             return Value.IsGreater(other.Value);
-        }*/
+        }
     }
 }
