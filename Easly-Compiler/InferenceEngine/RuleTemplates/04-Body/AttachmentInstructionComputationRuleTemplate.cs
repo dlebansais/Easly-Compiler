@@ -68,7 +68,6 @@
             {
                 ICompiledType SourceType = SourceResult.At(i).ValueType;
 
-//#if COMPILER_CLASSES
                 if (SourceType == ClassType.ClassAnyType)
                 {
                     bool AttachmentToAny = false;
@@ -148,7 +147,6 @@
                     }
                 }
                 else
-//#endif
                 {
                     for (int j = 0; j < node.AttachmentList.Count; j++)
                     {

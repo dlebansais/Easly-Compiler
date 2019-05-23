@@ -65,7 +65,7 @@
 
             Debug.Assert(FinalFeature != null);
 
-            List<IExpressionType>  MergedArgumentList = new List<IExpressionType>();
+            List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
             IErrorList ArgumentErrorList = new ErrorList();
             TypeArgumentStyles ArgumentStyle;
             if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out ArgumentStyle, ArgumentErrorList))

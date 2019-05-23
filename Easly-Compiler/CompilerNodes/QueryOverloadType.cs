@@ -216,7 +216,7 @@
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsHandled = true;
             }
@@ -227,10 +227,6 @@
                 ResultTable = new ListTableEx<IParameter>();
                 ConformantResultTable = new ListTableEx<ICompiledType>();
                 ResultTypeList = new List<IExpressionType>();
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
                 IsHandled = true;
             }
 
@@ -247,7 +243,7 @@
 
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsResolved = false;
                 IsHandled = true;
@@ -257,16 +253,6 @@
                 IsResolved = ConformantResultTable.IsSealed;
                 Debug.Assert(ParameterTable.IsSealed || !IsResolved);
                 Debug.Assert(ResultTable.IsSealed || !IsResolved);
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Contract)
-            {
-                IsResolved = false;
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
-                IsResolved = false;
                 IsHandled = true;
             }
 

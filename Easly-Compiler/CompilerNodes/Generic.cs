@@ -126,7 +126,7 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsHandled = true;
             }
@@ -136,10 +136,6 @@ namespace CompilerNode
                 ResolvedGenericType = new OnceReference<IFormalGenericType>();
                 ResolvedDefaultType = new OnceReference<ICompiledType>();
                 ResolvedConformanceTable = new HashtableEx<ITypeName, ICompiledType>();
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
                 IsHandled = true;
             }
 
@@ -156,7 +152,7 @@ namespace CompilerNode
 
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsResolved = false;
                 IsHandled = true;
@@ -164,16 +160,6 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 IsResolved = ResolvedConformanceTable.IsSealed;
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Contract)
-            {
-                IsResolved = false;
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
-                IsResolved = false;
                 IsHandled = true;
             }
 

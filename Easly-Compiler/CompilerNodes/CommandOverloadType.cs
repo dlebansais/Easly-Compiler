@@ -185,7 +185,7 @@
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsHandled = true;
             }
@@ -193,10 +193,6 @@
             {
                 TypeName = null;
                 ParameterTable = new ListTableEx<IParameter>();
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
                 IsHandled = true;
             }
 
@@ -213,7 +209,7 @@
 
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsResolved = false;
                 IsHandled = true;
@@ -221,16 +217,6 @@
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 IsResolved = ParameterTable.IsSealed;
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Contract)
-            {
-                IsResolved = false;
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
-                IsResolved = false;
                 IsHandled = true;
             }
 

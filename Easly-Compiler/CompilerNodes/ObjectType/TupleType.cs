@@ -149,7 +149,7 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsHandled = true;
             }
@@ -166,10 +166,6 @@ namespace CompilerNode
                 FieldTable = new HashtableEx<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
-                IsHandled = true;
-            }
 
             Debug.Assert(IsHandled);
         }
@@ -184,7 +180,7 @@ namespace CompilerNode
 
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsResolved = false;
                 IsHandled = true;
@@ -194,16 +190,6 @@ namespace CompilerNode
                 Debug.Assert(ResolvedTypeName.IsAssigned == ResolvedType.IsAssigned);
                 IsResolved = ResolvedType.IsAssigned;
                 Debug.Assert(FieldTable.IsSealed == IsResolved);
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Contract)
-            {
-                IsResolved = false;
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
-                IsResolved = false;
                 IsHandled = true;
             }
 

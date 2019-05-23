@@ -71,7 +71,7 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsHandled = true;
             }
@@ -79,10 +79,6 @@ namespace CompilerNode
             {
                 ResolvedSourceTypeName = new OnceReference<ITypeName>();
                 ResolvedSourceType = new OnceReference<ICompiledType>();
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
                 IsHandled = true;
             }
 
@@ -99,7 +95,7 @@ namespace CompilerNode
 
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsResolved = false;
                 IsHandled = true;
@@ -108,16 +104,6 @@ namespace CompilerNode
             {
                 Debug.Assert(ResolvedSourceTypeName.IsAssigned == ResolvedSourceType.IsAssigned);
                 IsResolved = ResolvedSourceType.IsAssigned;
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Contract)
-            {
-                IsResolved = false;
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
-                IsResolved = false;
                 IsHandled = true;
             }
 

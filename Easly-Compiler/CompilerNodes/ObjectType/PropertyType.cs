@@ -211,7 +211,7 @@
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsHandled = true;
             }
@@ -231,10 +231,6 @@
                 OriginatingTypedef = new OnceReference<ITypedef>();
                 IsHandled = true;
             }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
-                IsHandled = true;
-            }
 
             Debug.Assert(IsHandled);
         }
@@ -249,7 +245,7 @@
 
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsResolved = false;
                 IsHandled = true;
@@ -258,16 +254,6 @@
             {
                 Debug.Assert(ResolvedTypeName.IsAssigned == ResolvedType.IsAssigned);
                 IsResolved = ResolvedType.IsAssigned;
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Contract)
-            {
-                IsResolved = false;
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
-                IsResolved = false;
                 IsHandled = true;
             }
 

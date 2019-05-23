@@ -222,7 +222,7 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsHandled = true;
             }
@@ -246,10 +246,6 @@ namespace CompilerNode
                 ResolvedBodyTagList = new OnceReference<IList<IBody>>();
                 IsHandled = true;
             }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
-                IsHandled = true;
-            }
 
             Debug.Assert(IsHandled);
         }
@@ -264,7 +260,7 @@ namespace CompilerNode
 
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsResolved = false;
                 IsHandled = true;
@@ -282,11 +278,6 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsResolved = ResolvedBodyTagList.IsAssigned;
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
-                IsResolved = false;
                 IsHandled = true;
             }
 

@@ -112,7 +112,7 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsHandled = true;
             }
@@ -135,10 +135,6 @@ namespace CompilerNode
                 FullSetScope = new HashtableEx<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
-                IsHandled = true;
-            }
 
             Debug.Assert(IsHandled);
         }
@@ -153,7 +149,7 @@ namespace CompilerNode
 
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsResolved = false;
                 IsHandled = true;
@@ -165,16 +161,6 @@ namespace CompilerNode
                 IsResolved = ResolvedFeature.IsAssigned;
                 Debug.Assert(ResolvedEntityType.IsAssigned == IsResolved);
                 Debug.Assert(ResolvedFeatureType.IsAssigned == IsResolved);
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Contract)
-            {
-                IsResolved = false;
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
-                IsResolved = false;
                 IsHandled = true;
             }
 

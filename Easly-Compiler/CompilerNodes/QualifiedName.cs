@@ -91,17 +91,13 @@
                 ValidPath = new OnceReference<IList<IIdentifier>>();
                 IsHandled = true;
             }
-            else if (ruleTemplateList == RuleTemplateSet.Types)
+            else if (ruleTemplateList == RuleTemplateSet.Types || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ValidResultTypePath = new OnceReference<IList<IExpressionType>>();
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
                 IsHandled = true;
             }
 
@@ -123,7 +119,7 @@
                 IsResolved = ValidPath.IsAssigned;
                 IsHandled = true;
             }
-            else if (ruleTemplateList == RuleTemplateSet.Types)
+            else if (ruleTemplateList == RuleTemplateSet.Types || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsResolved = false;
                 IsHandled = true;
@@ -131,11 +127,6 @@
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsResolved = ValidResultTypePath.IsAssigned;
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
-                IsResolved = false;
                 IsHandled = true;
             }
 

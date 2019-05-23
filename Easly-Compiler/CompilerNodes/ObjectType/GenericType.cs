@@ -137,7 +137,7 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsHandled = true;
             }
@@ -150,10 +150,6 @@ namespace CompilerNode
                 ArgumentIdentifierTable = new HashtableEx<string, IIdentifier>();
                 ResolvedTypeArgumentTable = new OnceReference<IHashtableEx<string, ICompiledType>>();
                 ResolvedArgumentLocationTable = new OnceReference<IHashtableEx<string, IObjectType>>();
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
                 IsHandled = true;
             }
 
@@ -170,7 +166,7 @@ namespace CompilerNode
 
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsResolved = false;
                 IsHandled = true;
@@ -182,16 +178,6 @@ namespace CompilerNode
                 Debug.Assert(ResolvedArgumentLocationTable.IsAssigned == IsResolved);
                 Debug.Assert(ResolvedTypeArgumentTable.IsAssigned == IsResolved);
                 Debug.Assert(BaseClass.IsAssigned == IsResolved);
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Contract)
-            {
-                IsResolved = false;
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
-                IsResolved = false;
                 IsHandled = true;
             }
 

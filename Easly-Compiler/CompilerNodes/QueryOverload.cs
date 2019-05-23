@@ -179,7 +179,7 @@
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsHandled = true;
             }
@@ -202,10 +202,6 @@
                 ResolvedBody = new OnceReference<ICompiledBody>();
                 IsHandled = true;
             }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
-                IsHandled = true;
-            }
 
             Debug.Assert(IsHandled);
         }
@@ -220,7 +216,7 @@
 
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsResolved = false;
                 IsHandled = true;
@@ -238,11 +234,6 @@
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsResolved = ResolvedBody.IsAssigned;
-                IsHandled = true;
-            }
-            else if (ruleTemplateList == RuleTemplateSet.Body)
-            {
-                IsResolved = false;
                 IsHandled = true;
             }
 
