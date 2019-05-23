@@ -89,7 +89,6 @@
                                 else if (AttachmentType == BaseNode.CopySemantic.Any)
                                     AttachmentType = BaseNode.CopySemantic.Reference;
                             }
-
                             else if (DestinationType.IsValue)
                             {
                                 if (AttachmentType == BaseNode.CopySemantic.Reference || AttachmentToAny)
@@ -100,24 +99,18 @@
                                 else if (AttachmentType == BaseNode.CopySemantic.Any)
                                     AttachmentType = BaseNode.CopySemantic.Value;
                             }
-
-                            else
+                            else if (AttachmentToAny)
                             {
-                                if (AttachmentToAny)
-                                {
-                                    AddSourceError(new ErrorInvalidAttachment(AttachmentItem));
-                                    ConformanceError = true;
-                                }
-
-                                else if (AttachmentType != BaseNode.CopySemantic.Any)
-                                {
-                                    AddSourceError(new ErrorInvalidAttachment(AttachmentItem));
-                                    ConformanceError = true;
-                                }
-
-                                else
-                                    AttachmentToAny = true;
+                                AddSourceError(new ErrorInvalidAttachment(AttachmentItem));
+                                ConformanceError = true;
                             }
+                            else if (AttachmentType != BaseNode.CopySemantic.Any)
+                            {
+                                AddSourceError(new ErrorInvalidAttachment(AttachmentItem));
+                                ConformanceError = true;
+                            }
+                            else
+                                AttachmentToAny = true;
                         }
 
                     if (!ConformanceError && !AttachmentToAny)
@@ -161,7 +154,6 @@
                                 AddSourceError(new ErrorInvalidAttachment(AttachmentItem));
                                 ConformanceError = true;
                             }
-
                             else
                                 for (int k = 0; k < j; k++)
                                 {

@@ -292,7 +292,6 @@ namespace CompilerNode
             IList<IIdentifier> ValidPath = Query.ValidPath.Item;
 
             IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
-            Debug.Assert(LocalScope != null);
 
             if (!ObjectType.GetQualifiedPathFinalType(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, errorList, out ICompiledFeature FinalFeature, out IDiscrete FinalDiscrete, out ITypeName FinalTypeName, out ICompiledType FinalType, out bool InheritBySideAttribute))
                 return false;
@@ -302,131 +301,167 @@ namespace CompilerNode
             if (FinalFeature != null)
             {
                 resolvedFinalFeature = FinalFeature;
-
-                List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
-                TypeArgumentStyles ArgumentStyle;
-                if (!Argument.Validate(ArgumentList, MergedArgumentList, out ArgumentStyle, errorList))
-                    return false;
-
-                IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
-                IIdentifier LastIdentifier = ValidPath[ValidPath.Count - 1];
-                string ValidText = LastIdentifier.ValidText.Item;
-                bool IsHandled = false;
-                bool Success = true;
-
-                switch (FinalType)
-                {
-                    case IFunctionType AsFunctionType:
-                        foreach (IQueryOverloadType Overload in AsFunctionType.OverloadList)
-                            ParameterTableList.Add(Overload.ParameterTable);
-
-                        int SelectedIndex;
-                        if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, ArgumentStyle, errorList, node, out SelectedIndex))
-                            return false;
-
-                        IQueryOverloadType SelectedOverload = AsFunctionType.OverloadList[SelectedIndex];
-                        resolvedResult = new ResultType(SelectedOverload.ResultTypeList);
-                        resolvedException = new ResultException(SelectedOverload.ExceptionIdentifierList);
-                        selectedParameterList = SelectedOverload.ParameterTable;
-                        selectedResultList = SelectedOverload.ResultTable;
-                        resolvedArgumentList = MergedArgumentList;
-                        IsHandled = true;
-                        break;
-
-                    case IProcedureType AsProcedureType:
-                    case IIndexerType AsIndexerType:
-                        errorList.AddError(new ErrorInvalidExpression(node));
-                        Success = false;
-                        IsHandled = true;
-                        break;
-
-                    case IPropertyType AsPropertyType:
-                        resolvedResult = new ResultType(AsPropertyType.ResolvedEntityTypeName.Item, AsPropertyType.ResolvedEntityType.Item, ValidText);
-
-                        resolvedException = new ResultException(AsPropertyType.GetExceptionIdentifierList);
-                        selectedParameterList = new ListTableEx<IParameter>();
-                        selectedResultList = new ListTableEx<IParameter>();
-                        resolvedArgumentList = new List<IExpressionType>();
-                        IsHandled = true;
-                        break;
-
-                    case IClassType AsClassType:
-                        resolvedResult = new ResultType(FinalTypeName, AsClassType, ValidText);
-
-                        resolvedException = new ResultException();
-                        selectedParameterList = new ListTableEx<IParameter>();
-                        selectedResultList = new ListTableEx<IParameter>();
-                        resolvedArgumentList = MergedArgumentList;
-                        IsHandled = true;
-                        break;
-
-                    case IFormalGenericType AsFormalGenericType:
-                        resolvedResult = new ResultType(FinalTypeName, AsFormalGenericType, ValidText);
-
-                        resolvedException = new ResultException();
-                        selectedParameterList = new ListTableEx<IParameter>();
-                        selectedResultList = new ListTableEx<IParameter>();
-                        resolvedArgumentList = MergedArgumentList;
-                        IsHandled = true;
-                        break;
-
-                    case ITupleType AsTupleType:
-                        resolvedResult = new ResultType(FinalTypeName, AsTupleType, ValidText);
-
-                        resolvedException = new ResultException();
-                        selectedParameterList = new ListTableEx<IParameter>();
-                        selectedResultList = new ListTableEx<IParameter>();
-                        resolvedArgumentList = MergedArgumentList;
-                        IsHandled = true;
-                        break;
-                }
-
-                Debug.Assert(IsHandled);
-
-                if (!Success)
-                    return false;
-
-                ObjectType.FillResultPath(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, Query.ValidResultTypePath.Item);
-
-                IsHandled = false;
-                switch (FinalFeature)
-                {
-                    case IConstantFeature AsConstantFeature:
-                        IExpression ConstantValue = (IExpression)AsConstantFeature.ConstantValue;
-                        constantSourceList.Add(ConstantValue);
-                        IsHandled = true;
-                        break;
-
-                    default:
-                        IsHandled = true; // TODO: handle IFunctionFeature or the indexer to try to get a constant.
-                        break;
-                }
+                return ResolveFeature(node, errorList, resolvedFinalFeature, FinalTypeName, FinalType, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedParameterList, out selectedResultList, out resolvedArgumentList);
             }
             else
             {
                 Debug.Assert(FinalDiscrete != null);
 
                 resolvedFinalDiscrete = FinalDiscrete;
-
-                // This is enforced by the code above.
-                bool IsNumberTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName NumberTypeName, out ICompiledType NumberType);
-                Debug.Assert(IsNumberTypeAvailable);
-
-                resolvedResult = new ResultType(NumberTypeName, NumberType, FinalDiscrete.ValidDiscreteName.Item.Name);
-                resolvedException = new ResultException();
-
-                if (FinalDiscrete.NumericValue.IsAssigned)
-                {
-                    IExpression NumericValue = (IExpression)FinalDiscrete.NumericValue.Item;
-                    constantSourceList.Add(NumericValue);
-                }
-                else
-                    expressionConstant = new DiscreteLanguageConstant(FinalDiscrete);
-
-                selectedParameterList = new ListTableEx<IParameter>();
-                selectedResultList = new ListTableEx<IParameter>();
-                resolvedArgumentList = new List<IExpressionType>();
+                ResolveDiscrete(node, errorList, resolvedFinalDiscrete, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedParameterList, out selectedResultList, out resolvedArgumentList);
             }
+
+            return true;
+        }
+
+        private static bool ResolveFeature(IQueryExpression node, IErrorList errorList, ICompiledFeature resolvedFinalFeature, ITypeName finalTypeName, ICompiledType finalType, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out ListTableEx<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList)
+        {
+            resolvedResult = null;
+            resolvedException = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+            selectedParameterList = null;
+            selectedResultList = null;
+            resolvedArgumentList = null;
+
+            IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
+
+            IQualifiedName Query = (IQualifiedName)node.Query;
+            IList<IArgument> ArgumentList = node.ArgumentList;
+            IClass EmbeddingClass = node.EmbeddingClass;
+            IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;
+            IList<IIdentifier> ValidPath = Query.ValidPath.Item;
+
+            List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
+            TypeArgumentStyles ArgumentStyle;
+            if (!Argument.Validate(ArgumentList, MergedArgumentList, out ArgumentStyle, errorList))
+                return false;
+
+            IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+            IIdentifier LastIdentifier = ValidPath[ValidPath.Count - 1];
+            string ValidText = LastIdentifier.ValidText.Item;
+            bool IsHandled = false;
+            bool Success = true;
+
+            switch (finalType)
+            {
+                case IFunctionType AsFunctionType:
+                    foreach (IQueryOverloadType Overload in AsFunctionType.OverloadList)
+                        ParameterTableList.Add(Overload.ParameterTable);
+
+                    int SelectedIndex;
+                    if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, ArgumentStyle, errorList, node, out SelectedIndex))
+                        return false;
+
+                    IQueryOverloadType SelectedOverload = AsFunctionType.OverloadList[SelectedIndex];
+                    resolvedResult = new ResultType(SelectedOverload.ResultTypeList);
+                    resolvedException = new ResultException(SelectedOverload.ExceptionIdentifierList);
+                    selectedParameterList = SelectedOverload.ParameterTable;
+                    selectedResultList = SelectedOverload.ResultTable;
+                    resolvedArgumentList = MergedArgumentList;
+                    IsHandled = true;
+                    break;
+
+                case IProcedureType AsProcedureType:
+                case IIndexerType AsIndexerType:
+                    errorList.AddError(new ErrorInvalidExpression(node));
+                    Success = false;
+                    IsHandled = true;
+                    break;
+
+                case IPropertyType AsPropertyType:
+                    resolvedResult = new ResultType(AsPropertyType.ResolvedEntityTypeName.Item, AsPropertyType.ResolvedEntityType.Item, ValidText);
+
+                    resolvedException = new ResultException(AsPropertyType.GetExceptionIdentifierList);
+                    selectedParameterList = new ListTableEx<IParameter>();
+                    selectedResultList = new ListTableEx<IParameter>();
+                    resolvedArgumentList = new List<IExpressionType>();
+                    IsHandled = true;
+                    break;
+
+                case IClassType AsClassType:
+                    resolvedResult = new ResultType(finalTypeName, AsClassType, ValidText);
+
+                    resolvedException = new ResultException();
+                    selectedParameterList = new ListTableEx<IParameter>();
+                    selectedResultList = new ListTableEx<IParameter>();
+                    resolvedArgumentList = MergedArgumentList;
+                    IsHandled = true;
+                    break;
+
+                case IFormalGenericType AsFormalGenericType:
+                    resolvedResult = new ResultType(finalTypeName, AsFormalGenericType, ValidText);
+
+                    resolvedException = new ResultException();
+                    selectedParameterList = new ListTableEx<IParameter>();
+                    selectedResultList = new ListTableEx<IParameter>();
+                    resolvedArgumentList = MergedArgumentList;
+                    IsHandled = true;
+                    break;
+
+                case ITupleType AsTupleType:
+                    resolvedResult = new ResultType(finalTypeName, AsTupleType, ValidText);
+
+                    resolvedException = new ResultException();
+                    selectedParameterList = new ListTableEx<IParameter>();
+                    selectedResultList = new ListTableEx<IParameter>();
+                    resolvedArgumentList = MergedArgumentList;
+                    IsHandled = true;
+                    break;
+            }
+
+            Debug.Assert(IsHandled);
+
+            if (!Success)
+                return false;
+
+            ObjectType.FillResultPath(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, Query.ValidResultTypePath.Item);
+
+            IsHandled = false;
+            switch (resolvedFinalFeature)
+            {
+                case IConstantFeature AsConstantFeature:
+                    IExpression ConstantValue = (IExpression)AsConstantFeature.ConstantValue;
+                    constantSourceList.Add(ConstantValue);
+                    IsHandled = true;
+                    break;
+
+                default:
+                    IsHandled = true; // TODO: handle IFunctionFeature or the indexer to try to get a constant.
+                    break;
+            }
+
+            return true;
+        }
+
+        private static bool ResolveDiscrete(IQueryExpression node, IErrorList errorList, IDiscrete resolvedFinalDiscrete, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out ListTableEx<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList)
+        {
+            resolvedResult = null;
+            resolvedException = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+            selectedParameterList = null;
+            selectedResultList = null;
+            resolvedArgumentList = null;
+
+            // This is enforced by the caller.
+            bool IsNumberTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName NumberTypeName, out ICompiledType NumberType);
+            Debug.Assert(IsNumberTypeAvailable);
+
+            resolvedResult = new ResultType(NumberTypeName, NumberType, resolvedFinalDiscrete.ValidDiscreteName.Item.Name);
+            resolvedException = new ResultException();
+
+            if (resolvedFinalDiscrete.NumericValue.IsAssigned)
+            {
+                IExpression NumericValue = (IExpression)resolvedFinalDiscrete.NumericValue.Item;
+                constantSourceList.Add(NumericValue);
+            }
+            else
+                expressionConstant = new DiscreteLanguageConstant(resolvedFinalDiscrete);
+
+            selectedParameterList = new ListTableEx<IParameter>();
+            selectedResultList = new ListTableEx<IParameter>();
+            resolvedArgumentList = new List<IExpressionType>();
 
             return true;
         }

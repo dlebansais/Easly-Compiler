@@ -311,60 +311,66 @@
                 }
 
                 foreach (IIdentifier IdentifierItem in AssignmentItem.ParameterList)
-                {
-                    string ValidIdentifierText = IdentifierItem.ValidText.Item;
+                    Success &= CheckAssignemntIdentifier(errorList, featureTable, assignedFeatureTable, IdentifierItem);
+            }
 
-                    if (assignedFeatureTable.ContainsKey(ValidIdentifierText))
+            return Success;
+        }
+
+        private static bool CheckAssignemntIdentifier(IErrorList errorList, IHashtableEx<IFeatureName, IFeatureInstance> featureTable, IHashtableEx<string, ICompiledFeature> assignedFeatureTable, IIdentifier identifierItem)
+        {
+            bool Success = true;
+            string ValidIdentifierText = identifierItem.ValidText.Item;
+
+            if (assignedFeatureTable.ContainsKey(ValidIdentifierText))
+            {
+                errorList.AddError(new ErrorIdentifierAlreadyListed(identifierItem, ValidIdentifierText));
+                Success = false;
+            }
+            else
+            {
+                if (FeatureName.TableContain(featureTable, ValidIdentifierText, out IFeatureName Key, out IFeatureInstance FeatureItem))
+                {
+                    bool ValidFeature = false;
+
+                    if (FeatureItem.Feature.Item is AttributeFeature AsAttributeFeature)
+                        ValidFeature = true;
+                    else if (FeatureItem.Feature.Item is IPropertyFeature AsPropertyFeature)
                     {
-                        errorList.AddError(new ErrorIdentifierAlreadyListed(IdentifierItem, ValidIdentifierText));
-                        Success = false;
+                        bool IsHandled = false;
+                        switch (AsPropertyFeature.PropertyKind)
+                        {
+                            case BaseNode.UtilityType.ReadOnly:
+                                ValidFeature = !AsPropertyFeature.GetterBody.IsAssigned;
+                                IsHandled = true;
+                                break;
+
+                            case BaseNode.UtilityType.ReadWrite:
+                                ValidFeature = !(AsPropertyFeature.GetterBody.IsAssigned && !AsPropertyFeature.SetterBody.IsAssigned);
+                                IsHandled = true;
+                                break;
+
+                            case BaseNode.UtilityType.WriteOnly:
+                                ValidFeature = true;
+                                IsHandled = true;
+                                break;
+                        }
+
+                        Debug.Assert(IsHandled);
                     }
+
+                    if (ValidFeature)
+                        assignedFeatureTable.Add(ValidIdentifierText, FeatureItem.Feature.Item);
                     else
                     {
-                        if (FeatureName.TableContain(featureTable, ValidIdentifierText, out IFeatureName Key, out IFeatureInstance FeatureItem))
-                        {
-                            bool ValidFeature = false;
-
-                            if (FeatureItem.Feature.Item is AttributeFeature AsAttributeFeature)
-                                ValidFeature = true;
-                            else if (FeatureItem.Feature.Item is IPropertyFeature AsPropertyFeature)
-                            {
-                                bool IsHandled = false;
-                                switch (AsPropertyFeature.PropertyKind)
-                                {
-                                    case BaseNode.UtilityType.ReadOnly:
-                                        ValidFeature = !AsPropertyFeature.GetterBody.IsAssigned;
-                                        IsHandled = true;
-                                        break;
-
-                                    case BaseNode.UtilityType.ReadWrite:
-                                        ValidFeature = !(AsPropertyFeature.GetterBody.IsAssigned && !AsPropertyFeature.SetterBody.IsAssigned);
-                                        IsHandled = true;
-                                        break;
-
-                                    case BaseNode.UtilityType.WriteOnly:
-                                        ValidFeature = true;
-                                        IsHandled = true;
-                                        break;
-                                }
-
-                                Debug.Assert(IsHandled);
-                            }
-
-                            if (ValidFeature)
-                                assignedFeatureTable.Add(ValidIdentifierText, FeatureItem.Feature.Item);
-                            else
-                            {
-                                errorList.AddError(new ErrorAttributeOrPropertyRequired(IdentifierItem, ValidIdentifierText));
-                                Success = false;
-                            }
-                        }
-                        else
-                        {
-                            errorList.AddError(new ErrorUnknownIdentifier(IdentifierItem, ValidIdentifierText));
-                            Success = false;
-                        }
+                        errorList.AddError(new ErrorAttributeOrPropertyRequired(identifierItem, ValidIdentifierText));
+                        Success = false;
                     }
+                }
+                else
+                {
+                    errorList.AddError(new ErrorUnknownIdentifier(identifierItem, ValidIdentifierText));
+                    Success = false;
                 }
             }
 

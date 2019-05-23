@@ -68,7 +68,6 @@
                         AddSourceError(new ErrorNumberTypeMissing(Source));
                         return false;
                     }
-
                     else if (ValueType != NumberType)
                     {
                         AddSourceError(new ErrorInvalidExpression(Source));

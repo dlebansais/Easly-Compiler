@@ -86,7 +86,6 @@
                     AddSourceError(new ErrorInvalidOverSourceType(OverList));
                     return false;
                 }
-
                 else if (!IsConformantToEnumerable && !IsConformantToNumericIndexer)
                 {
                     AddSourceError(new ErrorInvalidOverSourceType(OverList));

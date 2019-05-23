@@ -290,7 +290,6 @@ namespace CompilerNode
                     return false;
                 }
             }
-
             else
             {
                 errorList.AddError(new ErrorUnknownIdentifier(ConstantIdentifier, ValidConstantText));

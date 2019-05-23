@@ -1520,7 +1520,6 @@
                 if (index + 1 < validPath.Count)
                     FillResultPath(baseClass, ResolvedFeatureType, null, validPath, index + 1, resultPath);
             }
-
             else if (FeatureName.TableContain(FeatureTable, ValidText, out IFeatureName Key, out IFeatureInstance Instance))
             {
                 ICompiledFeature SourceFeature = Instance.Feature.Item;

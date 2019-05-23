@@ -139,7 +139,6 @@ namespace CompilerNode
                     case IPositionalArgument AsPositionalArgument:
                         if (argumentStyle == TypeArgumentStyles.None)
                             argumentStyle = TypeArgumentStyles.Positional;
-
                         else if (argumentStyle == TypeArgumentStyles.Assignment)
                         {
                             errorList.AddError(new ErrorArgumentMixed(AsPositionalArgument));
@@ -152,7 +151,6 @@ namespace CompilerNode
                     case IAssignmentArgument AsAssignmentArgument:
                         if (argumentStyle == TypeArgumentStyles.None)
                             argumentStyle = TypeArgumentStyles.Assignment;
-
                         else if (argumentStyle == TypeArgumentStyles.Positional)
                         {
                             errorList.AddError(new ErrorArgumentMixed(AsAssignmentArgument));

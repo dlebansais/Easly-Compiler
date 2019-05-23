@@ -63,8 +63,8 @@
 
             if (AttributeType is IClassType AsClassType)
                 ConstraintClassTypeList.Add(AsClassType);
-
             else if (AttributeType is IFormalGenericType AsFormalGenericType)
+            {
                 foreach (KeyValuePair<ITypeName, ICompiledType> Entry in AsFormalGenericType.ConformanceTable)
                     if (Entry.Value is IClassType AsConformantClassType)
                         ConstraintClassTypeList.Add(AsConformantClassType);
@@ -73,7 +73,7 @@
                         AddSourceError(new ErrorClassTypeRequired(EntityIdentifier));
                         return false;
                     }
-
+            }
             else
             {
                 AddSourceError(new ErrorClassTypeRequired(EntityIdentifier));
@@ -179,14 +179,12 @@
                     attributeType = AsAttributeFeature.ResolvedEntityType.Item;
                     Success = true;
                 }
-
                 else if (Instance.Feature.Item is IPropertyFeature AsPropertyFeature)
                 {
                     attributeTypeName = AsPropertyFeature.ResolvedEntityTypeName.Item;
                     attributeType = AsPropertyFeature.ResolvedEntityType.Item;
                     Success = true;
                 }
-
                 else
                     AddSourceError(new ErrorCreatedFeatureNotAttributeOrProperty(EntityIdentifier, ValidText));
             }
