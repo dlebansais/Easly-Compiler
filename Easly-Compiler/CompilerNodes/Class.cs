@@ -361,6 +361,14 @@ namespace CompilerNode
         /// Compiler class 'Any Value'.
         /// </summary>
         public static IClass ClassAnyValue { get; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Class"/> class.
+        /// </summary>
+        public Class()
+        {
+            LocalScope.Seal();
+        }
         #endregion
 
         #region Compiler
@@ -629,6 +637,7 @@ namespace CompilerNode
                 ImportedLanguageTypeTable = new Dictionary<Guid, Tuple<ITypeName, IClassType>>();
                 NamespaceTable = new HashtableEx<string, IHashtableEx>();
                 LocalScope = new HashtableEx<string, IScopeAttributeFeature>();
+                LocalScope.Seal();
                 InnerScopes = new List<IScopeHolder>();
                 FullScope = new HashtableEx<string, IScopeAttributeFeature>();
                 IsHandled = true;

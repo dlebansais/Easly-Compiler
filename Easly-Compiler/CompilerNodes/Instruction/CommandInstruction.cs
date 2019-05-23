@@ -140,11 +140,11 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IResultType>();
-                ResolvedException = new OnceReference<IResultException>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
+                ResolvedException = new OnceReference<IResultException>();
                 SelectedFeature = new OnceReference<ICompiledFeature>();
                 SelectedOverload = new OnceReference<ICommandOverloadType>();
                 MergedArgumentList = new OnceReference<IList<IExpressionType>>();
