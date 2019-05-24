@@ -258,28 +258,6 @@ namespace CompilerNode
         }
 
         /// <summary>
-        /// Merge two lists of exceptions source code can throw.
-        /// </summary>
-        /// <param name="mergedExceptions">The list with the merged content upon return.</param>
-        /// <param name="additionalExceptions">The list of exception identifiers to merge with <paramref name="mergedExceptions"/>.</param>
-        public static void MergeExceptions(IList<IIdentifier> mergedExceptions, IList<IIdentifier> additionalExceptions)
-        {
-            foreach (IIdentifier Item in additionalExceptions)
-            {
-                bool Found = false;
-                foreach (IIdentifier OtherItem in mergedExceptions)
-                    if (OtherItem.ValidText.Item == Item.ValidText.Item)
-                    {
-                        Found = true;
-                        break;
-                    }
-
-                if (!Found)
-                    mergedExceptions.Add(Item);
-            }
-        }
-
-        /// <summary>
         /// Gets the final constant in a chain of expressions.
         /// </summary>
         /// <param name="expression">The expression.</param>

@@ -60,7 +60,7 @@
             IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;
 
             ICompiledType SourceType = SourceResult.At(0).ValueType;
-            ICompiledType DestinationType;
+            ICompiledType DestinationType = null;
 
             if (node.Destination == BaseNode.Keyword.Result)
             {
@@ -68,7 +68,18 @@
                     DestinationType = AsPropertyFeature.ResolvedEntityType.Item;
                 else if (node.EmbeddingFeature is IIndexerFeature AsIndexerFeature)
                     DestinationType = AsIndexerFeature.ResolvedEntityType.Item;
+                else if (node.EmbeddingOverload is IQueryOverload AsQueryOverload)
+                {
+                    if (AsQueryOverload.ResultTable.Count == 1)
+                    {
+                        IParameter SingleResult = AsQueryOverload.ResultTable[0];
+                        if (SingleResult.Name == nameof(BaseNode.Keyword.Result))
+                            DestinationType = SingleResult.ResolvedParameter.ResolvedFeatureType.Item;
+                    }
+                }
                 else
+
+                if (DestinationType == null)
                 {
                     AddSourceError(new ErrorInvalidAssignment(node));
                     return false;

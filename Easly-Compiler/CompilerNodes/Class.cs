@@ -423,12 +423,7 @@ namespace CompilerNode
                     foreach (KeyValuePair<ITypeName, ICompiledType> Entry in ConformanceTable)
                         if (Entry.Value is IClassType AsClassType)
                             if (AsClassType.BaseClass.ClassGuid == LanguageClasses.Enumeration.Guid)
-                            {
-                                if (ConformanceTable.Count == 1)
-                                    IsInheritingEnumeration = true;
-
-                                break;
-                            }
+                                IsInheritingEnumeration |= ConformanceTable.Count == 1;
                 }
 
                 return IsInheritingEnumeration;

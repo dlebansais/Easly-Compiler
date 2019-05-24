@@ -118,12 +118,12 @@
 
         private bool IsRangeCompatible(IList<IConstantRange> completeRangeList, IConstantRange range)
         {
-            bool Result = true;
+            bool IsIntersecting = false;
 
             foreach (IConstantRange Item in completeRangeList)
-                Result &= Item.IsIntersecting(range);
+                IsIntersecting |= Item.IsIntersecting(range);
 
-            return Result;
+            return !IsIntersecting;
         }
 
         /// <summary>

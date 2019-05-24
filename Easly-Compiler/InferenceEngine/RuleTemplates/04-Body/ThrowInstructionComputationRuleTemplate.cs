@@ -94,12 +94,16 @@
                 ICommandOverloadType SelectedOverload = AsProcedureType.OverloadList[SelectedIndex];
 
                 IResultException ResolvedException = new ResultException();
+                ResolvedException.Add(ValidText);
+
+                Debug.Assert(ResolvedException.At(0).Text == ValidText);
+                Debug.Assert(ResolvedException.At(0).ValidText.IsAssigned);
+                Debug.Assert(ResolvedException.At(0).ValidText.Item == ValidText);
 
                 foreach (IArgument Item in node.ArgumentList)
                     ResultException.Merge(ResolvedException, Item.ResolvedException.Item);
 
                 ResultException.Merge(ResolvedException, SelectedOverload.ExceptionIdentifierList);
-                ResolvedException.Add(ValidText);
 
                 ListTableEx<IParameter> SelectedParameterList = SelectedOverload.ParameterTable;
 
