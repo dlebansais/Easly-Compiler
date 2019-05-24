@@ -79,12 +79,8 @@
                 IIndexerType AsIndexerType = (IndexerType)Indexer.ResolvedFeatureType.Item;
 
                 List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
-                IErrorList ArgumentErrorList = new ErrorList();
-                if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, ArgumentErrorList))
-                {
-                    AddSourceErrorList(ArgumentErrorList);
+                if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, ErrorList))
                     return false;
-                }
 
                 IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
                 ParameterTableList.Add(AsIndexerType.ParameterTable);
@@ -108,6 +104,8 @@
                     AddSourceError(new ErrorInvalidExpression(Source));
                     return false;
                 }
+
+                // TODO: check that the indexer isn't read-only
 
                 ObjectType.FillResultPath(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, Destination.ValidResultTypePath.Item);
                 ListTableEx<IParameter> SelectedParameterList = ParameterTableList[SelectedIndex];

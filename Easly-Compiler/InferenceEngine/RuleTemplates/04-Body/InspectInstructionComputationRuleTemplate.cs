@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -63,12 +64,11 @@
                 IClass BaseClass = AsClassType.BaseClass;
                 if (!BaseClass.IsEnumeration)
                 {
-                    if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName NumberTypeName, out ICompiledType NumberType))
-                    {
-                        AddSourceError(new ErrorNumberTypeMissing(Source));
-                        return false;
-                    }
-                    else if (ValueType != NumberType)
+                    // TODO: allow enum class as constant, but then test this.
+                    bool IsNumberAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName NumberTypeName, out ICompiledType NumberType);
+                    Debug.Assert(IsNumberAvailable);
+
+                    if (ValueType != NumberType)
                     {
                         AddSourceError(new ErrorInvalidExpression(Source));
                         return false;

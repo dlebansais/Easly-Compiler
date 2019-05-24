@@ -1461,7 +1461,14 @@
                 if (FeatureName.TableContain(DiscreteTable, ValidText, out Key, out IDiscrete Discrete))
                 {
                     finalDiscrete = Discrete;
-                    return Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, ValidIdentifier, out finalTypeName, out finalType);
+
+                    if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, ValidIdentifier, out finalTypeName, out finalType))
+                    {
+                        errorList.AddError(new ErrorNumberTypeMissing(ValidIdentifier));
+                        return false;
+                    }
+                    else
+                        return true;
                 }
                 else
                 {

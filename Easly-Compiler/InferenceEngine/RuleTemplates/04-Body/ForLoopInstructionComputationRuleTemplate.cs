@@ -63,15 +63,15 @@
                 bool IsBooleanTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
                 bool IsNumberTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName NumberTypeName, out ICompiledType NumberType);
 
-                if (!IsBooleanTypeAvailable)
-                {
-                    AddSourceError(new ErrorBooleanTypeMissing(node));
-                    Success = false;
-                }
-
                 if (node.Variant.IsAssigned && !IsNumberTypeAvailable)
                 {
                     AddSourceError(new ErrorNumberTypeMissing(node));
+                    Success = false;
+                }
+
+                if (!IsBooleanTypeAvailable)
+                {
+                    AddSourceError(new ErrorBooleanTypeMissing(node));
                     Success = false;
                 }
 

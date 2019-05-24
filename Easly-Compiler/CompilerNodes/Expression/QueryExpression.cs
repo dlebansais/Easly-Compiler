@@ -308,10 +308,8 @@ namespace CompilerNode
                 Debug.Assert(FinalDiscrete != null);
 
                 resolvedFinalDiscrete = FinalDiscrete;
-                ResolveDiscrete(node, errorList, resolvedFinalDiscrete, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedParameterList, out selectedResultList, out resolvedArgumentList);
+                return ResolveDiscrete(node, errorList, resolvedFinalDiscrete, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedParameterList, out selectedResultList, out resolvedArgumentList);
             }
-
-            return true;
         }
 
         private static bool ResolveFeature(IQueryExpression node, IErrorList errorList, ICompiledFeature resolvedFinalFeature, ITypeName finalTypeName, ICompiledType finalType, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out ListTableEx<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList)
