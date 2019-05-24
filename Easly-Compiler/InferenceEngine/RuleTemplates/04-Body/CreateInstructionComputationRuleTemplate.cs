@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
     using Easly;
 
@@ -59,26 +60,33 @@
             if (!GetCreatedEntity(node, out ITypeName AttributeTypeName, out ICompiledType AttributeType))
                 return false;
 
-            IList<IClassType> ConstraintClassTypeList = new List<IClassType>();
+            Debug.Assert(AttributeType.IsReference);
 
-            if (AttributeType is IClassType AsClassType)
-                ConstraintClassTypeList.Add(AsClassType);
-            else if (AttributeType is IFormalGenericType AsFormalGenericType)
+            IList<IClassType> ConstraintClassTypeList = new List<IClassType>();
+            bool IsHandled = false;
+
+            switch (AttributeType)
             {
-                foreach (KeyValuePair<ITypeName, ICompiledType> Entry in AsFormalGenericType.ConformanceTable)
-                    if (Entry.Value is IClassType AsConformantClassType)
-                        ConstraintClassTypeList.Add(AsConformantClassType);
-                    else
-                    {
-                        AddSourceError(new ErrorClassTypeRequired(EntityIdentifier));
-                        return false;
-                    }
+                case IClassType AsClassType:
+                    ConstraintClassTypeList.Add(AsClassType);
+                    IsHandled = true;
+                    break;
+
+                case IFormalGenericType AsFormalGenericType:
+                    foreach (KeyValuePair<ITypeName, ICompiledType> Entry in AsFormalGenericType.ConformanceTable)
+                        if (Entry.Value is IClassType AsConformantClassType)
+                            ConstraintClassTypeList.Add(AsConformantClassType);
+                        else
+                        {
+                            AddSourceError(new ErrorClassTypeRequired(EntityIdentifier));
+                            return false;
+                        }
+                    IsHandled = true;
+                    break;
             }
-            else
-            {
-                AddSourceError(new ErrorClassTypeRequired(EntityIdentifier));
-                return false;
-            }
+
+            // Since AttributeType is a reference type, it can only be one of the two cases above.
+            Debug.Assert(IsHandled);
 
             IIdentifier CreationRoutineIdentifier = (IIdentifier)node.CreationRoutineIdentifier;
             ValidText = CreationRoutineIdentifier.ValidText.Item;
@@ -102,12 +110,8 @@
             if (CreationRoutineInstance is ICreationFeature AsCreationFeature)
             {
                 List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
-                IErrorList ArgumentErrorList = new ErrorList();
-                if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, ArgumentErrorList))
-                {
-                    AddSourceErrorList(ArgumentErrorList);
+                if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, ErrorList))
                     return false;
-                }
 
                 IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
 
@@ -132,16 +136,16 @@
 
                     if (!ObjectType.GetQualifiedPathFinalType(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, ErrorList, out ICompiledFeature FinalFeature, out IDiscrete FinalDiscrete, out ITypeName FinalTypeName, out ICompiledType FinalType, out bool InheritBySideAttribute))
                         return false;
-
-                    IResultException ResolvedException = new ResultException();
-
-                    foreach (IArgument Item in node.ArgumentList)
-                        ResultException.Merge(ResolvedException, Item.ResolvedException.Item);
-
-                    ResultException.Merge(ResolvedException, SelectedOverload.ExceptionIdentifierList);
-
-                    data = new Tuple<IResultException, ICommandOverloadType, ITypeName, ICompiledType>(ResolvedException, SelectedOverload, CreatedObjectTypeName, CreatedObjectType);
                 }
+
+                IResultException ResolvedException = new ResultException();
+
+                foreach (IArgument Item in node.ArgumentList)
+                    ResultException.Merge(ResolvedException, Item.ResolvedException.Item);
+
+                ResultException.Merge(ResolvedException, SelectedOverload.ExceptionIdentifierList);
+
+                data = new Tuple<IResultException, ICommandOverloadType, ITypeName, ICompiledType>(ResolvedException, SelectedOverload, CreatedObjectTypeName, CreatedObjectType);
             }
             else
             {

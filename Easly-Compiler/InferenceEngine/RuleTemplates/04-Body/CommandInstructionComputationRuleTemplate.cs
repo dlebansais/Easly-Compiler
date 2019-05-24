@@ -66,13 +66,8 @@
             Debug.Assert(FinalFeature != null);
 
             List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
-            IErrorList ArgumentErrorList = new ErrorList();
-            TypeArgumentStyles ArgumentStyle;
-            if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out ArgumentStyle, ArgumentErrorList))
-            {
-                AddSourceErrorList(ArgumentErrorList);
+            if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, ErrorList))
                 return false;
-            }
 
             IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
             ICommandOverloadType SelectedOverload = null;
@@ -82,6 +77,7 @@
             switch (FinalType)
             {
                 case IFunctionType AsFunctionType:
+                case IPropertyType AsPropertyType:
                     AddSourceError(new ErrorInvalidInstruction(node));
                     Success = false;
                     IsHandled = true;
@@ -99,19 +95,6 @@
                         SelectedOverload = AsProcedureType.OverloadList[SelectedIndex];
                         CommandFinalType = AsProcedureType;
                     }
-                    IsHandled = true;
-                    break;
-
-                case IIndexerType AsIndexerType:
-                    AddSourceError(new ErrorInvalidInstruction(node));
-                    Success = false;
-                    IsHandled = true;
-                    break;
-
-                case IPropertyType AsPropertyType:
-                    //CommandInstructionException.Item = AsPropertyType.SetExceptionIdentifierList; ??? can be a property ?
-                    //SelectedParameterList.Item = new ListTableEx<Parameter>();
-                    AddSourceError(new ErrorInvalidInstruction(node));
                     IsHandled = true;
                     break;
             }

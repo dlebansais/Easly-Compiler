@@ -329,7 +329,7 @@
 
             foreach (IRuleTemplate Rule in RuleTemplateList)
             {
-                /*if (Rule is IAllBodiesComputationRuleTemplate AsRuleTemplate)
+                /*if (Rule is IConstraintRuleTemplate AsRuleTemplate)
                 {
 
                 }*/

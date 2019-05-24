@@ -36,6 +36,8 @@
         {
             FormalGeneric = formalGeneric;
             ResolvedTypeName = resolvedTypeName;
+            DiscreteTable.Seal();
+            FeatureTable.Seal();
         }
         #endregion
 
