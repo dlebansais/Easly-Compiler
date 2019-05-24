@@ -48,57 +48,52 @@
             data = null;
             bool Success = true;
 
-            if (node.DestinationList.Count == 0)
+            // This list has been verified during the node tree check.
+            Debug.Assert(node.DestinationList.Count > 0);
+
+            IExpression SourceExpression = (IExpression)node.Source;
+            IResultType SourceResult = SourceExpression.ResolvedResult.Item;
+
+            if (node.DestinationList.Count > SourceResult.Count)
             {
-                AddSourceError(new ErrorInvalidInstruction(node));
+                AddSourceError(new ErrorAssignmentMismatch(node));
                 Success = false;
             }
             else
             {
-                IExpression SourceExpression = (IExpression)node.Source;
-                IResultType SourceResult = SourceExpression.ResolvedResult.Item;
+                IClass EmbeddingClass = node.EmbeddingClass;
+                IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;
 
-                if (node.DestinationList.Count > SourceResult.Count)
+                IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
+
+                for (int i = 0; i < node.DestinationList.Count; i++)
                 {
-                    AddSourceError(new ErrorAssignmentMismatch(node));
-                    Success = false;
-                }
-                else
-                {
-                    IClass EmbeddingClass = node.EmbeddingClass;
-                    IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;
+                    IQualifiedName Destination = (QualifiedName)node.DestinationList[i];
+                    IList<IIdentifier> ValidPath = Destination.ValidPath.Item;
+                    IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
 
-                    IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-
-                    for (int i = 0; i < node.DestinationList.Count; i++)
+                    if (!ObjectType.GetQualifiedPathFinalType(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, ErrorList, out ICompiledFeature FinalFeature, out IDiscrete FinalDiscrete, out ITypeName FinalTypeName, out ICompiledType FinalType, out bool InheritBySideAttribute))
+                        Success = false;
+                    else
                     {
-                        IQualifiedName Destination = (QualifiedName)node.DestinationList[i];
-                        IList<IIdentifier> ValidPath = Destination.ValidPath.Item;
-                        IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
+                        Debug.Assert(FinalFeature != null);
 
-                        if (!ObjectType.GetQualifiedPathFinalType(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, ErrorList, out ICompiledFeature FinalFeature, out IDiscrete FinalDiscrete, out ITypeName FinalTypeName, out ICompiledType FinalType, out bool InheritBySideAttribute))
-                            Success = false;
-                        else
+                        ICompiledType SourceType = SourceResult.At(i).ValueType;
+                        IPathParticipatingType DestinationType = FinalType as IPathParticipatingType;
+                        Debug.Assert(DestinationType != null);
+
+                        if (!ObjectType.TypeConformToBase(SourceType, DestinationType.TypeAsDestinationOrSource, SubstitutionTypeTable))
                         {
-                            Debug.Assert(FinalFeature != null);
-
-                            ICompiledType SourceType = SourceResult.At(i).ValueType;
-                            IPathParticipatingType DestinationType = FinalType as IPathParticipatingType;
-                            Debug.Assert(DestinationType != null);
-
-                            if (!ObjectType.TypeConformToBase(SourceType, DestinationType.TypeAsDestinationOrSource, SubstitutionTypeTable))
-                            {
-                                AddSourceError(new ErrorAssignmentMismatch(Destination));
-                                Success = false;
-                            }
-                            else
-                                ObjectType.FillResultPath(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, Destination.ValidResultTypePath.Item);
+                            AddSourceError(new ErrorAssignmentMismatch(Destination));
+                            Success = false;
                         }
+                        else
+                            ObjectType.FillResultPath(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, Destination.ValidResultTypePath.Item);
                     }
-
-                    if (Success)
-                        data = SourceExpression.ResolvedException.Item;
                 }
+
+                if (Success)
+                    data = SourceExpression.ResolvedException.Item;
             }
 
             return Success;
