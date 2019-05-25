@@ -1393,7 +1393,7 @@
             if (localScope.ContainsKey(ValidText))
                 return GetQualifiedPathFinalTypeFromLocal(baseClass, baseType, localScope, validPath, index, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
             else if (FeatureName.TableContain(FeatureTable, ValidText, out IFeatureName Key, out IFeatureInstance Instance))
-                return GetQualifiedPathFinalTypeAsFeature(baseClass, baseType, localScope, validPath, index, errorList, Key, Instance, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
+                return GetQualifiedPathFinalTypeAsFeature(baseClass, baseType, localScope, validPath, index, errorList, Instance, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
             else if (index == 0 && index + 1 < validPath.Count && baseClass.ImportedClassTable.ContainsKey(ValidText) && baseClass.ImportedClassTable[ValidText].Item.Cloneable == BaseNode.CloneableStatus.Single)
                 return GetQualifiedPathFinalTypeFromSingle(baseClass, validPath, index, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
             else if (index + 1 == validPath.Count)
@@ -1432,9 +1432,9 @@
             }
         }
 
-        private static bool GetQualifiedPathFinalTypeAsFeature(IClass baseClass, ICompiledType baseType, IHashtableEx<string, IScopeAttributeFeature> localScope, IList<IIdentifier> validPath, int index, IErrorList errorList, IFeatureName Key, IFeatureInstance Instance, out ICompiledFeature finalFeature, out IDiscrete finalDiscrete, out ITypeName finalTypeName, out ICompiledType finalType, out bool inheritBySideAttribute)
+        private static bool GetQualifiedPathFinalTypeAsFeature(IClass baseClass, ICompiledType baseType, IHashtableEx<string, IScopeAttributeFeature> localScope, IList<IIdentifier> validPath, int index, IErrorList errorList, IFeatureInstance instance, out ICompiledFeature finalFeature, out IDiscrete finalDiscrete, out ITypeName finalTypeName, out ICompiledType finalType, out bool inheritBySideAttribute)
         {
-            ICompiledFeature SourceFeature = Instance.Feature.Item;
+            ICompiledFeature SourceFeature = instance.Feature.Item;
             ITypeName ResolvedFeatureTypeName = SourceFeature.ResolvedFeatureTypeName.Item;
             ICompiledType ResolvedFeatureType = SourceFeature.ResolvedFeatureType.Item;
 
@@ -1457,7 +1457,7 @@
                 finalDiscrete = null;
                 finalTypeName = ResolvedFeatureTypeName;
                 finalType = ResolvedFeatureType;
-                inheritBySideAttribute = Instance.InheritBySideAttribute;
+                inheritBySideAttribute = instance.InheritBySideAttribute;
                 return true;
             }
         }

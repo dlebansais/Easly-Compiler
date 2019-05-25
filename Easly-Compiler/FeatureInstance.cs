@@ -79,6 +79,15 @@
         /// </summary>
         /// <param name="ancestor">The ancestor.</param>
         IFeatureInstance Clone(IClassType ancestor);
+
+        /// <summary>
+        /// Find the precursor, either the only one or the selected one.
+        /// </summary>
+        /// <param name="ancestorType">The optionally selected precursor.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="source">The source to use when reporting errors.</param>
+        /// <param name="selectedPrecursor">The selected precursor upon return if successful.</param>
+        bool FindPrecursor(IOptionalReference<BaseNode.IObjectType> ancestorType, IErrorList errorList, ISource source, out IFeatureInstance selectedPrecursor);
     }
 
     /// <summary>
@@ -215,6 +224,43 @@
                 ClonedObject.OriginalPrecursor.Item = OriginalPrecursor.Item;
 
             return ClonedObject;
+        }
+
+        /// <summary>
+        /// Find the precursor, either the only one or the selected one.
+        /// </summary>
+        /// <param name="ancestorType">The optionally selected precursor.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="source">The source to use when reporting errors.</param>
+        /// <param name="selectedPrecursor">The selected precursor upon return if successful.</param>
+        public bool FindPrecursor(IOptionalReference<BaseNode.IObjectType> ancestorType, IErrorList errorList, ISource source, out IFeatureInstance selectedPrecursor)
+        {
+            selectedPrecursor = null;
+
+            if (ancestorType.IsAssigned)
+            {
+                IObjectType AssignedAncestorType = (IObjectType)ancestorType.Item;
+                IClassType Ancestor = AssignedAncestorType.ResolvedType.Item as IClassType;
+                Debug.Assert(Ancestor != null);
+
+                foreach (IPrecursorInstance PrecursorItem in PrecursorList)
+                    if (PrecursorItem.Ancestor.BaseClass == Ancestor.BaseClass)
+                    {
+                        selectedPrecursor = PrecursorItem.Precursor;
+                        break;
+                    }
+
+                if (selectedPrecursor == null)
+                    errorList.AddError(new ErrorInvalidPrecursor(AssignedAncestorType));
+            }
+            else if (PrecursorList.Count == 0)
+                errorList.AddError(new ErrorNoPrecursor(source));
+            else if (PrecursorList.Count > 1)
+                errorList.AddError(new ErrorInvalidPrecursor(source));
+            else
+                selectedPrecursor = PrecursorList[0].Precursor;
+
+            return selectedPrecursor != null;
         }
         #endregion
     }

@@ -260,8 +260,7 @@ namespace CompilerNode
             IClass EmbeddingClass = node.EmbeddingClass;
             IHashtableEx<string, IImportedClass> ClassTable = EmbeddingClass.ImportedClassTable;
             IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable = EmbeddingClass.FeatureTable;
-            OnceReference<IFeatureInstance> SelectedPrecursor = new OnceReference<IFeatureInstance>();
-            IFeature InnerFeature = (IFeature)node.EmbeddingFeature;
+            IFeature InnerFeature = node.EmbeddingFeature;
 
             if (InnerFeature is IndexerFeature)
             {
@@ -272,43 +271,14 @@ namespace CompilerNode
             IFeature AsNamedFeature = InnerFeature;
             IFeatureInstance Instance = FeatureTable[AsNamedFeature.ValidFeatureName.Item];
 
-            if (AncestorType.IsAssigned)
-            {
-                IObjectType AssignedAncestorType = (IObjectType)AncestorType.Item;
-                IClassType Ancestor = AssignedAncestorType.ResolvedType.Item as IClassType;
-                Debug.Assert(Ancestor != null);
-
-                foreach (IPrecursorInstance PrecursorItem in Instance.PrecursorList)
-                    if (PrecursorItem.Ancestor.BaseClass == Ancestor.BaseClass)
-                    {
-                        SelectedPrecursor.Item = PrecursorItem.Precursor;
-                        break;
-                    }
-
-                if (!SelectedPrecursor.IsAssigned)
-                {
-                    errorList.AddError(new ErrorInvalidPrecursor(AssignedAncestorType));
-                    return false;
-                }
-            }
-            else if (Instance.PrecursorList.Count == 0)
-            {
-                errorList.AddError(new ErrorNoPrecursor(node));
+            if (!Instance.FindPrecursor(node.AncestorType, errorList, node, out IFeatureInstance SelectedPrecursor))
                 return false;
-            }
-            else if (Instance.PrecursorList.Count > 1)
-            {
-                errorList.AddError(new ErrorInvalidPrecursor(node));
-                return false;
-            }
-            else
-                SelectedPrecursor.Item = Instance.PrecursorList[0].Precursor;
 
             List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
             if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, errorList))
                 return false;
 
-            ICompiledFeature OperatorFeature = SelectedPrecursor.Item.Feature.Item;
+            ICompiledFeature OperatorFeature = SelectedPrecursor.Feature.Item;
             ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
             ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
             IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
