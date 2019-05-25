@@ -58,71 +58,77 @@
                 AddSourceError(new ErrorInvalidExpression(WhileCondition));
                 Success = false;
             }
+            else if (!IsForLoopTypeAvailable(node))
+                Success = false;
             else
             {
-                bool IsBooleanTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
-                bool IsNumberTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName NumberTypeName, out ICompiledType NumberType);
+                IResultException ResolvedException = new ResultException();
 
-                if (node.Variant.IsAssigned && !IsNumberTypeAvailable)
+                foreach (IInstruction Item in node.InitInstructionList)
+                    ResultException.Merge(ResolvedException, Item.ResolvedException.Item);
+
+                ResultException.Merge(ResolvedException, WhileCondition.ResolvedException.Item);
+
+                foreach (IInstruction Item in node.LoopInstructionList)
+                    ResultException.Merge(ResolvedException, Item.ResolvedException.Item);
+
+                foreach (IInstruction Item in node.IterationInstructionList)
+                    ResultException.Merge(ResolvedException, Item.ResolvedException.Item);
+
+                foreach (Assertion Item in node.InvariantList)
+                    ResultException.Merge(ResolvedException, Item.ResolvedException.Item);
+
+                if (node.Variant.IsAssigned)
                 {
-                    AddSourceError(new ErrorNumberTypeMissing(node));
-                    Success = false;
+                    IExpression Variant = (IExpression)node.Variant.Item;
+                    ResultException.Merge(ResolvedException, Variant.ResolvedException.Item);
                 }
 
-                if (!IsBooleanTypeAvailable)
-                {
-                    AddSourceError(new ErrorBooleanTypeMissing(node));
-                    Success = false;
-                }
+                data = ResolvedException;
+            }
 
-                if (Success)
-                {
-                    IExpressionType ContractType = ResolvedResult.At(0);
+            return Success;
+        }
 
-                    if (ContractType.ValueType != BooleanType)
+        private bool IsForLoopTypeAvailable(IForLoopInstruction node)
+        {
+            bool IsBooleanTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
+            bool IsNumberTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName NumberTypeName, out ICompiledType NumberType);
+
+            if (node.Variant.IsAssigned && !IsNumberTypeAvailable)
+            {
+                AddSourceError(new ErrorNumberTypeMissing(node));
+                return false;
+            }
+
+            if (!IsBooleanTypeAvailable)
+            {
+                AddSourceError(new ErrorBooleanTypeMissing(node));
+                return false;
+            }
+
+            IExpression WhileCondition = (IExpression)node.WhileCondition;
+            IResultType ResolvedResult = WhileCondition.ResolvedResult.Item;
+            IExpressionType ContractType = ResolvedResult.At(0);
+
+            if (ContractType.ValueType != BooleanType)
+            {
+                AddSourceError(new ErrorInvalidExpression(WhileCondition));
+                return false;
+            }
+
+            bool Success = true;
+
+            if (node.Variant.IsAssigned)
+            {
+                IExpression VariantCondition = (IExpression)node.Variant.Item;
+
+                foreach (IExpressionType Item in VariantCondition.ResolvedResult.Item)
+                    if (Item.ValueType != NumberType)
                     {
-                        AddSourceError(new ErrorInvalidExpression(WhileCondition));
+                        AddSourceError(new ErrorInvalidExpression(VariantCondition));
                         Success = false;
                     }
-                    else if (node.Variant.IsAssigned)
-                    {
-                        IExpression VariantCondition = (IExpression)node.Variant.Item;
-
-                        foreach (IExpressionType Item in VariantCondition.ResolvedResult.Item)
-                            if (Item.ValueType != NumberType)
-                            {
-                                AddSourceError(new ErrorInvalidExpression(VariantCondition));
-                                Success = false;
-                            }
-                    }
-
-                    if (Success)
-                    {
-                        IResultException ResolvedException = new ResultException();
-
-                        foreach (IInstruction Item in node.InitInstructionList)
-                            ResultException.Merge(ResolvedException, Item.ResolvedException.Item);
-
-                        ResultException.Merge(ResolvedException, WhileCondition.ResolvedException.Item);
-
-                        foreach (IInstruction Item in node.LoopInstructionList)
-                            ResultException.Merge(ResolvedException, Item.ResolvedException.Item);
-
-                        foreach (IInstruction Item in node.IterationInstructionList)
-                            ResultException.Merge(ResolvedException, Item.ResolvedException.Item);
-
-                        foreach (Assertion Item in node.InvariantList)
-                            ResultException.Merge(ResolvedException, Item.ResolvedException.Item);
-
-                        if (node.Variant.IsAssigned)
-                        {
-                            IExpression Variant = (IExpression)node.Variant.Item;
-                            ResultException.Merge(ResolvedException, Variant.ResolvedException.Item);
-                        }
-
-                        data = ResolvedException;
-                    }
-                }
             }
 
             return Success;

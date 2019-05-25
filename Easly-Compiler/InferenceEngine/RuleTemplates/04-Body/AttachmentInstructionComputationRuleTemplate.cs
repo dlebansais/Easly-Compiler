@@ -102,8 +102,6 @@
             bool AttachmentToAny = false;
             BaseNode.CopySemantic AttachmentType = BaseNode.CopySemantic.Any;
 
-            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-
             foreach (IAttachment AttachmentItem in node.AttachmentList)
                 if (index < AttachmentItem.AttachTypeList.Count)
                 {
@@ -145,26 +143,35 @@
                 }
 
             if (!ConformanceError && !AttachmentToAny)
+                ConformanceError = CheckConsistencyAnyConformance(node, index);
+
+            return ConformanceError;
+        }
+
+        private bool CheckConsistencyAnyConformance(IAttachmentInstruction node, int index)
+        {
+            bool ConformanceError = false;
+
+            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
+
+            for (int j = 0; j < node.AttachmentList.Count; j++)
             {
-                for (int j = 0; j < node.AttachmentList.Count; j++)
+                IAttachment AttachmentItem = node.AttachmentList[j];
+                if (index < AttachmentItem.AttachTypeList.Count)
                 {
-                    IAttachment AttachmentItem = node.AttachmentList[j];
-                    if (index < AttachmentItem.AttachTypeList.Count)
+                    IObjectType AttachType = AttachmentItem.AttachTypeList[index];
+                    ICompiledType DestinationType = AttachType.ResolvedType.Item;
+
+                    for (int k = 0; k < j; k++)
                     {
-                        IObjectType AttachType = AttachmentItem.AttachTypeList[index];
-                        ICompiledType DestinationType = AttachType.ResolvedType.Item;
+                        IAttachment PreviousAttachmentItem = node.AttachmentList[k];
+                        IObjectType PreviousAttachType = PreviousAttachmentItem.AttachTypeList[index];
+                        ICompiledType PreviousDestinationType = PreviousAttachType.ResolvedType.Item;
 
-                        for (int k = 0; k < j; k++)
+                        if (ObjectType.TypeConformToBase(DestinationType, PreviousDestinationType, SubstitutionTypeTable))
                         {
-                            IAttachment PreviousAttachmentItem = node.AttachmentList[k];
-                            IObjectType PreviousAttachType = PreviousAttachmentItem.AttachTypeList[index];
-                            ICompiledType PreviousDestinationType = PreviousAttachType.ResolvedType.Item;
-
-                            if (ObjectType.TypeConformToBase(DestinationType, PreviousDestinationType, SubstitutionTypeTable))
-                            {
-                                AddSourceError(new ErrorInvalidAttachment(AttachmentItem));
-                                ConformanceError = true;
-                            }
+                            AddSourceError(new ErrorInvalidAttachment(AttachmentItem));
+                            ConformanceError = true;
                         }
                     }
                 }
