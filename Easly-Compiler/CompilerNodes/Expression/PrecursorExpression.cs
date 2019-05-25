@@ -278,7 +278,24 @@ namespace CompilerNode
             if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, errorList))
                 return false;
 
-            ICompiledFeature OperatorFeature = SelectedPrecursor.Feature.Item;
+            if (!ResolveCall(node, SelectedPrecursor, MergedArgumentList, ArgumentStyle, errorList, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedParameterList, out resolvedArgumentList))
+                return false;
+
+            // TODO: check if the precursor is a constant number
+            return true;
+        }
+
+        private static bool ResolveCall(IPrecursorExpression node, IFeatureInstance selectedPrecursor, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        {
+            resolvedResult = null;
+            resolvedException = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+            selectedParameterList = null;
+            resolvedArgumentList = null;
+
+            IList<IArgument> ArgumentList = node.ArgumentList;
+            ICompiledFeature OperatorFeature = selectedPrecursor.Feature.Item;
             ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
             ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
             IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
@@ -288,19 +305,7 @@ namespace CompilerNode
             switch (OperatorType)
             {
                 case IFunctionType AsFunctionType:
-                    foreach (IQueryOverloadType Overload in AsFunctionType.OverloadList)
-                        ParameterTableList.Add(Overload.ParameterTable);
-
-                    int SelectedIndex;
-                    if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, ArgumentStyle, errorList, node, out SelectedIndex))
-                        return false;
-
-                    IQueryOverloadType SelectedOverload = AsFunctionType.OverloadList[SelectedIndex];
-                    resolvedResult = new ResultType(SelectedOverload.ResultTypeList);
-                    resolvedException = new ResultException(SelectedOverload.ExceptionIdentifierList);
-                    selectedParameterList = SelectedOverload.ParameterTable;
-                    resolvedArgumentList = MergedArgumentList;
-                    Success = true;
+                    Success = ResolveCallFunction(node, selectedPrecursor, AsFunctionType, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedParameterList, out resolvedArgumentList);
                     IsHandled = true;
                     break;
 
@@ -311,52 +316,121 @@ namespace CompilerNode
                     break;
 
                 case IClassType AsClassType:
-                    if (ArgumentList.Count > 0)
-                        errorList.AddError(new ErrorInvalidExpression(node));
-                    else
-                    {
-                        resolvedResult = new ResultType(OperatorTypeName, OperatorType, string.Empty);
-
-                        resolvedException = new ResultException();
-                        selectedParameterList = new ListTableEx<IParameter>();
-                        resolvedArgumentList = new List<IExpressionType>();
-
-                        if (OperatorFeature is IConstantFeature AsConstantFeature)
-                        {
-                            IExpression ConstantValue = (IExpression)AsConstantFeature.ConstantValue;
-                            constantSourceList.Add(ConstantValue);
-                        }
-
-                        Success = true;
-                    }
+                    Success = ResolveCallClass(node, selectedPrecursor, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedParameterList, out resolvedArgumentList);
                     IsHandled = true;
                     break;
 
                 case IPropertyType AsPropertyType:
-                    IPropertyFeature Property = (IPropertyFeature)OperatorFeature;
-                    string PropertyName = ((IFeatureWithName)Property).EntityName.Text;
-
-                    resolvedResult = new ResultType(AsPropertyType.ResolvedEntityTypeName.Item, AsPropertyType.ResolvedEntityType.Item, PropertyName);
-
-                    resolvedException = new ResultException();
-
-                    if (Property.GetterBody.IsAssigned)
-                    {
-                        IBody GetterBody = (IBody)Property.GetterBody.Item;
-                        resolvedException = new ResultException(GetterBody.ExceptionIdentifierList);
-                    }
-
-                    selectedParameterList = new ListTableEx<IParameter>();
-                    resolvedArgumentList = new List<IExpressionType>();
-                    Success = true;
+                    Success = ResolveCallProperty(node, selectedPrecursor, AsPropertyType, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedParameterList, out resolvedArgumentList);
                     IsHandled = true;
                     break;
             }
 
             Debug.Assert(IsHandled);
 
-            // TODO: check if the precursor is a constant number
             return Success;
+        }
+
+        private static bool ResolveCallFunction(IPrecursorExpression node, IFeatureInstance selectedPrecursor, IFunctionType callType, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        {
+            resolvedResult = null;
+            resolvedException = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+            selectedParameterList = null;
+            resolvedArgumentList = null;
+
+            IList<IArgument> ArgumentList = node.ArgumentList;
+            ICompiledFeature OperatorFeature = selectedPrecursor.Feature.Item;
+            ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
+            ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
+            IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+
+            foreach (IQueryOverloadType Overload in callType.OverloadList)
+                ParameterTableList.Add(Overload.ParameterTable);
+
+            if (!Argument.ArgumentsConformToParameters(ParameterTableList, mergedArgumentList, argumentStyle, errorList, node, out int SelectedIndex))
+                return false;
+
+            IQueryOverloadType SelectedOverload = callType.OverloadList[SelectedIndex];
+            resolvedResult = new ResultType(SelectedOverload.ResultTypeList);
+            resolvedException = new ResultException(SelectedOverload.ExceptionIdentifierList);
+            selectedParameterList = SelectedOverload.ParameterTable;
+            resolvedArgumentList = mergedArgumentList;
+
+            return true;
+        }
+
+        private static bool ResolveCallClass(IPrecursorExpression node, IFeatureInstance selectedPrecursor, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        {
+            resolvedResult = null;
+            resolvedException = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+            selectedParameterList = null;
+            resolvedArgumentList = null;
+
+            IList<IArgument> ArgumentList = node.ArgumentList;
+            ICompiledFeature OperatorFeature = selectedPrecursor.Feature.Item;
+            ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
+            ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
+            IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+
+            if (ArgumentList.Count > 0)
+            {
+                errorList.AddError(new ErrorInvalidExpression(node));
+                return false;
+            }
+            else
+            {
+                resolvedResult = new ResultType(OperatorTypeName, OperatorType, string.Empty);
+
+                resolvedException = new ResultException();
+                selectedParameterList = new ListTableEx<IParameter>();
+                resolvedArgumentList = new List<IExpressionType>();
+
+                if (OperatorFeature is IConstantFeature AsConstantFeature)
+                {
+                    IExpression ConstantValue = (IExpression)AsConstantFeature.ConstantValue;
+                    constantSourceList.Add(ConstantValue);
+                }
+            }
+
+            return true;
+        }
+
+        private static bool ResolveCallProperty(IPrecursorExpression node, IFeatureInstance selectedPrecursor, IPropertyType callType, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        {
+            resolvedResult = null;
+            resolvedException = null;
+            constantSourceList = new ListTableEx<IExpression>();
+            expressionConstant = NeutralLanguageConstant.NotConstant;
+            selectedParameterList = null;
+            resolvedArgumentList = null;
+
+            IList<IArgument> ArgumentList = node.ArgumentList;
+            ICompiledFeature OperatorFeature = selectedPrecursor.Feature.Item;
+            ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
+            ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
+            IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+
+            IPropertyFeature Property = (IPropertyFeature)OperatorFeature;
+            string PropertyName = ((IFeatureWithName)Property).EntityName.Text;
+
+            resolvedResult = new ResultType(callType.ResolvedEntityTypeName.Item, callType.ResolvedEntityType.Item, PropertyName);
+
+            resolvedException = new ResultException();
+
+            if (Property.GetterBody.IsAssigned)
+            {
+                IBody GetterBody = (IBody)Property.GetterBody.Item;
+                resolvedException = new ResultException(GetterBody.ExceptionIdentifierList);
+            }
+
+            selectedParameterList = new ListTableEx<IParameter>();
+            resolvedArgumentList = new List<IExpressionType>();
+
+            return true;
         }
         #endregion
 
