@@ -423,5 +423,46 @@ namespace CompilerNode
             else
                 return true;
         }
+
+        /// <summary>
+        /// Checks the validity of an assignment of a source to a destination, with arguments.
+        /// </summary>
+        /// <param name="parameterTableList">The list of expected parameters.</param>
+        /// <param name="argumentList">The list of actual arguments.</param>
+        /// <param name="sourceExpression">Expression in the assignment.</param>
+        /// <param name="destinationType">The expected type for the expression.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="source">The source to use when reporting errors.</param>
+        /// <param name="selectedParameterList">The list of parameters for the selected overload upon return.</param>
+        public static bool CheckAssignmentConformance(IList<ListTableEx<IParameter>> parameterTableList, IList<IArgument> argumentList, IExpression sourceExpression, ICompiledType destinationType, IErrorList errorList, ISource source, out ListTableEx<IParameter> selectedParameterList)
+        {
+            selectedParameterList = null;
+            IResultType SourceResult = sourceExpression.ResolvedResult.Item;
+
+            List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
+            if (!Argument.Validate(argumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, errorList))
+                return false;
+
+            if (!Argument.ArgumentsConformToParameters(parameterTableList, MergedArgumentList, ArgumentStyle, errorList, source, out int SelectedIndex))
+                return false;
+
+            if (SourceResult.Count != 1)
+            {
+                errorList.AddError(new ErrorInvalidExpression(sourceExpression));
+                return false;
+            }
+
+            selectedParameterList = parameterTableList[SelectedIndex];
+            ICompiledType SourceType = SourceResult.At(0).ValueType;
+
+            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
+            if (!ObjectType.TypeConformToBase(SourceType, destinationType, SubstitutionTypeTable, errorList, sourceExpression))
+            {
+                errorList.AddError(new ErrorInvalidExpression(sourceExpression));
+                return false;
+            }
+
+            return true;
+        }
     }
 }

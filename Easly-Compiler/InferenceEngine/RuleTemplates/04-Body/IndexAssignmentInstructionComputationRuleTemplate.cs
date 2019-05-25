@@ -78,37 +78,17 @@
                 IIndexerFeature Indexer = (IndexerFeature)IndexerInstance.Feature.Item;
                 IIndexerType AsIndexerType = (IndexerType)Indexer.ResolvedFeatureType.Item;
 
-                List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
-                if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, ErrorList))
-                    return false;
-
                 IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
                 ParameterTableList.Add(AsIndexerType.ParameterTable);
 
-                if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, ArgumentStyle, ErrorList, node, out int SelectedIndex))
+                ICompiledType DestinationType = AsIndexerType.ResolvedEntityType.Item;
+
+                if (!Argument.CheckAssignmentConformance(ParameterTableList, node.ArgumentList, Source, DestinationType, ErrorList, node, out ListTableEx<IParameter> SelectedParameterList))
                     return false;
-
-                IResultType SourceResult = Source.ResolvedResult.Item;
-
-                if (SourceResult.Count != 1)
-                {
-                    AddSourceError(new ErrorInvalidExpression(Source));
-                    return false;
-                }
-
-                ICompiledType SourceType = SourceResult.At(0).ValueType;
-
-                IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-                if (!ObjectType.TypeConformToBase(SourceType, AsIndexerType.ResolvedEntityType.Item, SubstitutionTypeTable, ErrorList, Source))
-                {
-                    AddSourceError(new ErrorInvalidExpression(Source));
-                    return false;
-                }
 
                 // TODO: check that the indexer isn't read-only
 
                 ObjectType.FillResultPath(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, Destination.ValidResultTypePath.Item);
-                ListTableEx<IParameter> SelectedParameterList = ParameterTableList[SelectedIndex];
 
                 IResultException ResolvedException = new ResultException();
 

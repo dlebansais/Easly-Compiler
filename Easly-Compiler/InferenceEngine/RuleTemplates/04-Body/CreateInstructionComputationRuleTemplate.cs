@@ -63,95 +63,37 @@
             Debug.Assert(AttributeType.IsReference);
 
             IList<IClassType> ConstraintClassTypeList = new List<IClassType>();
-            bool IsHandled = false;
-
-            switch (AttributeType)
-            {
-                case IClassType AsClassType:
-                    ConstraintClassTypeList.Add(AsClassType);
-                    IsHandled = true;
-                    break;
-
-                case IFormalGenericType AsFormalGenericType:
-                    foreach (KeyValuePair<ITypeName, ICompiledType> Entry in AsFormalGenericType.ConformanceTable)
-                        if (Entry.Value is IClassType AsConformantClassType)
-                            ConstraintClassTypeList.Add(AsConformantClassType);
-                        else
-                        {
-                            AddSourceError(new ErrorClassTypeRequired(EntityIdentifier));
-                            return false;
-                        }
-                    IsHandled = true;
-                    break;
-            }
-
-            // Since AttributeType is a reference type, it can only be one of the two cases above.
-            Debug.Assert(IsHandled);
-
-            IIdentifier CreationRoutineIdentifier = (IIdentifier)node.CreationRoutineIdentifier;
-            ValidText = CreationRoutineIdentifier.ValidText.Item;
-
-            IFeatureInstance CreationFeatureInstance = null;
-            foreach (ClassType Item in ConstraintClassTypeList)
-                if (FeatureName.TableContain(Item.FeatureTable, ValidText, out IFeatureName Key, out IFeatureInstance Instance))
-                {
-                    CreationFeatureInstance = Instance;
-                    break;
-                }
-
-            if (CreationFeatureInstance == null)
-            {
-                AddSourceError(new ErrorUnknownIdentifier(CreationRoutineIdentifier, ValidText));
+            if (!CheckConstraints(node, AttributeType, ConstraintClassTypeList))
                 return false;
-            }
 
-            ICompiledFeature CreationRoutineInstance = CreationFeatureInstance.Feature.Item;
-
-            if (CreationRoutineInstance is ICreationFeature AsCreationFeature)
-            {
-                List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
-                if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, ErrorList))
-                    return false;
-
-                IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
-
-                IProcedureType AsProcedureType = (IProcedureType)AsCreationFeature.ResolvedFeatureType.Item;
-                foreach (ICommandOverloadType Overload in AsProcedureType.OverloadList)
-                    ParameterTableList.Add(Overload.ParameterTable);
-
-                int SelectedIndex;
-                if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, ArgumentStyle, ErrorList, node, out SelectedIndex))
-                    return false;
-
-                ICommandOverloadType SelectedOverload = AsProcedureType.OverloadList[SelectedIndex];
-                ITypeName CreatedObjectTypeName = AttributeTypeName;
-                ICompiledType CreatedObjectType = AttributeType;
-
-                if (node.Processor.IsAssigned)
-                {
-                    IQualifiedName Processor = (IQualifiedName)node.Processor.Item;
-                    IList<IIdentifier> ValidPath = Processor.ValidPath.Item;
-
-                    IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
-
-                    if (!ObjectType.GetQualifiedPathFinalType(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, ErrorList, out ICompiledFeature FinalFeature, out IDiscrete FinalDiscrete, out ITypeName FinalTypeName, out ICompiledType FinalType, out bool InheritBySideAttribute))
-                        return false;
-                }
-
-                IResultException ResolvedException = new ResultException();
-
-                foreach (IArgument Item in node.ArgumentList)
-                    ResultException.Merge(ResolvedException, Item.ResolvedException.Item);
-
-                ResultException.Merge(ResolvedException, SelectedOverload.ExceptionIdentifierList);
-
-                data = new Tuple<IResultException, ICommandOverloadType, ITypeName, ICompiledType>(ResolvedException, SelectedOverload, CreatedObjectTypeName, CreatedObjectType);
-            }
-            else
-            {
-                AddSourceError(new ErrorCreationFeatureRequired(CreationRoutineIdentifier, ValidText));
+            if (!CheckCreationRoutine(node, ConstraintClassTypeList, out ICreationFeature CreationFeature))
                 return false;
+
+            if (!CheckCall(node, AttributeTypeName, AttributeType, CreationFeature, out ICommandOverloadType SelectedOverload))
+                return false;
+
+            ITypeName CreatedObjectTypeName = AttributeTypeName;
+            ICompiledType CreatedObjectType = AttributeType;
+
+            if (node.Processor.IsAssigned)
+            {
+                IQualifiedName Processor = (IQualifiedName)node.Processor.Item;
+                IList<IIdentifier> ValidPath = Processor.ValidPath.Item;
+
+                IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
+
+                if (!ObjectType.GetQualifiedPathFinalType(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, ErrorList, out ICompiledFeature FinalFeature, out IDiscrete FinalDiscrete, out ITypeName FinalTypeName, out ICompiledType FinalType, out bool InheritBySideAttribute))
+                    return false;
             }
+
+            IResultException ResolvedException = new ResultException();
+
+            foreach (IArgument Item in node.ArgumentList)
+                ResultException.Merge(ResolvedException, Item.ResolvedException.Item);
+
+            ResultException.Merge(ResolvedException, SelectedOverload.ExceptionIdentifierList);
+
+            data = new Tuple<IResultException, ICommandOverloadType, ITypeName, ICompiledType>(ResolvedException, SelectedOverload, CreatedObjectTypeName, CreatedObjectType);
 
             return Success;
         }
@@ -202,6 +144,99 @@
             }
 
             return Success;
+        }
+
+        private bool CheckConstraints(ICreateInstruction node, ICompiledType attributeType, IList<IClassType> constraintClassTypeList)
+        {
+            IIdentifier EntityIdentifier = (IIdentifier)node.EntityIdentifier;
+            string ValidText = EntityIdentifier.ValidText.Item;
+            bool IsHandled = false;
+
+            switch (attributeType)
+            {
+                case IClassType AsClassType:
+                    constraintClassTypeList.Add(AsClassType);
+                    IsHandled = true;
+                    break;
+
+                case IFormalGenericType AsFormalGenericType:
+                    foreach (KeyValuePair<ITypeName, ICompiledType> Entry in AsFormalGenericType.ConformanceTable)
+                        if (Entry.Value is IClassType AsConformantClassType)
+                            constraintClassTypeList.Add(AsConformantClassType);
+                        else
+                        {
+                            AddSourceError(new ErrorClassTypeRequired(EntityIdentifier));
+                            return false;
+                        }
+
+                    IsHandled = true;
+                    break;
+            }
+
+            // Since AttributeType is a reference type, it can only be one of the two cases above.
+            Debug.Assert(IsHandled);
+
+            return true;
+        }
+
+        private bool CheckCreationRoutine(ICreateInstruction node, IList<IClassType> constraintClassTypeList, out ICreationFeature creationFeature)
+        {
+            creationFeature = null;
+
+            IIdentifier CreationRoutineIdentifier = (IIdentifier)node.CreationRoutineIdentifier;
+            string ValidText = CreationRoutineIdentifier.ValidText.Item;
+
+            IFeatureInstance CreationFeatureInstance = null;
+            foreach (IClassType Item in constraintClassTypeList)
+                if (FeatureName.TableContain(Item.FeatureTable, ValidText, out IFeatureName Key, out IFeatureInstance Instance))
+                {
+                    CreationFeatureInstance = Instance;
+                    break;
+                }
+
+            if (CreationFeatureInstance == null)
+            {
+                AddSourceError(new ErrorUnknownIdentifier(CreationRoutineIdentifier, ValidText));
+                return false;
+            }
+
+            ICompiledFeature CreationRoutineInstance = CreationFeatureInstance.Feature.Item;
+
+            if (CreationRoutineInstance is ICreationFeature AsCreationFeature)
+            {
+                creationFeature = AsCreationFeature;
+                return true;
+            }
+            else
+            {
+                AddSourceError(new ErrorCreationFeatureRequired(CreationRoutineIdentifier, ValidText));
+                return false;
+            }
+        }
+
+        private bool CheckCall(ICreateInstruction node, ITypeName attributeTypeName, ICompiledType attributeType, ICreationFeature creationFeature, out ICommandOverloadType selectedOverload)
+        {
+            selectedOverload = null;
+
+            IClass EmbeddingClass = node.EmbeddingClass;
+            IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;
+
+            List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
+            if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, ErrorList))
+                return false;
+
+            IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+
+            IProcedureType AsProcedureType = (IProcedureType)creationFeature.ResolvedFeatureType.Item;
+            foreach (ICommandOverloadType Overload in AsProcedureType.OverloadList)
+                ParameterTableList.Add(Overload.ParameterTable);
+
+            int SelectedIndex;
+            if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, ArgumentStyle, ErrorList, node, out SelectedIndex))
+                return false;
+
+            selectedOverload = AsProcedureType.OverloadList[SelectedIndex];
+            return true;
         }
 
         /// <summary>

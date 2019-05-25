@@ -54,77 +54,23 @@
             IClass EmbeddingClass = node.EmbeddingClass;
             IHashtableEx<string, IImportedClass> ClassTable = EmbeddingClass.ImportedClassTable;
             IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable = EmbeddingClass.FeatureTable;
-            OnceReference<IFeatureInstance> SelectedPrecursor = new OnceReference<IFeatureInstance>();
             IFeature InnerFeature = node.EmbeddingFeature;
 
             if (InnerFeature is IIndexerFeature AsIndexerFeature)
             {
                 IFeatureInstance Instance = FeatureTable[AsIndexerFeature.ValidFeatureName.Item];
-                IList<IPrecursorInstance> PrecursorList = Instance.PrecursorList;
-
-                if (node.AncestorType.IsAssigned)
-                {
-                    IObjectType DeclaredAncestor = (IObjectType)node.AncestorType.Item;
-
-                    if (DeclaredAncestor.ResolvedType.Item is IClassType AsClassTypeAncestor)
-                    {
-                        foreach (IPrecursorInstance Item in PrecursorList)
-                            if (Item.Ancestor.BaseClass == AsClassTypeAncestor.BaseClass)
-                            {
-                                SelectedPrecursor.Item = Item.Precursor;
-                                break;
-                            }
-                    }
-
-                    if (!SelectedPrecursor.IsAssigned)
-                    {
-                        AddSourceError(new ErrorInvalidPrecursor(DeclaredAncestor));
-                        return false;
-                    }
-                }
-                else if (Instance.PrecursorList.Count > 1)
-                {
-                    AddSourceError(new ErrorInvalidPrecursor(node));
-                    return false;
-                }
-                else if (Instance.PrecursorList.Count == 0)
-                {
-                    AddSourceError(new ErrorNoPrecursor(node));
-                    return false;
-                }
-                else
-                    SelectedPrecursor.Item = Instance.PrecursorList[0].Precursor;
-
-                List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
-                if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, ErrorList))
+                if (!Instance.FindPrecursor(node.AncestorType, ErrorList, node, out IFeatureInstance SelectedPrecursor))
                     return false;
 
                 IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
-
-                ICompiledFeature OperatorFeature = SelectedPrecursor.Item.Feature.Item;
+                ICompiledFeature OperatorFeature = SelectedPrecursor.Feature.Item;
                 IIndexerType AsIndexerType = OperatorFeature.ResolvedFeatureType.Item as IIndexerType;
                 Debug.Assert(AsIndexerType != null);
 
                 ParameterTableList.Add(AsIndexerType.ParameterTable);
 
-                if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, ArgumentStyle, ErrorList, node, out int SelectedIndex))
+                if (!Argument.CheckAssignmentConformance(ParameterTableList, node.ArgumentList, SourceExpression, AsIndexerType.ResolvedEntityType.Item, ErrorList, node, out ListTableEx<IParameter> SelectedParameterList))
                     return false;
-
-                if (SourceResult.Count != 1)
-                {
-                    AddSourceError(new ErrorInvalidExpression(SourceExpression));
-                    return false;
-                }
-
-                ListTableEx<IParameter> SelectedParameterList = ParameterTableList[SelectedIndex];
-                ICompiledType SourceType = SourceResult.At(0).ValueType;
-
-                IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-                if (!ObjectType.TypeConformToBase(SourceType, AsIndexerType.ResolvedEntityType.Item, SubstitutionTypeTable, ErrorList, SourceExpression))
-                {
-                    AddSourceError(new ErrorInvalidExpression(SourceExpression));
-                    return false;
-                }
 
                 IResultException ResolvedException = new ResultException();
 
