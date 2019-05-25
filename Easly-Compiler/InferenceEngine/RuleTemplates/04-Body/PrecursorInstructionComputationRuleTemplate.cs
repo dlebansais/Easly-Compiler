@@ -108,58 +108,28 @@
                 ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
                 IList<IIdentifier> PrecursorInstructionException = null;
                 ListTableEx<IParameter> SelectedParameterList = null;
-                bool IsHandled = false;
 
-                switch (OperatorType)
-                {
-                    case IFunctionType AsFunctionType:
-                        AddSourceError(new ErrorInvalidExpression(node));
-                        Success = false;
-                        IsHandled = true;
-                        break;
+                // This has been checked in the type pass.
+                IProcedureType AsProcedureType = OperatorType as IProcedureType;
+                Debug.Assert(AsProcedureType != null);
+                foreach (ICommandOverloadType Overload in AsProcedureType.OverloadList)
+                    ParameterTableList.Add(Overload.ParameterTable);
 
-                    case IProcedureType AsProcedureType:
-                        foreach (ICommandOverloadType Overload in AsProcedureType.OverloadList)
-                            ParameterTableList.Add(Overload.ParameterTable);
+                if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, ArgumentStyle, ErrorList, node, out int SelectedIndex))
+                    return false;
 
-                        if (Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, ArgumentStyle, ErrorList, node, out int SelectedIndex))
-                        {
-                            ICommandOverloadType SelectedOverload = AsProcedureType.OverloadList[SelectedIndex];
-                            PrecursorInstructionException = SelectedOverload.ExceptionIdentifierList;
-                            SelectedParameterList = SelectedOverload.ParameterTable;
-                        }
-                        else
-                            Success = false;
+                ICommandOverloadType SelectedOverload = AsProcedureType.OverloadList[SelectedIndex];
+                PrecursorInstructionException = SelectedOverload.ExceptionIdentifierList;
+                SelectedParameterList = SelectedOverload.ParameterTable;
 
-                        IsHandled = true;
-                        break;
+                IResultException ResolvedException = new ResultException();
 
-                    case IIndexerType AsIndexerType:
-                        AddSourceError(new ErrorInvalidExpression(node));
-                        Success = false;
-                        IsHandled = true;
-                        break;
+                foreach (IArgument Item in node.ArgumentList)
+                    ResultException.Merge(ResolvedException, Item.ResolvedException.Item);
 
-                    case IPropertyType AsPropertyType:
-                        AddSourceError(new ErrorInvalidExpression(node));
-                        Success = false;
-                        IsHandled = true;
-                        break;
-                }
+                ResultException.Merge(ResolvedException, PrecursorInstructionException);
 
-                Debug.Assert(IsHandled);
-
-                if (Success)
-                {
-                    IResultException ResolvedException = new ResultException();
-
-                    foreach (IArgument Item in node.ArgumentList)
-                        ResultException.Merge(ResolvedException, Item.ResolvedException.Item);
-
-                    ResultException.Merge(ResolvedException, PrecursorInstructionException);
-
-                    data = new Tuple<IResultException, ListTableEx<IParameter>>(ResolvedException, SelectedParameterList);
-                }
+                data = new Tuple<IResultException, ListTableEx<IParameter>>(ResolvedException, SelectedParameterList);
             }
 
             return Success;

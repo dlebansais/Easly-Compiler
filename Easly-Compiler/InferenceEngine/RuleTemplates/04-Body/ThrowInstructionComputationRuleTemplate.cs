@@ -57,7 +57,7 @@
             if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Exception.Guid, node, out ITypeName ExceptionTypeName, out ICompiledType ExceptionType))
             {
                 AddSourceError(new ErrorExceptionTypeMissing(node));
-                Success = false;
+                return false;
             }
 
             IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();

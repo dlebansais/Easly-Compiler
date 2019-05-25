@@ -49,11 +49,8 @@
 
             IScope Instructions = (IScope)node.Instructions;
 
-            if (node.RangeList.Count == 0)
-            {
-                AddSourceError(new ErrorInvalidInstruction(node));
-                return false;
-            }
+            // This is enforced when the root node is validated.
+            Debug.Assert(node.RangeList.Count > 0);
 
             IResultException ResolvedException = new ResultException();
 

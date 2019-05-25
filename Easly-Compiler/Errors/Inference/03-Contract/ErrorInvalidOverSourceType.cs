@@ -27,7 +27,7 @@
         /// <summary>
         /// The error message.
         /// </summary>
-        public override string Message { get { return "Type has no indexer taking an index and does not inherit from 'Over Loop Source' either."; } }
+        public override string Message { get { return "Type contains an indexer but also inherits from 'Over Loop Source'."; } }
         #endregion
     }
 }

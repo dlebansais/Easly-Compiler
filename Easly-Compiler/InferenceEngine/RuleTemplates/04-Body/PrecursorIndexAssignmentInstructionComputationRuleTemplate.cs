@@ -60,21 +60,25 @@
             if (InnerFeature is IIndexerFeature AsIndexerFeature)
             {
                 IFeatureInstance Instance = FeatureTable[AsIndexerFeature.ValidFeatureName.Item];
+                IList<IPrecursorInstance> PrecursorList = Instance.PrecursorList;
 
                 if (node.AncestorType.IsAssigned)
                 {
-                    IObjectType AncestorType = (IObjectType)node.AncestorType.Item;
+                    IObjectType DeclaredAncestor = (IObjectType)node.AncestorType.Item;
 
-                    foreach (IPrecursorInstance PrecursorItem in Instance.PrecursorList)
-                        if (PrecursorItem.Ancestor == AncestorType)
-                        {
-                            SelectedPrecursor.Item = PrecursorItem.Precursor;
-                            break;
-                        }
+                    if (DeclaredAncestor.ResolvedType.Item is IClassType AsClassTypeAncestor)
+                    {
+                        foreach (IPrecursorInstance Item in PrecursorList)
+                            if (Item.Ancestor.BaseClass == AsClassTypeAncestor.BaseClass)
+                            {
+                                SelectedPrecursor.Item = Item.Precursor;
+                                break;
+                            }
+                    }
 
                     if (!SelectedPrecursor.IsAssigned)
                     {
-                        AddSourceError(new ErrorInvalidPrecursor(AncestorType));
+                        AddSourceError(new ErrorInvalidPrecursor(DeclaredAncestor));
                         return false;
                     }
                 }

@@ -93,7 +93,7 @@
                     }
                     else if (!IsConformantToEnumerable && !IsConformantToNumericIndexer)
                     {
-                        AddSourceError(new ErrorInvalidOverSourceType(OverList));
+                        AddSourceError(new ErrorMissingOverSourceAndIndexer(OverList));
                         Success = false;
                     }
                     else
