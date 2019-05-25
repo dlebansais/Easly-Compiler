@@ -1350,20 +1350,17 @@
             if (TypeConformToBase(type2, type1, substitutionTypeTable))
                 return false; // Acceptable, but useless. Change this to a warning.
 
+            bool IsConformant = false;
+
             foreach (KeyValuePair<ITypeName, ICompiledType> Entry in embeddingClass.TypeTable)
             {
                 ICompiledType Descendant = Entry.Value;
 
-                if (TypeConformToBase(Descendant, type1, substitutionTypeTable))
-                    if (TypeConformToBase(Descendant, type2, substitutionTypeTable))
-                        return true;
-
-                if (TypeConformToBase(Descendant, type2, substitutionTypeTable))
-                    if (TypeConformToBase(Descendant, type1, substitutionTypeTable))
-                        return true;
+                IsConformant |= TypeConformToBase(Descendant, type1, substitutionTypeTable) && TypeConformToBase(Descendant, type2, substitutionTypeTable);
+                IsConformant |= TypeConformToBase(Descendant, type2, substitutionTypeTable) && TypeConformToBase(Descendant, type1, substitutionTypeTable);
             }
 
-            return false;
+            return IsConformant;
         }
 
         /// <summary>
