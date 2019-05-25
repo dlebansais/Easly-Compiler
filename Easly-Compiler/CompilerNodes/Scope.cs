@@ -287,29 +287,13 @@ namespace CompilerNode
                         break;
 
                     case IPropertyFeature AsPropertyFeature:
-                        if (AsPropertyFeature.GetterBody.IsAssigned && AsPropertyFeature.GetterBody.Item == ChildSource)
-                        {
-                            Result = AsPropertyFeature.FullGetScope;
-                            IsHandled = true;
-                        }
-                        else if (AsPropertyFeature.SetterBody.IsAssigned && AsPropertyFeature.SetterBody.Item == ChildSource)
-                        {
-                            Result = AsPropertyFeature.FullSetScope;
-                            IsHandled = true;
-                        }
+                        Result = CurrentPropertyScope(AsPropertyFeature, ChildSource);
+                        IsHandled = true;
                         break;
 
                     case IIndexerFeature AsIndexerFeature:
-                        if (AsIndexerFeature.GetterBody.IsAssigned && AsIndexerFeature.GetterBody.Item == ChildSource)
-                        {
-                            Result = AsIndexerFeature.FullGetScope;
-                            IsHandled = true;
-                        }
-                        else if (AsIndexerFeature.SetterBody.IsAssigned && AsIndexerFeature.SetterBody.Item == ChildSource)
-                        {
-                            Result = AsIndexerFeature.FullSetScope;
-                            IsHandled = true;
-                        }
+                        Result = CurrentIndexerScope(AsIndexerFeature, ChildSource);
+                        IsHandled = true;
                         break;
 
                     default:
@@ -324,6 +308,48 @@ namespace CompilerNode
             while (Result == null);
 
             Debug.Assert(Result != null);
+
+            return Result;
+        }
+
+        private static IHashtableEx<string, IScopeAttributeFeature> CurrentPropertyScope(IPropertyFeature propertyFeature, ISource childSource)
+        {
+            IHashtableEx<string, IScopeAttributeFeature> Result = null;
+            bool IsHandled = false;
+
+            if (propertyFeature.GetterBody.IsAssigned && propertyFeature.GetterBody.Item == childSource)
+            {
+                Result = propertyFeature.FullGetScope;
+                IsHandled = true;
+            }
+            else if (propertyFeature.SetterBody.IsAssigned && propertyFeature.SetterBody.Item == childSource)
+            {
+                Result = propertyFeature.FullSetScope;
+                IsHandled = true;
+            }
+
+            Debug.Assert(IsHandled);
+
+            return Result;
+        }
+
+        private static IHashtableEx<string, IScopeAttributeFeature> CurrentIndexerScope(IIndexerFeature indexerFeature, ISource childSource)
+        {
+            IHashtableEx<string, IScopeAttributeFeature> Result = null;
+            bool IsHandled = false;
+
+            if (indexerFeature.GetterBody.IsAssigned && indexerFeature.GetterBody.Item == childSource)
+            {
+                Result = indexerFeature.FullGetScope;
+                IsHandled = true;
+            }
+            else if (indexerFeature.SetterBody.IsAssigned && indexerFeature.SetterBody.Item == childSource)
+            {
+                Result = indexerFeature.FullSetScope;
+                IsHandled = true;
+            }
+
+            Debug.Assert(IsHandled);
 
             return Result;
         }

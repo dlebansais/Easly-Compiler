@@ -178,53 +178,7 @@
             else
             {
                 ICompiledFeature ItemFeature = ItemInstance.Feature.Item;
-
-                Debug.Assert(nextItem != null);
-                Debug.Assert(nextItem.ValidText.IsAssigned);
-                string NextItemText = nextItem.ValidText.Item;
-
-                bool IsHandled = false;
-                switch (ItemFeature)
-                {
-                    case IAttributeFeature AsAttributeFeature:
-                        IsReady = AsAttributeFeature.ResolvedEntityType.IsAssigned;
-                        ItemType = IsReady ? AsAttributeFeature.ResolvedEntityType.Item : null;
-                        IsHandled = true;
-                        break;
-
-                    case IConstantFeature AsConstantFeature:
-                        IsReady = AsConstantFeature.ResolvedEntityType.IsAssigned;
-                        ItemType = IsReady ? AsConstantFeature.ResolvedEntityType.Item : null;
-                        IsHandled = true;
-                        break;
-
-                    // Creation and procedure features don't return anything.
-                    case ICreationFeature AsCreationFeature:
-                    case IProcedureFeature AsProcedureFeature:
-                        errorList.AddError(new ErrorUnknownIdentifier(nextItem, NextItemText));
-                        isInterrupted = true;
-                        return false;
-
-                    case IFunctionFeature AsFunctionFeature:
-                        IsReady = AsFunctionFeature.MostCommonType.IsAssigned;
-                        ItemType = IsReady ? AsFunctionFeature.MostCommonType.Item : null;
-                        IsHandled = true;
-                        break;
-
-                    case IPropertyFeature AsPropertyFeature:
-                        IsReady = AsPropertyFeature.ResolvedEntityType.IsAssigned;
-                        ItemType = IsReady ? AsPropertyFeature.ResolvedEntityType.Item : null;
-                        IsHandled = true;
-                        break;
-
-                    case IIndexerFeature AsIndexerFeature:
-                        IsReady = AsIndexerFeature.ResolvedEntityType.IsAssigned;
-                        ItemType = IsReady ? AsIndexerFeature.ResolvedEntityType.Item : null;
-                        IsHandled = true;
-                        break;
-                }
-
-                Debug.Assert(IsHandled);
+                IsReady = IsPathGlobalItemReady(ItemFeature, nextItem, errorList, ref isInterrupted, out ItemType);
             }
 
             if (IsReady)
@@ -234,6 +188,61 @@
 
                 IsReady = featureTable.IsSealed;
             }
+
+            return IsReady;
+        }
+
+        private static bool IsPathGlobalItemReady(ICompiledFeature itemFeature, IIdentifier nextItem, IErrorList errorList, ref bool isInterrupted, out ICompiledType itemType)
+        {
+            bool IsReady = false;
+            itemType = null;
+
+            Debug.Assert(nextItem != null);
+            Debug.Assert(nextItem.ValidText.IsAssigned);
+            string NextItemText = nextItem.ValidText.Item;
+
+            bool IsHandled = false;
+            switch (itemFeature)
+            {
+                case IAttributeFeature AsAttributeFeature:
+                    IsReady = AsAttributeFeature.ResolvedEntityType.IsAssigned;
+                    itemType = IsReady ? AsAttributeFeature.ResolvedEntityType.Item : null;
+                    IsHandled = true;
+                    break;
+
+                case IConstantFeature AsConstantFeature:
+                    IsReady = AsConstantFeature.ResolvedEntityType.IsAssigned;
+                    itemType = IsReady ? AsConstantFeature.ResolvedEntityType.Item : null;
+                    IsHandled = true;
+                    break;
+
+                // Creation and procedure features don't return anything.
+                case ICreationFeature AsCreationFeature:
+                case IProcedureFeature AsProcedureFeature:
+                    errorList.AddError(new ErrorUnknownIdentifier(nextItem, NextItemText));
+                    isInterrupted = true;
+                    return false;
+
+                case IFunctionFeature AsFunctionFeature:
+                    IsReady = AsFunctionFeature.MostCommonType.IsAssigned;
+                    itemType = IsReady ? AsFunctionFeature.MostCommonType.Item : null;
+                    IsHandled = true;
+                    break;
+
+                case IPropertyFeature AsPropertyFeature:
+                    IsReady = AsPropertyFeature.ResolvedEntityType.IsAssigned;
+                    itemType = IsReady ? AsPropertyFeature.ResolvedEntityType.Item : null;
+                    IsHandled = true;
+                    break;
+
+                case IIndexerFeature AsIndexerFeature:
+                    IsReady = AsIndexerFeature.ResolvedEntityType.IsAssigned;
+                    itemType = IsReady ? AsIndexerFeature.ResolvedEntityType.Item : null;
+                    IsHandled = true;
+                    break;
+            }
+
+            Debug.Assert(IsHandled);
 
             return IsReady;
         }
