@@ -77,7 +77,6 @@
                             DestinationType = SingleResult.ResolvedParameter.ResolvedFeatureType.Item;
                     }
                 }
-                else
 
                 if (DestinationType == null)
                 {
