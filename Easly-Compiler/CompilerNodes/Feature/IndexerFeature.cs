@@ -230,6 +230,7 @@ namespace CompilerNode
 
         /// <summary>
         /// Guid of the language type corresponding to the entity object for an instance of this class.
+        /// TODO: this is not used because the indexer has no name and therefore can't be reached in an EntityExpression or AnchoredType. Allow 'indexer' to be a special value at the end of the path.
         /// </summary>
         public Guid EntityGuid { get { return LanguageClasses.IndexerEntity.Guid; } }
 

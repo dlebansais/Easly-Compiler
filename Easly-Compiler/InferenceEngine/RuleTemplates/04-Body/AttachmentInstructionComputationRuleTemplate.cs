@@ -104,46 +104,52 @@
 
             foreach (IAttachment AttachmentItem in node.AttachmentList)
                 if (index < AttachmentItem.AttachTypeList.Count)
-                {
-                    IObjectType AttachType = AttachmentItem.AttachTypeList[index];
-                    ICompiledType DestinationType = AttachType.ResolvedType.Item;
-
-                    if (DestinationType.IsReference)
-                    {
-                        if (AttachmentType == BaseNode.CopySemantic.Value || AttachmentToAny)
-                        {
-                            AddSourceError(new ErrorInvalidAttachment(AttachmentItem));
-                            ConformanceError = true;
-                        }
-                        else if (AttachmentType == BaseNode.CopySemantic.Any)
-                            AttachmentType = BaseNode.CopySemantic.Reference;
-                    }
-                    else if (DestinationType.IsValue)
-                    {
-                        if (AttachmentType == BaseNode.CopySemantic.Reference || AttachmentToAny)
-                        {
-                            AddSourceError(new ErrorInvalidAttachment(AttachmentItem));
-                            ConformanceError = true;
-                        }
-                        else if (AttachmentType == BaseNode.CopySemantic.Any)
-                            AttachmentType = BaseNode.CopySemantic.Value;
-                    }
-                    else if (AttachmentToAny)
-                    {
-                        AddSourceError(new ErrorInvalidAttachment(AttachmentItem));
-                        ConformanceError = true;
-                    }
-                    else if (AttachmentType != BaseNode.CopySemantic.Any)
-                    {
-                        AddSourceError(new ErrorInvalidAttachment(AttachmentItem));
-                        ConformanceError = true;
-                    }
-                    else
-                        AttachmentToAny = true;
-                }
+                    ConformanceError |= CheckConsistencyAnyReferenceOrValue(AttachmentItem, index, ref AttachmentType, ref AttachmentToAny);
 
             if (!ConformanceError && !AttachmentToAny)
                 ConformanceError = CheckConsistencyAnyConformance(node, index);
+
+            return ConformanceError;
+        }
+
+        private bool CheckConsistencyAnyReferenceOrValue(IAttachment attachment, int index, ref BaseNode.CopySemantic attachmentType, ref bool attachmentToAny)
+        {
+            bool ConformanceError = false;
+            IObjectType AttachType = attachment.AttachTypeList[index];
+            ICompiledType DestinationType = AttachType.ResolvedType.Item;
+
+            if (DestinationType.IsReference)
+            {
+                if (attachmentType == BaseNode.CopySemantic.Value || attachmentToAny)
+                {
+                    AddSourceError(new ErrorInvalidAttachment(attachment));
+                    ConformanceError = true;
+                }
+                else if (attachmentType == BaseNode.CopySemantic.Any)
+                    attachmentType = BaseNode.CopySemantic.Reference;
+            }
+            else if (DestinationType.IsValue)
+            {
+                if (attachmentType == BaseNode.CopySemantic.Reference || attachmentToAny)
+                {
+                    AddSourceError(new ErrorInvalidAttachment(attachment));
+                    ConformanceError = true;
+                }
+                else if (attachmentType == BaseNode.CopySemantic.Any)
+                    attachmentType = BaseNode.CopySemantic.Value;
+            }
+            else if (attachmentToAny)
+            {
+                AddSourceError(new ErrorInvalidAttachment(attachment));
+                ConformanceError = true;
+            }
+            else if (attachmentType != BaseNode.CopySemantic.Any)
+            {
+                AddSourceError(new ErrorInvalidAttachment(attachment));
+                ConformanceError = true;
+            }
+            else
+                attachmentToAny = true;
 
             return ConformanceError;
         }
