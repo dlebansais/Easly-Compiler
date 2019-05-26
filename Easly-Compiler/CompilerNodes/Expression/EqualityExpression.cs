@@ -8,7 +8,7 @@
     /// <summary>
     /// Compiler IEqualityExpression.
     /// </summary>
-    public interface IEqualityExpression : BaseNode.IEqualityExpression, IExpression
+    public interface IEqualityExpression : BaseNode.IEqualityExpression, IExpression, IComparableExpression
     {
     }
 
@@ -151,16 +151,26 @@
         /// <summary>
         /// Compares two expressions.
         /// </summary>
-        /// <param name="expression1">The first expression.</param>
-        /// <param name="expression2">The second expression.</param>
-        public static bool IsExpressionEqual(IEqualityExpression expression1, IEqualityExpression expression2)
+        /// <param name="other">The other expression.</param>
+        public bool IsExpressionEqual(IComparableExpression other)
         {
+            return IsExpressionEqual(other as IEqualityExpression);
+        }
+
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="other">The other expression.</param>
+        protected bool IsExpressionEqual(IEqualityExpression other)
+        {
+            Debug.Assert(other != null);
+
             bool Result = true;
 
-            Result &= Expression.IsExpressionEqual((IExpression)expression1.LeftExpression, (IExpression)expression2.LeftExpression);
-            Result &= expression1.Comparison == expression2.Comparison;
-            Result &= expression1.Equality == expression2.Equality;
-            Result &= Expression.IsExpressionEqual((IExpression)expression1.RightExpression, (IExpression)expression2.RightExpression);
+            Result &= Expression.IsExpressionEqual((IExpression)LeftExpression, (IExpression)other.LeftExpression);
+            Result &= Comparison == other.Comparison;
+            Result &= Equality == other.Equality;
+            Result &= Expression.IsExpressionEqual((IExpression)RightExpression, (IExpression)other.RightExpression);
 
             return Result;
         }

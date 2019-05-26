@@ -8,7 +8,7 @@
     /// <summary>
     /// Compiler IBinaryConditionalExpression.
     /// </summary>
-    public interface IBinaryConditionalExpression : BaseNode.IBinaryConditionalExpression, IExpression
+    public interface IBinaryConditionalExpression : BaseNode.IBinaryConditionalExpression, IExpression, IComparableExpression
     {
     }
 
@@ -151,15 +151,25 @@
         /// <summary>
         /// Compares two expressions.
         /// </summary>
-        /// <param name="expression1">The first expression.</param>
-        /// <param name="expression2">The second expression.</param>
-        public static bool IsExpressionEqual(IBinaryConditionalExpression expression1, IBinaryConditionalExpression expression2)
+        /// <param name="other">The other expression.</param>
+        public bool IsExpressionEqual(IComparableExpression other)
         {
+            return IsExpressionEqual(other as IBinaryConditionalExpression);
+        }
+
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="other">The other expression.</param>
+        protected bool IsExpressionEqual(IBinaryConditionalExpression other)
+        {
+            Debug.Assert(other != null);
+
             bool Result = true;
 
-            Result &= Expression.IsExpressionEqual((IExpression)expression1.LeftExpression, (IExpression)expression2.LeftExpression);
-            Result &= expression1.Conditional == expression2.Conditional;
-            Result &= Expression.IsExpressionEqual((IExpression)expression1.RightExpression, (IExpression)expression2.RightExpression);
+            Result &= Expression.IsExpressionEqual((IExpression)LeftExpression, (IExpression)other.LeftExpression);
+            Result &= Conditional == other.Conditional;
+            Result &= Expression.IsExpressionEqual((IExpression)RightExpression, (IExpression)other.RightExpression);
 
             return Result;
         }

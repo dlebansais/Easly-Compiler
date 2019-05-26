@@ -8,7 +8,7 @@
     /// <summary>
     /// Compiler IManifestNumberExpression.
     /// </summary>
-    public interface IManifestNumberExpression : BaseNode.IManifestNumberExpression, IExpression
+    public interface IManifestNumberExpression : BaseNode.IManifestNumberExpression, IExpression, IComparableExpression
     {
         /// <summary>
         /// The valid value of <see cref="BaseNode.IManifestNumberExpression.Text"/>.
@@ -200,13 +200,23 @@
         /// <summary>
         /// Compares two expressions.
         /// </summary>
-        /// <param name="expression1">The first expression.</param>
-        /// <param name="expression2">The second expression.</param>
-        public static bool IsExpressionEqual(IManifestNumberExpression expression1, IManifestNumberExpression expression2)
+        /// <param name="other">The other expression.</param>
+        public bool IsExpressionEqual(IComparableExpression other)
         {
+            return IsExpressionEqual(other as IManifestNumberExpression);
+        }
+
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="other">The other expression.</param>
+        protected bool IsExpressionEqual(IManifestNumberExpression other)
+        {
+            Debug.Assert(other != null);
+
             bool Result = true;
 
-            Result &= expression1.ValidText.Item == expression2.ValidText.Item;
+            Result &= ValidText.Item == other.ValidText.Item;
 
             return Result;
         }

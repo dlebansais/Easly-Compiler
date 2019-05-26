@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IKeywordExpression.
     /// </summary>
-    public interface IKeywordExpression : BaseNode.IKeywordExpression, IExpression
+    public interface IKeywordExpression : BaseNode.IKeywordExpression, IExpression, IComparableExpression
     {
     }
 
@@ -152,13 +152,23 @@ namespace CompilerNode
         /// <summary>
         /// Compares two expressions.
         /// </summary>
-        /// <param name="expression1">The first expression.</param>
-        /// <param name="expression2">The second expression.</param>
-        public static bool IsExpressionEqual(IKeywordExpression expression1, IKeywordExpression expression2)
+        /// <param name="other">The other expression.</param>
+        public bool IsExpressionEqual(IComparableExpression other)
         {
+            return IsExpressionEqual(other as IKeywordExpression);
+        }
+
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="other">The other expression.</param>
+        protected bool IsExpressionEqual(IKeywordExpression other)
+        {
+            Debug.Assert(other != null);
+
             bool Result = true;
 
-            Result &= expression1.Value == expression2.Value;
+            Result &= Value == other.Value;
 
             return Result;
         }

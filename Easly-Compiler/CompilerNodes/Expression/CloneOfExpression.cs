@@ -8,7 +8,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler ICloneOfExpression.
     /// </summary>
-    public interface ICloneOfExpression : BaseNode.ICloneOfExpression, IExpression
+    public interface ICloneOfExpression : BaseNode.ICloneOfExpression, IExpression, IComparableExpression
     {
     }
 
@@ -151,13 +151,23 @@ namespace CompilerNode
         /// <summary>
         /// Compares two expressions.
         /// </summary>
-        /// <param name="expression1">The first expression.</param>
-        /// <param name="expression2">The second expression.</param>
-        public static bool IsExpressionEqual(ICloneOfExpression expression1, ICloneOfExpression expression2)
+        /// <param name="other">The other expression.</param>
+        public bool IsExpressionEqual(IComparableExpression other)
         {
+            return IsExpressionEqual(other as ICloneOfExpression);
+        }
+
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="other">The other expression.</param>
+        protected bool IsExpressionEqual(ICloneOfExpression other)
+        {
+            Debug.Assert(other != null);
+
             bool Result = true;
 
-            Result &= expression1.Source == expression2.Source;
+            Result &= Source == other.Source;
 
             return Result;
         }

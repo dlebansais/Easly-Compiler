@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IQueryExpression.
     /// </summary>
-    public interface IQueryExpression : BaseNode.IQueryExpression, IExpression, INodeWithReplicatedBlocks
+    public interface IQueryExpression : BaseNode.IQueryExpression, INodeWithReplicatedBlocks, IExpression, IComparableExpression
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.QueryExpression.ArgumentBlocks"/>.
@@ -247,14 +247,24 @@ namespace CompilerNode
         /// <summary>
         /// Compares two expressions.
         /// </summary>
-        /// <param name="expression1">The first expression.</param>
-        /// <param name="expression2">The second expression.</param>
-        public static bool IsExpressionEqual(IQueryExpression expression1, IQueryExpression expression2)
+        /// <param name="other">The other expression.</param>
+        public bool IsExpressionEqual(IComparableExpression other)
         {
+            return IsExpressionEqual(other as IQueryExpression);
+        }
+
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="other">The other expression.</param>
+        protected bool IsExpressionEqual(IQueryExpression other)
+        {
+            Debug.Assert(other != null);
+
             bool Result = true;
 
-            Result &= QualifiedName.IsQualifiedNameEqual((IQualifiedName)expression1.Query, (IQualifiedName)expression2.Query);
-            Result &= Argument.IsArgumentListEqual(expression1.ArgumentList, expression2.ArgumentList);
+            Result &= QualifiedName.IsQualifiedNameEqual((IQualifiedName)Query, (IQualifiedName)other.Query);
+            Result &= Argument.IsArgumentListEqual(ArgumentList, other.ArgumentList);
 
             return Result;
         }

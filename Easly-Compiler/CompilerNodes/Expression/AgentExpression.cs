@@ -8,7 +8,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IAgentExpression.
     /// </summary>
-    public interface IAgentExpression : BaseNode.IAgentExpression, IExpression
+    public interface IAgentExpression : BaseNode.IAgentExpression, IExpression, IComparableExpression
     {
         /// <summary>
         /// The resolved type name of the feature providing the expression result.
@@ -186,13 +186,23 @@ namespace CompilerNode
         /// <summary>
         /// Compares two expressions.
         /// </summary>
-        /// <param name="expression1">The first expression.</param>
-        /// <param name="expression2">The second expression.</param>
-        public static bool IsExpressionEqual(IAgentExpression expression1, IAgentExpression expression2)
+        /// <param name="other">The other expression.</param>
+        public bool IsExpressionEqual(IComparableExpression other)
         {
+            return IsExpressionEqual(other as IAgentExpression);
+        }
+
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="other">The other expression.</param>
+        protected bool IsExpressionEqual(IAgentExpression other)
+        {
+            Debug.Assert(other != null);
+
             bool Result = true;
 
-            Result &= expression1.Delegated.Text == expression2.Delegated.Text;
+            Result &= Delegated.Text == other.Delegated.Text;
 
             return Result;
         }

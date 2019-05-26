@@ -8,7 +8,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler INewExpression.
     /// </summary>
-    public interface INewExpression : BaseNode.INewExpression, IExpression
+    public interface INewExpression : BaseNode.INewExpression, IExpression, IComparableExpression
     {
         /// <summary>
         /// The resolved feature.
@@ -164,13 +164,23 @@ namespace CompilerNode
         /// <summary>
         /// Compares two expressions.
         /// </summary>
-        /// <param name="expression1">The first expression.</param>
-        /// <param name="expression2">The second expression.</param>
-        public static bool IsExpressionEqual(INewExpression expression1, INewExpression expression2)
+        /// <param name="other">The other expression.</param>
+        public bool IsExpressionEqual(IComparableExpression other)
         {
+            return IsExpressionEqual(other as INewExpression);
+        }
+
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="other">The other expression.</param>
+        protected bool IsExpressionEqual(INewExpression other)
+        {
+            Debug.Assert(other != null);
+
             bool Result = true;
 
-            Result &= QualifiedName.IsQualifiedNameEqual((IQualifiedName)expression1.Object, (IQualifiedName)expression2.Object);
+            Result &= QualifiedName.IsQualifiedNameEqual((IQualifiedName)Object, (IQualifiedName)other.Object);
 
             return Result;
         }

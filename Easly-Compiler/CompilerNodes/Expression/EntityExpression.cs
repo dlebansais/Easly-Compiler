@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IEntityExpression.
     /// </summary>
-    public interface IEntityExpression : BaseNode.IEntityExpression, IExpression
+    public interface IEntityExpression : BaseNode.IEntityExpression, IExpression, IComparableExpression
     {
         /// <summary>
         /// The resolved feature.
@@ -174,13 +174,23 @@ namespace CompilerNode
         /// <summary>
         /// Compares two expressions.
         /// </summary>
-        /// <param name="expression1">The first expression.</param>
-        /// <param name="expression2">The second expression.</param>
-        public static bool IsExpressionEqual(IEntityExpression expression1, IEntityExpression expression2)
+        /// <param name="other">The other expression.</param>
+        public bool IsExpressionEqual(IComparableExpression other)
         {
+            return IsExpressionEqual(other as IEntityExpression);
+        }
+
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="other">The other expression.</param>
+        protected bool IsExpressionEqual(IEntityExpression other)
+        {
+            Debug.Assert(other != null);
+
             bool Result = true;
 
-            Result &= QualifiedName.IsQualifiedNameEqual((IQualifiedName)expression1.Query, (IQualifiedName)expression2.Query);
+            Result &= QualifiedName.IsQualifiedNameEqual((IQualifiedName)Query, (IQualifiedName)other.Query);
 
             return Result;
         }

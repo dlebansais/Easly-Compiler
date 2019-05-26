@@ -8,7 +8,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IOldExpression.
     /// </summary>
-    public interface IOldExpression : BaseNode.IOldExpression, IExpression
+    public interface IOldExpression : BaseNode.IOldExpression, IExpression, IComparableExpression
     {
         /// <summary>
         /// The resolved feature.
@@ -164,13 +164,23 @@ namespace CompilerNode
         /// <summary>
         /// Compares two expressions.
         /// </summary>
-        /// <param name="expression1">The first expression.</param>
-        /// <param name="expression2">The second expression.</param>
-        public static bool IsExpressionEqual(IOldExpression expression1, IOldExpression expression2)
+        /// <param name="other">The other expression.</param>
+        public bool IsExpressionEqual(IComparableExpression other)
         {
+            return IsExpressionEqual(other as IOldExpression);
+        }
+
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="other">The other expression.</param>
+        protected bool IsExpressionEqual(IOldExpression other)
+        {
+            Debug.Assert(other != null);
+
             bool Result = true;
 
-            Result &= QualifiedName.IsQualifiedNameEqual((IQualifiedName)expression1.Query, (IQualifiedName)expression2.Query);
+            Result &= QualifiedName.IsQualifiedNameEqual((IQualifiedName)Query, (IQualifiedName)other.Query);
 
             return Result;
         }

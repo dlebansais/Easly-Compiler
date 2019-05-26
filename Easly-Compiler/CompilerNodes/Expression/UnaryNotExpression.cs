@@ -8,7 +8,7 @@
     /// <summary>
     /// Compiler IUnaryNotExpression.
     /// </summary>
-    public interface IUnaryNotExpression : BaseNode.IUnaryNotExpression, IExpression
+    public interface IUnaryNotExpression : BaseNode.IUnaryNotExpression, IExpression, IComparableExpression
     {
     }
 
@@ -151,13 +151,23 @@
         /// <summary>
         /// Compares two expressions.
         /// </summary>
-        /// <param name="expression1">The first expression.</param>
-        /// <param name="expression2">The second expression.</param>
-        public static bool IsExpressionEqual(IUnaryNotExpression expression1, IUnaryNotExpression expression2)
+        /// <param name="other">The other expression.</param>
+        public bool IsExpressionEqual(IComparableExpression other)
         {
+            return IsExpressionEqual(other as IUnaryNotExpression);
+        }
+
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="other">The other expression.</param>
+        protected bool IsExpressionEqual(IUnaryNotExpression other)
+        {
+            Debug.Assert(other != null);
+
             bool Result = true;
 
-            Result &= Expression.IsExpressionEqual((IExpression)expression1.RightExpression, (IExpression)expression2.RightExpression);
+            Result &= Expression.IsExpressionEqual((IExpression)RightExpression, (IExpression)other.RightExpression);
 
             return Result;
         }

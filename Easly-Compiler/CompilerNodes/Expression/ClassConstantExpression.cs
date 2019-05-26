@@ -8,7 +8,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IClassConstantExpression.
     /// </summary>
-    public interface IClassConstantExpression : BaseNode.IClassConstantExpression, IExpression
+    public interface IClassConstantExpression : BaseNode.IClassConstantExpression, IExpression, IComparableExpression
     {
         /// <summary>
         /// The resolved feature.
@@ -197,14 +197,24 @@ namespace CompilerNode
         /// <summary>
         /// Compares two expressions.
         /// </summary>
-        /// <param name="expression1">The first expression.</param>
-        /// <param name="expression2">The second expression.</param>
-        public static bool IsExpressionEqual(IClassConstantExpression expression1, IClassConstantExpression expression2)
+        /// <param name="other">The other expression.</param>
+        public bool IsExpressionEqual(IComparableExpression other)
         {
+            return IsExpressionEqual(other as IClassConstantExpression);
+        }
+
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="other">The other expression.</param>
+        protected bool IsExpressionEqual(IClassConstantExpression other)
+        {
+            Debug.Assert(other != null);
+
             bool Result = true;
 
-            Result &= expression1.ClassIdentifier.Text == expression2.ClassIdentifier.Text;
-            Result &= expression1.ConstantIdentifier.Text == expression2.ConstantIdentifier.Text;
+            Result &= ClassIdentifier.Text == other.ClassIdentifier.Text;
+            Result &= ConstantIdentifier.Text == other.ConstantIdentifier.Text;
 
             return Result;
         }

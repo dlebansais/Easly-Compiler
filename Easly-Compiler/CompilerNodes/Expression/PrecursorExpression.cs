@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IPrecursorExpression.
     /// </summary>
-    public interface IPrecursorExpression : BaseNode.IPrecursorExpression, IExpression, INodeWithReplicatedBlocks
+    public interface IPrecursorExpression : BaseNode.IPrecursorExpression, INodeWithReplicatedBlocks, IExpression, IComparableExpression
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.PrecursorExpression.ArgumentBlocks"/>.
@@ -212,16 +212,26 @@ namespace CompilerNode
         /// <summary>
         /// Compares two expressions.
         /// </summary>
-        /// <param name="expression1">The first expression.</param>
-        /// <param name="expression2">The second expression.</param>
-        public static bool IsExpressionEqual(IPrecursorExpression expression1, IPrecursorExpression expression2)
+        /// <param name="other">The other expression.</param>
+        public bool IsExpressionEqual(IComparableExpression other)
         {
+            return IsExpressionEqual(other as IPrecursorExpression);
+        }
+
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="other">The other expression.</param>
+        protected bool IsExpressionEqual(IPrecursorExpression other)
+        {
+            Debug.Assert(other != null);
+
             bool Result = true;
 
-            if (expression1.AncestorType.IsAssigned && expression2.AncestorType.IsAssigned)
+            if (AncestorType.IsAssigned && other.AncestorType.IsAssigned)
             {
-                IObjectType AncestorType1 = (IObjectType)expression1.AncestorType.Item;
-                IObjectType AncestorType2 = (IObjectType)expression2.AncestorType.Item;
+                IObjectType AncestorType1 = (IObjectType)AncestorType.Item;
+                IObjectType AncestorType2 = (IObjectType)other.AncestorType.Item;
 
                 Debug.Assert(AncestorType1.ResolvedType.IsAssigned);
                 Debug.Assert(AncestorType2.ResolvedType.IsAssigned);
@@ -229,8 +239,8 @@ namespace CompilerNode
                 Result &= AncestorType1.ResolvedType.Item == AncestorType2.ResolvedType.Item;
             }
 
-            Result &= expression1.AncestorType.IsAssigned == expression2.AncestorType.IsAssigned;
-            Result &= Argument.IsArgumentListEqual(expression1.ArgumentList, expression2.ArgumentList);
+            Result &= AncestorType.IsAssigned == other.AncestorType.IsAssigned;
+            Result &= Argument.IsArgumentListEqual(ArgumentList, other.ArgumentList);
 
             return Result;
         }

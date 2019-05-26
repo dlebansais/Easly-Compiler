@@ -8,7 +8,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IManifestCharacterExpression.
     /// </summary>
-    public interface IManifestCharacterExpression : BaseNode.IManifestCharacterExpression, IExpression
+    public interface IManifestCharacterExpression : BaseNode.IManifestCharacterExpression, IExpression, IComparableExpression
     {
         /// <summary>
         /// The valid value of <see cref="BaseNode.IManifestCharacterExpression.Text"/>.
@@ -170,13 +170,23 @@ namespace CompilerNode
         /// <summary>
         /// Compares two expressions.
         /// </summary>
-        /// <param name="expression1">The first expression.</param>
-        /// <param name="expression2">The second expression.</param>
-        public static bool IsExpressionEqual(IManifestCharacterExpression expression1, IManifestCharacterExpression expression2)
+        /// <param name="other">The other expression.</param>
+        public bool IsExpressionEqual(IComparableExpression other)
         {
+            return IsExpressionEqual(other as IManifestCharacterExpression);
+        }
+
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="other">The other expression.</param>
+        protected bool IsExpressionEqual(IManifestCharacterExpression other)
+        {
+            Debug.Assert(other != null);
+
             bool Result = true;
 
-            Result &= expression1.ValidText.Item == expression2.ValidText.Item;
+            Result &= ValidText.Item == other.ValidText.Item;
 
             return Result;
         }

@@ -9,7 +9,7 @@
     /// <summary>
     /// Compiler IInitializedObjectExpression.
     /// </summary>
-    public interface IInitializedObjectExpression : BaseNode.IInitializedObjectExpression, IExpression, INodeWithReplicatedBlocks
+    public interface IInitializedObjectExpression : BaseNode.IInitializedObjectExpression, INodeWithReplicatedBlocks, IExpression, IComparableExpression
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.InitializedObjectExpression.AssignmentBlocks"/>.
@@ -222,18 +222,28 @@
         /// <summary>
         /// Compares two expressions.
         /// </summary>
-        /// <param name="expression1">The first expression.</param>
-        /// <param name="expression2">The second expression.</param>
-        public static bool IsExpressionEqual(IInitializedObjectExpression expression1, IInitializedObjectExpression expression2)
+        /// <param name="other">The other expression.</param>
+        public bool IsExpressionEqual(IComparableExpression other)
         {
+            return IsExpressionEqual(other as IInitializedObjectExpression);
+        }
+
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="other">The other expression.</param>
+        protected bool IsExpressionEqual(IInitializedObjectExpression other)
+        {
+            Debug.Assert(other != null);
+
             bool Result = true;
 
-            Result &= expression1.AssignmentList.Count == expression2.AssignmentList.Count;
+            Result &= AssignmentList.Count == other.AssignmentList.Count;
 
-            for (int i = 0; i < expression1.AssignmentList.Count && i < expression2.AssignmentList.Count; i++)
+            for (int i = 0; i < AssignmentList.Count && i < other.AssignmentList.Count; i++)
             {
-                IAssignmentArgument InitializationAssignment1 = expression1.AssignmentList[i];
-                IAssignmentArgument InitializationAssignment2 = expression2.AssignmentList[i];
+                IAssignmentArgument InitializationAssignment1 = AssignmentList[i];
+                IAssignmentArgument InitializationAssignment2 = other.AssignmentList[i];
 
                 Result &= AssignmentArgument.IsAssignmentArgumentEqual(InitializationAssignment1, InitializationAssignment2);
             }

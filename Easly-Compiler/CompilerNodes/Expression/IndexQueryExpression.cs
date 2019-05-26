@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IIndexQueryExpression.
     /// </summary>
-    public interface IIndexQueryExpression : BaseNode.IIndexQueryExpression, IExpression, INodeWithReplicatedBlocks
+    public interface IIndexQueryExpression : BaseNode.IIndexQueryExpression, INodeWithReplicatedBlocks, IExpression, IComparableExpression
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.IndexQueryExpression.ArgumentBlocks"/>.
@@ -212,14 +212,24 @@ namespace CompilerNode
         /// <summary>
         /// Compares two expressions.
         /// </summary>
-        /// <param name="expression1">The first expression.</param>
-        /// <param name="expression2">The second expression.</param>
-        public static bool IsExpressionEqual(IIndexQueryExpression expression1, IIndexQueryExpression expression2)
+        /// <param name="other">The other expression.</param>
+        public bool IsExpressionEqual(IComparableExpression other)
         {
+            return IsExpressionEqual(other as IIndexQueryExpression);
+        }
+
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="other">The other expression.</param>
+        protected bool IsExpressionEqual(IIndexQueryExpression other)
+        {
+            Debug.Assert(other != null);
+
             bool Result = true;
 
-            Result &= Expression.IsExpressionEqual((IExpression)expression1.IndexedExpression, (IExpression)expression2.IndexedExpression);
-            Result &= Argument.IsArgumentListEqual(expression1.ArgumentList, expression2.ArgumentList);
+            Result &= Expression.IsExpressionEqual((IExpression)IndexedExpression, (IExpression)other.IndexedExpression);
+            Result &= Argument.IsArgumentListEqual(ArgumentList, other.ArgumentList);
 
             return Result;
         }

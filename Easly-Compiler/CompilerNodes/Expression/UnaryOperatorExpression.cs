@@ -8,7 +8,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IUnaryOperatorExpression.
     /// </summary>
-    public interface IUnaryOperatorExpression : BaseNode.IUnaryOperatorExpression, IExpression
+    public interface IUnaryOperatorExpression : BaseNode.IUnaryOperatorExpression, IExpression, IComparableExpression
     {
         /// <summary>
         /// The resolved operator feature.
@@ -186,14 +186,24 @@ namespace CompilerNode
         /// <summary>
         /// Compares two expressions.
         /// </summary>
-        /// <param name="expression1">The first expression.</param>
-        /// <param name="expression2">The second expression.</param>
-        public static bool IsExpressionEqual(IUnaryOperatorExpression expression1, IUnaryOperatorExpression expression2)
+        /// <param name="other">The other expression.</param>
+        public bool IsExpressionEqual(IComparableExpression other)
         {
+            return IsExpressionEqual(other as IUnaryOperatorExpression);
+        }
+
+        /// <summary>
+        /// Compares two expressions.
+        /// </summary>
+        /// <param name="other">The other expression.</param>
+        protected bool IsExpressionEqual(IUnaryOperatorExpression other)
+        {
+            Debug.Assert(other != null);
+
             bool Result = true;
 
-            Result &= Expression.IsExpressionEqual((IExpression)expression1.RightExpression, (IExpression)expression2.RightExpression);
-            Result &= expression1.Operator.Text == expression2.Operator.Text;
+            Result &= Expression.IsExpressionEqual((IExpression)RightExpression, (IExpression)other.RightExpression);
+            Result &= Operator.Text == other.Operator.Text;
 
             return Result;
         }
