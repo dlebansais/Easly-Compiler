@@ -11,7 +11,7 @@
         /// Initializes a new instance of the <see cref="BuildInferenceSourceList"/> class.
         /// </summary>
         /// <param name="ruleTemplateList">The list of rule templates that will be used during inference.</param>
-        public BuildInferenceSourceList(IList<IRuleTemplate> ruleTemplateList)
+        public BuildInferenceSourceList(IRuleTemplateList ruleTemplateList)
         {
             RuleTemplateList = ruleTemplateList;
         }
@@ -19,7 +19,7 @@
         /// <summary>
         /// The list of rule templates that will be used during inference.
         /// </summary>
-        public IList<IRuleTemplate> RuleTemplateList { get; }
+        public IRuleTemplateList RuleTemplateList { get; }
 
         /// <summary>
         /// The resulting source list.

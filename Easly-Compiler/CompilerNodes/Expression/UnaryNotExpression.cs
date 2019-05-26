@@ -67,7 +67,7 @@
         /// Reset some intermediate results.
         /// </summary>
         /// <param name="ruleTemplateList">The list of rule templates that would read the properties to reset.</param>
-        public void Reset(IList<IRuleTemplate> ruleTemplateList)
+        public void Reset(IRuleTemplateList ruleTemplateList)
         {
             bool IsHandled = false;
 
@@ -95,7 +95,7 @@
         /// Checks if a rule is resolved for this source.
         /// </summary>
         /// <param name="ruleTemplateList">The list of rule templates that would read the properties to check.</param>
-        public virtual bool IsResolved(IList<IRuleTemplate> ruleTemplateList)
+        public virtual bool IsResolved(IRuleTemplateList ruleTemplateList)
         {
             bool IsResolved = false;
 

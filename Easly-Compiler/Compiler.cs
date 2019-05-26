@@ -1005,7 +1005,7 @@
         }
 
         /// <summary></summary>
-        protected virtual bool Resolve(IRoot root, IList<IRuleTemplate> ruleTemplateList)
+        protected virtual bool Resolve(IRoot root, IRuleTemplateList ruleTemplateList)
         {
             BuildInferenceSourceList Context = new BuildInferenceSourceList(ruleTemplateList);
             IWalkCallbacks<BuildInferenceSourceList> Callbacks = new WalkCallbacks<BuildInferenceSourceList>() { HandlerNode = ListAllSources, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() };

@@ -11,7 +11,7 @@
         /// <summary>
         /// Rules for the identifiers inference pass.
         /// </summary>
-        public static IList<IRuleTemplate> Identifiers { get; } = new List<IRuleTemplate>()
+        public static RuleTemplateList Identifiers { get; } = new RuleTemplateList()
         {
             // Create many derivations of IdentifierRuleTemplate to have separate static constructors, to ensure separate namespaces.
             new ExportChangeRuleTemplate(),
@@ -36,7 +36,7 @@
         /// <summary>
         /// Rules for the types inference pass.
         /// </summary>
-        public static IList<IRuleTemplate> Types { get; } = new List<IRuleTemplate>()
+        public static IRuleTemplateList Types { get; } = new RuleTemplateList()
         {
             // No dependency rules.
             new AllInheritancesClassGroupRuleTemplate(),
@@ -145,7 +145,7 @@
         /// <summary>
         /// Rules for the contract inference pass.
         /// </summary>
-        public static IList<IRuleTemplate> Contract { get; } = new List<IRuleTemplate>()
+        public static IRuleTemplateList Contract { get; } = new RuleTemplateList()
         {
             new AgentExpressionRuleTemplate(),
             new AllBodiesRuleTemplate(),
@@ -256,7 +256,7 @@
         /// <summary>
         /// Rules for the body inference pass.
         /// </summary>
-        public static IList<IRuleTemplate> Body { get; } = new List<IRuleTemplate>()
+        public static IRuleTemplateList Body { get; } = new RuleTemplateList()
         {
             new AgentExpressionComputationRuleTemplate(),
             new AllBodiesComputationRuleTemplate(),

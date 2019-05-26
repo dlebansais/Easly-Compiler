@@ -74,6 +74,7 @@
     <Compile Include="Errors\Inference\04-Body\ErrorExceptionTypeRequired.cs" />
     <Compile Include="Errors\Inference\04-Body\ErrorReferenceTypeRequired.cs" />
     <Compile Include="Errors\Inference\04-Body\ErrorInvalidAttachment.cs" />
+    <Compile Include="InferenceEngine\RuleTemplateList.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\04-Body\PrecursorBodyComputationRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\04-Body\ExternBodyComputationRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\04-Body\DeferredBodyComputationRuleTemplate.cs" />

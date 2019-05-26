@@ -13,7 +13,7 @@
         /// <summary>
         /// The set of rules to execute.
         /// </summary>
-        IList<IRuleTemplate> RuleTemplateList { get; }
+        IRuleTemplateList RuleTemplateList { get; }
 
         /// <summary>
         /// The list of nodes on which rules are checked and applied.
@@ -64,7 +64,7 @@
         /// <param name="classList">The list of classes to resolve.</param>
         /// <param name="isCycleErrorChecked">True if the engine should check for cyclic dependencies errors.</param>
         /// <param name="retries">Number of retries (debug only).</param>
-        public InferenceEngine(IList<IRuleTemplate> ruleTemplateList, IList<ISource> sourceList, IList<IClass> classList, bool isCycleErrorChecked, int retries)
+        public InferenceEngine(IRuleTemplateList ruleTemplateList, IList<ISource> sourceList, IList<IClass> classList, bool isCycleErrorChecked, int retries)
         {
             RuleTemplateList = ruleTemplateList;
             SourceList = sourceList;
@@ -78,7 +78,7 @@
         /// <summary>
         /// The set of rules to execute.
         /// </summary>
-        public IList<IRuleTemplate> RuleTemplateList { get; }
+        public IRuleTemplateList RuleTemplateList { get; }
 
         /// <summary>
         /// The list of nodes on which rules are checked and applied.
