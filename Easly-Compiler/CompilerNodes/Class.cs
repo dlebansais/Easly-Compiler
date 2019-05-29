@@ -306,6 +306,11 @@ namespace CompilerNode
         /// List of bodies with resolved instructions
         /// </summary>
         OnceReference<IList<IBody>> ResolvedBodyList { get; }
+
+        /// <summary>
+        /// True if the class contains at least one extern body.
+        /// </summary>
+        bool HasExternBody { get; }
     }
 
     /// <summary>
@@ -1162,6 +1167,27 @@ namespace CompilerNode
         /// List of bodies with resolved instructions
         /// </summary>
         public OnceReference<IList<IBody>> ResolvedBodyList { get; private set; } = new OnceReference<IList<IBody>>();
+
+        /// <summary>
+        /// True if the class contains at least one extern body.
+        /// </summary>
+        public bool HasExternBody
+        {
+            get
+            {
+                bool Result = false;
+
+                foreach (KeyValuePair<IFeatureName, IFeatureInstance> Entry in FeatureTable)
+                {
+                    IFeatureInstance Instance = Entry.Value;
+                    ICompiledFeature SourceFeature = Instance.Feature.Item;
+
+                    Result |= SourceFeature.HasExternBody;
+                }
+
+                return Result;
+            }
+        }
         #endregion
 
         #region Debugging

@@ -24,7 +24,7 @@
         /// <summary>
         /// The resolved class type.
         /// </summary>
-        OnceReference<ICompiledType> ResolvedClassType { get; }
+        OnceReference<IClassType> ResolvedClassType { get; }
 
         /// <summary>
         /// The list of features assigned in the resolved type.
@@ -131,7 +131,7 @@
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
                 ResolvedClassTypeName = new OnceReference<ITypeName>();
-                ResolvedClassType = new OnceReference<ICompiledType>();
+                ResolvedClassType = new OnceReference<IClassType>();
                 AssignedFeatureTable = new HashtableEx<string, ICompiledFeature>();
                 IsHandled = true;
             }
@@ -212,7 +212,7 @@
         /// <summary>
         /// The resolved class type.
         /// </summary>
-        public OnceReference<ICompiledType> ResolvedClassType { get; private set; } = new OnceReference<ICompiledType>();
+        public OnceReference<IClassType> ResolvedClassType { get; private set; } = new OnceReference<IClassType>();
 
         /// <summary>
         /// The list of features assigned in the resolved type.
@@ -263,7 +263,7 @@
         /// <param name="initializedObjectTypeName">The initialized object type name upon return.</param>
         /// <param name="initializedObjectType">The initialized object type upon return.</param>
         /// <param name="assignedFeatureTable">The table of assigned values upon return.</param>
-        public static bool ResolveCompilerReferences(IInitializedObjectExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ITypeName initializedObjectTypeName, out ICompiledType initializedObjectType, out IHashtableEx<string, ICompiledFeature> assignedFeatureTable)
+        public static bool ResolveCompilerReferences(IInitializedObjectExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ITypeName initializedObjectTypeName, out IClassType initializedObjectType, out IHashtableEx<string, ICompiledFeature> assignedFeatureTable)
         {
             resolvedResult = null;
             resolvedException = null;

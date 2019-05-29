@@ -25,6 +25,11 @@ namespace CompilerNode
         /// Resolved arguments of the call.
         /// </summary>
         OnceReference<IList<IExpressionType>> ResolvedArgumentList { get; }
+
+        /// <summary>
+        /// The argument passing style.
+        /// </summary>
+        TypeArgumentStyles ArgumentStyle { get; set; }
     }
 
     /// <summary>
@@ -132,6 +137,7 @@ namespace CompilerNode
                 ResolvedException = new OnceReference<IResultException>();
                 SelectedParameterList = new ListTableEx<IParameter>();
                 ResolvedArgumentList = new OnceReference<IList<IExpressionType>>();
+                ArgumentStyle = TypeArgumentStyles.None;
                 IsHandled = true;
             }
 
@@ -209,6 +215,12 @@ namespace CompilerNode
         /// </summary>
         public OnceReference<IList<IExpressionType>> ResolvedArgumentList { get; private set; } = new OnceReference<IList<IExpressionType>>();
 
+        /// <summary>
+        /// The argument passing style.
+        /// </summary>
+        ///TODO: merge this and ResolvedArgumentList.
+        public TypeArgumentStyles ArgumentStyle { get; set; }
+
         /*
          * Two precursor index expressions cannot be compared because it happens only when comparing different features, and there can be only one indexer.
         public static bool IsExpressionEqual(IPrecursorIndexExpression expression1, IPrecursorIndexExpression expression2)
@@ -244,7 +256,8 @@ namespace CompilerNode
         /// <param name="expressionConstant">The expression constant upon return.</param>
         /// <param name="selectedParameterList">The selected parameters.</param>
         /// <param name="resolvedArgumentList">The list of arguments corresponding to selected parameters.</param>
-        public static bool ResolveCompilerReferences(IPrecursorIndexExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        /// <param name="argumentStyle">The argument passing style.</param>
+        public static bool ResolveCompilerReferences(IPrecursorIndexExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList, out TypeArgumentStyles argumentStyle)
         {
             resolvedResult = null;
             resolvedException = null;
@@ -252,6 +265,7 @@ namespace CompilerNode
             expressionConstant = NeutralLanguageConstant.NotConstant;
             selectedParameterList = null;
             resolvedArgumentList = null;
+            argumentStyle = TypeArgumentStyles.None;
 
             IOptionalReference<BaseNode.IObjectType> AncestorType = node.AncestorType;
             IList<IArgument> ArgumentList = node.ArgumentList;
@@ -268,7 +282,7 @@ namespace CompilerNode
                 if (!Instance.FindPrecursor(node.AncestorType, errorList, node, out IFeatureInstance SelectedPrecursor))
                     return false;
 
-                if (!ResolveSelectedPrecursor(node, SelectedPrecursor, errorList, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedParameterList, out resolvedArgumentList))
+                if (!ResolveSelectedPrecursor(node, SelectedPrecursor, errorList, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedParameterList, out resolvedArgumentList, out argumentStyle))
                     return false;
             }
             else
@@ -280,7 +294,7 @@ namespace CompilerNode
             return true;
         }
 
-        private static bool ResolveSelectedPrecursor(IPrecursorIndexExpression node, IFeatureInstance selectedPrecursor, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        private static bool ResolveSelectedPrecursor(IPrecursorIndexExpression node, IFeatureInstance selectedPrecursor, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList, out TypeArgumentStyles argumentStyle)
         {
             resolvedResult = null;
             resolvedException = null;
@@ -288,11 +302,12 @@ namespace CompilerNode
             expressionConstant = NeutralLanguageConstant.NotConstant;
             selectedParameterList = null;
             resolvedArgumentList = null;
+            argumentStyle = TypeArgumentStyles.None;
 
             IList<IArgument> ArgumentList = node.ArgumentList;
 
             List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
-            if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, errorList))
+            if (!Argument.Validate(ArgumentList, MergedArgumentList, out argumentStyle, errorList))
                 return false;
 
             IIndexerFeature OperatorFeature = selectedPrecursor.Feature.Item as IIndexerFeature;
@@ -304,7 +319,7 @@ namespace CompilerNode
             ParameterTableList.Add(OperatorType.ParameterTable);
 
             int SelectedIndex;
-            if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, ArgumentStyle, errorList, node, out SelectedIndex))
+            if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, argumentStyle, errorList, node, out SelectedIndex))
                 return false;
 
             resolvedResult = new ResultType(OperatorType.ResolvedEntityTypeName.Item, OperatorType.ResolvedEntityType.Item, string.Empty);

@@ -13,7 +13,7 @@ namespace CompilerNode
         /// <summary>
         /// The resolved feature.
         /// </summary>
-        OnceReference<ICompiledFeature> ResolvedFinalFeature { get; }
+        OnceReference<IConstantFeature> ResolvedFinalFeature { get; }
 
         /// <summary>
         /// The resolved discrete.
@@ -28,7 +28,7 @@ namespace CompilerNode
         /// <summary>
         /// The class type.
         /// </summary>
-        OnceReference<ICompiledType> ResolvedClassType { get; }
+        OnceReference<IClassType> ResolvedClassType { get; }
     }
 
     /// <summary>
@@ -99,10 +99,10 @@ namespace CompilerNode
                 ResolvedResult = new OnceReference<IResultType>();
                 ConstantSourceList = new ListTableEx<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
-                ResolvedFinalFeature = new OnceReference<ICompiledFeature>();
+                ResolvedFinalFeature = new OnceReference<IConstantFeature>();
                 ResolvedFinalDiscrete = new OnceReference<IDiscrete>();
                 ResolvedClassTypeName = new OnceReference<ITypeName>();
-                ResolvedClassType = new OnceReference<ICompiledType>();
+                ResolvedClassType = new OnceReference<IClassType>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
@@ -177,7 +177,7 @@ namespace CompilerNode
         /// <summary>
         /// The resolved feature.
         /// </summary>
-        public OnceReference<ICompiledFeature> ResolvedFinalFeature { get; private set; } = new OnceReference<ICompiledFeature>();
+        public OnceReference<IConstantFeature> ResolvedFinalFeature { get; private set; } = new OnceReference<IConstantFeature>();
 
         /// <summary>
         /// The resolved discrete.
@@ -192,7 +192,7 @@ namespace CompilerNode
         /// <summary>
         /// The class type.
         /// </summary>
-        public OnceReference<ICompiledType> ResolvedClassType { get; private set; } = new OnceReference<ICompiledType>();
+        public OnceReference<IClassType> ResolvedClassType { get; private set; } = new OnceReference<IClassType>();
 
         /// <summary>
         /// Compares two expressions.
@@ -232,7 +232,7 @@ namespace CompilerNode
         /// <param name="resolvedFinalDiscrete">The discrete if the end of the path is a discrete.</param>
         /// <param name="resolvedClassTypeName">The class type name upon return.</param>
         /// <param name="resolvedClassType">The class name upon return.</param>
-        public static bool ResolveCompilerReferences(IClassConstantExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out ITypeName resolvedClassTypeName, out ICompiledType resolvedClassType)
+        public static bool ResolveCompilerReferences(IClassConstantExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IConstantFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out ITypeName resolvedClassTypeName, out IClassType resolvedClassType)
         {
             resolvedResult = null;
             resolvedException = null;

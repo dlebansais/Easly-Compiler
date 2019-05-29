@@ -10,7 +10,7 @@
     /// </summary>
     /// <typeparam name="TFeature">One of the <see cref="IFeature"/> descendants.</typeparam>
     public interface IFeatureRuleTemplate<TFeature> : IRuleTemplate
-        where TFeature : IFeatureWithName, ICompiledFeature
+        where TFeature : IFeature, IFeatureWithName, ICompiledFeature
     {
     }
 

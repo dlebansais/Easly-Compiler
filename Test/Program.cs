@@ -10,8 +10,8 @@ namespace Test
     {
         static int Main(string[] args)
         {
-            Compiler c = new Compiler();
-            //c.InferenceRetries = 50;
+            ICompiler c = CreateCompiler();
+            IErrorList ErrorList;
 
             c.Compile(@"C:\Users\DLB\AppData\Local\Temp\root.easly");
             //c.Compile("../../../coverage/coverage.easly");
@@ -20,9 +20,34 @@ namespace Test
             //c.Compile("../../../root.easly");
             //c.Compile("../../../coverage/coverage replication.easly");
 
-            Debug.WriteLine(c.ErrorList.ToString());
+            ErrorList = c.ErrorList;
+            if (ErrorList.IsEmpty)
+            {
+                ITargetLanguage t = CreateTarget(c);
+                t.Translate();
 
-            return c.ErrorList.IsEmpty ? 0 : -1;
+                ErrorList = t.ErrorList;
+            }
+
+            Debug.WriteLine(ErrorList.ToString());
+
+            return ErrorList.IsEmpty ? 0 : -1;
+        }
+
+        static ICompiler CreateCompiler()
+        {
+            Compiler c = new Compiler();
+            //c.InferenceRetries = 50;
+
+            return c;
+        }
+
+        static ITargetLanguage CreateTarget(ICompiler c)
+        {
+            TargetCSharp t = new TargetCSharp(c, "Test");
+            t.OutputRootFolder = "../../../Output";
+
+            return t;
         }
 
         static void DebugOutputLanguage()

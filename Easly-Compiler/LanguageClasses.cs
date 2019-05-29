@@ -89,6 +89,48 @@
             { UniversallyUniqueIdentifier.Name, UniversallyUniqueIdentifier.Guid },
         };
 
+        public static Dictionary<Guid, string> GuidToName { get; } = new Dictionary<Guid, string>()
+        {
+            { Any.Guid, Any.Name },
+            { AnyReference.Guid, AnyReference.Name },
+            { AnyValue.Guid, AnyValue.Name },
+            { AttributeEntity.Guid, AttributeEntity.Name },
+            { Boolean.Guid, Boolean.Name },
+            { Character.Guid, Character.Name },
+            { ConstantEntity.Guid, ConstantEntity.Name },
+            { Entity.Guid, Entity.Name },
+            { ProcedureEntity.Guid, ProcedureEntity.Name },
+            { Event.Guid, Event.Name },
+            { Number.Guid, Number.Name },
+            { PropertyEntity.Guid, PropertyEntity.Name },
+            { IndexerEntity.Guid, IndexerEntity.Name },
+            { LocalEntity.Guid, LocalEntity.Name },
+            { OnceReference.Guid, OnceReference.Name },
+            { OverLoopSource.Guid, OverLoopSource.Name },
+            { AnyOnceReference.Guid, AnyOnceReference.Name },
+            { Enumeration.Guid, Enumeration.Name },
+            { OptionalReference.Guid, OptionalReference.Name },
+            { String.Guid, String.Name },
+            { DateAndTime.Guid, DateAndTime.Name },
+            { AnyDetachableReference.Guid, AnyDetachableReference.Name },
+            { AnyOptionalReference.Guid, AnyOptionalReference.Name },
+            { FeatureEntity.Guid, FeatureEntity.Name },
+            { KeyValuePair.Guid, KeyValuePair.Name },
+            { SpecializedTypeEntity.Guid, SpecializedTypeEntity.Name },
+            { DetachableReference.Guid, DetachableReference.Name },
+            { NamedFeatureEntity.Guid, NamedFeatureEntity.Name },
+            { StableReference.Guid, StableReference.Name },
+            { AnyStableReference.Guid, AnyStableReference.Name },
+            { Hashtable.Guid, Hashtable.Name },
+            { List.Guid, List.Name },
+            { Exception.Guid, Exception.Name },
+            { SealableHashtable.Guid, SealableHashtable.Name },
+            { TypeEntity.Guid, TypeEntity.Name },
+            { BitFieldEnumeration.Guid, BitFieldEnumeration.Name },
+            { FunctionEntity.Guid, FunctionEntity.Name },
+            { UniversallyUniqueIdentifier.Guid, UniversallyUniqueIdentifier.Name },
+        };
+
         public static readonly string BooleanTrueString = "True";
         public static readonly string BooleanFalseString = "False";
     }

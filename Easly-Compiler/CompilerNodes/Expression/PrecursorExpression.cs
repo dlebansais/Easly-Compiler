@@ -25,6 +25,11 @@ namespace CompilerNode
         /// Resolved arguments of the call.
         /// </summary>
         OnceReference<IList<IExpressionType>> ResolvedArgumentList { get; }
+
+        /// <summary>
+        /// The argument passing style.
+        /// </summary>
+        TypeArgumentStyles ArgumentStyle { get; set; }
     }
 
     /// <summary>
@@ -132,6 +137,7 @@ namespace CompilerNode
                 ResolvedException = new OnceReference<IResultException>();
                 SelectedParameterList = new ListTableEx<IParameter>();
                 ResolvedArgumentList = new OnceReference<IList<IExpressionType>>();
+                ArgumentStyle = TypeArgumentStyles.None;
                 IsHandled = true;
             }
 
@@ -210,6 +216,12 @@ namespace CompilerNode
         public OnceReference<IList<IExpressionType>> ResolvedArgumentList { get; private set; } = new OnceReference<IList<IExpressionType>>();
 
         /// <summary>
+        /// The argument passing style.
+        /// </summary>
+        ///TODO: merge this and ResolvedArgumentList.
+        public TypeArgumentStyles ArgumentStyle { get; set; }
+
+        /// <summary>
         /// Compares two expressions.
         /// </summary>
         /// <param name="other">The other expression.</param>
@@ -256,7 +268,8 @@ namespace CompilerNode
         /// <param name="expressionConstant">The expression constant upon return.</param>
         /// <param name="selectedParameterList">The selected parameters.</param>
         /// <param name="resolvedArgumentList">The list of arguments corresponding to selected parameters.</param>
-        public static bool ResolveCompilerReferences(IPrecursorExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        /// <param name="argumentStyle">The argument passing style.</param>
+        public static bool ResolveCompilerReferences(IPrecursorExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList, out TypeArgumentStyles argumentStyle)
         {
             resolvedResult = null;
             resolvedException = null;
@@ -264,6 +277,7 @@ namespace CompilerNode
             expressionConstant = NeutralLanguageConstant.NotConstant;
             selectedParameterList = null;
             resolvedArgumentList = null;
+            argumentStyle = TypeArgumentStyles.None;
 
             IOptionalReference<BaseNode.IObjectType> AncestorType = node.AncestorType;
             IList<IArgument> ArgumentList = node.ArgumentList;
@@ -285,10 +299,10 @@ namespace CompilerNode
                 return false;
 
             List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
-            if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, errorList))
+            if (!Argument.Validate(ArgumentList, MergedArgumentList, out argumentStyle, errorList))
                 return false;
 
-            if (!ResolveCall(node, SelectedPrecursor, MergedArgumentList, ArgumentStyle, errorList, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedParameterList, out resolvedArgumentList))
+            if (!ResolveCall(node, SelectedPrecursor, MergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedParameterList, out resolvedArgumentList))
                 return false;
 
             // TODO: check if the precursor is a constant number

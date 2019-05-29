@@ -15,19 +15,58 @@
     /// <summary>
     /// Process Easly source code to output code for the target language (C# supported only).
     /// </summary>
-    public class Compiler
+    public interface ICompiler
+    {
+        /// <summary>
+        /// True to verify the program after compilation.
+        /// </summary>
+        bool ActivateVerification { get; set; }
+
+        /// <summary>
+        /// The last compiled file name.
+        /// </summary>
+        string FileName { get; }
+
+        /// <summary>
+        /// The source code, merged with languages classes and compiled.
+        /// </summary>
+        IRoot LoadedRoot { get; }
+
+        /// <summary>
+        /// Errors in last compilation.
+        /// </summary>
+        IErrorList ErrorList { get; }
+
+        /// <summary>
+        /// Number of retries by the inference engine (debug only).
+        /// </summary>
+        int InferenceRetries { get; }
+
+        /// <summary>
+        /// Compiles the file. The file must contain a serialized Easly Root object.
+        /// </summary>
+        /// <param name="fileName">The file to compile.</param>
+        void Compile(string fileName);
+
+        /// <summary>
+        /// Compiles the source code.
+        /// </summary>
+        /// <param name="root">The source code to compile.</param>
+        void Compile(BaseNode.IRoot root);
+
+        /// <summary>
+        /// Compiles the source code.
+        /// </summary>
+        /// <param name="stream">The source code to compile.</param>
+        void Compile(Stream stream);
+    }
+
+    /// <summary>
+    /// Process Easly source code to output code for the target language (C# supported only).
+    /// </summary>
+    public class Compiler : ICompiler
     {
         #region Properties
-        /// <summary>
-        /// Folder where to output the result.
-        /// </summary>
-        public string OutputRootFolder { get; set; }
-
-        /// <summary>
-        /// Namespace for the output code.
-        /// </summary>
-        public string Namespace { get; set; }
-
         /// <summary>
         /// True to verify the program after compilation.
         /// </summary>
@@ -42,6 +81,11 @@
         /// The last compiled source code.
         /// </summary>
         public BaseNode.IRoot Root { get; private set; }
+
+        /// <summary>
+        /// The source code, merged with languages classes and compiled.
+        /// </summary>
+        public IRoot LoadedRoot { get; private set; }
 
         /// <summary>
         /// Errors in last compilation.
@@ -110,7 +154,6 @@
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
             ErrorList.ClearErrors();
-            IRoot LoadedRoot;
 
             try
             {
@@ -203,6 +246,7 @@
             BaseNode.IBlock<BaseNode.IIdentifier, BaseNode.Identifier> BlockIdentifier = LanguageLibrary.ClassIdentifierBlocks.NodeBlockList[0];
 
             Debug.Assert(BlockIdentifier.NodeList.Count == LanguageClasses.NameToGuid.Count);
+            Debug.Assert(BlockIdentifier.NodeList.Count == LanguageClasses.GuidToName.Count);
             List<string> IdentifierList = new List<string>();
             foreach (IIdentifier Item in BlockIdentifier.NodeList)
             {
@@ -214,10 +258,13 @@
             BaseNode.IBlock<BaseNode.IClass, BaseNode.Class> BlockClass = languageRoot.ClassBlocks.NodeBlockList[0];
 
             Debug.Assert(BlockClass.NodeList.Count == LanguageClasses.NameToGuid.Count);
+            Debug.Assert(BlockClass.NodeList.Count == LanguageClasses.GuidToName.Count);
             foreach (IClass Item in BlockClass.NodeList)
             {
                 Debug.Assert(LanguageClasses.NameToGuid.ContainsKey(Item.EntityName.Text));
                 Debug.Assert(LanguageClasses.NameToGuid[Item.EntityName.Text] == Item.ClassGuid);
+                Debug.Assert(LanguageClasses.GuidToName.ContainsKey(Item.ClassGuid));
+                Debug.Assert(LanguageClasses.GuidToName[Item.ClassGuid] == Item.EntityName.Text);
                 Debug.Assert(IdentifierList.Contains(Item.EntityName.Text));
             }
             root.ClassBlocks.NodeBlockList.Add(BlockClass);

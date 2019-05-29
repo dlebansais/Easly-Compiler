@@ -1,6 +1,5 @@
 ﻿namespace CompilerNode
 {
-    using System.Collections.Generic;
     using System.Diagnostics;
     using Easly;
     using EaslyCompiler;
@@ -10,6 +9,15 @@
     /// </summary>
     public interface IBinaryConditionalExpression : BaseNode.IBinaryConditionalExpression, IExpression, IComparableExpression
     {
+        /// <summary>
+        /// True if the condition is on events.
+        /// </summary>
+        bool IsEventExpression { get; }
+
+        /// <summary>
+        /// Sets the <see cref="IsEventExpression"/> property.
+        /// </summary>
+        void SetIsEventExpression(bool isEventExpression);
     }
 
     /// <summary>
@@ -149,6 +157,11 @@
 
         #region Compiler
         /// <summary>
+        /// True if the condition is on events.
+        /// </summary>
+        public bool IsEventExpression { get; private set; }
+
+        /// <summary>
         /// Compares two expressions.
         /// </summary>
         /// <param name="other">The other expression.</param>
@@ -172,6 +185,14 @@
             Result &= Expression.IsExpressionEqual((IExpression)RightExpression, (IExpression)other.RightExpression);
 
             return Result;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="IsEventExpression"/> property.
+        /// </summary>
+        public void SetIsEventExpression(bool isEventExpression)
+        {
+            IsEventExpression = isEventExpression;
         }
 
         /// <summary>
@@ -211,6 +232,8 @@
                 errorList.AddError(new ErrorInvalidExpression(LeftExpression));
                 return false;
             }
+
+            node.SetIsEventExpression(LeftExpressionClassType != BooleanType);
 
             constantSourceList.Add(LeftExpression);
             constantSourceList.Add(RightExpression);

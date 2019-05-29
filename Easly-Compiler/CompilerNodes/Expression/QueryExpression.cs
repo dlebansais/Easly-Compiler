@@ -40,6 +40,11 @@ namespace CompilerNode
         /// Resolved arguments of the call.
         /// </summary>
         OnceReference<IList<IExpressionType>> ResolvedArgumentList { get; }
+
+        /// <summary>
+        /// The argument passing style.
+        /// </summary>
+        TypeArgumentStyles ArgumentStyle { get; set; }
     }
 
     /// <summary>
@@ -150,6 +155,7 @@ namespace CompilerNode
                 SelectedParameterList = new ListTableEx<IParameter>();
                 SelectedResultList = new ListTableEx<IParameter>();
                 ResolvedArgumentList = new OnceReference<IList<IExpressionType>>();
+                ArgumentStyle = TypeArgumentStyles.None;
                 IsHandled = true;
             }
 
@@ -245,6 +251,12 @@ namespace CompilerNode
         public OnceReference<IList<IExpressionType>> ResolvedArgumentList { get; private set; } = new OnceReference<IList<IExpressionType>>();
 
         /// <summary>
+        /// The argument passing style.
+        /// </summary>
+        ///TODO: merge this and ResolvedArgumentList.
+        public TypeArgumentStyles ArgumentStyle { get; set; }
+
+        /// <summary>
         /// Compares two expressions.
         /// </summary>
         /// <param name="other">The other expression.</param>
@@ -283,7 +295,8 @@ namespace CompilerNode
         /// <param name="selectedParameterList">The selected parameters.</param>
         /// <param name="selectedResultList">The selected results.</param>
         /// <param name="resolvedArgumentList">The list of arguments corresponding to selected parameters.</param>
-        public static bool ResolveCompilerReferences(IQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out ListTableEx<IParameter> selectedParameterList, out ListTableEx<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList)
+        /// <param name="argumentStyle">The argument passing style.</param>
+        public static bool ResolveCompilerReferences(IQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out ListTableEx<IParameter> selectedParameterList, out ListTableEx<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList, out TypeArgumentStyles argumentStyle)
         {
             resolvedResult = null;
             resolvedException = null;
@@ -294,6 +307,7 @@ namespace CompilerNode
             selectedParameterList = null;
             selectedResultList = null;
             resolvedArgumentList = null;
+            argumentStyle = TypeArgumentStyles.None;
 
             IQualifiedName Query = (IQualifiedName)node.Query;
             IList<IArgument> ArgumentList = node.ArgumentList;
@@ -311,7 +325,7 @@ namespace CompilerNode
             if (FinalFeature != null)
             {
                 resolvedFinalFeature = FinalFeature;
-                return ResolveFeature(node, errorList, resolvedFinalFeature, FinalTypeName, FinalType, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedParameterList, out selectedResultList, out resolvedArgumentList);
+                return ResolveFeature(node, errorList, resolvedFinalFeature, FinalTypeName, FinalType, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedParameterList, out selectedResultList, out resolvedArgumentList, out argumentStyle);
             }
             else
             {
@@ -322,7 +336,7 @@ namespace CompilerNode
             }
         }
 
-        private static bool ResolveFeature(IQueryExpression node, IErrorList errorList, ICompiledFeature resolvedFinalFeature, ITypeName finalTypeName, ICompiledType finalType, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out ListTableEx<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList)
+        private static bool ResolveFeature(IQueryExpression node, IErrorList errorList, ICompiledFeature resolvedFinalFeature, ITypeName finalTypeName, ICompiledType finalType, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out ListTableEx<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList, out TypeArgumentStyles argumentStyle)
         {
             resolvedResult = null;
             resolvedException = null;
@@ -331,6 +345,7 @@ namespace CompilerNode
             selectedParameterList = null;
             selectedResultList = null;
             resolvedArgumentList = null;
+            argumentStyle = TypeArgumentStyles.None;
 
             IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
 
@@ -341,8 +356,7 @@ namespace CompilerNode
             IList<IIdentifier> ValidPath = Query.ValidPath.Item;
 
             List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
-            TypeArgumentStyles ArgumentStyle;
-            if (!Argument.Validate(ArgumentList, MergedArgumentList, out ArgumentStyle, errorList))
+            if (!Argument.Validate(ArgumentList, MergedArgumentList, out argumentStyle, errorList))
                 return false;
 
             IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
@@ -358,7 +372,7 @@ namespace CompilerNode
                         ParameterTableList.Add(Overload.ParameterTable);
 
                     int SelectedIndex;
-                    if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, ArgumentStyle, errorList, node, out SelectedIndex))
+                    if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, argumentStyle, errorList, node, out SelectedIndex))
                         return false;
 
                     IQueryOverloadType SelectedOverload = AsFunctionType.OverloadList[SelectedIndex];
