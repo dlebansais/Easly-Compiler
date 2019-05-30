@@ -15,11 +15,6 @@
         new IEntityExpression Source { get; }
 
         /// <summary>
-        /// The query.
-        /// </summary>
-        ICSharpQualifiedName Query { get; }
-
-        /// <summary>
         /// The source feature for which an entity object is obtained. Can be null.
         /// </summary>
         ICSharpFeature Feature { get; }
@@ -28,6 +23,11 @@
         /// The source discrete for which an entity object is obtained. Can be null.
         /// </summary>
         ICSharpDiscrete Discrete { get; }
+
+        /// <summary>
+        /// The query.
+        /// </summary>
+        ICSharpQualifiedName Query { get; }
     }
 
     /// <summary>
@@ -54,8 +54,6 @@
         protected CSharpEntityExpression(IEntityExpression source, ICSharpContext context)
             : base(source, context)
         {
-            Query = CSharpQualifiedName.Create((IQualifiedName)Source.Query, context);
-
             if (Source.ResolvedFinalFeature.IsAssigned)
                 Feature = context.GetFeature(Source.ResolvedFinalFeature.Item);
 
@@ -72,6 +70,8 @@
             }
 
             Debug.Assert((Feature != null && Discrete == null) || (Feature == null && Discrete != null));
+
+            Query = CSharpQualifiedName.Create((IQualifiedName)Source.Query, Feature, Discrete, false, context);
         }
         #endregion
 
@@ -87,11 +87,6 @@
         public override bool IsComplex { get { return false; } }
 
         /// <summary>
-        /// The query.
-        /// </summary>
-        public ICSharpQualifiedName Query { get; }
-
-        /// <summary>
         /// The source feature for which an entity object is obtained. Can be null.
         /// </summary>
         public ICSharpFeature Feature { get; }
@@ -100,6 +95,11 @@
         /// The source discrete for which an entity object is obtained. Can be null.
         /// </summary>
         public ICSharpDiscrete Discrete { get; }
+
+        /// <summary>
+        /// The query.
+        /// </summary>
+        public ICSharpQualifiedName Query { get; }
         #endregion
 
         #region Client Interface
@@ -151,6 +151,7 @@
                         break;
 
                     case IScopeAttributeFeature AsScopeAttributeFeature:
+                        /*
                         string FeatureString;
                         IIndexerFeature ThisFeatureAsIndexer;
                         IFeatureWithName ThisFeatureWithName;
@@ -165,6 +166,8 @@
                             throw new InvalidCastException();
 
                         Result = "LocalEntity" + "." + "FromThis" + "(" + "this" + "," + " " + FeatureString + "," + " " + "\"" + QueryText + "\"" + ")";
+                        */
+                        Result = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Property" + "(" + "\"" + QueryText + "\"" + ")";
                         break;
                 }
             }

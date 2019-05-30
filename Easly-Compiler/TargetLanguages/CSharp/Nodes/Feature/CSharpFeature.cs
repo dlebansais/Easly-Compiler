@@ -132,8 +132,6 @@
         /// </summary>
         public void MarkAsOverride()
         {
-            Debug.Assert(!IsOverride);
-
             IsOverride = true;
         }
         #endregion

@@ -82,6 +82,11 @@
         bool IsSharedName { get; }
 
         /// <summary>
+        /// True if the class is a singleton with no parameter used to call it.
+        /// </summary>
+        bool IsUnparameterizedSingleton { get; }
+
+        /// <summary>
         /// Sets the base class.
         /// </summary>
         /// <param name="baseClass">The base class.</param>
@@ -104,6 +109,11 @@
         /// Sets the <see cref="IsSharedName"/> property.
         /// </summary>
         void SetIsSharedName();
+
+        /// <summary>
+        /// Sets the <see cref="IsUnparameterizedSingleton"/> property.
+        /// </summary>
+        void SetIsUnparameterizedSingleton();
 
         /// <summary>
         /// Find features that are overrides and mark them as such.
@@ -275,6 +285,11 @@
         /// True if the class shares its name with another from a different 'From' source.
         /// </summary>
         public bool IsSharedName { get; private set; }
+
+        /// <summary>
+        /// True if the class is a singleton with no parameter used to call it.
+        /// </summary>
+        public bool IsUnparameterizedSingleton { get; private set; }
         #endregion
 
         #region Client Interface
@@ -337,6 +352,14 @@
             Debug.Assert(Context != null);
 
             IsSharedName = true;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="IsUnparameterizedSingleton"/> property.
+        /// </summary>
+        public void SetIsUnparameterizedSingleton()
+        {
+            IsUnparameterizedSingleton = true;
         }
 
         /// <summary>
@@ -525,16 +548,14 @@
         {
             foreach (KeyValuePair<IFeatureName, ITypedefType> Entry in Source.LocalTypedefTable)
             {
+                ITypeName ReferencedTypeName = Entry.Value.ReferencedTypeName.Item;
                 ICompiledType ReferencedType = Entry.Value.ReferencedType.Item;
 
                 switch (ReferencedType)
                 {
                     case IFunctionType AsFunctionType:
-                        TypedefDelegateTable.Add(AsFunctionType.ResolvedTypeName.Item, AsFunctionType.ResolvedType.Item);
-                        break;
-
                     case IProcedureType AsProcedureType:
-                        TypedefDelegateTable.Add(AsProcedureType.ResolvedTypeName.Item, AsProcedureType.ResolvedType.Item);
+                        TypedefDelegateTable.Add(ReferencedTypeName, ReferencedType);
                         break;
                 }
             }
@@ -654,9 +675,7 @@
             string ClassNamespace;
             string ClassOrInterfaceName;
 
-            string UsingClause;
-            string NakedClassName;
-            if (CSharpRootOutput.SplitUsingClause(ValidClassName, out UsingClause, out NakedClassName))
+            if (SplitUsingClause(ValidClassName, out string UsingClause, out string NakedClassName))
             {
                 ClassNamespace = string.Empty;
                 ClassOrInterfaceName = NakedClassName;
@@ -696,6 +715,26 @@
                     return ClassNamespace + "." + ClassOrInterfaceName;
             else
                 return ClassOrInterfaceName;
+        }
+
+        /// <summary>
+        /// Gets elements of a using clause from a class name.
+        /// </summary>
+        /// <param name="className">The class name.</param>
+        /// <param name="usingClause">The using clause.</param>
+        /// <param name="nakedClassName">The class name to use if the using clause is set.</param>
+        public static bool SplitUsingClause(string className, out string usingClause, out string nakedClassName)
+        {
+            usingClause = null;
+            nakedClassName = null;
+
+            int DotIndex = className.LastIndexOf('.');
+            if (DotIndex < 1)
+                return false;
+
+            usingClause = className.Substring(0, DotIndex);
+            nakedClassName = className.Substring(DotIndex + 1);
+            return true;
         }
 
         /// <summary>

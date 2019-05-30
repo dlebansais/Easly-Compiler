@@ -44,7 +44,7 @@
             : base(source)
         {
             Name = ((IName)source.EntityName).ValidText.Item;
-            Type = CSharpType.Create(source.ResolvedDefinedType.Item);
+            Type = CSharpType.Create(source.ResolvedDefinedType.Item, this);
 
             if (Type is ICSharpFormalGenericType AsFormalGenericType)
             {

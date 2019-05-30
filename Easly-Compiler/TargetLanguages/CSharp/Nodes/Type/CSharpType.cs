@@ -52,6 +52,7 @@
         {
             ICSharpType Result = null;
 
+            // A typedef is required for IFunctionType and IProcedureType.
             switch (source)
             {
                 case IClassType AsClassType:
@@ -62,17 +63,50 @@
                     Result = CSharpFormalGenericType.Create(AsFormalGenericType);
                     break;
 
-                /* A typedef is required for this type.
-                 *
-                 * case IFunctionType AsFunctionType:
-                    Result = CSharpFunctionType.Create(AsFunctionType);
-                    break;*/
+                case IIndexerType AsIndexerType:
+                    Result = CSharpIndexerType.Create(AsIndexerType);
+                    break;
 
-                /* A typedef is required for this type.
-                 *
-                 * case IProcedureType AsProcedureType:
-                    Result = CSharpProcedureType.Create(AsProcedureType);
-                    break;*/
+                case IPropertyType AsPropertyType:
+                    Result = CSharpPropertyType.Create(AsPropertyType);
+                    break;
+
+                case ITupleType AsTupleType:
+                    Result = CSharpTupleType.Create(AsTupleType);
+                    break;
+            }
+
+            Debug.Assert(Result != null);
+
+            return Result;
+        }
+
+        /// <summary>
+        /// Creates a new C# type associated to a typedef.
+        /// </summary>
+        /// <param name="source">The Easly type from which the C# type is created.</param>
+        /// <param name="typedef">The typedef.</param>
+        public static ICSharpType Create(ICompiledType source, ICSharpTypedef typedef)
+        {
+            ICSharpType Result = null;
+
+            switch (source)
+            {
+                case IClassType AsClassType:
+                    Result = CSharpClassType.Create(AsClassType);
+                    break;
+
+                case IFormalGenericType AsFormalGenericType:
+                    Result = CSharpFormalGenericType.Create(AsFormalGenericType);
+                    break;
+
+                case IFunctionType AsFunctionType:
+                    Result = CSharpFunctionType.Create(AsFunctionType, typedef);
+                    break;
+
+                case IProcedureType AsProcedureType:
+                    Result = CSharpProcedureType.Create(AsProcedureType, typedef);
+                    break;
 
                 case IIndexerType AsIndexerType:
                     Result = CSharpIndexerType.Create(AsIndexerType);

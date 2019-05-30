@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -14,14 +15,24 @@
         new IQueryExpression Source { get; }
 
         /// <summary>
-        /// The query.
-        /// </summary>
-        ICSharpQualifiedName Query { get; }
-
-        /// <summary>
         /// The feature call.
         /// </summary>
         ICSharpFeatureCall FeatureCall { get; }
+
+        /// <summary>
+        /// The feature called. Can be null.
+        /// </summary>
+        ICSharpFeature Feature { get; }
+
+        /// <summary>
+        /// The discrete read. Can be null.
+        /// </summary>
+        ICSharpDiscrete Discrete { get; }
+
+        /// <summary>
+        /// The query.
+        /// </summary>
+        ICSharpQualifiedName Query { get; }
     }
 
     /// <summary>
@@ -48,8 +59,26 @@
         protected CSharpQueryExpression(IQueryExpression source, ICSharpContext context)
             : base(source, context)
         {
-            Query = CSharpQualifiedName.Create((IQualifiedName)Source.Query, context);
             FeatureCall = new CSharpFeatureCall(source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle, context);
+
+            if (Source.ResolvedFinalFeature.IsAssigned)
+                Feature = context.GetFeature(Source.ResolvedFinalFeature.Item);
+
+            if (Source.ResolvedFinalDiscrete.IsAssigned)
+            {
+                ICSharpClass Class = context.GetClass(Source.ResolvedFinalDiscrete.Item.EmbeddingClass);
+
+                foreach (ICSharpDiscrete Item in Class.DiscreteList)
+                    if (Item.Source == Source.ResolvedFinalDiscrete.Item)
+                    {
+                        Debug.Assert(Discrete == null);
+                        Discrete = Item;
+                    }
+            }
+
+            Debug.Assert((Feature != null && Discrete == null) || (Feature == null && Discrete != null));
+
+            Query = CSharpQualifiedName.Create((IQualifiedName)Source.Query, Feature, Discrete, source.InheritBySideAttribute, context);
         }
         #endregion
 
@@ -65,14 +94,24 @@
         public override bool IsComplex { get { return false; } }
 
         /// <summary>
-        /// The query.
-        /// </summary>
-        public ICSharpQualifiedName Query { get; }
-
-        /// <summary>
         /// The feature call.
         /// </summary>
         public ICSharpFeatureCall FeatureCall { get; }
+
+        /// <summary>
+        /// The feature called. Can be null.
+        /// </summary>
+        public ICSharpFeature Feature { get; }
+
+        /// <summary>
+        /// The discrete read. Can be null.
+        /// </summary>
+        public ICSharpDiscrete Discrete { get; }
+
+        /// <summary>
+        /// The query.
+        /// </summary>
+        public ICSharpQualifiedName Query { get; }
         #endregion
 
         #region Client Interface
@@ -93,12 +132,12 @@
         public virtual string CSharpText(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
         {
             string ArgumentListText = CSharpArgument.CSharpArgumentList(cSharpNamespace, FeatureCall, destinationList);
+            string QueryText = Query.CSharpText(cSharpNamespace, 0);
 
             if (ArgumentListText.Length > 0)
-            {
-                string QueryText = Query.CSharpText(cSharpNamespace, 0);
                 return $"{QueryText}({ArgumentListText})";
-            }
+            else
+                return QueryText;
             /*
             else
             {

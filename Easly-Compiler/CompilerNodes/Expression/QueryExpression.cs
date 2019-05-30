@@ -45,6 +45,11 @@ namespace CompilerNode
         /// The argument passing style.
         /// </summary>
         TypeArgumentStyles ArgumentStyle { get; set; }
+
+        /// <summary>
+        /// Inherit the side-by-side attribute.
+        /// </summary>
+        bool InheritBySideAttribute { get; set; }
     }
 
     /// <summary>
@@ -156,6 +161,7 @@ namespace CompilerNode
                 SelectedResultList = new ListTableEx<IParameter>();
                 ResolvedArgumentList = new OnceReference<IList<IExpressionType>>();
                 ArgumentStyle = TypeArgumentStyles.None;
+                InheritBySideAttribute = false;
                 IsHandled = true;
             }
 
@@ -257,6 +263,12 @@ namespace CompilerNode
         public TypeArgumentStyles ArgumentStyle { get; set; }
 
         /// <summary>
+        /// Inherit the side-by-side attribute.
+        /// </summary>
+        ///TODO: merge this and ResolvedArgumentList.
+        public bool InheritBySideAttribute { get; set; }
+
+        /// <summary>
         /// Compares two expressions.
         /// </summary>
         /// <param name="other">The other expression.</param>
@@ -296,7 +308,8 @@ namespace CompilerNode
         /// <param name="selectedResultList">The selected results.</param>
         /// <param name="resolvedArgumentList">The list of arguments corresponding to selected parameters.</param>
         /// <param name="argumentStyle">The argument passing style.</param>
-        public static bool ResolveCompilerReferences(IQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out ListTableEx<IParameter> selectedParameterList, out ListTableEx<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList, out TypeArgumentStyles argumentStyle)
+        /// <param name="inheritBySideAttribute">Inherit the side-by-side attribute.</param>
+        public static bool ResolveCompilerReferences(IQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out ListTableEx<IParameter> selectedParameterList, out ListTableEx<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList, out TypeArgumentStyles argumentStyle, out bool inheritBySideAttribute)
         {
             resolvedResult = null;
             resolvedException = null;
@@ -317,7 +330,7 @@ namespace CompilerNode
 
             IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
 
-            if (!ObjectType.GetQualifiedPathFinalType(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, errorList, out ICompiledFeature FinalFeature, out IDiscrete FinalDiscrete, out ITypeName FinalTypeName, out ICompiledType FinalType, out bool InheritBySideAttribute))
+            if (!ObjectType.GetQualifiedPathFinalType(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, errorList, out ICompiledFeature FinalFeature, out IDiscrete FinalDiscrete, out ITypeName FinalTypeName, out ICompiledType FinalType, out inheritBySideAttribute))
                 return false;
 
             Debug.Assert(FinalFeature != null || FinalDiscrete != null);
