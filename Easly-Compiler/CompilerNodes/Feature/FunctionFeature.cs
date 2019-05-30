@@ -10,7 +10,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IFunctionFeature.
     /// </summary>
-    public interface IFunctionFeature : BaseNode.IFunctionFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature
+    public interface IFunctionFeature : BaseNode.IFunctionFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithPrecursor
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.FunctionFeature.OverloadBlocks"/>.
@@ -117,7 +117,7 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsHandled = true;
             }
@@ -129,6 +129,11 @@ namespace CompilerNode
                 ResolvedFeature = new OnceReference<ICompiledFeature>();
                 MostCommonTypeName = new OnceReference<ITypeName>();
                 MostCommonType = new OnceReference<ICompiledType>();
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                IsCallingPrecursor = false;
                 IsHandled = true;
             }
 
@@ -212,6 +217,21 @@ namespace CompilerNode
         /// The source node associated to this instance.
         /// </summary>
         public ISource Location { get { return this; } }
+        #endregion
+
+        #region Implementation of IFeatureWithPrecursor
+        /// <summary>
+        /// True if the feature is calling a precursor.
+        /// </summary>
+        public bool IsCallingPrecursor { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="IsCallingPrecursor"/> property.
+        /// </summary>
+        public void MarkAsCallingPrecursor()
+        {
+            IsCallingPrecursor = true;
+        }
         #endregion
 
         #region Compiler

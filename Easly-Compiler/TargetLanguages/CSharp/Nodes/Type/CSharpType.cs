@@ -25,6 +25,11 @@
         bool IsUsedInCode { get; }
 
         /// <summary>
+        /// True if the type can be used in the interface 'I' text format.
+        /// </summary>
+        bool HasInterfaceText { get; }
+
+        /// <summary>
         /// Sets the <see cref="IsUsedInCode"/> property.
         /// </summary>
         void SetUsedInCode();
@@ -167,6 +172,11 @@
         /// True if the type is used in output source code.
         /// </summary>
         public bool IsUsedInCode { get; private set; }
+
+        /// <summary>
+        /// True if the type can be used in the interface 'I' text format.
+        /// </summary>
+        public abstract bool HasInterfaceText { get; }
         #endregion
 
         #region Client Interface

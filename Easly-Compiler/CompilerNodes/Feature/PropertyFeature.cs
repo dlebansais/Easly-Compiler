@@ -10,7 +10,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IPropertyFeature.
     /// </summary>
-    public interface IPropertyFeature : BaseNode.IPropertyFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IGetterSetterScopeHolder, INodeWithResult
+    public interface IPropertyFeature : BaseNode.IPropertyFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithPrecursor, IGetterSetterScopeHolder, INodeWithResult
     {
         /// <summary>
         /// The name of the resolved property type.
@@ -112,7 +112,7 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsHandled = true;
             }
@@ -133,6 +133,11 @@ namespace CompilerNode
                 FullScope = new HashtableEx<string, IScopeAttributeFeature>();
                 FullGetScope = new HashtableEx<string, IScopeAttributeFeature>();
                 FullSetScope = new HashtableEx<string, IScopeAttributeFeature>();
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                IsCallingPrecursor = false;
                 IsHandled = true;
             }
 
@@ -216,6 +221,21 @@ namespace CompilerNode
         /// The source node associated to this instance.
         /// </summary>
         public ISource Location { get { return this; } }
+        #endregion
+
+        #region Implementation of IFeatureWithPrecursor
+        /// <summary>
+        /// True if the feature is calling a precursor.
+        /// </summary>
+        public bool IsCallingPrecursor { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="IsCallingPrecursor"/> property.
+        /// </summary>
+        public void MarkAsCallingPrecursor()
+        {
+            IsCallingPrecursor = true;
+        }
         #endregion
 
         #region Implementation of IGetterSetterScopeHolder

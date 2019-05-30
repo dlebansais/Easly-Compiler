@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
     using Easly;
 
@@ -76,9 +77,10 @@
             node.ResolvedArgumentList.Item = ResolvedArgumentList;
             node.ArgumentStyle = ArgumentStyle;
 
-            // TODO
-            // IFeature EmbeddingFeature = node.EmbeddingFeature;
-            // EmbeddingFeature.ResolvedFeature.Item.MarkAsCallingPrecursor();
+            IFeature EmbeddingFeature = node.EmbeddingFeature;
+            IFeatureWithPrecursor ResolvedFeature = EmbeddingFeature.ResolvedFeature.Item as IFeatureWithPrecursor;
+            Debug.Assert(ResolvedFeature != null);
+            ResolvedFeature.MarkAsCallingPrecursor();
         }
         #endregion
     }

@@ -16,10 +16,21 @@
         int IndentLevel { get; }
 
         /// <summary>
+        /// Writes an empty line.
+        /// </summary>
+        void WriteLine();
+
+        /// <summary>
         /// Writes a line using the current indentation.
         /// </summary>
         /// <param name="line">The line to write.</param>
         void WriteIndentedLine(string line);
+
+        /// <summary>
+        /// Writes the documentation associated to a node.
+        /// </summary>
+        /// <param name="node">The documented node.</param>
+        void WriteDocumentation(BaseNode.INode node);
 
         /// <summary>
         /// Increased the current indentation level by 1.
@@ -66,6 +77,18 @@
                 Write("    ");
 
             WriteLine(line);
+        }
+
+        /// <summary>
+        /// Writes the documentation associated to a node.
+        /// </summary>
+        /// <param name="node">The documented node.</param>
+        public void WriteDocumentation(BaseNode.INode node)
+        {
+            string Comment = node.Documentation.Comment;
+
+            if (!string.IsNullOrEmpty(Comment))
+                WriteIndentedLine($"// {Comment}");
         }
 
         /// <summary>

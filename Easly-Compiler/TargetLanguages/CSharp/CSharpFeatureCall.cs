@@ -47,7 +47,8 @@
         {
             foreach (IParameter Item in parameterList)
             {
-                ICSharpParameter NewParameter = CSharpParameter.Create(Item, context);
+                ICSharpClass Owner = context.GetClass(Item.ResolvedParameter.Location.EmbeddingClass);
+                ICSharpParameter NewParameter = CSharpParameter.Create(Item, Owner);
                 ParameterList.Add(NewParameter);
             }
 

@@ -60,6 +60,11 @@
         /// The associated generic.
         /// </summary>
         public ICSharpGeneric Generic { get; private set; }
+
+        /// <summary>
+        /// True if the type can be used in the interface 'I' text format.
+        /// </summary>
+        public override bool HasInterfaceText { get { return false; } }
         #endregion
 
         #region Client Interface

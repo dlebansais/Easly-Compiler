@@ -66,5 +66,36 @@
         {
             return s;
         }
+
+        /// <summary>
+        /// Returns the text of an export.
+        /// </summary>
+        /// <param name="isOverride">True if the feature is an override of a parent virtual feature.</param>
+        /// <param name="isAbstract">True if the feature is abstract.</param>
+        /// <param name="isNonVirtual">True if the feature is NOT virtual.</param>
+        /// <param name="exportStatus">The base export status.</param>
+        public static string ComposedExportStatus(bool isOverride, bool isAbstract, bool isNonVirtual, CSharpExports exportStatus)
+        {
+            string Result = null;
+
+            switch (exportStatus)
+            {
+                case CSharpExports.Private:
+                    Result = "private";
+                    break;
+
+                case CSharpExports.Protected:
+                    Result = "protected" + (isAbstract ? " " + "abstract" : (isOverride ? " " + "override" : (isNonVirtual ? string.Empty : " " + "virtual")));
+                    break;
+
+                case CSharpExports.Public:
+                    Result = "public" + (isAbstract ? " " + "abstract" : (isOverride ? " " + "override" : (isNonVirtual ? string.Empty : " " + "virtual")));
+                    break;
+            }
+
+            Debug.Assert(Result != null);
+
+            return Result;
+        }
     }
 }

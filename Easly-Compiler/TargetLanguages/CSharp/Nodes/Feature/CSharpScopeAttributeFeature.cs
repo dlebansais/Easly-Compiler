@@ -31,6 +31,11 @@
         /// The default value. Can be null.
         /// </summary>
         ICSharpExpression DefaultValue { get; }
+
+        /// <summary>
+        /// The attribute type.
+        /// </summary>
+        ICSharpType Type { get; }
     }
 
     /// <summary>
@@ -43,23 +48,22 @@
         /// Create a new C# local attribute.
         /// </summary>
         /// <param name="owner">The class where the feature is declared.</param>
-        /// <param name="instance">The source feature instance.</param>
         /// <param name="source">The source Easly feature.</param>
-        public static ICSharpScopeAttributeFeature Create(ICSharpClass owner, IFeatureInstance instance, IScopeAttributeFeature source)
+        public static ICSharpScopeAttributeFeature Create(ICSharpClass owner, IScopeAttributeFeature source)
         {
-            return new CSharpScopeAttributeFeature(owner, instance, source);
+            return new CSharpScopeAttributeFeature(owner, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpScopeAttributeFeature"/> class.
         /// </summary>
         /// <param name="owner">The class where the feature is declared.</param>
-        /// <param name="instance">The source feature instance.</param>
         /// <param name="source">The source Easly feature.</param>
-        protected CSharpScopeAttributeFeature(ICSharpClass owner, IFeatureInstance instance, IScopeAttributeFeature source)
-            : base(owner, instance, source)
+        protected CSharpScopeAttributeFeature(ICSharpClass owner, IScopeAttributeFeature source)
+            : base(owner, source)
         {
             Name = Source.ValidFeatureName.Item.Name;
+            Type = CSharpType.Create(source.ResolvedFeatureType.Item);
 
             //TODO: handle the default value.
             /*
@@ -84,6 +88,11 @@
         /// The default value. Can be null.
         /// </summary>
         public ICSharpExpression DefaultValue { get; }
+
+        /// <summary>
+        /// The attribute type.
+        /// </summary>
+        public ICSharpType Type { get; }
         #endregion
     }
 }

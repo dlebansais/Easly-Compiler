@@ -19,6 +19,16 @@
         /// The associated unique type name.
         /// </summary>
         ITypeName ResolvedTypeName { get; }
+
+        /// <summary>
+        /// True if the type is used to create at least one object.
+        /// </summary>
+        bool IsUsedToCreate { get; }
+
+        /// <summary>
+        /// Sets the <see cref="IsUsedToCreate"/> property.
+        /// </summary>
+        void SetIsUsedToCreate();
     }
 
     /// <summary>
@@ -161,6 +171,19 @@
         #endregion
 
         #region Compiler
+        /// <summary>
+        /// True if the type is used to create at least one object.
+        /// </summary>
+        public bool IsUsedToCreate { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="IsUsedToCreate"/> property.
+        /// </summary>
+        public void SetIsUsedToCreate()
+        {
+            IsUsedToCreate = true;
+        }
+
         /// <summary>
         /// Compares two types.
         /// </summary>

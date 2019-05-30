@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="CompiledBody.cs" />
     <Compile Include="CompilerNodes\Expression\ComparableExpression.cs" />
+    <Compile Include="CompilerNodes\Feature\FeatureWithPrecursor.cs" />
     <Compile Include="Errors\Inference\03-Contract\ErrorMissingOverSourceAndIndexer.cs" />
     <Compile Include="Errors\Inference\04-Body\ErrorCreatedFeatureNotAttributeOrProperty.cs" />
     <Compile Include="Errors\Inference\04-Body\ErrorCreationFeatureRequired.cs" />
@@ -627,6 +628,7 @@
     <Compile Include="StringValidation.cs" />
     <Compile Include="FeatureName.cs" />
     <Compile Include="TargetLanguages\CSharp\ClassSplitting.cs" />
+    <Compile Include="TargetLanguages\CSharp\CSharpConstructorTypes.cs" />
     <Compile Include="TargetLanguages\CSharp\CSharpFeatureCall.cs" />
     <Compile Include="TargetLanguages\CSharp\CSharpContext.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\Argument\CSharpAssignmentArgument.cs" />
@@ -638,7 +640,10 @@
     <Compile Include="TargetLanguages\CSharp\CSharpTypeFormats.cs" />
     <Compile Include="TargetLanguages\CSharp\CSharpNames.cs" />
     <Compile Include="TargetLanguages\CSharp\CSharpWriter.cs" />
+    <Compile Include="TargetLanguages\CSharp\Nodes\CSharpCommandOverload.cs" />
+    <Compile Include="TargetLanguages\CSharp\Nodes\CSharpQueryOverload.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\CSharpDiscrete.cs" />
+    <Compile Include="TargetLanguages\CSharp\Nodes\CSharpConstraint.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\CSharpParameter.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\CSharpQualifiedName.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\CSharpTypedef.cs" />
@@ -667,6 +672,7 @@
     <Compile Include="TargetLanguages\CSharp\Nodes\Expression\CSharpAgentExpression.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\Expression\CSharpExpression.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\Feature\CSharpFeatureWithName.cs" />
+    <Compile Include="TargetLanguages\CSharp\Nodes\Feature\CSharpOverload.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\Type\CSharpTupleType.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\Type\CSharpPropertyType.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\Type\CSharpIndexerType.cs" />

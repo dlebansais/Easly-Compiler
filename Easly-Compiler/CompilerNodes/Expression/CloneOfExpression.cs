@@ -194,7 +194,7 @@ namespace CompilerNode
             foreach (IExpressionType Item in ResolvedSourceResult)
             {
                 if (Item.ValueType is IClassType AsClassType)
-                    AsClassType.MarkAsCloned();
+                    AsClassType.MarkAsUsedInCloneOf();
                 else
                 {
                     errorList.AddError(new ErrorClassTypeRequired(node));

@@ -28,21 +28,21 @@
         /// Create a new C# parameter.
         /// </summary>
         /// <param name="source">The Easly node from which the C# node is created.</param>
-        /// <param name="context">The creation context.</param>
-        public static ICSharpParameter Create(IParameter source, ICSharpContext context)
+        /// <param name="owner">The class where the parameter is declared.</param>
+        public static ICSharpParameter Create(IParameter source, ICSharpClass owner)
         {
-            return new CSharpParameter(source, context);
+            return new CSharpParameter(source, owner);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpParameter"/> class.
         /// </summary>
         /// <param name="source">The Easly node from which the C# node is created.</param>
-        /// <param name="context">The creation context.</param>
-        protected CSharpParameter(IParameter source, ICSharpContext context)
+        /// <param name="owner">The class where the parameter is declared.</param>
+        protected CSharpParameter(IParameter source, ICSharpClass owner)
             : base(source)
         {
-            Feature = context.GetFeature(source.ResolvedParameter) as ICSharpScopeAttributeFeature;
+            Feature = CSharpScopeAttributeFeature.Create(owner, source.ResolvedParameter);
             Debug.Assert(Feature != null);
         }
         #endregion

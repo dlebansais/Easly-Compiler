@@ -1,6 +1,8 @@
 ﻿namespace EaslyCompiler
 {
     using System.Diagnostics;
+    using CompilerNode;
+    using Easly;
 
     /// <summary>
     /// A C# feature.
@@ -36,6 +38,18 @@
         /// Mark this feature as an override of a virtual parent.
         /// </summary>
         void MarkAsOverride();
+
+        /// <summary>
+        /// Gets the export status of a feature in the class that implements it.
+        /// </summary>
+        /// <param name="sourceClass">The class implementing the feature.</param>
+        CSharpExports GetExportStatus(ICSharpClass sourceClass);
+
+        /// <summary>
+        /// Sets the <see cref="CoexistingPrecursorName"/> property.
+        /// </summary>
+        /// <param name="coexistingPrecursorName">The name of the precursor.</param>
+        void MarkPrecursorAsCoexisting(string coexistingPrecursorName);
     }
 
     /// <summary>
@@ -69,6 +83,18 @@
         /// Mark this feature as an override of a virtual parent.
         /// </summary>
         void MarkAsOverride();
+
+        /// <summary>
+        /// Gets the export status of a feature in the class that implements it.
+        /// </summary>
+        /// <param name="sourceClass">The class implementing the feature.</param>
+        CSharpExports GetExportStatus(ICSharpClass sourceClass);
+
+        /// <summary>
+        /// Sets the <see cref="CoexistingPrecursorName"/> property.
+        /// </summary>
+        /// <param name="coexistingPrecursorName">The name of the precursor.</param>
+        void MarkPrecursorAsCoexisting(string coexistingPrecursorName);
     }
 
     /// <summary>
@@ -79,6 +105,19 @@
         where T : class, ICompiledFeature
     {
         #region Init
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CSharpFeature{T}"/> class.
+        /// </summary>
+        /// <param name="owner">The class where the feature is declared.</param>
+        /// <param name="source">The source Easly feature.</param>
+        protected CSharpFeature(ICSharpClass owner, T source)
+            : base(source)
+        {
+            Debug.Assert(source is IScopeAttributeFeature);
+
+            Owner = owner;
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpFeature{T}"/> class.
         /// </summary>
@@ -122,7 +161,7 @@
         /// <summary>
         /// The name of the precursor if it's implemented as a separate feature in the same class. Can be null.
         /// </summary>
-        public string CoexistingPrecursorName { get; }
+        public string CoexistingPrecursorName { get; private set; }
         string ICSharpFeature.CoexistingPrecursorName { get { return CoexistingPrecursorName; } }
         #endregion
 
@@ -133,6 +172,60 @@
         public void MarkAsOverride()
         {
             IsOverride = true;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="CoexistingPrecursorName"/> property.
+        /// </summary>
+        /// <param name="coexistingPrecursorName">The name of the precursor.</param>
+        public void MarkPrecursorAsCoexisting(string coexistingPrecursorName)
+        {
+            CoexistingPrecursorName = coexistingPrecursorName;
+        }
+
+        /// <summary>
+        /// Gets the export status of a feature in the class that implements it.
+        /// </summary>
+        /// <param name="sourceClass">The class implementing the feature.</param>
+        public virtual CSharpExports GetExportStatus(ICSharpClass sourceClass)
+        {
+            bool IsExportedToClient;
+
+            IFeature AsFeature = Source as IFeature;
+            Debug.Assert(AsFeature != null);
+
+            IIdentifier Identifier = (IIdentifier)AsFeature.ExportIdentifier;
+            string ExportIdentifier = Identifier.ValidText.Item;
+
+            if (ExportIdentifier == "All")
+                IsExportedToClient = true;
+
+            else if (ExportIdentifier == "None" || ExportIdentifier == "Self")
+                IsExportedToClient = false;
+
+            else
+            {
+                FeatureName.TableContain(Owner.Source.ExportTable, ExportIdentifier, out IFeatureName ExportName, out IHashtableEx<string, IClass> ExportList);
+                Debug.Assert(ExportList.Count > 0);
+
+                if (ExportList.Count > 1)
+                    IsExportedToClient = true;
+                else
+                {
+                    if (ExportList.ContainsKey(sourceClass.ValidClassName))
+                        IsExportedToClient = false; // Export to self = self + descendant = protected
+                    else
+                        IsExportedToClient = true; // export to another = export to all = public
+                }
+            }
+
+            if (IsExportedToClient)
+                return CSharpExports.Public;
+
+            else if (AsFeature.Export == BaseNode.ExportStatus.Exported)
+                return CSharpExports.Protected;
+            else
+                return CSharpExports.Private;
         }
         #endregion
 

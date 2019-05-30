@@ -57,6 +57,11 @@
         IList<ICSharpFeature> FeatureList { get; }
 
         /// <summary>
+        /// The list of inhrited features.
+        /// </summary>
+        IList<ICSharpFeature> InheritedFeatureList { get; }
+
+        /// <summary>
         /// The context for creating nodes.
         /// </summary>
         ICSharpContext Context { get; }
@@ -82,9 +87,19 @@
         bool IsSharedName { get; }
 
         /// <summary>
-        /// True if the class is a singleton with no parameter used to call it.
+        /// True if the class is a singleton with generic parameters.
+        /// </summary>
+        bool IsParameterizedSingleton { get; }
+
+        /// <summary>
+        /// True if the class is a singleton with no generic parameters.
         /// </summary>
         bool IsUnparameterizedSingleton { get; }
+
+        /// <summary>
+        /// Gets how many contructors the class has.
+        /// </summary>
+        CSharpConstructorTypes ClassConstructorType { get; }
 
         /// <summary>
         /// Sets the base class.
@@ -97,7 +112,8 @@
         /// Sets the list of class features.
         /// </summary>
         /// <param name="featureList">The list of features.</param>
-        void SetFeatureList(IList<ICSharpFeature> featureList);
+        /// <param name="inheritedFeatureList">The list of inherited features.</param>
+        void SetFeatureList(IList<ICSharpFeature> featureList, IList<ICSharpFeature> inheritedFeatureList);
 
         /// <summary>
         /// Sets the <see cref="Context"/> property.
@@ -109,11 +125,6 @@
         /// Sets the <see cref="IsSharedName"/> property.
         /// </summary>
         void SetIsSharedName();
-
-        /// <summary>
-        /// Sets the <see cref="IsUnparameterizedSingleton"/> property.
-        /// </summary>
-        void SetIsUnparameterizedSingleton();
 
         /// <summary>
         /// Find features that are overrides and mark them as such.
@@ -262,6 +273,11 @@
         public IList<ICSharpFeature> FeatureList { get; private set; }
 
         /// <summary>
+        /// The list of inhrited features.
+        /// </summary>
+        public IList<ICSharpFeature> InheritedFeatureList { get; private set; }
+
+        /// <summary>
         /// The context for creating nodes.
         /// </summary>
         public ICSharpContext Context { get; private set; }
@@ -287,9 +303,36 @@
         public bool IsSharedName { get; private set; }
 
         /// <summary>
-        /// True if the class is a singleton with no parameter used to call it.
+        /// True if the class is a singleton with generic parameters.
         /// </summary>
-        public bool IsUnparameterizedSingleton { get; private set; }
+        public bool IsParameterizedSingleton { get { return Source.Cloneable == BaseNode.CloneableStatus.Single && Source.GenericTable.Count > 0; } }
+
+        /// <summary>
+        /// True if the class is a singleton with no generic parameters.
+        /// </summary>
+        public bool IsUnparameterizedSingleton { get { return Source.Cloneable == BaseNode.CloneableStatus.Single && Source.GenericTable.Count == 0; } }
+
+        /// <summary>
+        /// Gets how many contructors the class has.
+        /// </summary>
+        public CSharpConstructorTypes ClassConstructorType
+        {
+            get
+            {
+                int ConstructorCount = 0;
+
+                foreach (ICSharpFeature Feature in FeatureList)
+                    if (Feature is ICSharpCreationFeature)
+                        ConstructorCount++;
+
+                if (ConstructorCount == 0)
+                    return CSharpConstructorTypes.NoConstructor;
+                else if (ConstructorCount == 1)
+                    return CSharpConstructorTypes.OneConstructor;
+                else
+                    return CSharpConstructorTypes.ManyConstructors;
+            }
+        }
         #endregion
 
         #region Client Interface
@@ -317,13 +360,17 @@
         /// Sets the list of class features.
         /// </summary>
         /// <param name="featureList">The list of features.</param>
-        public void SetFeatureList(IList<ICSharpFeature> featureList)
+        /// <param name="inheritedFeatureList">The list of inherited features.</param>
+        public void SetFeatureList(IList<ICSharpFeature> featureList, IList<ICSharpFeature> inheritedFeatureList)
         {
             Debug.Assert(featureList != null);
+            Debug.Assert(inheritedFeatureList != null);
             Debug.Assert(FeatureList == null);
+            Debug.Assert(InheritedFeatureList == null);
             Debug.Assert(Context == null);
 
             FeatureList = featureList;
+            InheritedFeatureList = inheritedFeatureList;
         }
 
         /// <summary>
@@ -352,14 +399,6 @@
             Debug.Assert(Context != null);
 
             IsSharedName = true;
-        }
-
-        /// <summary>
-        /// Sets the <see cref="IsUnparameterizedSingleton"/> property.
-        /// </summary>
-        public void SetIsUnparameterizedSingleton()
-        {
-            IsUnparameterizedSingleton = true;
         }
 
         /// <summary>
@@ -649,6 +688,508 @@
 
         private void WriteClass(ICSharpWriter writer, string outputNamespace)
         {
+            writer.WriteIndentedLine("namespace " + outputNamespace);
+            writer.WriteIndentedLine("{");
+            writer.IncreaseIndent();
+
+            if (IsParameterizedSingleton)
+                WriteParameterizedSingletonClass(writer, outputNamespace);
+            else
+                WriteClassInterface(writer, outputNamespace);
+
+            WriteClassImplementation(writer, outputNamespace);
+
+            writer.DecreaseIndent();
+            writer.WriteIndentedLine("}");
+        }
+
+        private void WriteParameterizedSingletonClass(ICSharpWriter writer, string outputNamespace)
+        {
+            string ClassName = BasicClassName2CSharpClassName(outputNamespace, CSharpTypeFormats.AsSingleton, CSharpNamespaceFormats.None);
+
+            writer.WriteIndentedLine($"class {ClassName}");
+            writer.WriteIndentedLine("{");
+            writer.IncreaseIndent();
+            writer.WriteIndentedLine($"static  {ClassName}()");
+            writer.WriteIndentedLine("{");
+            writer.IncreaseIndent();
+            writer.WriteIndentedLine("SingletonSet = new Hashtable<string, object>();");
+            writer.DecreaseIndent();
+            writer.WriteIndentedLine("}");
+
+            writer.WriteLine();
+            writer.WriteIndentedLine("public static Hashtable<string, object> SingletonSet;");
+            writer.DecreaseIndent();
+            writer.WriteIndentedLine("}");
+
+            writer.WriteLine();
+        }
+
+        private void WriteClassInterface(ICSharpWriter writer, string outputNamespace)
+        {
+            string InterfaceName = FullClassName2CSharpClassName(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+
+            IList<ICSharpClass> InterfaceList = new List<ICSharpClass>();
+            if (BaseClass != null)
+                InterfaceList.Add(BaseClass);
+
+            foreach (ICSharpInheritance Inheritance in InheritanceList)
+            {
+                if (Inheritance.Source.Conformance == BaseNode.ConformanceType.NonConformant)
+                    continue;
+
+                ICSharpClass AncestorClass = Inheritance.AncestorClass;
+                Debug.Assert(AncestorClass != null);
+
+                if (AncestorClass != BaseClass)
+                    InterfaceList.Add(AncestorClass);
+            }
+
+            string InterfaceDeclarationLine = $"public interface {InterfaceName}";
+
+            if (InterfaceList.Count > 0)
+            {
+                string OtherInterfaceNames = string.Empty;
+                foreach (ICSharpClass OtherInterface in InterfaceList)
+                {
+                    if (OtherInterfaceNames.Length > 0)
+                        OtherInterfaceNames += ", ";
+
+                    OtherInterfaceNames += OtherInterface.FullClassName2CSharpClassName(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+                }
+
+                InterfaceDeclarationLine += $" : {OtherInterfaceNames}";
+            }
+
+            writer.WriteIndentedLine(InterfaceDeclarationLine);
+
+            foreach (ICSharpGeneric Generic in GenericList)
+                WriteGenericWhereClause(writer, outputNamespace, Generic);
+
+            writer.WriteIndentedLine("{");
+            writer.IncreaseIndent();
+
+            foreach (ICSharpFeature Feature in FeatureList)
+            {
+                if (!IsDirectFeature(Feature))
+                    continue;
+
+                CSharpExports ExportStatus = Feature.GetExportStatus(this);
+                bool IsLocal = Feature.Owner == this;
+                if (ExportStatus != CSharpExports.Public || Feature is ICSharpCreationFeature)
+                    continue;
+
+                bool IsMultiline = false;
+                bool IsFirstFeature = true;
+                //SourceFeature.WriteCSharp(writer, outputNamespace, FeatureTextTypes.Interface, CSharpExports.None, Entry.Key.Name, Instance, IsLocal, ref IsFirstFeature, ref IsMultiline);
+            }
+
+            writer.DecreaseIndent();
+            writer.WriteIndentedLine("}");
+            writer.WriteLine();
+        }
+
+        private bool IsDirectFeature(ICSharpFeature feature)
+        {
+            if (feature.Owner == this && feature.Instance.PrecursorList.Count == 0)
+                return true;
+            else
+                return false;
+        }
+
+        private void WriteGenericWhereClause(ICSharpWriter writer, string outputNamespace, ICSharpGeneric generic)
+        {
+            string GenericName = CSharpNames.ToCSharpIdentifier(generic.Name);
+            string InterfaceGenericName = $"I{GenericName}";
+
+            string CopyConstraint = CopyConstraintAsString(generic);
+
+            string ParentConstraint = ParentConstraintAsString(generic, outputNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+            string InterfaceParentConstraint = ParentConstraintAsString(generic, outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+
+            string Constraints = string.Empty;
+            string InterfaceConstraints = string.Empty;
+
+            if (ParentConstraint.Length == 0)
+                Constraints = CopyConstraint;
+            else
+                Constraints = ParentConstraint;
+
+            if (generic.IsUsedToCreate)
+            {
+                if (Constraints.Length > 0)
+                    Constraints += ", ";
+
+                Constraints += "new()";
+            }
+
+            InterfaceConstraints = CopyConstraint;
+            if (InterfaceConstraints.Length > 0)
+                InterfaceConstraints += ", ";
+            InterfaceConstraints += InterfaceParentConstraint;
+
+            if (InterfaceConstraints.Length == 0)
+                return;
+
+            writer.IncreaseIndent();
+            writer.WriteIndentedLine($"where {InterfaceGenericName} : {InterfaceConstraints}");
+            writer.WriteIndentedLine($"where {GenericName} : {Constraints}, {InterfaceGenericName}");
+            writer.DecreaseIndent();
+        }
+
+        private string CopyConstraintAsString(ICSharpGeneric generic)
+        {
+            return string.Empty;
+        }
+
+        private string ParentConstraintAsString(ICSharpGeneric generic, string outputNamespace, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat)
+        {
+            string Result = string.Empty;
+
+            foreach (ICSharpConstraint Constraint in generic.ConstraintList)
+            {
+                if (Result.Length > 0)
+                    Result += ", ";
+
+                Result += Constraint.Type.Type2CSharpString(outputNamespace, cSharpTypeFormat, cSharpNamespaceFormat);
+            }
+
+            return Result;
+        }
+
+        private void WriteClassImplementation(ICSharpWriter writer, string outputNamespace)
+        {
+            writer.WriteDocumentation(Source);
+
+            string InterfaceName = FullClassName2CSharpClassName(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+            string ClassName = FullClassName2CSharpClassName(outputNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+            string SingletonName = BasicClassName2CSharpClassName(outputNamespace, CSharpTypeFormats.AsSingleton, CSharpNamespaceFormats.None);
+
+            bool IsAbstract = Source.IsAbstract;
+
+            foreach (ICSharpFeature Feature in FeatureList)
+            {
+                IFeatureInstance Instance = Feature.Instance;
+                if (Instance.IsForgotten)
+                {
+                    IsAbstract = true;
+                    break;
+                }
+            }
+
+            if (!IsAbstract && Source.Cloneable == BaseNode.CloneableStatus.Cloneable)
+                writer.WriteIndentedLine("[System.Serializable]");
+
+            string IsAbstractText = IsAbstract ? "abstract " : string.Empty;
+            string InterfaceDeclarationLine = $"public {IsAbstractText}class {ClassName}";
+            IList<string> InheritanceLineList = new List<string>();
+
+            if (BaseClass != null)
+            {
+                string ParentClassName = BaseClass.FullClassName2CSharpClassName(outputNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+                InheritanceLineList.Add(ParentClassName);
+            }
+
+            if (Source.Cloneable != BaseNode.CloneableStatus.Single)
+                InheritanceLineList.Add(InterfaceName);
+
+            if (Type.Source.IsUsedInCloneOf)
+                InheritanceLineList.Add("ICloneable");
+
+            string InheritanceLineString = string.Empty;
+            foreach (string s in InheritanceLineList)
+            {
+                if (InheritanceLineString.Length > 0)
+                    InheritanceLineString += ", ";
+
+                InheritanceLineString += s;
+            }
+
+            if (InheritanceLineString.Length > 0)
+                InterfaceDeclarationLine += $" : {InheritanceLineString}";
+
+            writer.WriteIndentedLine(InterfaceDeclarationLine);
+
+            foreach (ICSharpGeneric Generic in GenericList)
+                WriteGenericWhereClause(writer, outputNamespace, Generic);
+
+            string InitRegion = "Init";
+            string PropertiesRegion = "Properties";
+            string ClientInterfaceRegion = "Client Interface";
+            string DescendantInterfaceRegion = "Descendant Interface";
+            string ImplementationRegion = "Implementation";
+
+            List<string> OrderedRegionList = new List<string>();
+            OrderedRegionList.Add(InitRegion);
+            OrderedRegionList.Add(PropertiesRegion);
+            OrderedRegionList.Add(ClientInterfaceRegion);
+            OrderedRegionList.Add(DescendantInterfaceRegion);
+            OrderedRegionList.Add(ImplementationRegion);
+
+            IHashtableEx<string, IHashtableEx<string, ICSharpFeature>> RegionTable = new HashtableEx<string, IHashtableEx<string, ICSharpFeature>>();
+            foreach (string Region in OrderedRegionList)
+                RegionTable.Add(Region, new HashtableEx<string, ICSharpFeature>());
+
+            ICSharpCreationFeature ConstructorOverride = null;
+
+            foreach (ICSharpFeature Feature in InheritedFeatureList)
+            {
+                IFeatureInstance Instance = Feature.Instance;
+
+                if (Feature is ICSharpCreationFeature AsCreationFeature)
+                    if (AsCreationFeature.Owner.ClassConstructorType == CSharpConstructorTypes.OneConstructor)
+                    {
+                        ICreationFeature Constructor = (ICreationFeature)Instance.Feature.Item;
+                        foreach (ICommandOverload Overload in Constructor.OverloadList)
+                            if (Overload.ParameterList.Count > 0)
+                            {
+                                ConstructorOverride = AsCreationFeature;
+                                break;
+                            }
+                    }
+            }
+
+            foreach (ICSharpFeature Feature in FeatureList)
+            {
+                ICSharpClass Owner = Feature.Owner;
+                CSharpExports ExportStatus = Feature.GetExportStatus(this);
+                bool IsLocal = Owner == this;
+
+                string BelongingRegion;
+                if (IsLocal)
+                {
+                    if (Feature is ICSharpCreationFeature)
+                        BelongingRegion = InitRegion;
+
+                    else if (Feature is ICSharpPropertyFeature)
+                        BelongingRegion = PropertiesRegion;
+
+                    else if (ExportStatus == CSharpExports.Public)
+                        BelongingRegion = ClientInterfaceRegion;
+
+                    else if (ExportStatus == CSharpExports.Protected)
+                        BelongingRegion = DescendantInterfaceRegion;
+
+                    else
+                        BelongingRegion = ImplementationRegion;
+                }
+                else
+                    BelongingRegion = "Implementation of " + Owner.ValidClassName;
+
+                if (!OrderedRegionList.Contains(BelongingRegion))
+                {
+                    OrderedRegionList.Add(BelongingRegion);
+                    RegionTable.Add(BelongingRegion, new HashtableEx<string, ICSharpFeature>());
+                }
+
+                IHashtableEx<string, ICSharpFeature> Region = RegionTable[BelongingRegion];
+
+                if (Feature is ICSharpFeatureWithName AsFeatureWithName)
+                    Region.Add(AsFeatureWithName.Name, Feature);
+            }
+
+            writer.WriteIndentedLine("{");
+            writer.IncreaseIndent();
+
+            bool IsFirstRegion = true;
+            bool IsFirstFeature = true;
+            bool IsMultiline = false;
+            foreach (string BelongingRegion in OrderedRegionList)
+            {
+                int WrittenFeatures = 0;
+                IHashtableEx<string, ICSharpFeature> Region = RegionTable[BelongingRegion];
+                if (Region.Count > 0 || (BelongingRegion == InitRegion && ConstructorOverride != null))
+                {
+                    if (IsFirstRegion)
+                        IsFirstRegion = false;
+                    else
+                        writer.WriteLine();
+
+                    writer.WriteIndentedLine("#region" + " " + BelongingRegion);
+
+                    IsFirstFeature = true;
+                    IsMultiline = false;
+
+                    if ((BelongingRegion == InitRegion && ConstructorOverride != null) && Region.Count == 0)
+                    {
+                        string NameString = BasicClassName2CSharpClassName(outputNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+
+                        foreach (ICSharpCommandOverload Item in ConstructorOverride.OverloadList)
+                        {
+                            string ParameterEntityList, ParameterNameList;
+                            CSharpArgument.BuildParameterList(Item.ParameterList, outputNamespace, out ParameterEntityList, out ParameterNameList);
+
+                            if (IsMultiline)
+                                writer.WriteLine();
+
+                            writer.WriteIndentedLine(CSharpNames.ComposedExportStatus(false, false, true, CSharpExports.Public) + $" {NameString}({ParameterEntityList})");
+                            writer.IncreaseIndent();
+                            writer.WriteIndentedLine($": base({ParameterNameList})");
+                            writer.DecreaseIndent();
+                            writer.WriteIndentedLine("{");
+                            writer.WriteIndentedLine("}");
+                            IsMultiline = true;
+                        }
+
+                        WrittenFeatures++;
+                    }
+
+                    foreach (KeyValuePair<string, ICSharpFeature> Entry in Region)
+                    {
+                        ICSharpFeature Feature = Entry.Value;
+                        IFeatureInstance Instance = Feature.Instance;
+
+                        ICompiledFeature SourceFeature = Feature.Source;
+                        ICSharpClass Owner = Feature.Owner;
+                        CSharpExports ExportStatus = Feature.GetExportStatus(Owner);
+                        bool IsLocal = Owner == this;
+
+                        if (SourceFeature is IFeatureWithPrecursor AsFeatureWithPrecursor && AsFeatureWithPrecursor.IsCallingPrecursor)
+                        {
+                            bool IsFromParent = false;
+                            ICSharpClass CurrentClass = this;
+                            while (CurrentClass.BaseClass != null)
+                            {
+                                ICSharpClass ParentClass = CurrentClass.BaseClass;
+
+                                foreach (IPrecursorInstance PrecursorItem in Instance.PrecursorList)
+                                    if (PrecursorItem.Precursor.Owner.Item == ParentClass.Source)
+                                    {
+                                        IsFromParent = true;
+                                        break;
+                                    }
+
+                                if (IsFromParent)
+                                    break;
+                                else
+                                    CurrentClass = ParentClass;
+                            }
+
+                            if (!IsFromParent)
+                                Feature.MarkPrecursorAsCoexisting(Entry.Key);
+                        }
+
+                        //SourceFeature.WriteCSharp(sw, Context, FeatureTextTypes.Implementation, ExportStatus, Entry.Key.Name, Instance, IsLocal, ref IsFirstFeature, ref IsMultiline);
+                        WrittenFeatures++;
+
+                        if (!string.IsNullOrEmpty(Feature.CoexistingPrecursorName) && Instance.PrecursorList.Count > 0)
+                        {
+                            IPrecursorInstance PrecursorItem = Instance.PrecursorList[0];
+                            IFeatureInstance CoexistingPrecursor = PrecursorItem.Precursor;
+
+                            ICompiledFeature SourcePrecursorFeature = CoexistingPrecursor.Feature.Item;
+                            IClass SourcePrecursorClass = CoexistingPrecursor.Owner.Item;
+                            CSharpExports PrecursorExportStatus = CSharpExports.Private;
+
+                            //SourcePrecursorFeature.WriteCSharp(sw, Context, FeatureTextTypes.Implementation, PrecursorExportStatus, Entry.Key.Name + " " + "Base", CoexistingPrecursor, false, ref IsFirstFeature, ref IsMultiline);
+                            WrittenFeatures++;
+                        }
+                    }
+                }
+
+                if (BelongingRegion == InitRegion)
+                {
+                    if (IsParameterizedSingleton)
+                    {
+                        if (WrittenFeatures > 0)
+                            writer.WriteLine();
+                        else
+                            writer.WriteIndentedLine("#region" + " " + BelongingRegion);
+
+                        writer.WriteIndentedLine("public" + " " + "static" + " " + ClassName + " " + "Singleton");
+                        writer.WriteIndentedLine("{");
+                        writer.IncreaseIndent();
+                        writer.WriteIndentedLine("get");
+                        writer.WriteIndentedLine("{");
+                        writer.IncreaseIndent();
+                        writer.WriteIndentedLine("string" + " " + "Key" + " " + "=" + " " + "\"\"" + ";");
+                        foreach (ICSharpGeneric Generic in GenericList)
+                            writer.WriteIndentedLine("Key" + " " + "+=" + " " + "\"" + "*" + "\"" + " " + "+" + " " + "typeof" + "(" + Generic.Name + ")" + "." + "FullName" + ";");
+                        writer.WriteLine();
+                        writer.WriteIndentedLine("if" + " " + "(" + "!" + SingletonName + "." + "SingletonSet" + "." + "ContainsKey" + "(" + "Key" + ")" + ")");
+                        writer.WriteIndentedLine("{");
+                        writer.IncreaseIndent();
+                        writer.WriteIndentedLine(ClassName + " " + "NewEntity" + " " + "=" + " " + "new" + " " + ClassName + "(" + ")" + ";");
+                        writer.WriteIndentedLine(SingletonName + "." + "SingletonSet" + "." + "Add" + "(" + "Key" + ", " + "NewEntity" + ")" + ";");
+                        writer.DecreaseIndent();
+                        writer.WriteIndentedLine("}");
+                        writer.WriteLine();
+                        writer.WriteIndentedLine("return" + " " + "(" + ClassName + ")" + SingletonName + "." + "SingletonSet" + "[" + "Key" + "]" + ";");
+                        writer.DecreaseIndent();
+                        writer.WriteIndentedLine("}");
+                        writer.DecreaseIndent();
+                        writer.WriteIndentedLine("}");
+
+                        IsFirstRegion = false;
+                        WrittenFeatures++;
+                    }
+
+                    else if (IsUnparameterizedSingleton)
+                    {
+                        if (WrittenFeatures > 0)
+                            writer.WriteLine();
+                        else
+                            writer.WriteIndentedLine("#region" + " " + BelongingRegion);
+
+                        writer.WriteIndentedLine("static" + " " + ClassName + "(" + ")");
+                        writer.WriteIndentedLine("{");
+                        writer.IncreaseIndent();
+                        writer.WriteIndentedLine("_Singleton" + " " + "=" + " " + "new" + " " + "OnceReference" + "<" + ClassName + ">" + "(" + ")" + ";");
+                        writer.DecreaseIndent();
+                        writer.WriteIndentedLine("}");
+                        writer.WriteLine();
+
+                        writer.WriteIndentedLine("public" + " " + "static" + " " + ClassName + " " + "Singleton");
+                        writer.WriteIndentedLine("{");
+                        writer.IncreaseIndent();
+                        writer.WriteIndentedLine("get");
+                        writer.WriteIndentedLine("{");
+                        writer.IncreaseIndent();
+                        writer.WriteIndentedLine("if" + " " + "(" + "!" + "_Singleton" + "." + "IsAssigned" + ")");
+                        writer.IncreaseIndent();
+                        writer.WriteIndentedLine("_Singleton" + "." + "Item" + " " + "=" + " " + "new" + " " + ClassName + "(" + ")" + ";");
+                        writer.DecreaseIndent();
+                        writer.WriteLine();
+                        writer.WriteIndentedLine("return" + " " + "_Singleton" + "." + "Item" + ";");
+                        writer.DecreaseIndent();
+                        writer.WriteIndentedLine("}");
+                        writer.DecreaseIndent();
+                        writer.WriteIndentedLine("}");
+                        writer.WriteIndentedLine("private" + " " + "static" + " " + "OnceReference" + "<" + ClassName + ">" + " " + "_Singleton" + ";");
+
+                        IsFirstRegion = false;
+                        WrittenFeatures++;
+                    }
+                }
+
+                if (WrittenFeatures > 0)
+                    writer.WriteIndentedLine("#endregion");
+            }
+
+            if (Type.Source.IsUsedInCloneOf)
+            {
+                if (IsMultiline)
+                    writer.WriteLine();
+
+                WriteClonableImplementation(writer, out IsMultiline);
+            }
+
+            writer.DecreaseIndent();
+            writer.WriteIndentedLine("}");
+        }
+
+        private void WriteClonableImplementation(ICSharpWriter writer, out bool isMultiline)
+        {
+            isMultiline = true;
+
+            writer.WriteIndentedLine("#region Implementation of ICloneable");
+            writer.WriteIndentedLine("object Clone()");
+            writer.WriteIndentedLine("{");
+            writer.IncreaseIndent();
+            writer.WriteIndentedLine("return Easly.DeepCopy(this);");
+            writer.DecreaseIndent();
+            writer.WriteIndentedLine("}");
+            writer.WriteIndentedLine("#endregion");
         }
         #endregion
 

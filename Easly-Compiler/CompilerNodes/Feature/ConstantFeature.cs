@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IConstantFeature.
     /// </summary>
-    public interface IConstantFeature : BaseNode.IConstantFeature, IFeature, IFeatureWithName, ICompiledFeature
+    public interface IConstantFeature : BaseNode.IConstantFeature, IFeature, IFeatureWithName, ICompiledFeature, IFeatureWithPrecursor
     {
         /// <summary>
         /// The name of the resolved constant type.
@@ -81,7 +81,7 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsHandled = true;
             }
@@ -93,6 +93,11 @@ namespace CompilerNode
                 ResolvedFeature = new OnceReference<ICompiledFeature>();
                 ResolvedEntityTypeName = new OnceReference<ITypeName>();
                 ResolvedEntityType = new OnceReference<ICompiledType>();
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                IsCallingPrecursor = false;
                 IsHandled = true;
             }
 
@@ -176,6 +181,21 @@ namespace CompilerNode
         /// The source node associated to this instance.
         /// </summary>
         public ISource Location { get { return this; } }
+        #endregion
+
+        #region Implementation of IFeatureWithPrecursor
+        /// <summary>
+        /// True if the feature is calling a precursor.
+        /// </summary>
+        public bool IsCallingPrecursor { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="IsCallingPrecursor"/> property.
+        /// </summary>
+        public void MarkAsCallingPrecursor()
+        {
+            IsCallingPrecursor = true;
+        }
         #endregion
 
         #region Compiler

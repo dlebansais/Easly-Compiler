@@ -88,6 +88,7 @@
                 return;
 
             IDictionary<ICompiledFeature, ICSharpFeature> GlobalFeatureTable = new Dictionary<ICompiledFeature, ICSharpFeature>();
+
             foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
             {
                 ICSharpClass Class = Entry.Value;
@@ -99,8 +100,29 @@
                     Debug.Assert(!GlobalFeatureTable.ContainsKey(Feature.Source));
                     GlobalFeatureTable.Add(Feature.Source, Feature);
                 }
+            }
 
-                Class.SetFeatureList(FeatureList);
+            foreach (KeyValuePair<IClass, ICSharpClass> ClassEntry in ClassTable)
+            {
+                ICSharpClass Class = ClassEntry.Value;
+                IList<ICSharpFeature> FeatureList = new List<ICSharpFeature>();
+                IList<ICSharpFeature> InheritedFeatureList = new List<ICSharpFeature>();
+
+                foreach (KeyValuePair<ICompiledFeature, ICSharpFeature> FeatureEntry in GlobalFeatureTable)
+                {
+                    ICSharpFeature Feature = FeatureEntry.Value;
+                    IFeatureInstance Instance = Feature.Instance;
+
+                    if (Instance.IsDiscontinued)
+                        continue;
+
+                    if (FeatureEntry.Value.Owner == Class)
+                        FeatureList.Add(Feature);
+                    else if (!IsDirectOrNotMainParentFeature(Instance, Class))
+                        InheritedFeatureList.Add(Feature);
+                }
+
+                Class.SetFeatureList(FeatureList, InheritedFeatureList);
             }
 
             ICSharpContext Context = new CSharpContext(ClassTable, GlobalFeatureTable);
@@ -397,7 +419,7 @@
                     break;
 
                 case IScopeAttributeFeature AsScopeAttributeFeature:
-                    result = CSharpScopeAttributeFeature.Create(owner, instance, AsScopeAttributeFeature);
+                    result = CSharpScopeAttributeFeature.Create(owner, AsScopeAttributeFeature);
                     IsHandled = true;
                     break;
             }

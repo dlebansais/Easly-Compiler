@@ -10,7 +10,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IProcedureFeature.
     /// </summary>
-    public interface IProcedureFeature : BaseNode.IProcedureFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature
+    public interface IProcedureFeature : BaseNode.IProcedureFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithPrecursor
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.ProcedureFeature.OverloadBlocks"/>.
@@ -107,7 +107,7 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsHandled = true;
             }
@@ -117,6 +117,11 @@ namespace CompilerNode
                 ResolvedFeatureType = new OnceReference<ICompiledType>();
                 ValidFeatureName = new OnceReference<IFeatureName>();
                 ResolvedFeature = new OnceReference<ICompiledFeature>();
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                IsCallingPrecursor = false;
                 IsHandled = true;
             }
 
@@ -197,6 +202,21 @@ namespace CompilerNode
         /// The source node associated to this instance.
         /// </summary>
         public ISource Location { get { return this; } }
+        #endregion
+
+        #region Implementation of IFeatureWithPrecursor
+        /// <summary>
+        /// True if the feature is calling a precursor.
+        /// </summary>
+        public bool IsCallingPrecursor { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="IsCallingPrecursor"/> property.
+        /// </summary>
+        public void MarkAsCallingPrecursor()
+        {
+            IsCallingPrecursor = true;
+        }
         #endregion
 
         #region Debugging

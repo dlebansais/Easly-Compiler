@@ -43,6 +43,11 @@
         /// The Easly type from which the C# type is created.
         /// </summary>
         public new IIndexerType Source { get { return (IIndexerType)base.Source; } }
+
+        /// <summary>
+        /// True if the type can be used in the interface 'I' text format.
+        /// </summary>
+        public override bool HasInterfaceText { get { return false; } }
         #endregion
 
         #region Client Interface

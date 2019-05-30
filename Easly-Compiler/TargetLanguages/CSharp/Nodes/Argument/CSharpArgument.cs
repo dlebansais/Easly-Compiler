@@ -211,6 +211,38 @@
 
             return Result;
         }
+
+        /// <summary>
+        /// Builds a list of parameters, with and without their type.
+        /// </summary>
+        /// <param name="parameterList">The list of parameters.</param>
+        /// <param name="outputNamespace">The current namespace.</param>
+        /// <param name="parameterListText">The list of parameters with type upon return.</param>
+        /// <param name="parameterNameListText">The list of parameters without type upon return.</param>
+        public static void BuildParameterList(IList<ICSharpParameter> parameterList, string outputNamespace, out string parameterListText, out string parameterNameListText)
+        {
+            parameterListText = string.Empty;
+            parameterNameListText = string.Empty;
+
+            foreach (ICSharpParameter Parameter in parameterList)
+            {
+                if (parameterListText.Length > 0)
+                    parameterListText += ", ";
+                if (parameterNameListText.Length > 0)
+                    parameterNameListText += ", ";
+
+                string ParameterName = Parameter.Name;
+                ICSharpType ParameterType = Parameter.Feature.Type;
+
+                CSharpTypeFormats ParameterFormat = ParameterType.HasInterfaceText ? CSharpTypeFormats.AsInterface : CSharpTypeFormats.Normal;
+
+                string ParameterText = ParameterType.Type2CSharpString(outputNamespace, ParameterFormat, CSharpNamespaceFormats.None);
+                string ParameterNameText = CSharpNames.ToCSharpIdentifier(ParameterName);
+
+                parameterListText += $"{ParameterText} {ParameterNameText}";
+                parameterNameListText += ParameterNameText;
+            }
+        }
         #endregion
     }
 }

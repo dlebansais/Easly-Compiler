@@ -38,12 +38,12 @@
         /// <summary>
         /// True if an instance of the class is cloned at some point.
         /// </summary>
-        bool IsCloned { get; }
+        bool IsUsedInCloneOf { get; }
 
         /// <summary>
-        /// Sets the <see cref="IsCloned"/> flag.
+        /// Sets the <see cref="IsUsedInCloneOf"/> flag.
         /// </summary>
-        void MarkAsCloned();
+        void MarkAsUsedInCloneOf();
     }
 
     /// <summary>
@@ -286,7 +286,7 @@
         /// <summary>
         /// True if an instance of the class is cloned at some point.
         /// </summary>
-        public bool IsCloned { get; private set; }
+        public bool IsUsedInCloneOf { get; private set; }
         #endregion
 
         #region Client Interface
@@ -538,11 +538,11 @@
         }
 
         /// <summary>
-        /// Sets the <see cref="IsCloned"/> flag.
+        /// Sets the <see cref="IsUsedInCloneOf"/> flag.
         /// </summary>
-        public void MarkAsCloned()
+        public void MarkAsUsedInCloneOf()
         {
-            IsCloned = true;
+            IsUsedInCloneOf = true;
         }
         #endregion
 

@@ -72,6 +72,11 @@
         /// The class on which this type is based.
         /// </summary>
         public ICSharpClass Class { get; private set; }
+
+        /// <summary>
+        /// True if the type can be used in the interface 'I' text format.
+        /// </summary>
+        public override bool HasInterfaceText { get { return Class.Source.Cloneable != BaseNode.CloneableStatus.Single && Class.ValidSourceName != "Microsoft .NET"; } }
         #endregion
 
         #region Client Interface

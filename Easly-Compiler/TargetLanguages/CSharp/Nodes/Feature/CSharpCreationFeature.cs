@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Collections.Generic;
     using CompilerNode;
 
     /// <summary>
@@ -55,6 +56,12 @@
             : base(owner, instance, source)
         {
             Name = Source.ValidFeatureName.Item.Name;
+
+            foreach (ICommandOverload Overload in source.OverloadList)
+            {
+                ICSharpCommandOverload NewOverload = CSharpCommandOverload.Create(Overload, owner);
+                OverloadList.Add(NewOverload);
+            }
         }
         #endregion
 
@@ -68,6 +75,11 @@
         /// The feature name.
         /// </summary>
         public string Name { get; }
+
+        /// <summary>
+        /// The list of overloads.
+        /// </summary>
+        public IList<ICSharpOverload> OverloadList { get; } = new List<ICSharpOverload>();
         #endregion
     }
 }

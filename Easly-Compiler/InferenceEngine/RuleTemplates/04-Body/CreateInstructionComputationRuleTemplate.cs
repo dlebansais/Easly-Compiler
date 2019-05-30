@@ -256,9 +256,8 @@
             node.ResolvedEntityTypeName.Item = CreatedObjectTypeName;
             node.ResolvedEntityType.Item = CreatedObjectType;
 
-            // TODO
-            /*if (CreatedObjectType is IFormalGenericType AsFormalGenericType)
-                AsFormalGenericType.SetCreated();*/
+            if (CreatedObjectType is IFormalGenericType AsFormalGenericType)
+                AsFormalGenericType.SetIsUsedToCreate();
         }
         #endregion
     }

@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Collections.Generic;
     using CompilerNode;
 
     /// <summary>
@@ -16,6 +17,16 @@
         /// The corresponding type.
         /// </summary>
         ICSharpFormalGenericType Type { get; }
+
+        /// <summary>
+        /// True if the generic is used to create at least one object.
+        /// </summary>
+        bool IsUsedToCreate { get; }
+
+        /// <summary>
+        /// The list of constraints.
+        /// </summary>
+        IList<ICSharpConstraint> ConstraintList { get; }
     }
 
     /// <summary>
@@ -43,6 +54,12 @@
             Name = ((IName)source.EntityName).ValidText.Item;
             Type = CSharpFormalGenericType.Create(source.ResolvedGenericType.Item);
             Type.SetGeneric(this);
+
+            foreach (IConstraint Constraint in source.ConstraintList)
+            {
+                ICSharpConstraint NewConstraint = CSharpConstraint.Create(Constraint);
+                ConstraintList.Add(NewConstraint);
+            }
         }
         #endregion
 
@@ -56,6 +73,16 @@
         /// The corresponding type.
         /// </summary>
         public ICSharpFormalGenericType Type { get; }
+
+        /// <summary>
+        /// True if the generic is used to create at least one object.
+        /// </summary>
+        public bool IsUsedToCreate { get { return Type.Source.IsUsedToCreate; } }
+
+        /// <summary>
+        /// The list of constraints.
+        /// </summary>
+        public IList<ICSharpConstraint> ConstraintList { get; } = new List<ICSharpConstraint>();
         #endregion
     }
 }
