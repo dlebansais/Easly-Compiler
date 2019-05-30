@@ -24,6 +24,24 @@
         /// Create a new C# type.
         /// </summary>
         /// <param name="source">The Easly type from which the C# type is created.</param>
+        public static ICSharpProcedureType Create(IProcedureType source)
+        {
+            return new CSharpProcedureType(source);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CSharpProcedureType"/> class.
+        /// </summary>
+        /// <param name="source">The Easly type from which the C# type is created.</param>
+        protected CSharpProcedureType(IProcedureType source)
+            : base(source)
+        {
+        }
+
+        /// <summary>
+        /// Create a new C# type.
+        /// </summary>
+        /// <param name="source">The Easly type from which the C# type is created.</param>
         /// <param name="originatingTypedef">The typedef where this type is declared.</param>
         public static ICSharpProcedureType Create(IProcedureType source, ICSharpTypedef originatingTypedef)
         {

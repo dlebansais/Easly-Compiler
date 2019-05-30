@@ -68,6 +68,14 @@
                     Result = CSharpFormalGenericType.Create(AsFormalGenericType);
                     break;
 
+                case IFunctionType AsFunctionType:
+                    Result = CSharpFunctionType.Create(AsFunctionType);
+                    break;
+
+                case IProcedureType AsProcedureType:
+                    Result = CSharpProcedureType.Create(AsProcedureType);
+                    break;
+
                 case IIndexerType AsIndexerType:
                     Result = CSharpIndexerType.Create(AsIndexerType);
                     break;
