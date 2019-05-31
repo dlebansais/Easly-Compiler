@@ -23,20 +23,20 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpOldExpression Create(IOldExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpOldExpression Create(ICSharpContext context, IOldExpression source)
         {
-            return new CSharpOldExpression(source, context);
+            return new CSharpOldExpression(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpOldExpression"/> class.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpOldExpression(IOldExpression source, ICSharpContext context)
-            : base(source, context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        protected CSharpOldExpression(ICSharpContext context, IOldExpression source)
+            : base(context, source)
         {
         }
         #endregion
@@ -70,7 +70,7 @@
         /// <param name="destinationList">The list of destinations.</param>
         public virtual string CSharpText(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
         {
-            return ""; // TODO
+            return string.Empty; // TODO
         }
         #endregion
     }

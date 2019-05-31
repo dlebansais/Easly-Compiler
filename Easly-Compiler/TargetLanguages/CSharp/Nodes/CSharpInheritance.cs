@@ -12,12 +12,6 @@
         /// The class associated to this inheritance clause.
         /// </summary>
         ICSharpClass AncestorClass { get; }
-
-        /// <summary>
-        /// Sets the <see cref="AncestorClass"/> property.
-        /// </summary>
-        /// <param name="ancestorClass">The class associated to this inheritance clause.</param>
-        void SetAncestorClass(ICSharpClass ancestorClass);
     }
 
     /// <summary>
@@ -30,18 +24,23 @@
         /// Create a new C# inheritance.
         /// </summary>
         /// <param name="source">The Easly node from which the C# node is created.</param>
-        public static ICSharpInheritance Create(IInheritance source)
+        /// <param name="ancestorClass">The ancestor class.</param>
+        public static ICSharpInheritance Create(IInheritance source, ICSharpClass ancestorClass)
         {
-            return new CSharpInheritance(source);
+            return new CSharpInheritance(source, ancestorClass);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpInheritance"/> class.
         /// </summary>
         /// <param name="source">The Easly node from which the C# node is created.</param>
-        protected CSharpInheritance(IInheritance source)
+        /// <param name="ancestorClass">The ancestor class.</param>
+        protected CSharpInheritance(IInheritance source, ICSharpClass ancestorClass)
             : base(source)
         {
+            Debug.Assert(ancestorClass != null);
+
+            AncestorClass = ancestorClass;
         }
         #endregion
 
@@ -50,20 +49,6 @@
         /// The class associated to this inheritance clause.
         /// </summary>
         public ICSharpClass AncestorClass { get; private set; }
-        #endregion
-
-        #region Client Interface
-        /// <summary>
-        /// Sets the <see cref="AncestorClass"/> property.
-        /// </summary>
-        /// <param name="ancestorClass">The class associated to this inheritance clause.</param>
-        public void SetAncestorClass(ICSharpClass ancestorClass)
-        {
-            Debug.Assert(ancestorClass != null);
-            Debug.Assert(AncestorClass == null);
-
-            AncestorClass = ancestorClass;
-        }
         #endregion
     }
 }

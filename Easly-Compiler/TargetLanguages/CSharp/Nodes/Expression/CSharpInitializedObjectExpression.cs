@@ -33,26 +33,26 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpInitializedObjectExpression Create(IInitializedObjectExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpInitializedObjectExpression Create(ICSharpContext context, IInitializedObjectExpression source)
         {
-            return new CSharpInitializedObjectExpression(source, context);
+            return new CSharpInitializedObjectExpression(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpInitializedObjectExpression"/> class.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpInitializedObjectExpression(IInitializedObjectExpression source, ICSharpContext context)
-            : base(source, context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        protected CSharpInitializedObjectExpression(ICSharpContext context, IInitializedObjectExpression source)
+            : base(context, source)
         {
             Class = context.GetClass(source.ResolvedClassType.Item.BaseClass);
 
             foreach (IAssignmentArgument Argument in source.AssignmentList)
             {
-                ICSharpAssignmentArgument NewAssignment = CSharpAssignmentArgument.Create(Argument, context);
+                ICSharpAssignmentArgument NewAssignment = CSharpAssignmentArgument.Create(context, Argument);
                 AssignmentList.Add(NewAssignment);
             }
         }

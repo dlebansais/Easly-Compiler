@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
@@ -62,11 +63,6 @@
         IList<ICSharpFeature> InheritedFeatureList { get; }
 
         /// <summary>
-        /// The context for creating nodes.
-        /// </summary>
-        ICSharpContext Context { get; }
-
-        /// <summary>
         /// The list of using clauses.
         /// </summary>
         IList<IUsingClause> UsingClauseList { get; }
@@ -105,21 +101,21 @@
         /// Sets the base class.
         /// </summary>
         /// <param name="baseClass">The base class.</param>
+        void SetBaseClass(ICSharpClass baseClass);
+
+        /// <summary>
+        /// Sets the base class.
+        /// </summary>
         /// <param name="classTable">The table of all classes.</param>
-        void SetBaseClass(ICSharpClass baseClass, IDictionary<IClass, ICSharpClass> classTable);
+        void SetAncestorClasses(IDictionary<IClass, ICSharpClass> classTable);
 
         /// <summary>
         /// Sets the list of class features.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="featureList">The list of features.</param>
         /// <param name="inheritedFeatureList">The list of inherited features.</param>
-        void SetFeatureList(IList<ICSharpFeature> featureList, IList<ICSharpFeature> inheritedFeatureList);
-
-        /// <summary>
-        /// Sets the <see cref="Context"/> property.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        void SetContext(ICSharpContext context);
+        void SetFeatureList(ICSharpContext context, IList<ICSharpFeature> featureList, IList<ICSharpFeature> inheritedFeatureList);
 
         /// <summary>
         /// Sets the <see cref="IsSharedName"/> property.
@@ -202,27 +198,6 @@
         {
             ValidClassName = source.ValidClassName;
             ValidSourceName = source.ValidSourceName;
-
-            foreach (IGeneric Item in source.GenericList)
-            {
-                ICSharpGeneric NewGeneric = CSharpGeneric.Create(Item);
-                GenericList.Add(NewGeneric);
-            }
-
-            foreach (IInheritance Item in source.InheritanceList)
-            {
-                ICSharpInheritance NewInheritance = CSharpInheritance.Create(Item);
-                InheritanceList.Add(NewInheritance);
-            }
-
-            foreach (ITypedef Item in source.TypedefList)
-            {
-                ICSharpTypedef NewTypedef = CSharpTypedef.Create(Item, this);
-                TypedefList.Add(NewTypedef);
-            }
-
-            Type = CSharpClassType.Create(source.ResolvedClassType.Item);
-            Type.SetClass(this);
         }
         #endregion
 
@@ -260,7 +235,7 @@
         /// <summary>
         /// The corresponding type.
         /// </summary>
-        public ICSharpClassType Type { get; }
+        public ICSharpClassType Type { get; private set; }
 
         /// <summary>
         /// The base class. Can be null if none.
@@ -276,11 +251,6 @@
         /// The list of inhrited features.
         /// </summary>
         public IList<ICSharpFeature> InheritedFeatureList { get; private set; }
-
-        /// <summary>
-        /// The context for creating nodes.
-        /// </summary>
-        public ICSharpContext Context { get; private set; }
 
         /// <summary>
         /// The list of using clauses.
@@ -337,56 +307,79 @@
 
         #region Client Interface
         /// <summary>
+        /// Checks if a class is one of the language classes.
+        /// </summary>
+        /// <param name="sourceClass">The class to check.</param>
+        public static bool IsLanguageClass(IClass sourceClass)
+        {
+            return LanguageClasses.GuidToName.ContainsKey(sourceClass.ClassGuid);
+        }
+
+        /// <summary>
         /// Sets the base class.
         /// </summary>
         /// <param name="baseClass">The base class.</param>
-        /// <param name="classTable">The table of all classes.</param>
-        public void SetBaseClass(ICSharpClass baseClass, IDictionary<IClass, ICSharpClass> classTable)
+        public void SetBaseClass(ICSharpClass baseClass)
         {
             Debug.Assert(baseClass != null);
             Debug.Assert(BaseClass == null);
-            Debug.Assert(Context == null);
 
             BaseClass = baseClass;
+        }
 
-            foreach (ICSharpInheritance Inheritance in InheritanceList)
+        /// <summary>
+        /// Sets the base class.
+        /// </summary>
+        /// <param name="classTable">The table of all classes.</param>
+        public void SetAncestorClasses(IDictionary<IClass, ICSharpClass> classTable)
+        {
+            foreach (IInheritance Item in Source.InheritanceList)
             {
-                ICSharpClass AncestorClass = classTable[Inheritance.Source.ResolvedClassParentType.Item.BaseClass];
-                Inheritance.SetAncestorClass(AncestorClass);
+                IClass BaseClass = Item.ResolvedClassParentType.Item.BaseClass;
+                Guid ClassGuid = BaseClass.ClassGuid;
+
+                Debug.Assert(classTable.ContainsKey(BaseClass));
+
+                ICSharpClass AncestorClass = classTable[BaseClass];
+                ICSharpInheritance NewInheritance = CSharpInheritance.Create(Item, AncestorClass);
+
+                InheritanceList.Add(NewInheritance);
             }
         }
 
         /// <summary>
         /// Sets the list of class features.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="featureList">The list of features.</param>
         /// <param name="inheritedFeatureList">The list of inherited features.</param>
-        public void SetFeatureList(IList<ICSharpFeature> featureList, IList<ICSharpFeature> inheritedFeatureList)
+        public void SetFeatureList(ICSharpContext context, IList<ICSharpFeature> featureList, IList<ICSharpFeature> inheritedFeatureList)
         {
             Debug.Assert(featureList != null);
             Debug.Assert(inheritedFeatureList != null);
             Debug.Assert(FeatureList == null);
             Debug.Assert(InheritedFeatureList == null);
-            Debug.Assert(Context == null);
 
             FeatureList = featureList;
             InheritedFeatureList = inheritedFeatureList;
-        }
 
-        /// <summary>
-        /// Sets the <see cref="Context"/> property.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        public void SetContext(ICSharpContext context)
-        {
-            Debug.Assert(context != null);
-            Debug.Assert(Context == null);
+            Type = CSharpClassType.Create(context, Source.ResolvedClassType.Item);
 
-            Context = context;
+            foreach (IGeneric Item in Source.GenericList)
+            {
+                ICSharpGeneric NewGeneric = CSharpGeneric.Create(context, Item);
+                GenericList.Add(NewGeneric);
+            }
+
+            foreach (ITypedef Item in Source.TypedefList)
+            {
+                ICSharpTypedef NewTypedef = CSharpTypedef.Create(context, Item, this);
+                TypedefList.Add(NewTypedef);
+            }
 
             foreach (IDiscrete Item in Source.DiscreteList)
             {
-                ICSharpDiscrete NewDiscrete = CSharpDiscrete.Create(Item, context);
+                ICSharpDiscrete NewDiscrete = CSharpDiscrete.Create(context, Item);
                 DiscreteList.Add(NewDiscrete);
             }
         }
@@ -396,8 +389,6 @@
         /// </summary>
         public void SetIsSharedName()
         {
-            Debug.Assert(Context != null);
-
             IsSharedName = true;
         }
 
@@ -406,8 +397,6 @@
         /// </summary>
         public void CheckOverrides()
         {
-            Debug.Assert(Context != null);
-
             foreach (ICSharpFeature Feature in FeatureList)
                 CheckOverride(Feature);
         }
@@ -457,8 +446,6 @@
         /// <param name="isChanged">True if a feature was changed.</param>
         public void CheckForcedReadWrite(IDictionary<ICompiledFeature, ICSharpFeature> globalFeatureTable, ref bool isChanged)
         {
-            Debug.Assert(Context != null);
-
             foreach (ICSharpFeature Feature in FeatureList)
                 if (Feature.IsOverride)
                 {
@@ -520,8 +507,6 @@
         /// </summary>
         public void CheckSideBySideAttributes()
         {
-            Debug.Assert(Context != null);
-
             foreach (ICSharpFeature Feature in FeatureList)
                 if (Feature is ICSharpPropertyFeature AsPropertyFeature)
                     AsPropertyFeature.CheckSideBySideAttribute();
@@ -533,8 +518,6 @@
         /// <param name="globalFeatureTable">The table of all known features.</param>
         public void CheckInheritSideBySideAttributes(IDictionary<ICompiledFeature, ICSharpFeature> globalFeatureTable)
         {
-            Debug.Assert(Context != null);
-
             foreach (ICSharpFeature Feature in FeatureList)
                 if (Feature is ICSharpPropertyFeature AsPropertyFeature)
                     AsPropertyFeature.CheckInheritSideBySideAttribute(globalFeatureTable);
@@ -545,8 +528,6 @@
         /// </summary>
         public void CreateDelegates()
         {
-            Debug.Assert(Context != null);
-
             CreateImplicitDelegates();
             CreateExplicitDelegates();
         }
@@ -607,8 +588,6 @@
         /// <param name="outputNamespace">Namespace for the output code.</param>
         public void Write(string folder, string outputNamespace)
         {
-            Debug.Assert(Context != null);
-
             string OutputFolder;
             if (Source.FromIdentifier.IsAssigned)
             {
@@ -633,8 +612,10 @@
                     }
                 }
             }
-            catch
+            catch (Exception e)
             {
+                Debug.WriteLine(e.Message);
+                Debug.WriteLine(e.StackTrace);
             }
         }
         #endregion
@@ -739,9 +720,8 @@
                     continue;
 
                 ICSharpClass AncestorClass = Inheritance.AncestorClass;
-                Debug.Assert(AncestorClass != null);
 
-                if (AncestorClass != BaseClass)
+                if (AncestorClass != null && AncestorClass != BaseClass)
                     InterfaceList.Add(AncestorClass);
             }
 
@@ -848,10 +828,15 @@
 
             foreach (ICSharpConstraint Constraint in generic.ConstraintList)
             {
-                if (Result.Length > 0)
-                    Result += ", ";
+                ICSharpType ConstraintType = Constraint.Type;
 
-                Result += Constraint.Type.Type2CSharpString(outputNamespace, cSharpTypeFormat, cSharpNamespaceFormat);
+                if (ConstraintType is ICSharpClassType || ConstraintType is ICSharpFormalGenericType)
+                {
+                    if (Result.Length > 0)
+                        Result += ", ";
+
+                    Result += Constraint.Type.Type2CSharpString(outputNamespace, cSharpTypeFormat, cSharpNamespaceFormat);
+                }
             }
 
             return Result;
@@ -1236,7 +1221,7 @@
                     break;
 
                 case CSharpTypeFormats.AsInterface:
-                    if (Source.FromIdentifier.Item.Text != "Microsoft .NET")
+                    if (ValidSourceName != "Microsoft .NET")
                         ClassOrInterfaceName = "I" + ClassOrInterfaceName;
                     IsHandled = true;
                     break;

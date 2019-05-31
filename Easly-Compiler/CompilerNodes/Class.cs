@@ -321,20 +321,21 @@ namespace CompilerNode
         #region Init
         static Class()
         {
-            ClassAny = ClassForTypeAny(LanguageClasses.Any.Name, BaseNode.CopySemantic.Any);
-            ClassAnyReference = ClassForTypeAny(LanguageClasses.AnyReference.Name, BaseNode.CopySemantic.Reference);
-            ClassAnyValue = ClassForTypeAny(LanguageClasses.AnyValue.Name, BaseNode.CopySemantic.Value);
+            ClassAny = ClassForTypeAny(LanguageClasses.Any, BaseNode.CopySemantic.Any);
+            ClassAnyReference = ClassForTypeAny(LanguageClasses.AnyReference, BaseNode.CopySemantic.Reference);
+            ClassAnyValue = ClassForTypeAny(LanguageClasses.AnyValue, BaseNode.CopySemantic.Value);
         }
 
-        private static IClass ClassForTypeAny(string className, BaseNode.CopySemantic copySpecification)
+        private static IClass ClassForTypeAny(NameGuidPair languageClass, BaseNode.CopySemantic copySpecification)
         {
             Class BaseClass = new Class();
             BaseClass.CopySpecification = copySpecification;
             Name BaseClassName = new Name();
-            BaseClassName.Text = className;
-            BaseClassName.ValidText.Item = className;
+            BaseClassName.Text = languageClass.Name;
+            BaseClassName.ValidText.Item = languageClass.Name;
             BaseClass.EntityName = BaseClassName;
-            BaseClass.ValidClassName = className;
+            BaseClass.ClassGuid = languageClass.Guid;
+            BaseClass.ValidClassName = languageClass.Name;
             BaseClass.ClassGroupList.Seal();
             BaseClass.ClassGroup.Item = new SingleClassGroup(BaseClass);
             BaseClass.DiscreteTable.Seal();

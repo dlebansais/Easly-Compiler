@@ -39,23 +39,23 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpBinaryConditionalExpression Create(IBinaryConditionalExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpBinaryConditionalExpression Create(ICSharpContext context, IBinaryConditionalExpression source)
         {
-            return new CSharpBinaryConditionalExpression(source, context);
+            return new CSharpBinaryConditionalExpression(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpBinaryConditionalExpression"/> class.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpBinaryConditionalExpression(IBinaryConditionalExpression source, ICSharpContext context)
-            : base(source, context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        protected CSharpBinaryConditionalExpression(ICSharpContext context, IBinaryConditionalExpression source)
+            : base(context, source)
         {
-            LeftExpression = Create((IExpression)source.LeftExpression, context);
-            RightExpression = Create((IExpression)source.RightExpression, context);
+            LeftExpression = Create(context, (IExpression)source.LeftExpression);
+            RightExpression = Create(context, (IExpression)source.RightExpression);
         }
         #endregion
 

@@ -34,22 +34,22 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpCloneOfExpression Create(ICloneOfExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpCloneOfExpression Create(ICSharpContext context, ICloneOfExpression source)
         {
-            return new CSharpCloneOfExpression(source, context);
+            return new CSharpCloneOfExpression(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpCloneOfExpression"/> class.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpCloneOfExpression(ICloneOfExpression source, ICSharpContext context)
-            : base(source, context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        protected CSharpCloneOfExpression(ICSharpContext context, ICloneOfExpression source)
+            : base(context, source)
         {
-            SourceExpression = Create((IExpression)source.Source, context);
+            SourceExpression = Create(context, (IExpression)source.Source);
 
             IResultType SourceResult = SourceExpression.Source.ResolvedResult.Item;
             Debug.Assert(SourceResult.Count > 0);
@@ -57,7 +57,7 @@
             foreach (IExpressionType ExpressionType in SourceResult)
             {
                 ICompiledType ClonedType = ExpressionType.ValueType;
-                ICSharpType Type = CSharpType.Create(ClonedType);
+                ICSharpType Type = CSharpType.Create(context, ClonedType);
                 TypeList.Add(Type);
             }
         }

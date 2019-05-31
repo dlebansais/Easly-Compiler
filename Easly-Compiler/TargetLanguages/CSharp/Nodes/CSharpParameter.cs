@@ -27,23 +27,27 @@
         /// <summary>
         /// Create a new C# parameter.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
         /// <param name="owner">The class where the parameter is declared.</param>
-        public static ICSharpParameter Create(IParameter source, ICSharpClass owner)
+        public static ICSharpParameter Create(ICSharpContext context, IParameter source, ICSharpClass owner)
         {
-            return new CSharpParameter(source, owner);
+            return new CSharpParameter(context, source, owner);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpParameter"/> class.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
         /// <param name="owner">The class where the parameter is declared.</param>
-        protected CSharpParameter(IParameter source, ICSharpClass owner)
+        protected CSharpParameter(ICSharpContext context, IParameter source, ICSharpClass owner)
             : base(source)
         {
             Feature = CSharpScopeAttributeFeature.Create(owner, source.ResolvedParameter);
             Debug.Assert(Feature != null);
+
+            ((ICSharpFeature)Feature).Init(context);
         }
         #endregion
 

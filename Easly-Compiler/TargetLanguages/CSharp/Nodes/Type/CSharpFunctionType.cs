@@ -23,38 +23,42 @@
         /// <summary>
         /// Create a new C# type.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
-        public static ICSharpFunctionType Create(IFunctionType source)
+        public static ICSharpFunctionType Create(ICSharpContext context, IFunctionType source)
         {
-            return new CSharpFunctionType(source);
+            return new CSharpFunctionType(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpFunctionType"/> class.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
-        protected CSharpFunctionType(IFunctionType source)
-            : base(source)
+        protected CSharpFunctionType(ICSharpContext context, IFunctionType source)
+            : base(context, source)
         {
         }
 
         /// <summary>
         /// Create a new C# type.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
         /// <param name="originatingTypedef">The typedef where this type is declared.</param>
-        public static ICSharpFunctionType Create(IFunctionType source, ICSharpTypedef originatingTypedef)
+        public static ICSharpFunctionType Create(ICSharpContext context, IFunctionType source, ICSharpTypedef originatingTypedef)
         {
-            return new CSharpFunctionType(source, originatingTypedef);
+            return new CSharpFunctionType(context, source, originatingTypedef);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpFunctionType"/> class.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
         /// <param name="originatingTypedef">The typedef where this type is declared.</param>
-        protected CSharpFunctionType(IFunctionType source, ICSharpTypedef originatingTypedef)
-            : base(source, originatingTypedef)
+        protected CSharpFunctionType(ICSharpContext context, IFunctionType source, ICSharpTypedef originatingTypedef)
+            : base(context, source, originatingTypedef)
         {
         }
         #endregion

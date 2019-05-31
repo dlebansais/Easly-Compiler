@@ -34,25 +34,25 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpPrecursorExpression Create(IPrecursorExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpPrecursorExpression Create(ICSharpContext context, IPrecursorExpression source)
         {
-            return new CSharpPrecursorExpression(source, context);
+            return new CSharpPrecursorExpression(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpPrecursorExpression"/> class.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpPrecursorExpression(IPrecursorExpression source, ICSharpContext context)
-            : base(source, context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        protected CSharpPrecursorExpression(ICSharpContext context, IPrecursorExpression source)
+            : base(context, source)
         {
             Feature = context.GetFeature((ICompiledFeature)source.EmbeddingFeature) as ICSharpFeatureWithName;
             Debug.Assert(Feature != null);
 
-            FeatureCall = new CSharpFeatureCall(source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle, context);
+            FeatureCall = new CSharpFeatureCall(context, source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle);
         }
         #endregion
 

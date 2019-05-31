@@ -34,100 +34,100 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpExpression Create(IExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpExpression Create(ICSharpContext context, IExpression source)
         {
             ICSharpExpression Result = null;
 
             switch (source)
             {
                 case IAgentExpression AsAgentExpression:
-                    Result = CSharpAgentExpression.Create(AsAgentExpression, context);
+                    Result = CSharpAgentExpression.Create(context, AsAgentExpression);
                     break;
 
                 case IAssertionTagExpression AsAssertionTagExpression:
-                    Result = CSharpAssertionTagExpression.Create(AsAssertionTagExpression, context);
+                    Result = CSharpAssertionTagExpression.Create(context, AsAssertionTagExpression);
                     break;
 
                 case IBinaryConditionalExpression AsBinaryConditionalExpression:
-                    Result = CSharpBinaryConditionalExpression.Create(AsBinaryConditionalExpression, context);
+                    Result = CSharpBinaryConditionalExpression.Create(context, AsBinaryConditionalExpression);
                     break;
 
                 case IBinaryOperatorExpression AsBinaryOperatorExpression:
-                    Result = CSharpBinaryOperatorExpression.Create(AsBinaryOperatorExpression, context);
+                    Result = CSharpBinaryOperatorExpression.Create(context, AsBinaryOperatorExpression);
                     break;
 
                 case IClassConstantExpression AsClassConstantExpression:
-                    Result = CSharpClassConstantExpression.Create(AsClassConstantExpression, context);
+                    Result = CSharpClassConstantExpression.Create(context, AsClassConstantExpression);
                     break;
 
                 case ICloneOfExpression AsCloneOfExpression:
-                    Result = CSharpCloneOfExpression.Create(AsCloneOfExpression, context);
+                    Result = CSharpCloneOfExpression.Create(context, AsCloneOfExpression);
                     break;
 
                 case IEntityExpression AsEntityExpression:
-                    Result = CSharpEntityExpression.Create(AsEntityExpression, context);
+                    Result = CSharpEntityExpression.Create(context, AsEntityExpression);
                     break;
 
                 case IEqualityExpression AsEqualityExpression:
-                    Result = CSharpEqualityExpression.Create(AsEqualityExpression, context);
+                    Result = CSharpEqualityExpression.Create(context, AsEqualityExpression);
                     break;
 
                 case IIndexQueryExpression AsIndexQueryExpression:
-                    Result = CSharpIndexQueryExpression.Create(AsIndexQueryExpression, context);
+                    Result = CSharpIndexQueryExpression.Create(context, AsIndexQueryExpression);
                     break;
 
                 case IInitializedObjectExpression AsInitializedObjectExpression:
-                    Result = CSharpInitializedObjectExpression.Create(AsInitializedObjectExpression, context);
+                    Result = CSharpInitializedObjectExpression.Create(context, AsInitializedObjectExpression);
                     break;
 
                 case IKeywordExpression AsKeywordExpression:
-                    Result = CSharpKeywordExpression.Create(AsKeywordExpression, context);
+                    Result = CSharpKeywordExpression.Create(context, AsKeywordExpression);
                     break;
 
                 case IManifestCharacterExpression AsManifestCharacterExpression:
-                    Result = CSharpManifestCharacterExpression.Create(AsManifestCharacterExpression, context);
+                    Result = CSharpManifestCharacterExpression.Create(context, AsManifestCharacterExpression);
                     break;
 
                 case IManifestNumberExpression AsManifestNumberExpression:
-                    Result = CSharpManifestNumberExpression.Create(AsManifestNumberExpression, context);
+                    Result = CSharpManifestNumberExpression.Create(context, AsManifestNumberExpression);
                     break;
 
                 case IManifestStringExpression AsManifestStringExpression:
-                    Result = CSharpManifestStringExpression.Create(AsManifestStringExpression, context);
+                    Result = CSharpManifestStringExpression.Create(context, AsManifestStringExpression);
                     break;
 
                 case INewExpression AsNewExpression:
-                    Result = CSharpNewExpression.Create(AsNewExpression, context);
+                    Result = CSharpNewExpression.Create(context, AsNewExpression);
                     break;
 
                 case IOldExpression AsOldExpression:
-                    Result = CSharpOldExpression.Create(AsOldExpression, context);
+                    Result = CSharpOldExpression.Create(context, AsOldExpression);
                     break;
 
                 case IPrecursorExpression AsPrecursorExpression:
-                    Result = CSharpPrecursorExpression.Create(AsPrecursorExpression, context);
+                    Result = CSharpPrecursorExpression.Create(context, AsPrecursorExpression);
                     break;
 
                 case IPrecursorIndexExpression AsPrecursorIndexExpression:
-                    Result = CSharpPrecursorIndexExpression.Create(AsPrecursorIndexExpression, context);
+                    Result = CSharpPrecursorIndexExpression.Create(context, AsPrecursorIndexExpression);
                     break;
 
                 case IQueryExpression AsQueryExpression:
-                    Result = CSharpQueryExpression.Create(AsQueryExpression, context);
+                    Result = CSharpQueryExpression.Create(context, AsQueryExpression);
                     break;
 
                 case IResultOfExpression AsResultOfExpression:
-                    Result = CSharpResultOfExpression.Create(AsResultOfExpression, context);
+                    Result = CSharpResultOfExpression.Create(context, AsResultOfExpression);
                     break;
 
                 case IUnaryNotExpression AsUnaryNotExpression:
-                    Result = CSharpUnaryNotExpression.Create(AsUnaryNotExpression, context);
+                    Result = CSharpUnaryNotExpression.Create(context, AsUnaryNotExpression);
                     break;
 
                 case IUnaryOperatorExpression AsUnaryOperatorExpression:
-                    Result = CSharpUnaryOperatorExpression.Create(AsUnaryOperatorExpression, context);
+                    Result = CSharpUnaryOperatorExpression.Create(context, AsUnaryOperatorExpression);
                     break;
             }
 
@@ -139,9 +139,9 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpExpression"/> class.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpExpression(IExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        protected CSharpExpression(ICSharpContext context, IExpression source)
         {
             Debug.Assert(source != null);
 

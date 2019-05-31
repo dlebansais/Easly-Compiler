@@ -35,20 +35,20 @@
         /// <summary>
         /// Creates a new C# argument.
         /// </summary>
-        /// <param name="source">The Easly argument from which the C# argument is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpArgument Create(IArgument source, ICSharpContext context)
+        /// <param name="source">The Easly argument from which the C# argument is created.</param>
+        public static ICSharpArgument Create(ICSharpContext context, IArgument source)
         {
             ICSharpArgument Result = null;
 
             switch (source)
             {
                 case IPositionalArgument AsPositionalArgument:
-                    Result = CSharpPositionalArgument.Create(AsPositionalArgument, context);
+                    Result = CSharpPositionalArgument.Create(context, AsPositionalArgument);
                     break;
 
                 case IAssignmentArgument AsAssignmentArgument:
-                    Result = CSharpAssignmentArgument.Create(AsAssignmentArgument, context);
+                    Result = CSharpAssignmentArgument.Create(context, AsAssignmentArgument);
                     break;
             }
 
@@ -60,9 +60,9 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpArgument"/> class.
         /// </summary>
-        /// <param name="source">The Easly argument from which the C# argument is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpArgument(IArgument source, ICSharpContext context)
+        /// <param name="source">The Easly argument from which the C# argument is created.</param>
+        protected CSharpArgument(ICSharpContext context, IArgument source)
         {
             Debug.Assert(source != null);
 

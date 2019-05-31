@@ -33,22 +33,22 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpUnaryNotExpression Create(IUnaryNotExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpUnaryNotExpression Create(ICSharpContext context, IUnaryNotExpression source)
         {
-            return new CSharpUnaryNotExpression(source, context);
+            return new CSharpUnaryNotExpression(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpUnaryNotExpression"/> class.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpUnaryNotExpression(IUnaryNotExpression source, ICSharpContext context)
-            : base(source, context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        protected CSharpUnaryNotExpression(ICSharpContext context, IUnaryNotExpression source)
+            : base(context, source)
         {
-            RightExpression = Create((IExpression)source.RightExpression, context);
+            RightExpression = Create(context, (IExpression)source.RightExpression);
         }
         #endregion
 

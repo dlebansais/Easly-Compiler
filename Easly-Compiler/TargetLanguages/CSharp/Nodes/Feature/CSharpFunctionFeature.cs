@@ -56,12 +56,6 @@
             : base(owner, instance, source)
         {
             Name = Source.ValidFeatureName.Item.Name;
-
-            foreach (IQueryOverload Overload in source.OverloadList)
-            {
-                ICSharpQueryOverload NewOverload = CSharpQueryOverload.Create(Overload, owner);
-                OverloadList.Add(NewOverload);
-            }
         }
         #endregion
 
@@ -80,6 +74,21 @@
         /// The list of overloads.
         /// </summary>
         public IList<ICSharpOverload> OverloadList { get; } = new List<ICSharpOverload>();
+        #endregion
+
+        #region Client Interface
+        /// <summary>
+        /// Initializes the feature.
+        /// </summary>
+        /// <param name="context">The initialization context.</param>
+        public override void Init(ICSharpContext context)
+        {
+            foreach (IQueryOverload Overload in Source.OverloadList)
+            {
+                ICSharpQueryOverload NewOverload = CSharpQueryOverload.Create(context, Overload, Owner);
+                OverloadList.Add(NewOverload);
+            }
+        }
         #endregion
     }
 }

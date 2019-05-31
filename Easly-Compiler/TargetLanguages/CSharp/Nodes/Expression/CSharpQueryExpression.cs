@@ -44,22 +44,22 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpQueryExpression Create(IQueryExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpQueryExpression Create(ICSharpContext context, IQueryExpression source)
         {
-            return new CSharpQueryExpression(source, context);
+            return new CSharpQueryExpression(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpQueryExpression"/> class.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpQueryExpression(IQueryExpression source, ICSharpContext context)
-            : base(source, context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        protected CSharpQueryExpression(ICSharpContext context, IQueryExpression source)
+            : base(context, source)
         {
-            FeatureCall = new CSharpFeatureCall(source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle, context);
+            FeatureCall = new CSharpFeatureCall(context, source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle);
 
             if (Source.ResolvedFinalFeature.IsAssigned)
                 Feature = context.GetFeature(Source.ResolvedFinalFeature.Item);
@@ -78,7 +78,7 @@
 
             Debug.Assert((Feature != null && Discrete == null) || (Feature == null && Discrete != null));
 
-            Query = CSharpQualifiedName.Create((IQualifiedName)Source.Query, Feature, Discrete, source.InheritBySideAttribute, context);
+            Query = CSharpQualifiedName.Create(context, (IQualifiedName)Source.Query, Feature, Discrete, source.InheritBySideAttribute);
         }
         #endregion
 

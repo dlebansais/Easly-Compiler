@@ -23,20 +23,20 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpManifestNumberExpression Create(IManifestNumberExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpManifestNumberExpression Create(ICSharpContext context, IManifestNumberExpression source)
         {
-            return new CSharpManifestNumberExpression(source, context);
+            return new CSharpManifestNumberExpression(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpManifestNumberExpression"/> class.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpManifestNumberExpression(IManifestNumberExpression source, ICSharpContext context)
-            : base(source, context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        protected CSharpManifestNumberExpression(ICSharpContext context, IManifestNumberExpression source)
+            : base(context, source)
         {
         }
         #endregion

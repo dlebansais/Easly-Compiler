@@ -39,22 +39,22 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpFeatureCall"/> class.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="parameterList">The list of parameters for the selected overload.</param>
         /// <param name="argumentList">The list of arguments.</param>
         /// <param name="argumentStyle">The argument passing style.</param>
-        /// <param name="context">The creation context.</param>
-        public CSharpFeatureCall(IList<IParameter> parameterList, IList<IArgument> argumentList, TypeArgumentStyles argumentStyle, ICSharpContext context)
+        public CSharpFeatureCall(ICSharpContext context, IList<IParameter> parameterList, IList<IArgument> argumentList, TypeArgumentStyles argumentStyle)
         {
             foreach (IParameter Item in parameterList)
             {
                 ICSharpClass Owner = context.GetClass(Item.ResolvedParameter.Location.EmbeddingClass);
-                ICSharpParameter NewParameter = CSharpParameter.Create(Item, Owner);
+                ICSharpParameter NewParameter = CSharpParameter.Create(context, Item, Owner);
                 ParameterList.Add(NewParameter);
             }
 
             foreach (IArgument Item in argumentList)
             {
-                ICSharpArgument NewArgument = CSharpArgument.Create(Item, context);
+                ICSharpArgument NewArgument = CSharpArgument.Create(context, Item);
                 ArgumentList.Add(NewArgument);
             }
 

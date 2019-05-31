@@ -28,23 +28,25 @@
         /// <summary>
         /// Create a new C# typedef.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
         /// <param name="embeddingClass">The class where the C# node is created.</param>
-        public static ICSharpTypedef Create(ITypedef source, ICSharpClass embeddingClass)
+        public static ICSharpTypedef Create(ICSharpContext context, ITypedef source, ICSharpClass embeddingClass)
         {
-            return new CSharpTypedef(source, embeddingClass);
+            return new CSharpTypedef(context, source, embeddingClass);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpTypedef"/> class.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
         /// <param name="embeddingClass">The class where the C# node is created.</param>
-        protected CSharpTypedef(ITypedef source, ICSharpClass embeddingClass)
+        protected CSharpTypedef(ICSharpContext context, ITypedef source, ICSharpClass embeddingClass)
             : base(source)
         {
             Name = ((IName)source.EntityName).ValidText.Item;
-            Type = CSharpType.Create(source.ResolvedDefinedType.Item, this);
+            Type = CSharpType.Create(context, source.ResolvedDefinedType.Item);
 
             if (Type is ICSharpFormalGenericType AsFormalGenericType)
             {

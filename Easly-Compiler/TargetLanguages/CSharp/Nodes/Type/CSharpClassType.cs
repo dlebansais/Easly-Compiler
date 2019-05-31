@@ -24,12 +24,6 @@
         /// The class on which this type is based.
         /// </summary>
         ICSharpClass Class { get; }
-
-        /// <summary>
-        /// Sets the <see cref="Class"/> property
-        /// </summary>
-        /// <param name="cSharpClass">The class on which this type is based.</param>
-        void SetClass(ICSharpClass cSharpClass);
     }
 
     /// <summary>
@@ -41,19 +35,33 @@
         /// <summary>
         /// Create a new C# type.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
-        public static ICSharpClassType Create(IClassType source)
+        public static ICSharpClassType Create(ICSharpContext context, IClassType source)
         {
-            return new CSharpClassType(source);
+            return new CSharpClassType(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpClassType"/> class.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
-        protected CSharpClassType(IClassType source)
-            : base(source)
+        protected CSharpClassType(ICSharpContext context, IClassType source)
+            : base(context, source)
         {
+            Class = context.GetClass(source.BaseClass);
+
+            foreach (ICSharpGeneric Generic in Class.GenericList)
+            {
+                string GenericName = Generic.Name;
+                Debug.Assert(Source.TypeArgumentTable.ContainsKey(GenericName));
+
+                ICompiledType Type = Source.TypeArgumentTable[GenericName];
+                ICSharpType TypeArgument = Create(context, Type);
+
+                TypeArgumentList.Add(TypeArgument);
+            }
         }
         #endregion
 
@@ -81,30 +89,6 @@
 
         #region Client Interface
         /// <summary>
-        /// Sets the <see cref="Class"/> property
-        /// </summary>
-        /// <param name="cSharpClass">The class on which this type is based.</param>
-        public void SetClass(ICSharpClass cSharpClass)
-        {
-            Debug.Assert(cSharpClass != null);
-            Debug.Assert(cSharpClass.Type == this);
-            Debug.Assert(Class == null);
-
-            Class = cSharpClass;
-
-            foreach (ICSharpGeneric Generic in Class.GenericList)
-            {
-                string GenericName = Generic.Name;
-                Debug.Assert(Source.TypeArgumentTable.ContainsKey(GenericName));
-
-                ICompiledType Type = Source.TypeArgumentTable[GenericName];
-                ICSharpType TypeArgument = Create(Type);
-
-                TypeArgumentList.Add(TypeArgument);
-            }
-        }
-
-        /// <summary>
         /// Get the name of a type.
         /// </summary>
         /// <param name="cSharpNamespace">The current namespace.</param>
@@ -113,6 +97,9 @@
         public override string Type2CSharpString(string cSharpNamespace, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat)
         {
             SetUsedInCode();
+
+            Debug.Assert(Class != null);
+            Debug.Assert(Class.Source != null);
 
             Guid BaseClassGuid = Class.Source.ClassGuid;
             bool AsInterface = cSharpTypeFormat == CSharpTypeFormats.AsInterface;
@@ -165,6 +152,14 @@
             }
 
             return Result;
+        }
+        #endregion
+
+        #region Debugging
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return Source.ToString();
         }
         #endregion
     }

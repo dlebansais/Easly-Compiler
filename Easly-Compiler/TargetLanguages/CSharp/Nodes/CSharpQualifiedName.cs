@@ -53,25 +53,25 @@
         /// <summary>
         /// Create a new C# qualified name.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
         /// <param name="feature">The feature at the end of the path. Can be null.</param>
         /// <param name="discrete">The discrete at the end of the path. Can be null.</param>
         /// <param name="inheritBySideAttribute">Inherit the side-by-side attribute.</param>
-        /// <param name="context">The creation context.</param>
-        public static ICSharpQualifiedName Create(IQualifiedName source, ICSharpFeature feature, ICSharpDiscrete discrete, bool inheritBySideAttribute, ICSharpContext context)
+        public static ICSharpQualifiedName Create(ICSharpContext context, IQualifiedName source, ICSharpFeature feature, ICSharpDiscrete discrete, bool inheritBySideAttribute)
         {
-            return new CSharpQualifiedName(source, feature, discrete, inheritBySideAttribute, context);
+            return new CSharpQualifiedName(context, source, feature, discrete, inheritBySideAttribute);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpQualifiedName"/> class.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
         /// <param name="feature">The feature at the end of the path. Can be null.</param>
         /// <param name="discrete">The discrete at the end of the path. Can be null.</param>
         /// <param name="inheritBySideAttribute">Inherit the side-by-side attribute.</param>
-        /// <param name="context">The creation context.</param>
-        protected CSharpQualifiedName(IQualifiedName source, ICSharpFeature feature, ICSharpDiscrete discrete, bool inheritBySideAttribute, ICSharpContext context)
+        protected CSharpQualifiedName(ICSharpContext context, IQualifiedName source, ICSharpFeature feature, ICSharpDiscrete discrete, bool inheritBySideAttribute)
             : base(source)
         {
             Debug.Assert((feature != null && discrete == null) || (feature == null && discrete != null));

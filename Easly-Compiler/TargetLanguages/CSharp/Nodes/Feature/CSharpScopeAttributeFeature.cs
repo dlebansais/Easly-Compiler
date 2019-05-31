@@ -63,13 +63,6 @@
             : base(owner, source)
         {
             Name = Source.ValidFeatureName.Item.Name;
-            Type = CSharpType.Create(source.ResolvedFeatureType.Item);
-
-            //TODO: handle the default value.
-            /*
-            if (source.DefaultValue.IsAssigned)
-                DefaultValue = CSharpExpression.Create((IExpression)source.DefaultValue.Item, context);
-                */
         }
         #endregion
 
@@ -87,12 +80,26 @@
         /// <summary>
         /// The default value. Can be null.
         /// </summary>
-        public ICSharpExpression DefaultValue { get; }
+        public ICSharpExpression DefaultValue { get; private set; }
 
         /// <summary>
         /// The attribute type.
         /// </summary>
-        public ICSharpType Type { get; }
+        public ICSharpType Type { get; private set; }
+        #endregion
+
+        #region Client Interface
+        /// <summary>
+        /// Initializes the feature.
+        /// </summary>
+        /// <param name="context">The initialization context.</param>
+        public override void Init(ICSharpContext context)
+        {
+            Type = CSharpType.Create(context, Source.ResolvedFeatureType.Item);
+
+            if (Source.DefaultValue.IsAssigned)
+                DefaultValue = CSharpExpression.Create(context, Source.DefaultValue.Item);
+        }
         #endregion
     }
 }

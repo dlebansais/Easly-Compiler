@@ -28,20 +28,20 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpAgentExpression Create(IAgentExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpAgentExpression Create(ICSharpContext context, IAgentExpression source)
         {
-            return new CSharpAgentExpression(source, context);
+            return new CSharpAgentExpression(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpAgentExpression"/> class.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpAgentExpression(IAgentExpression source, ICSharpContext context)
-            : base(source, context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        protected CSharpAgentExpression(ICSharpContext context, IAgentExpression source)
+            : base(context, source)
         {
             Delegated = ((IIdentifier)Source.Delegated).ValidText.Item;
         }

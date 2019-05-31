@@ -34,25 +34,25 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpPrecursorIndexExpression Create(IPrecursorIndexExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpPrecursorIndexExpression Create(ICSharpContext context, IPrecursorIndexExpression source)
         {
-            return new CSharpPrecursorIndexExpression(source, context);
+            return new CSharpPrecursorIndexExpression(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpPrecursorIndexExpression"/> class.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpPrecursorIndexExpression(IPrecursorIndexExpression source, ICSharpContext context)
-            : base(source, context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        protected CSharpPrecursorIndexExpression(ICSharpContext context, IPrecursorIndexExpression source)
+            : base(context, source)
         {
             Feature = context.GetFeature((ICompiledFeature)source.EmbeddingFeature) as ICSharpIndexerFeature;
             Debug.Assert(Feature != null);
 
-            FeatureCall = new CSharpFeatureCall(source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle, context);
+            FeatureCall = new CSharpFeatureCall(context, source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle);
         }
         #endregion
 

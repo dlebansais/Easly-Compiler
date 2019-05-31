@@ -22,18 +22,20 @@
         /// <summary>
         /// Create a new C# type.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
-        public static ICSharpIndexerType Create(IIndexerType source)
+        public static ICSharpIndexerType Create(ICSharpContext context, IIndexerType source)
         {
-            return new CSharpIndexerType(source);
+            return new CSharpIndexerType(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpIndexerType"/> class.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
-        protected CSharpIndexerType(IIndexerType source)
-            : base(source)
+        protected CSharpIndexerType(ICSharpContext context,  IIndexerType source)
+            : base(context, source)
         {
         }
         #endregion

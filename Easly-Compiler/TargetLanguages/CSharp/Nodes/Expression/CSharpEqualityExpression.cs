@@ -34,23 +34,23 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpEqualityExpression Create(IEqualityExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpEqualityExpression Create(ICSharpContext context, IEqualityExpression source)
         {
-            return new CSharpEqualityExpression(source, context);
+            return new CSharpEqualityExpression(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpEqualityExpression"/> class.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpEqualityExpression(IEqualityExpression source, ICSharpContext context)
-            : base(source, context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        protected CSharpEqualityExpression(ICSharpContext context, IEqualityExpression source)
+            : base(context, source)
         {
-            LeftExpression = Create((IExpression)source.LeftExpression, context);
-            RightExpression = Create((IExpression)source.RightExpression, context);
+            LeftExpression = Create(context, (IExpression)source.LeftExpression);
+            RightExpression = Create(context, (IExpression)source.RightExpression);
         }
         #endregion
 

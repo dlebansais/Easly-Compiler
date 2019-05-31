@@ -33,23 +33,23 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpIndexQueryExpression Create(IIndexQueryExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpIndexQueryExpression Create(ICSharpContext context, IIndexQueryExpression source)
         {
-            return new CSharpIndexQueryExpression(source, context);
+            return new CSharpIndexQueryExpression(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpIndexQueryExpression"/> class.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpIndexQueryExpression(IIndexQueryExpression source, ICSharpContext context)
-            : base(source, context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        protected CSharpIndexQueryExpression(ICSharpContext context, IIndexQueryExpression source)
+            : base(context, source)
         {
-            IndexedExpression = Create((IExpression)source.IndexedExpression, context);
-            FeatureCall = new CSharpFeatureCall(source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle, context);
+            IndexedExpression = Create(context, (IExpression)source.IndexedExpression);
+            FeatureCall = new CSharpFeatureCall(context, source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle);
         }
         #endregion
 

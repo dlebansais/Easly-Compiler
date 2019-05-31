@@ -23,20 +23,20 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpManifestCharacterExpression Create(IManifestCharacterExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpManifestCharacterExpression Create(ICSharpContext context, IManifestCharacterExpression source)
         {
-            return new CSharpManifestCharacterExpression(source, context);
+            return new CSharpManifestCharacterExpression(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpManifestCharacterExpression"/> class.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpManifestCharacterExpression(IManifestCharacterExpression source, ICSharpContext context)
-            : base(source, context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        protected CSharpManifestCharacterExpression(ICSharpContext context, IManifestCharacterExpression source)
+            : base(context, source)
         {
         }
         #endregion

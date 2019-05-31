@@ -27,25 +27,25 @@
         /// <summary>
         /// Create a new C# discrete.
         /// </summary>
-        /// <param name="source">The Easly node from which the C# node is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpDiscrete Create(IDiscrete source, ICSharpContext context)
+        /// <param name="source">The Easly node from which the C# node is created.</param>
+        public static ICSharpDiscrete Create(ICSharpContext context, IDiscrete source)
         {
-            return new CSharpDiscrete(source, context);
+            return new CSharpDiscrete(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpDiscrete"/> class.
         /// </summary>
-        /// <param name="source">The Easly node from which the C# node is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpDiscrete(IDiscrete source, ICSharpContext context)
+        /// <param name="source">The Easly node from which the C# node is created.</param>
+        protected CSharpDiscrete(ICSharpContext context, IDiscrete source)
             : base(source)
         {
             Name = source.ValidDiscreteName.Item.Name;
 
             if (source.NumericValue.IsAssigned)
-                ExplicitValue = CSharpExpression.Create((IExpression)source.NumericValue.Item, context);
+                ExplicitValue = CSharpExpression.Create(context, (IExpression)source.NumericValue.Item);
         }
         #endregion
 

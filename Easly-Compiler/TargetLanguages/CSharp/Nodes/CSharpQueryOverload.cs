@@ -23,30 +23,32 @@
         /// <summary>
         /// Create a new C# overload.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
         /// <param name="owner">The class where the overload is declared.</param>
-        public static ICSharpQueryOverload Create(IQueryOverload source, ICSharpClass owner)
+        public static ICSharpQueryOverload Create(ICSharpContext context, IQueryOverload source, ICSharpClass owner)
         {
-            return new CSharpQueryOverload(source, owner);
+            return new CSharpQueryOverload(context, source, owner);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpQueryOverload"/> class.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
         /// <param name="owner">The class where the overload is declared.</param>
-        protected CSharpQueryOverload(IQueryOverload source, ICSharpClass owner)
+        protected CSharpQueryOverload(ICSharpContext context, IQueryOverload source, ICSharpClass owner)
             : base(source)
         {
             foreach (IParameter Parameter in source.ParameterTable)
             {
-                ICSharpParameter NewParameter = CSharpParameter.Create(Parameter, owner);
+                ICSharpParameter NewParameter = CSharpParameter.Create(context, Parameter, owner);
                 ParameterList.Add(NewParameter);
             }
 
             foreach (IParameter Result in source.ResultTable)
             {
-                ICSharpParameter NewResult = CSharpParameter.Create(Result, owner);
+                ICSharpParameter NewResult = CSharpParameter.Create(context, Result, owner);
                 ResultList.Add(NewResult);
             }
         }

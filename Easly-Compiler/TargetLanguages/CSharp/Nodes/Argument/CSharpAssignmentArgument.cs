@@ -28,23 +28,23 @@
         /// <summary>
         /// Creates a new C# argument.
         /// </summary>
-        /// <param name="source">The Easly argument from which the C# argument is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpAssignmentArgument Create(IAssignmentArgument source, ICSharpContext context)
+        /// <param name="source">The Easly argument from which the C# argument is created.</param>
+        public static ICSharpAssignmentArgument Create(ICSharpContext context, IAssignmentArgument source)
         {
-            return new CSharpAssignmentArgument(source, context);
+            return new CSharpAssignmentArgument(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpAssignmentArgument"/> class.
         /// </summary>
-        /// <param name="source">The Easly argument from which the C# argument is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpAssignmentArgument(IAssignmentArgument source, ICSharpContext context)
-            : base(source, context)
+        /// <param name="source">The Easly argument from which the C# argument is created.</param>
+        protected CSharpAssignmentArgument(ICSharpContext context, IAssignmentArgument source)
+            : base(context, source)
         {
             IExpression ArgumentSource = (IExpression)source.Source;
-            SourceExpression = CSharpExpression.Create(ArgumentSource, context);
+            SourceExpression = CSharpExpression.Create(context, ArgumentSource);
 
             foreach (IIdentifier Item in source.ParameterList)
                 ParameterNameList.Add(Item.ValidText.Item);

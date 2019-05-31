@@ -35,6 +35,12 @@
         string CoexistingPrecursorName { get; }
 
         /// <summary>
+        /// Initializes the feature.
+        /// </summary>
+        /// <param name="context">The initialization context.</param>
+        void Init(ICSharpContext context);
+
+        /// <summary>
         /// Mark this feature as an override of a virtual parent.
         /// </summary>
         void MarkAsOverride();
@@ -80,6 +86,12 @@
         string CoexistingPrecursorName { get; }
 
         /// <summary>
+        /// Initializes the feature.
+        /// </summary>
+        /// <param name="context">The initialization context.</param>
+        void Init(ICSharpContext context);
+
+        /// <summary>
         /// Mark this feature as an override of a virtual parent.
         /// </summary>
         void MarkAsOverride();
@@ -101,7 +113,7 @@
     /// A C# feature.
     /// </summary>
     /// <typeparam name="T">The corresponding compiler node.</typeparam>
-    public class CSharpFeature<T> : CSharpSource<T>, ICSharpFeature<T>, ICSharpFeature
+    public abstract class CSharpFeature<T> : CSharpSource<T>, ICSharpFeature<T>, ICSharpFeature
         where T : class, ICompiledFeature
     {
         #region Init
@@ -166,6 +178,12 @@
         #endregion
 
         #region Client Interface
+        /// <summary>
+        /// Initializes the feature.
+        /// </summary>
+        /// <param name="context">The initialization context.</param>
+        public abstract void Init(ICSharpContext context);
+
         /// <summary>
         /// Mark this feature as an override of a virtual parent.
         /// </summary>

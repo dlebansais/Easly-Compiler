@@ -22,20 +22,22 @@
         /// <summary>
         /// Create a new C# constraint.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
-        public static ICSharpConstraint Create(IConstraint source)
+        public static ICSharpConstraint Create(ICSharpContext context, IConstraint source)
         {
-            return new CSharpConstraint(source);
+            return new CSharpConstraint(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpConstraint"/> class.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
-        protected CSharpConstraint(IConstraint source)
+        protected CSharpConstraint(ICSharpContext context, IConstraint source)
             : base(source)
         {
-            Type = CSharpType.Create(source.ResolvedConformingType.Item);
+            Type = CSharpType.Create(context, source.ResolvedConformingType.Item);
         }
         #endregion
 

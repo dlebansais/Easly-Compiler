@@ -34,18 +34,20 @@
         /// <summary>
         /// Create a new C# type.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
-        public static ICSharpFormalGenericType Create(IFormalGenericType source)
+        public static ICSharpFormalGenericType Create(ICSharpContext context, IFormalGenericType source)
         {
-            return new CSharpFormalGenericType(source);
+            return new CSharpFormalGenericType(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpFormalGenericType"/> class.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
-        protected CSharpFormalGenericType(IFormalGenericType source)
-            : base(source)
+        protected CSharpFormalGenericType(ICSharpContext context, IFormalGenericType source)
+            : base(context, source)
         {
         }
         #endregion

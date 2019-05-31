@@ -23,20 +23,20 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpResultOfExpression Create(IResultOfExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpResultOfExpression Create(ICSharpContext context, IResultOfExpression source)
         {
-            return new CSharpResultOfExpression(source, context);
+            return new CSharpResultOfExpression(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpResultOfExpression"/> class.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpResultOfExpression(IResultOfExpression source, ICSharpContext context)
-            : base(source, context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        protected CSharpResultOfExpression(ICSharpContext context, IResultOfExpression source)
+            : base(context, source)
         {
         }
         #endregion

@@ -23,38 +23,42 @@
         /// <summary>
         /// Create a new C# type.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
-        public static ICSharpProcedureType Create(IProcedureType source)
+        public static ICSharpProcedureType Create(ICSharpContext context, IProcedureType source)
         {
-            return new CSharpProcedureType(source);
+            return new CSharpProcedureType(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpProcedureType"/> class.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
-        protected CSharpProcedureType(IProcedureType source)
-            : base(source)
+        protected CSharpProcedureType(ICSharpContext context, IProcedureType source)
+            : base(context, source)
         {
         }
 
         /// <summary>
         /// Create a new C# type.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
         /// <param name="originatingTypedef">The typedef where this type is declared.</param>
-        public static ICSharpProcedureType Create(IProcedureType source, ICSharpTypedef originatingTypedef)
+        public static ICSharpProcedureType Create(ICSharpContext context, IProcedureType source, ICSharpTypedef originatingTypedef)
         {
-            return new CSharpProcedureType(source, originatingTypedef);
+            return new CSharpProcedureType(context, source, originatingTypedef);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpProcedureType"/> class.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
         /// <param name="originatingTypedef">The typedef where this type is declared.</param>
-        protected CSharpProcedureType(IProcedureType source, ICSharpTypedef originatingTypedef)
-            : base(source, originatingTypedef)
+        protected CSharpProcedureType(ICSharpContext context, IProcedureType source, ICSharpTypedef originatingTypedef)
+            : base(context, source, originatingTypedef)
         {
         }
         #endregion

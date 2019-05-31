@@ -38,26 +38,28 @@
         /// <summary>
         /// Create a new C# generic.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
-        public static ICSharpGeneric Create(IGeneric source)
+        public static ICSharpGeneric Create(ICSharpContext context, IGeneric source)
         {
-            return new CSharpGeneric(source);
+            return new CSharpGeneric(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpGeneric"/> class.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
-        protected CSharpGeneric(IGeneric source)
+        protected CSharpGeneric(ICSharpContext context, IGeneric source)
             : base(source)
         {
             Name = ((IName)source.EntityName).ValidText.Item;
-            Type = CSharpFormalGenericType.Create(source.ResolvedGenericType.Item);
+            Type = CSharpFormalGenericType.Create(context, source.ResolvedGenericType.Item);
             Type.SetGeneric(this);
 
             foreach (IConstraint Constraint in source.ConstraintList)
             {
-                ICSharpConstraint NewConstraint = CSharpConstraint.Create(Constraint);
+                ICSharpConstraint NewConstraint = CSharpConstraint.Create(context, Constraint);
                 ConstraintList.Add(NewConstraint);
             }
         }

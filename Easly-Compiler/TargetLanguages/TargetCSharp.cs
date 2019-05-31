@@ -16,11 +16,6 @@
         /// Namespace for the output code.
         /// </summary>
         string Namespace { get; }
-
-        /// <summary>
-        /// The table of classes.
-        /// </summary>
-        IDictionary<IClass, ICSharpClass> ClassTable { get; }
     }
 
     /// <summary>
@@ -46,11 +41,6 @@
         /// Namespace for the output code.
         /// </summary>
         public string Namespace { get; }
-
-        /// <summary>
-        /// The table of classes.
-        /// </summary>
-        public IDictionary<IClass, ICSharpClass> ClassTable { get; } = new Dictionary<IClass, ICSharpClass>();
         #endregion
 
         #region Client Interface
@@ -60,55 +50,22 @@
         public override void Translate()
         {
             ErrorList.ClearErrors();
-            ClassTable.Clear();
 
-            if (!ClassSplitting.Create(Compiler.LoadedRoot.ClassList, ErrorList, out IClassSplitting Splitting))
+            if (!CreateClasses(out IDictionary<IClass, ICSharpClass> ClassTable))
                 return;
 
-            foreach (IClass Class in Compiler.LoadedRoot.ClassList)
-                if (!IsClassFromLibrary(Class))
-                {
-                    ICSharpClass NewCSharpClass = CSharpClass.Create(Class);
-                    ClassTable.Add(Class, NewCSharpClass);
-                }
-
-            foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
-            {
-                ICSharpClass Class = Entry.Value;
-                if (GetBaseClass(Class, Splitting, out ICSharpClass BaseClass))
-                    Class.SetBaseClass(BaseClass, ClassTable);
-            }
-
-            foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
-            {
-                ICSharpClass Class = Entry.Value;
-                CheckRename(Class, ErrorList);
-            }
-            if (!ErrorList.IsEmpty)
+            if (!CreateFeatures(ClassTable, out IDictionary<ICompiledFeature, ICSharpFeature> FeatureTable))
                 return;
 
-            IDictionary<ICompiledFeature, ICSharpFeature> GlobalFeatureTable = new Dictionary<ICompiledFeature, ICSharpFeature>();
-
-            foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
-            {
-                ICSharpClass Class = Entry.Value;
-                IList<ICSharpFeature> FeatureList = new List<ICSharpFeature>();
-                CreateClassFeatures(Class, FeatureList);
-
-                foreach (ICSharpFeature Feature in FeatureList)
-                {
-                    Debug.Assert(!GlobalFeatureTable.ContainsKey(Feature.Source));
-                    GlobalFeatureTable.Add(Feature.Source, Feature);
-                }
-            }
+            ICSharpContext Context = new CSharpContext(ClassTable, FeatureTable);
 
             foreach (KeyValuePair<IClass, ICSharpClass> ClassEntry in ClassTable)
             {
                 ICSharpClass Class = ClassEntry.Value;
-                IList<ICSharpFeature> FeatureList = new List<ICSharpFeature>();
+                IList<ICSharpFeature> ClassFeatureList = new List<ICSharpFeature>();
                 IList<ICSharpFeature> InheritedFeatureList = new List<ICSharpFeature>();
 
-                foreach (KeyValuePair<ICompiledFeature, ICSharpFeature> FeatureEntry in GlobalFeatureTable)
+                foreach (KeyValuePair<ICompiledFeature, ICSharpFeature> FeatureEntry in FeatureTable)
                 {
                     ICSharpFeature Feature = FeatureEntry.Value;
                     IFeatureInstance Instance = Feature.Instance;
@@ -117,26 +74,24 @@
                         continue;
 
                     if (FeatureEntry.Value.Owner == Class)
-                        FeatureList.Add(Feature);
+                        ClassFeatureList.Add(Feature);
                     else if (!IsDirectOrNotMainParentFeature(Instance, Class))
                         InheritedFeatureList.Add(Feature);
                 }
 
-                Class.SetFeatureList(FeatureList, InheritedFeatureList);
+                Class.SetFeatureList(Context, ClassFeatureList, InheritedFeatureList);
             }
 
-            ICSharpContext Context = new CSharpContext(ClassTable, GlobalFeatureTable);
+            foreach (KeyValuePair<ICompiledFeature, ICSharpFeature> Entry in FeatureTable)
+            {
+                ICSharpFeature Feature = Entry.Value;
+                Feature.Init(Context);
+            }
 
             foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
             {
                 ICSharpClass Class = Entry.Value;
-                Class.SetContext(Context);
-            }
-
-            foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
-            {
-                ICSharpClass Class = Entry.Value;
-                CheckSharedName(Class);
+                CheckSharedName(Class, ClassTable);
             }
 
             foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
@@ -159,7 +114,7 @@
                 foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
                 {
                     ICSharpClass Class = Entry.Value;
-                    Class.CheckForcedReadWrite(GlobalFeatureTable, ref Continue);
+                    Class.CheckForcedReadWrite(FeatureTable, ref Continue);
                 }
             }
             while (Continue);
@@ -173,7 +128,7 @@
             foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
             {
                 ICSharpClass Class = Entry.Value;
-                Class.CheckInheritSideBySideAttributes(GlobalFeatureTable);
+                Class.CheckInheritSideBySideAttributes(FeatureTable);
             }
 
             foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
@@ -185,29 +140,84 @@
             foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
             {
                 ICSharpClass Class = Entry.Value;
-                Class.Write(OutputRootFolder, Namespace);
+                if (!CSharpClass.IsLanguageClass(Class.Source) && !IsClassFromLibrary(Class.Source))
+                    Class.Write(OutputRootFolder, Namespace);
             }
+        }
+
+        private bool CreateClasses(out IDictionary<IClass, ICSharpClass> classTable)
+        {
+            classTable = null;
+
+            if (!ClassSplitting.Create(Compiler.LoadedRoot.ClassList, ErrorList, out IClassSplitting Splitting))
+                return false;
+
+            classTable = new Dictionary<IClass, ICSharpClass>();
+
+            ICSharpClass ClassAny = CSharpClass.Create(Class.ClassAny);
+            classTable.Add(Class.ClassAny, ClassAny);
+
+            ICSharpClass ClassAnyReference = CSharpClass.Create(Class.ClassAnyReference);
+            classTable.Add(Class.ClassAnyReference, ClassAnyReference);
+
+            ICSharpClass ClassAnyValue = CSharpClass.Create(Class.ClassAnyValue);
+            classTable.Add(Class.ClassAnyValue, ClassAnyValue);
+
+            foreach (IClass Class in Compiler.LoadedRoot.ClassList)
+            {
+                ICSharpClass NewCSharpClass = CSharpClass.Create(Class);
+                classTable.Add(Class, NewCSharpClass);
+            }
+
+            foreach (KeyValuePair<IClass, ICSharpClass> Entry in classTable)
+            {
+                ICSharpClass Class = Entry.Value;
+
+                if (GetBaseClass(Class, Splitting, classTable, out ICSharpClass BaseClass))
+                    Class.SetBaseClass(BaseClass);
+
+                Class.SetAncestorClasses(classTable);
+            }
+
+            foreach (KeyValuePair<IClass, ICSharpClass> Entry in classTable)
+            {
+                ICSharpClass Class = Entry.Value;
+                CheckRename(Class, ErrorList);
+            }
+            if (!ErrorList.IsEmpty)
+                return false;
+
+            return true;
+        }
+
+        private bool CreateFeatures(IDictionary<IClass, ICSharpClass> classTable, out IDictionary<ICompiledFeature, ICSharpFeature> featureTable)
+        {
+            featureTable = new Dictionary<ICompiledFeature, ICSharpFeature>();
+
+            foreach (KeyValuePair<IClass, ICSharpClass> Entry in classTable)
+            {
+                ICSharpClass Class = Entry.Value;
+                IList<ICSharpFeature> FeatureList = new List<ICSharpFeature>();
+                CreateClassFeatures(Class, FeatureList);
+
+                foreach (ICSharpFeature Feature in FeatureList)
+                {
+                    Debug.Assert(!featureTable.ContainsKey(Feature.Source));
+                    featureTable.Add(Feature.Source, Feature);
+                }
+            }
+
+            return true;
         }
 
         private bool IsClassFromLibrary(IClass baseClass)
         {
-            bool Result = false;
-            ICollection<Guid> GuidValues = LanguageClasses.NameToGuid.Values;
-
-            Result = GuidValues.Contains(baseClass.ClassGuid) || baseClass.HasExternBody;
-
-            return Result;
+            return baseClass.HasExternBody;
         }
         #endregion
 
         #region Implementation
-        /// <summary>
-        /// Finds the base class of a C# class.
-        /// </summary>
-        /// <param name="cSharpClass">The class for which to find a base class.</param>
-        /// <param name="splitting">The class splitting.</param>
-        /// <param name="result">The base class upon return successful.</param>
-        private bool GetBaseClass(ICSharpClass cSharpClass, IClassSplitting splitting, out ICSharpClass result)
+        private bool GetBaseClass(ICSharpClass cSharpClass, IClassSplitting splitting, IDictionary<IClass, ICSharpClass> classTable, out ICSharpClass result)
         {
             result = null;
             IClass BaseClass = null;
@@ -218,9 +228,11 @@
                 IClassType ClassParentType = InheritanceItem.ResolvedClassParentType.Item;
                 IClass ParentClass = ClassParentType.BaseClass;
 
+                Debug.Assert(ParentClass != null);
+
                 if (splitting.MustInherit.Contains(ParentClass))
                 {
-                    Debug.Assert(ParentClass == null);
+                    Debug.Assert(BaseClass == null);
                     BaseClass = ParentClass;
                 }
             }
@@ -245,7 +257,7 @@
 
             if (BaseClass != null)
             {
-                foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
+                foreach (KeyValuePair<IClass, ICSharpClass> Entry in classTable)
                 {
                     ICSharpClass Item = Entry.Value;
 
@@ -336,9 +348,9 @@
                 return CSharpExports.Private;
         }
 
-        private void CheckSharedName(ICSharpClass cSharpClass)
+        private void CheckSharedName(ICSharpClass cSharpClass, IDictionary<IClass, ICSharpClass> classTable)
         {
-            foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
+            foreach (KeyValuePair<IClass, ICSharpClass> Entry in classTable)
             {
                 ICSharpClass OtherClass = Entry.Value;
 
@@ -368,12 +380,6 @@
             }
         }
 
-        /// <summary>
-        /// Creates a C# feature from an Easly feature.
-        /// </summary>
-        /// <param name="owner">The class where the feature is declared.</param>
-        /// <param name="instance">The source feature instance.</param>
-        /// <param name="result">The created feature upon return.</param>
         private static bool CreateFeature(ICSharpClass owner, IFeatureInstance instance, out ICSharpFeature result)
         {
             result = null;

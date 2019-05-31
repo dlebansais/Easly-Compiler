@@ -52,8 +52,9 @@
         /// <summary>
         /// Creates a new C# type.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
-        public static ICSharpType Create(ICompiledType source)
+        public static ICSharpType Create(ICSharpContext context, ICompiledType source)
         {
             ICSharpType Result = null;
 
@@ -61,31 +62,31 @@
             switch (source)
             {
                 case IClassType AsClassType:
-                    Result = CSharpClassType.Create(AsClassType);
+                    Result = CSharpClassType.Create(context, AsClassType);
                     break;
 
                 case IFormalGenericType AsFormalGenericType:
-                    Result = CSharpFormalGenericType.Create(AsFormalGenericType);
+                    Result = CSharpFormalGenericType.Create(context, AsFormalGenericType);
                     break;
 
                 case IFunctionType AsFunctionType:
-                    Result = CSharpFunctionType.Create(AsFunctionType);
+                    Result = CSharpFunctionType.Create(context, AsFunctionType);
                     break;
 
                 case IProcedureType AsProcedureType:
-                    Result = CSharpProcedureType.Create(AsProcedureType);
+                    Result = CSharpProcedureType.Create(context, AsProcedureType);
                     break;
 
                 case IIndexerType AsIndexerType:
-                    Result = CSharpIndexerType.Create(AsIndexerType);
+                    Result = CSharpIndexerType.Create(context, AsIndexerType);
                     break;
 
                 case IPropertyType AsPropertyType:
-                    Result = CSharpPropertyType.Create(AsPropertyType);
+                    Result = CSharpPropertyType.Create(context, AsPropertyType);
                     break;
 
                 case ITupleType AsTupleType:
-                    Result = CSharpTupleType.Create(AsTupleType);
+                    Result = CSharpTupleType.Create(context, AsTupleType);
                     break;
             }
 
@@ -97,40 +98,41 @@
         /// <summary>
         /// Creates a new C# type associated to a typedef.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
         /// <param name="typedef">The typedef.</param>
-        public static ICSharpType Create(ICompiledType source, ICSharpTypedef typedef)
+        public static ICSharpType Create(ICSharpContext context, ICompiledType source, ICSharpTypedef typedef)
         {
             ICSharpType Result = null;
 
             switch (source)
             {
                 case IClassType AsClassType:
-                    Result = CSharpClassType.Create(AsClassType);
+                    Result = CSharpClassType.Create(context, AsClassType);
                     break;
 
                 case IFormalGenericType AsFormalGenericType:
-                    Result = CSharpFormalGenericType.Create(AsFormalGenericType);
+                    Result = CSharpFormalGenericType.Create(context, AsFormalGenericType);
                     break;
 
                 case IFunctionType AsFunctionType:
-                    Result = CSharpFunctionType.Create(AsFunctionType, typedef);
+                    Result = CSharpFunctionType.Create(context, AsFunctionType, typedef);
                     break;
 
                 case IProcedureType AsProcedureType:
-                    Result = CSharpProcedureType.Create(AsProcedureType, typedef);
+                    Result = CSharpProcedureType.Create(context, AsProcedureType, typedef);
                     break;
 
                 case IIndexerType AsIndexerType:
-                    Result = CSharpIndexerType.Create(AsIndexerType);
+                    Result = CSharpIndexerType.Create(context, AsIndexerType);
                     break;
 
                 case IPropertyType AsPropertyType:
-                    Result = CSharpPropertyType.Create(AsPropertyType);
+                    Result = CSharpPropertyType.Create(context, AsPropertyType);
                     break;
 
                 case ITupleType AsTupleType:
-                    Result = CSharpTupleType.Create(AsTupleType);
+                    Result = CSharpTupleType.Create(context, AsTupleType);
                     break;
             }
 
@@ -142,8 +144,9 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpType"/> class.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
-        protected CSharpType(ICompiledType source)
+        protected CSharpType(ICSharpContext context, ICompiledType source)
         {
             Debug.Assert(source != null);
 
@@ -153,9 +156,10 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpType"/> class.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
         /// <param name="originatingTypedef">The typedef where this type is declared.</param>
-        protected CSharpType(ICompiledType source, ICSharpTypedef originatingTypedef)
+        protected CSharpType(ICSharpContext context, ICompiledType source, ICSharpTypedef originatingTypedef)
         {
             Debug.Assert(source != null);
             Debug.Assert(originatingTypedef != null);

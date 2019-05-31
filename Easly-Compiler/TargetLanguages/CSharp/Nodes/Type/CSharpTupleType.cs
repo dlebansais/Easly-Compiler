@@ -22,18 +22,20 @@
         /// <summary>
         /// Create a new C# type.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
-        public static ICSharpTupleType Create(ITupleType source)
+        public static ICSharpTupleType Create(ICSharpContext context, ITupleType source)
         {
-            return new CSharpTupleType(source);
+            return new CSharpTupleType(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpTupleType"/> class.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
-        protected CSharpTupleType(ITupleType source)
-            : base(source)
+        protected CSharpTupleType(ICSharpContext context, ITupleType source)
+            : base(context, source)
         {
         }
         #endregion

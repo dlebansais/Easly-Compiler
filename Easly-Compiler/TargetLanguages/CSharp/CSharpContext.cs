@@ -10,16 +10,6 @@
     public interface ICSharpContext
     {
         /// <summary>
-        /// The table of all classes.
-        /// </summary>
-        IDictionary<IClass, ICSharpClass> ClassTable { get; }
-
-        /// <summary>
-        /// The table of all known features.
-        /// </summary>
-        IDictionary<ICompiledFeature, ICSharpFeature> FeatureTable { get; }
-
-        /// <summary>
         /// Gets the C# class from the source class.
         /// </summary>
         /// <param name="sourceClass">The source class.</param>
@@ -45,8 +35,8 @@
         /// <param name="featureTable">The table of all known features.</param>
         public CSharpContext(IDictionary<IClass, ICSharpClass> classTable, IDictionary<ICompiledFeature, ICSharpFeature> featureTable)
         {
-            ClassTable = classTable;
-            FeatureTable = featureTable;
+            ClassTable = new Dictionary<IClass, ICSharpClass>(classTable);
+            FeatureTable = new Dictionary<ICompiledFeature, ICSharpFeature>(featureTable);
         }
         #endregion
 
@@ -54,12 +44,12 @@
         /// <summary>
         /// The table of all classes.
         /// </summary>
-        public IDictionary<IClass, ICSharpClass> ClassTable { get; }
+        public IReadOnlyDictionary<IClass, ICSharpClass> ClassTable { get; }
 
         /// <summary>
         /// The table of all known features.
         /// </summary>
-        public IDictionary<ICompiledFeature, ICSharpFeature> FeatureTable { get; }
+        public IReadOnlyDictionary<ICompiledFeature, ICSharpFeature> FeatureTable { get; }
         #endregion
 
         #region Client Interface

@@ -82,6 +82,14 @@
 
         #region Client Interface
         /// <summary>
+        /// Initializes the feature.
+        /// </summary>
+        /// <param name="context">The initialization context.</param>
+        public override void Init(ICSharpContext context)
+        {
+        }
+
+        /// <summary>
         /// Mark this feature as both read and write.
         /// </summary>
         public void MarkAsForcedReadWrite()

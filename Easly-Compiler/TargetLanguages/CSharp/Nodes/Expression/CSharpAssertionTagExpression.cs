@@ -23,20 +23,20 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpAssertionTagExpression Create(IAssertionTagExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpAssertionTagExpression Create(ICSharpContext context, IAssertionTagExpression source)
         {
-            return new CSharpAssertionTagExpression(source, context);
+            return new CSharpAssertionTagExpression(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpAssertionTagExpression"/> class.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpAssertionTagExpression(IAssertionTagExpression source, ICSharpContext context)
-            : base(source, context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        protected CSharpAssertionTagExpression(ICSharpContext context, IAssertionTagExpression source)
+            : base(context, source)
         {
         }
         #endregion

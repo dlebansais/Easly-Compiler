@@ -39,11 +39,11 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpBinaryOperatorExpression Create(IBinaryOperatorExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpBinaryOperatorExpression Create(ICSharpContext context, IBinaryOperatorExpression source)
         {
-            return new CSharpBinaryOperatorExpression(source, context);
+            return new CSharpBinaryOperatorExpression(context, source);
         }
 
         /// <summary>
@@ -51,11 +51,11 @@
         /// </summary>
         /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpBinaryOperatorExpression(IBinaryOperatorExpression source, ICSharpContext context)
-            : base(source, context)
+        protected CSharpBinaryOperatorExpression(ICSharpContext context, IBinaryOperatorExpression source)
+            : base(context, source)
         {
-            LeftExpression = Create((IExpression)source.LeftExpression, context);
-            RightExpression = Create((IExpression)source.RightExpression, context);
+            LeftExpression = Create(context, (IExpression)source.LeftExpression);
+            RightExpression = Create(context, (IExpression)source.RightExpression);
 
             Operator = context.GetFeature(source.SelectedFeature.Item) as ICSharpFunctionFeature;
             Debug.Assert(Operator != null);

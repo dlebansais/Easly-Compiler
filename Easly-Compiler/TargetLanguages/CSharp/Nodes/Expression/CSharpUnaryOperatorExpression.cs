@@ -34,22 +34,22 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpUnaryOperatorExpression Create(IUnaryOperatorExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpUnaryOperatorExpression Create(ICSharpContext context, IUnaryOperatorExpression source)
         {
-            return new CSharpUnaryOperatorExpression(source, context);
+            return new CSharpUnaryOperatorExpression(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpUnaryOperatorExpression"/> class.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpUnaryOperatorExpression(IUnaryOperatorExpression source, ICSharpContext context)
-            : base(source, context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        protected CSharpUnaryOperatorExpression(ICSharpContext context, IUnaryOperatorExpression source)
+            : base(context, source)
         {
-            RightExpression = Create((IExpression)source.RightExpression, context);
+            RightExpression = Create(context, (IExpression)source.RightExpression);
 
             Operator = context.GetFeature(source.SelectedFeature.Item) as ICSharpFunctionFeature;
             Debug.Assert(Operator != null);

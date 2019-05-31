@@ -34,20 +34,20 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpClassConstantExpression Create(IClassConstantExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpClassConstantExpression Create(ICSharpContext context, IClassConstantExpression source)
         {
-            return new CSharpClassConstantExpression(source, context);
+            return new CSharpClassConstantExpression(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpClassConstantExpression"/> class.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpClassConstantExpression(IClassConstantExpression source, ICSharpContext context)
-            : base(source, context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        protected CSharpClassConstantExpression(ICSharpContext context, IClassConstantExpression source)
+            : base(context, source)
         {
             Feature = context.GetFeature(source.ResolvedFinalFeature.Item) as ICSharpConstantFeature;
             Debug.Assert(Feature != null);

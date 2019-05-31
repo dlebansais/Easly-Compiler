@@ -69,5 +69,15 @@
         /// </summary>
         public string Name { get; }
         #endregion
+
+        #region Client Interface
+        /// <summary>
+        /// Initializes the feature.
+        /// </summary>
+        /// <param name="context">The initialization context.</param>
+        public override void Init(ICSharpContext context)
+        {
+        }
+        #endregion
     }
 }

@@ -22,18 +22,20 @@
         /// <summary>
         /// Create a new C# type.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
-        public static ICSharpPropertyType Create(IPropertyType source)
+        public static ICSharpPropertyType Create(ICSharpContext context, IPropertyType source)
         {
-            return new CSharpPropertyType(source);
+            return new CSharpPropertyType(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpPropertyType"/> class.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly type from which the C# type is created.</param>
-        protected CSharpPropertyType(IPropertyType source)
-            : base(source)
+        protected CSharpPropertyType(ICSharpContext context, IPropertyType source)
+            : base(context, source)
         {
         }
         #endregion

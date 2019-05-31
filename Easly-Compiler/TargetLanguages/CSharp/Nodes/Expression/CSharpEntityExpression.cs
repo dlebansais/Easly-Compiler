@@ -39,20 +39,20 @@
         /// <summary>
         /// Creates a new C# expression.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        public static ICSharpEntityExpression Create(IEntityExpression source, ICSharpContext context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        public static ICSharpEntityExpression Create(ICSharpContext context, IEntityExpression source)
         {
-            return new CSharpEntityExpression(source, context);
+            return new CSharpEntityExpression(context, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpEntityExpression"/> class.
         /// </summary>
-        /// <param name="source">The Easly expression from which the C# expression is created.</param>
         /// <param name="context">The creation context.</param>
-        protected CSharpEntityExpression(IEntityExpression source, ICSharpContext context)
-            : base(source, context)
+        /// <param name="source">The Easly expression from which the C# expression is created.</param>
+        protected CSharpEntityExpression(ICSharpContext context, IEntityExpression source)
+            : base(context, source)
         {
             if (Source.ResolvedFinalFeature.IsAssigned)
                 Feature = context.GetFeature(Source.ResolvedFinalFeature.Item);
@@ -71,7 +71,7 @@
 
             Debug.Assert((Feature != null && Discrete == null) || (Feature == null && Discrete != null));
 
-            Query = CSharpQualifiedName.Create((IQualifiedName)Source.Query, Feature, Discrete, false, context);
+            Query = CSharpQualifiedName.Create(context, (IQualifiedName)Source.Query, Feature, Discrete, false);
         }
         #endregion
 
