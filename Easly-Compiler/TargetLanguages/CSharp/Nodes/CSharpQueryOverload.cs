@@ -67,7 +67,7 @@
                 ResultList.Add(NewResult);
             }
 
-            Body = CSharpBody.Create(context, source.ResolvedBody.Item);
+            Body = CSharpBody.Create(context, parentFeature, source.ResolvedBody.Item);
         }
         #endregion
 

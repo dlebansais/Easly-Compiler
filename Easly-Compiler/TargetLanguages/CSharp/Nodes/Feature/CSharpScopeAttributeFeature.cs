@@ -36,6 +36,13 @@
         /// The attribute type.
         /// </summary>
         ICSharpType Type { get; }
+
+        /// <summary>
+        /// Writes down the C# feature.
+        /// </summary>
+        /// <param name="writer">The stream on which to write.</param>
+        /// <param name="outputNamespace">Namespace for the output code.</param>
+        void WriteCSharp(ICSharpWriter writer, string outputNamespace);
     }
 
     /// <summary>
@@ -99,6 +106,36 @@
 
             if (Source.DefaultValue.IsAssigned)
                 DefaultValue = CSharpExpression.Create(context, Source.DefaultValue.Item);
+        }
+
+        /// <summary>
+        /// Writes down the C# feature.
+        /// </summary>
+        /// <param name="writer">The stream on which to write.</param>
+        /// <param name="outputNamespace">Namespace for the output code.</param>
+        public void WriteCSharp(ICSharpWriter writer, string outputNamespace)
+        {
+            string NameString = CSharpNames.ToCSharpIdentifier(Name);
+            string TypeString = Type.Type2CSharpString(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+            string DefaultValueText = string.Empty;
+
+            if (DefaultValue != null)
+            {
+                DefaultValueText = DefaultValue.CSharpText(outputNamespace);
+                if (DefaultValue.IsComplex)
+                    DefaultValueText = $"({DefaultValueText})";
+            }
+
+            if (DefaultValueText.Length == 0)
+            {
+                if (Type.GetSingletonString(outputNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None, out string SingletonString))
+                    DefaultValueText = SingletonString;
+            }
+
+            if (DefaultValueText.Length > 0)
+                DefaultValueText = $" = {DefaultValueText}";
+
+            writer.WriteIndentedLine($"{TypeString} {NameString}{DefaultValueText};");
         }
 
         /// <summary>

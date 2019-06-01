@@ -648,6 +648,7 @@
     <Compile Include="TargetLanguages\CSharp\CSharpNames.cs" />
     <Compile Include="TargetLanguages\CSharp\CSharpWriter.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\CSharpCommandOverload.cs" />
+    <Compile Include="TargetLanguages\CSharp\Nodes\CSharpAssertion.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\CSharpQueryOverload.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\CSharpDiscrete.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\CSharpConstraint.cs" />

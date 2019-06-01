@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Diagnostics;
+    using CompilerNode;
 
     /// <summary>
     /// A C# parameter node.
@@ -44,10 +45,10 @@
         protected CSharpParameter(ICSharpContext context, IParameter source, ICSharpClass owner)
             : base(source)
         {
-            Feature = CSharpScopeAttributeFeature.Create(owner, source.ResolvedParameter);
-            Debug.Assert(Feature != null);
+            ICSharpFeature ParameterFeature = CSharpScopeAttributeFeature.Create(owner, source.ResolvedParameter);
+            ParameterFeature.Init(context);
 
-            ((ICSharpFeature)Feature).Init(context);
+            Feature = (ICSharpScopeAttributeFeature)ParameterFeature;
         }
         #endregion
 

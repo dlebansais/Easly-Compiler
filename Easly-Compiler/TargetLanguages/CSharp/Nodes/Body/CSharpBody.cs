@@ -1,6 +1,5 @@
 ﻿namespace EaslyCompiler
 {
-    using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
 
@@ -13,6 +12,11 @@
         /// The Easly body from which the C# body is created.
         /// </summary>
         IBody Source { get; }
+
+        /// <summary>
+        /// The parent feature.
+        /// </summary>
+        ICSharpFeature ParentFeature { get; }
     }
 
     /// <summary>
@@ -25,27 +29,28 @@
         /// Creates a new C# body.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly body from which the C# body is created.</param>
-        public static ICSharpBody Create(ICSharpContext context, ICompiledBody source)
+        public static ICSharpBody Create(ICSharpContext context, ICSharpFeature parentFeature, ICompiledBody source)
         {
             ICSharpBody Result = null;
 
             switch (source)
             {
                 case IDeferredBody AsDeferredBody:
-                    Result = CSharpDeferredBody.Create(context, AsDeferredBody);
+                    Result = CSharpDeferredBody.Create(context, parentFeature, AsDeferredBody);
                     break;
 
                 case IEffectiveBody AsEffectiveBody:
-                    Result = CSharpEffectiveBody.Create(context, AsEffectiveBody);
+                    Result = CSharpEffectiveBody.Create(context, parentFeature, AsEffectiveBody);
                     break;
 
                 case IExternBody AsExternBody:
-                    Result = CSharpExternBody.Create(context, AsExternBody);
+                    Result = CSharpExternBody.Create(context, parentFeature, AsExternBody);
                     break;
 
                 case IPrecursorBody AsPrecursorBody:
-                    Result = CSharpPrecursorBody.Create(context, AsPrecursorBody);
+                    Result = CSharpPrecursorBody.Create(context, parentFeature, AsPrecursorBody);
                     break;
             }
 
@@ -58,11 +63,13 @@
         /// Initializes a new instance of the <see cref="CSharpBody"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly body from which the C# body is created.</param>
-        protected CSharpBody(ICSharpContext context, IBody source)
+        protected CSharpBody(ICSharpContext context, ICSharpFeature parentFeature, IBody source)
         {
             Debug.Assert(source != null);
 
+            ParentFeature = parentFeature;
             Source = source;
         }
         #endregion
@@ -72,6 +79,11 @@
         /// The Easly body from which the C# body is created.
         /// </summary>
         public IBody Source { get; }
+
+        /// <summary>
+        /// The parent feature.
+        /// </summary>
+        public ICSharpFeature ParentFeature { get; }
         #endregion
     }
 }

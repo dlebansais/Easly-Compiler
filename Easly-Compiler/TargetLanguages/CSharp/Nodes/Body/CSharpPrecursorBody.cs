@@ -23,19 +23,21 @@
         /// Creates a new C# body.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly body from which the C# body is created.</param>
-        public static ICSharpPrecursorBody Create(ICSharpContext context, IPrecursorBody source)
+        public static ICSharpPrecursorBody Create(ICSharpContext context, ICSharpFeature parentFeature, IPrecursorBody source)
         {
-            return new CSharpPrecursorBody(context, source);
+            return new CSharpPrecursorBody(context, parentFeature, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpPrecursorBody"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly body from which the C# body is created.</param>
-        protected CSharpPrecursorBody(ICSharpContext context, IPrecursorBody source)
-            : base(context, source)
+        protected CSharpPrecursorBody(ICSharpContext context, ICSharpFeature parentFeature, IPrecursorBody source)
+            : base(context, parentFeature, source)
         {
         }
         #endregion

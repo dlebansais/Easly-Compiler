@@ -148,10 +148,10 @@
             EntityType = CSharpType.Create(context, Source.ResolvedEntityType.Item);
 
             if (Source.GetterBody.IsAssigned)
-                GetterBody = CSharpBody.Create(context, (ICompiledBody)Source.GetterBody.Item);
+                GetterBody = CSharpBody.Create(context, this, (ICompiledBody)Source.GetterBody.Item);
 
             if (Source.SetterBody.IsAssigned)
-                SetterBody = CSharpBody.Create(context, (ICompiledBody)Source.SetterBody.Item);
+                SetterBody = CSharpBody.Create(context, this, (ICompiledBody)Source.SetterBody.Item);
         }
 
         /// <summary>
