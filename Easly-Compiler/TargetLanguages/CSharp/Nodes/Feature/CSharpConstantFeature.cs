@@ -26,6 +26,16 @@
         /// True if this feature as an override of a virtual parent.
         /// </summary>
         new bool IsOverride { get; }
+
+        /// <summary>
+        /// The constant type.
+        /// </summary>
+        ICSharpType Type { get; }
+
+        /// <summary>
+        /// The constant value as an expression.
+        /// </summary>
+        ICSharpExpression ConstantExpression { get; }
     }
 
     /// <summary>
@@ -68,6 +78,16 @@
         /// The feature name.
         /// </summary>
         public string Name { get; }
+
+        /// <summary>
+        /// The constant type.
+        /// </summary>
+        public ICSharpType Type { get; private set; }
+
+        /// <summary>
+        /// The constant value as an expression.
+        /// </summary>
+        public ICSharpExpression ConstantExpression { get; private set; }
         #endregion
 
         #region Client Interface
@@ -77,6 +97,42 @@
         /// <param name="context">The initialization context.</param>
         public override void Init(ICSharpContext context)
         {
+            Type = CSharpType.Create(context, Source.ResolvedEntityType.Item);
+            ConstantExpression = CSharpExpression.Create(context, (IExpression)Source.ConstantValue);
+        }
+
+        /// <summary>
+        /// Writes down the C# feature.
+        /// </summary>
+        /// <param name="writer">The stream on which to write.</param>
+        /// <param name="outputNamespace">Namespace for the output code.</param>
+        /// <param name="featureTextType">The write mode.</param>
+        /// <param name="exportStatus">The feature export status.</param>
+        /// <param name="isLocal">True if the feature is local to the class.</param>
+        /// <param name="isFirstFeature">True if the feature is the first in a list.</param>
+        /// <param name="isMultiline">True if there is a separating line above.</param>
+        public override void WriteCSharp(ICSharpWriter writer, string outputNamespace, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
+        {
+            if (isMultiline)
+                writer.WriteLine();
+
+            isFirstFeature = false;
+            isMultiline = false;
+
+            if (featureTextType == CSharpFeatureTextTypes.Implementation)
+                WriteCSharpImplementation(writer, outputNamespace, exportStatus, isLocal, ref isFirstFeature, ref isMultiline);
+        }
+
+        private void WriteCSharpImplementation(ICSharpWriter writer, string outputNamespace, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
+        {
+            writer.WriteDocumentation(Source);
+
+            string TypeString = Type.Type2CSharpString(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+            string AttributeString = CSharpNames.ToCSharpIdentifier(Name);
+            string ValueString = ConstantExpression.CSharpText(outputNamespace);
+            string ExportStatusText = CSharpNames.ComposedExportStatus(false, false, true, exportStatus);
+
+            writer.WriteIndentedLine($"{ExportStatusText} const {TypeString} {AttributeString} = {ValueString};");
         }
         #endregion
     }

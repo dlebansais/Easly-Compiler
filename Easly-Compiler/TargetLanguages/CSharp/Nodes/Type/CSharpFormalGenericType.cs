@@ -17,12 +17,6 @@
         /// The associated generic.
         /// </summary>
         ICSharpGeneric Generic { get; }
-
-        /// <summary>
-        /// Sets the <see cref="Generic"/> property.
-        /// </summary>
-        /// <param name="generic">The associated generic.</param>
-        void SetGeneric(ICSharpGeneric generic);
     }
 
     /// <summary>
@@ -49,6 +43,7 @@
         protected CSharpFormalGenericType(ICSharpContext context, IFormalGenericType source)
             : base(context, source)
         {
+            Generic = context.GetGeneric(Source.FormalGeneric);
         }
         #endregion
 
@@ -70,18 +65,6 @@
         #endregion
 
         #region Client Interface
-        /// <summary>
-        /// Sets the <see cref="Generic"/> property.
-        /// </summary>
-        /// <param name="generic">The associated generic.</param>
-        public void SetGeneric(ICSharpGeneric generic)
-        {
-            Debug.Assert(generic != null && generic.Type == this);
-            Debug.Assert(Generic == null);
-
-            Generic = generic;
-        }
-
         /// <summary>
         /// Get the name of a type.
         /// </summary>

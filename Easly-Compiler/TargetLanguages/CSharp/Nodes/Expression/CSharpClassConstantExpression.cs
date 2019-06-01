@@ -20,6 +20,11 @@
         ICSharpConstantFeature Feature { get; }
 
         /// <summary>
+        /// The constant discrete.
+        /// </summary>
+        ICSharpDiscrete Discrete { get; }
+
+        /// <summary>
         /// The feature class.
         /// </summary>
         ICSharpClass Class { get; }
@@ -49,8 +54,13 @@
         protected CSharpClassConstantExpression(ICSharpContext context, IClassConstantExpression source)
             : base(context, source)
         {
-            Feature = context.GetFeature(source.ResolvedFinalFeature.Item) as ICSharpConstantFeature;
-            Debug.Assert(Feature != null);
+            if (source.ResolvedFinalFeature.IsAssigned)
+                Feature = context.GetFeature(source.ResolvedFinalFeature.Item) as ICSharpConstantFeature;
+
+            if (source.ResolvedFinalDiscrete.IsAssigned)
+                Discrete = CSharpDiscrete.Create(context, source.ResolvedFinalDiscrete.Item);
+
+            Debug.Assert((Feature != null && Discrete == null) || (Feature == null && Discrete != null));
         }
         #endregion
 
@@ -71,9 +81,14 @@
         public ICSharpConstantFeature Feature { get; }
 
         /// <summary>
+        /// The constant discrete.
+        /// </summary>
+        public ICSharpDiscrete Discrete { get; }
+
+        /// <summary>
         /// The feature class.
         /// </summary>
-        public ICSharpClass Class { get { return Feature.Owner; } }
+        public ICSharpClass Class { get { return Feature?.Owner; } }
         #endregion
 
         #region Client Interface
@@ -93,10 +108,13 @@
         /// <param name="destinationList">The list of destinations.</param>
         public virtual string CSharpText(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
         {
-            if (Class.ValidSourceName == "Microsoft .NET")
-                return CSharpNames.ToDotNetIdentifier(Class.ValidClassName) + "." + CSharpNames.ToDotNetIdentifier(Feature.Name);
+            if (Feature != null)
+                if (Class.ValidSourceName == "Microsoft .NET")
+                    return CSharpNames.ToDotNetIdentifier(Class.ValidClassName) + "." + CSharpNames.ToDotNetIdentifier(Feature.Name);
+                else
+                    return CSharpNames.ToCSharpIdentifier(Class.ValidClassName) + "." + CSharpNames.ToCSharpIdentifier(Feature.Name);
             else
-                return CSharpNames.ToCSharpIdentifier(Class.ValidClassName) + "." + CSharpNames.ToCSharpIdentifier(Feature.Name);
+                return CSharpNames.ToCSharpIdentifier(Discrete.Name);
         }
         #endregion
     }

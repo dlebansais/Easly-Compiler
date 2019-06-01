@@ -98,6 +98,16 @@
         CSharpConstructorTypes ClassConstructorType { get; }
 
         /// <summary>
+        /// True if the class is a .NET event.
+        /// </summary>
+        bool IsDotNetEventClass { get; }
+
+        /// <summary>
+        /// True if the class inherits from one of the .NET events.
+        /// </summary>
+        bool InheritFromDotNetEvent { get; }
+
+        /// <summary>
         /// Sets the base class.
         /// </summary>
         /// <param name="baseClass">The base class.</param>
@@ -198,6 +208,12 @@
         {
             ValidClassName = source.ValidClassName;
             ValidSourceName = source.ValidSourceName;
+
+            foreach (IGeneric Item in Source.GenericList)
+            {
+                ICSharpGeneric NewGeneric = CSharpGeneric.Create(Item);
+                GenericList.Add(NewGeneric);
+            }
         }
         #endregion
 
@@ -303,6 +319,30 @@
                     return CSharpConstructorTypes.ManyConstructors;
             }
         }
+
+        /// <summary>
+        /// True if the class is a .NET event.
+        /// </summary>
+        public bool IsDotNetEventClass { get { return ValidClassName == ".NET Event" && ValidSourceName == "Microsoft .NET"; } }
+
+        /// <summary>
+        /// True if the class inherits from one of the .NET events.
+        /// </summary>
+        public bool InheritFromDotNetEvent
+        {
+            get
+            {
+                if (IsDotNetEventClass)
+                    return true;
+
+                foreach (ICSharpInheritance Inheritance in InheritanceList)
+                    if (Inheritance.AncestorClass != null)
+                        if (Inheritance.AncestorClass.InheritFromDotNetEvent)
+                            return true;
+
+                return false;
+            }
+        }
         #endregion
 
         #region Client Interface
@@ -365,11 +405,8 @@
 
             Type = CSharpClassType.Create(context, Source.ResolvedClassType.Item);
 
-            foreach (IGeneric Item in Source.GenericList)
-            {
-                ICSharpGeneric NewGeneric = CSharpGeneric.Create(context, Item);
-                GenericList.Add(NewGeneric);
-            }
+            foreach (ICSharpGeneric Generic in GenericList)
+                Generic.Init(context);
 
             foreach (ITypedef Item in Source.TypedefList)
             {
@@ -761,7 +798,7 @@
 
                 bool IsMultiline = false;
                 bool IsFirstFeature = true;
-                //SourceFeature.WriteCSharp(writer, outputNamespace, FeatureTextTypes.Interface, CSharpExports.None, Entry.Key.Name, Instance, IsLocal, ref IsFirstFeature, ref IsMultiline);
+                Feature.WriteCSharp(writer, outputNamespace, CSharpFeatureTextTypes.Interface, CSharpExports.None, IsLocal, ref IsFirstFeature, ref IsMultiline);
             }
 
             writer.DecreaseIndent();
@@ -1054,7 +1091,7 @@
                                 Feature.MarkPrecursorAsCoexisting(Entry.Key);
                         }
 
-                        //SourceFeature.WriteCSharp(sw, Context, FeatureTextTypes.Implementation, ExportStatus, Entry.Key.Name, Instance, IsLocal, ref IsFirstFeature, ref IsMultiline);
+                        Feature.WriteCSharp(writer, outputNamespace, CSharpFeatureTextTypes.Implementation, ExportStatus, IsLocal, ref IsFirstFeature, ref IsMultiline);
                         WrittenFeatures++;
 
                         if (!string.IsNullOrEmpty(Feature.CoexistingPrecursorName) && Instance.PrecursorList.Count > 0)
@@ -1066,7 +1103,8 @@
                             IClass SourcePrecursorClass = CoexistingPrecursor.Owner.Item;
                             CSharpExports PrecursorExportStatus = CSharpExports.Private;
 
-                            //SourcePrecursorFeature.WriteCSharp(sw, Context, FeatureTextTypes.Implementation, PrecursorExportStatus, Entry.Key.Name + " " + "Base", CoexistingPrecursor, false, ref IsFirstFeature, ref IsMultiline);
+                            ICSharpFeature PrecursorFeature = null;
+                            PrecursorFeature.WriteCSharp(writer, outputNamespace, CSharpFeatureTextTypes.Implementation, PrecursorExportStatus, false, ref IsFirstFeature, ref IsMultiline);
                             WrittenFeatures++;
                         }
                     }

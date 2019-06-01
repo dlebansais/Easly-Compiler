@@ -136,9 +136,7 @@
             else*/
                 Result = string.Empty;
 
-            IList<IExpressionType> TypePath = Source.ValidResultTypePath.Item;
-
-            for (; i + skippedAtEnd < TypePath.Count; i++)
+            for (; i + skippedAtEnd < Source.ValidPath.Item.Count && i + skippedAtEnd < ClassPath.Count; i++)
             {
                 if (Result.Length > 0)
                     Result += ".";

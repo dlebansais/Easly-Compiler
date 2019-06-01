@@ -27,6 +27,12 @@
         /// The list of constraints.
         /// </summary>
         IList<ICSharpConstraint> ConstraintList { get; }
+
+        /// <summary>
+        /// Initializes the C# generic.
+        /// </summary>
+        /// <param name="context">The creation context.</param>
+        void Init(ICSharpContext context);
     }
 
     /// <summary>
@@ -38,30 +44,20 @@
         /// <summary>
         /// Create a new C# generic.
         /// </summary>
-        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
-        public static ICSharpGeneric Create(ICSharpContext context, IGeneric source)
+        public static ICSharpGeneric Create(IGeneric source)
         {
-            return new CSharpGeneric(context, source);
+            return new CSharpGeneric(source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpGeneric"/> class.
         /// </summary>
-        /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
-        protected CSharpGeneric(ICSharpContext context, IGeneric source)
+        protected CSharpGeneric(IGeneric source)
             : base(source)
         {
             Name = ((IName)source.EntityName).ValidText.Item;
-            Type = CSharpFormalGenericType.Create(context, source.ResolvedGenericType.Item);
-            Type.SetGeneric(this);
-
-            foreach (IConstraint Constraint in source.ConstraintList)
-            {
-                ICSharpConstraint NewConstraint = CSharpConstraint.Create(context, Constraint);
-                ConstraintList.Add(NewConstraint);
-            }
         }
         #endregion
 
@@ -74,7 +70,7 @@
         /// <summary>
         /// The corresponding type.
         /// </summary>
-        public ICSharpFormalGenericType Type { get; }
+        public ICSharpFormalGenericType Type { get; private set; }
 
         /// <summary>
         /// True if the generic is used to create at least one object.
@@ -85,6 +81,23 @@
         /// The list of constraints.
         /// </summary>
         public IList<ICSharpConstraint> ConstraintList { get; } = new List<ICSharpConstraint>();
+        #endregion
+
+        #region Client Interface
+        /// <summary>
+        /// Initializes the C# generic.
+        /// </summary>
+        /// <param name="context">The creation context.</param>
+        public void Init(ICSharpContext context)
+        {
+            Type = CSharpFormalGenericType.Create(context, Source.ResolvedGenericType.Item);
+
+            foreach (IConstraint Constraint in Source.ConstraintList)
+            {
+                ICSharpConstraint NewConstraint = CSharpConstraint.Create(context, Constraint);
+                ConstraintList.Add(NewConstraint);
+            }
+        }
         #endregion
     }
 }

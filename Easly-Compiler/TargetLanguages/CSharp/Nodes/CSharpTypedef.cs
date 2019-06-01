@@ -47,19 +47,6 @@
         {
             Name = ((IName)source.EntityName).ValidText.Item;
             Type = CSharpType.Create(context, source.ResolvedDefinedType.Item);
-
-            if (Type is ICSharpFormalGenericType AsFormalGenericType)
-            {
-                ICSharpGeneric Generic = null;
-                foreach (ICSharpGeneric Item in embeddingClass.GenericList)
-                    if (Item.Source == AsFormalGenericType.Source.FormalGeneric)
-                    {
-                        Debug.Assert(Generic == null);
-                        Generic = Item;
-                    }
-
-                AsFormalGenericType.SetGeneric(Generic);
-            }
         }
         #endregion
 

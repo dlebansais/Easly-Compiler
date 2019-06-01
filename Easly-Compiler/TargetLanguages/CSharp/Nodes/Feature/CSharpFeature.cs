@@ -56,6 +56,18 @@
         /// </summary>
         /// <param name="coexistingPrecursorName">The name of the precursor.</param>
         void MarkPrecursorAsCoexisting(string coexistingPrecursorName);
+
+        /// <summary>
+        /// Writes down the C# feature.
+        /// </summary>
+        /// <param name="writer">The stream on which to write.</param>
+        /// <param name="outputNamespace">Namespace for the output code.</param>
+        /// <param name="featureTextType">The write mode.</param>
+        /// <param name="exportStatus">The feature export status.</param>
+        /// <param name="isLocal">True if the feature is local to the class.</param>
+        /// <param name="isFirstFeature">True if the feature is the first in a list.</param>
+        /// <param name="isMultiline">True if there is a separating line above.</param>
+        void WriteCSharp(ICSharpWriter writer, string outputNamespace, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline);
     }
 
     /// <summary>
@@ -183,6 +195,18 @@
         /// </summary>
         /// <param name="context">The initialization context.</param>
         public abstract void Init(ICSharpContext context);
+
+        /// <summary>
+        /// Writes down the C# feature.
+        /// </summary>
+        /// <param name="writer">The stream on which to write.</param>
+        /// <param name="outputNamespace">Namespace for the output code.</param>
+        /// <param name="featureTextType">The write mode.</param>
+        /// <param name="exportStatus">The feature export status.</param>
+        /// <param name="isLocal">True if the feature is local to the class.</param>
+        /// <param name="isFirstFeature">True if the feature is the first in a list.</param>
+        /// <param name="isMultiline">True if there is a separating line above.</param>
+        public abstract void WriteCSharp(ICSharpWriter writer, string outputNamespace, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline);
 
         /// <summary>
         /// Mark this feature as an override of a virtual parent.

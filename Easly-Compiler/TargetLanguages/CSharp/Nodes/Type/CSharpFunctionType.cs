@@ -86,12 +86,19 @@
         {
             SetUsedInCode();
 
-            Debug.Assert(OriginatingTypedef != null);
+            string Result;
 
-            // TODO: detect delegate call parameters to select the proper overload
-            string DelegateName = CSharpNames.ToCSharpIdentifier(OriginatingTypedef.Name);
+            if (OriginatingTypedef != null)
+            {
+                // TODO: detect delegate call parameters to select the proper overload
+                string DelegateName = CSharpNames.ToCSharpIdentifier(OriginatingTypedef.Name);
 
-            return QueryOverloadType2CSharpString(DelegateName, Source.OverloadList[0]);
+                Result = QueryOverloadType2CSharpString(DelegateName, Source.OverloadList[0]);
+            }
+            else
+                Result = "<Not supported>";
+
+            return Result;
         }
 
         private string QueryOverloadType2CSharpString(string delegateName, IQueryOverloadType overload)

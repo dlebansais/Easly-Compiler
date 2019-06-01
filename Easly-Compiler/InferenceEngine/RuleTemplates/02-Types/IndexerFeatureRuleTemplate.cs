@@ -253,6 +253,10 @@
             node.IndexerParameterTable.Merge(CheckedScope);
             node.IndexerParameterTable.Seal();
 
+            foreach (KeyValuePair<string, IScopeAttributeFeature> Entry in CheckedScope)
+                node.ParameterTable.Add(new Parameter(Entry.Key, Entry.Value));
+            node.ParameterTable.Seal();
+
             if (node.GetterBody.IsAssigned)
                 EmbeddingClass.BodyList.Add((IBody)node.GetterBody.Item);
 

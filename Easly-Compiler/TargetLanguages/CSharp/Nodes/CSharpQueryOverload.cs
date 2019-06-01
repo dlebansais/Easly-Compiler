@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -9,9 +10,19 @@
     public interface ICSharpQueryOverload : ICSharpSource<IQueryOverload>, ICSharpOverload
     {
         /// <summary>
+        /// The precursor overload. Can be null.
+        /// </summary>
+        new ICSharpQueryOverload Precursor { get; }
+
+        /// <summary>
         /// The list of results.
         /// </summary>
         IList<ICSharpParameter> ResultList { get; }
+
+        /// <summary>
+        /// The overload body.
+        /// </summary>
+        ICSharpBody Body { get; }
     }
 
     /// <summary>
@@ -25,10 +36,11 @@
         /// </summary>
         /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="owner">The class where the overload is declared.</param>
-        public static ICSharpQueryOverload Create(ICSharpContext context, IQueryOverload source, ICSharpClass owner)
+        public static ICSharpQueryOverload Create(ICSharpContext context, IQueryOverload source, ICSharpFeature parentFeature, ICSharpClass owner)
         {
-            return new CSharpQueryOverload(context, source, owner);
+            return new CSharpQueryOverload(context, source, parentFeature, owner);
         }
 
         /// <summary>
@@ -36,10 +48,13 @@
         /// </summary>
         /// <param name="context">The creation context.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="owner">The class where the overload is declared.</param>
-        protected CSharpQueryOverload(ICSharpContext context, IQueryOverload source, ICSharpClass owner)
+        protected CSharpQueryOverload(ICSharpContext context, IQueryOverload source, ICSharpFeature parentFeature, ICSharpClass owner)
             : base(source)
         {
+            ParentFeature = parentFeature;
+
             foreach (IParameter Parameter in source.ParameterTable)
             {
                 ICSharpParameter NewParameter = CSharpParameter.Create(context, Parameter, owner);
@@ -51,10 +66,17 @@
                 ICSharpParameter NewResult = CSharpParameter.Create(context, Result, owner);
                 ResultList.Add(NewResult);
             }
+
+            Body = CSharpBody.Create(context, source.ResolvedBody.Item);
         }
         #endregion
 
         #region Properties
+        /// <summary>
+        /// The parent feature.
+        /// </summary>
+        public ICSharpFeature ParentFeature { get; }
+
         /// <summary>
         /// The list of parameters.
         /// </summary>
@@ -64,6 +86,144 @@
         /// The list of results.
         /// </summary>
         public IList<ICSharpParameter> ResultList { get; } = new List<ICSharpParameter>();
+
+        /// <summary>
+        /// The overload body.
+        /// </summary>
+        public ICSharpBody Body { get; }
+
+        /// <summary>
+        /// The precursor overload. Can be null.
+        /// </summary>
+        public ICSharpQueryOverload Precursor { get; private set; }
+        ICSharpOverload ICSharpOverload.Precursor { get { return Precursor; } }
+        #endregion
+
+        #region Client Interface
+        /// <summary>
+        /// Writes down the C# overload of a feature.
+        /// </summary>
+        /// <param name="writer">The stream on which to write.</param>
+        /// <param name="outputNamespace">Namespace for the output code.</param>
+        /// <param name="featureTextType">The write mode.</param>
+        /// <param name="isOverride">True if the feature is an override.</param>
+        /// <param name="nameString">The composed feature name.</param>
+        /// <param name="exportStatus">The feature export status.</param>
+        /// <param name="isConstructor">True if the feature is a constructor.</param>
+        /// <param name="isFirstFeature">True if the feature is the first in a list.</param>
+        /// <param name="isMultiline">True if there is a separating line above.</param>
+        public void WriteCSharp(ICSharpWriter writer, string outputNamespace, CSharpFeatureTextTypes featureTextType, bool isOverride, string nameString, CSharpExports exportStatus, bool isConstructor, ref bool isFirstFeature, ref bool isMultiline)
+        {
+            IList<ICSharpParameter> SelectedParameterList = ParameterList;
+            IList<ICSharpParameter> SelectedResultList = ResultList;
+
+            if (isOverride && Precursor != null)
+            {
+                SelectedParameterList = Precursor.ParameterList;
+                SelectedResultList = Precursor.ResultList;
+            }
+
+            CSharpArgument.BuildParameterList(SelectedParameterList, SelectedResultList, featureTextType, outputNamespace, out string ArgumentEntityList, out string ArgumentNameList, out string ResultType);
+            string ExportStatusText;
+
+            if (featureTextType == CSharpFeatureTextTypes.Implementation)
+            {
+                bool IsHandled = false;
+
+                switch (Body)
+                {
+                    case ICSharpDeferredBody AsDeferredBody:
+                        //Assertion.WriteContract(sw, AsDeferredBody.RequireList, AsDeferredBody.EnsureList, ContractLocations.Other, true, ref IsFirstFeature, ref IsMultiline);
+                        ExportStatusText = CSharpNames.ComposedExportStatus(false, true, false, exportStatus);
+                        writer.WriteIndentedLine($"{ExportStatusText} {ResultType} {nameString}({ArgumentEntityList});");
+                        isMultiline = false;
+                        IsHandled = true;
+                        break;
+
+                    case ICSharpEffectiveBody AsEffectiveBody:
+                        //Assertion.WriteContract(sw, AsEffectiveBody.RequireList, AsEffectiveBody.EnsureList, ContractLocations.Other, true, ref IsFirstFeature, ref IsMultiline);
+
+                        CSharpBodyFlags Flags = CSharpBodyFlags.MandatoryCurlyBrackets;
+                        string ResultString = string.Empty;
+                        List<string> InitialisationStringList = new List<string>();
+
+                        if (ResultList.Count == 1)
+                        {
+                            Flags |= CSharpBodyFlags.HasResult;
+                            ICSharpParameter Result = ResultList[0];
+                            ResultString = Result.Feature.Type.Type2CSharpString(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+                        }
+                        else
+                        {
+                            foreach (ICSharpParameter Item in ResultList)
+                            {
+                                string InitValueString;
+
+                                ICSharpType ResultEntityType = Item.Feature.Type;
+
+                                if (ResultEntityType is ICSharpClassType AsClassType)
+                                {
+                                    // TODO: when the type inherit from Enumeration
+                                    if (AsClassType.Class.Source.ClassGuid == LanguageClasses.AnyOptionalReference.Guid)
+                                        InitValueString = "new OptionalReference<>(null)"; // TODO
+
+                                    else if (AsClassType.Class.Source.ClassGuid == LanguageClasses.String.Guid)
+                                        InitValueString = "\"\"";
+
+                                    else if (AsClassType.Class.Source.ClassGuid == LanguageClasses.Boolean.Guid)
+                                        InitValueString = "false";
+
+                                    else if (AsClassType.Class.Source.ClassGuid == LanguageClasses.Character.Guid)
+                                        InitValueString = "'\0'";
+
+                                    else if (AsClassType.Class.Source.ClassGuid == LanguageClasses.Number.Guid)
+                                        InitValueString = "0";
+
+                                    else
+                                        InitValueString = "null";
+                                }
+
+                                else
+                                    InitValueString = "null"; // TODO : tuples
+
+                                string InitNameString = CSharpNames.ToCSharpIdentifier(Item.Name);
+
+                                InitialisationStringList.Add($"{InitNameString} = {InitValueString};");
+                            }
+                        }
+
+                        ExportStatusText = CSharpNames.ComposedExportStatus(isOverride, false, false, exportStatus);
+                        writer.WriteIndentedLine($"{ExportStatusText} {ResultType} {nameString}({ArgumentEntityList})");
+
+                        AsEffectiveBody.WriteCSharp(writer, outputNamespace, Flags, ResultString, false, InitialisationStringList);
+                        isMultiline = true;
+                        IsHandled = true;
+                        break;
+
+                    case ICSharpPrecursorBody AsPrecursorBody:
+                        if (isMultiline)
+                            writer.WriteLine();
+
+                        ExportStatusText = CSharpNames.ComposedExportStatus(true, false, false, exportStatus);
+                        writer.WriteIndentedLine($"{ExportStatusText} {ResultType} {nameString}({ArgumentEntityList})");
+                        writer.WriteIndentedLine("{");
+                        writer.IncreaseIndent();
+                        writer.WriteIndentedLine($"return base.{nameString}({ArgumentNameList});");
+                        writer.DecreaseIndent();
+                        writer.WriteIndentedLine("}");
+                        isMultiline = true;
+                        IsHandled = true;
+                        break;
+                }
+
+                Debug.Assert(IsHandled);
+            }
+            else
+            {
+                writer.WriteIndentedLine($"{ResultType} {nameString}({ArgumentEntityList});");
+                isMultiline = false;
+            }
+        }
         #endregion
     }
 }

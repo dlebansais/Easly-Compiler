@@ -153,6 +153,26 @@
 
             return Result;
         }
+
+        /// <summary>
+        /// Gets the singleton text corresponding to this type, if any.
+        /// </summary>
+        /// <param name="outputNamespace">The current namespace.</param>
+        /// <param name="cSharpTypeFormat">The type format.</param>
+        /// <param name="cSharpNamespaceFormat">The namespace format.</param>
+        /// <param name="text">The singleton text upon return, if successful.</param>
+        public override bool GetSingletonString(string outputNamespace, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat, out string text)
+        {
+            text = null;
+
+            if (Class.Source.Cloneable != BaseNode.CloneableStatus.Single)
+                return false;
+
+            string ClassTypeText = Type2CSharpString(outputNamespace, cSharpTypeFormat, cSharpNamespaceFormat);
+
+            text = $"{ClassTypeText}.Singleton";
+            return true;
+        }
         #endregion
 
         #region Debugging

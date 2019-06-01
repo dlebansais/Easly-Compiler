@@ -243,6 +243,77 @@
                 parameterNameListText += ParameterNameText;
             }
         }
+
+        /// <summary>
+        /// Builds a list of parameters, with and without their type.
+        /// </summary>
+        /// <param name="parameterList">The list of parameters.</param>
+        /// <param name="resultList">The list of results.</param>
+        /// <param name="featureTextType">The write mode.</param>
+        /// <param name="outputNamespace">The current namespace.</param>
+        /// <param name="parameterListText">The list of parameters with type upon return.</param>
+        /// <param name="parameterNameListText">The list of parameters without type upon return.</param>
+        /// <param name="resultTypeText">The type text upon return.</param>
+        public static void BuildParameterList(IList<ICSharpParameter> parameterList, IList<ICSharpParameter> resultList, CSharpFeatureTextTypes featureTextType, string outputNamespace, out string parameterListText, out string parameterNameListText, out string resultTypeText)
+        {
+            parameterListText = string.Empty;
+            parameterNameListText = string.Empty;
+
+            foreach (ICSharpParameter Parameter in parameterList)
+            {
+                if (parameterListText.Length > 0)
+                    parameterListText += ", ";
+                if (parameterNameListText.Length > 0)
+                    parameterNameListText += ", ";
+
+                string ParameterName = Parameter.Name;
+                ICSharpType ParameterType = Parameter.Feature.Type;
+
+                CSharpTypeFormats ParameterFormat = ParameterType.HasInterfaceText ? CSharpTypeFormats.AsInterface : CSharpTypeFormats.Normal;
+
+                string ParameterText = ParameterType.Type2CSharpString(outputNamespace, ParameterFormat, CSharpNamespaceFormats.None);
+                string ParameterNameText = CSharpNames.ToCSharpIdentifier(ParameterName);
+
+                parameterListText += $"{ParameterText} {ParameterNameText}";
+                parameterNameListText += ParameterNameText;
+            }
+
+            if (resultList.Count == 1)
+            {
+                ICSharpParameter Result = resultList[0];
+                ICSharpScopeAttributeFeature ResultAttribute = Result.Feature;
+
+                /*if (FeatureTextType == FeatureTextTypes.Interface)
+                    ResultType = CSharpTypes.Type2CSharpString(ResultAttribute.ResolvedFeatureType.Item, Context, CSharpTypeFormats.AsInterface);
+                else
+                    ResultType = CSharpTypes.Type2CSharpString(ResultAttribute.ResolvedFeatureType.Item, Context, CSharpTypeFormats.None);*/
+                resultTypeText = ResultAttribute.Type.Type2CSharpString(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+            }
+
+            else
+            {
+                resultTypeText = "void";
+
+                foreach (ICSharpParameter Result in resultList)
+                {
+                    ICSharpScopeAttributeFeature ResultAttribute = Result.Feature;
+                    ICSharpType ParameterType = ResultAttribute.Type;
+
+                    if (parameterListText.Length > 0)
+                        parameterListText += ", ";
+                    if (parameterNameListText.Length > 0)
+                        parameterNameListText += ", ";
+
+                    CSharpTypeFormats ParameterFormat = ParameterType.HasInterfaceText ? CSharpTypeFormats.AsInterface : CSharpTypeFormats.Normal;
+
+                    string TypeString = ParameterType.Type2CSharpString(outputNamespace, ParameterFormat, CSharpNamespaceFormats.None);
+                    string AttributeString = CSharpNames.ToCSharpIdentifier(Result.Name);
+
+                    parameterListText += $"out {TypeString} {AttributeString}";
+                    parameterNameListText += $"out {AttributeString}";
+                }
+            }
+        }
         #endregion
     }
 }

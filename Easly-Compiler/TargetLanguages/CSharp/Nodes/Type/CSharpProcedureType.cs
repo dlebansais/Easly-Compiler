@@ -86,12 +86,19 @@
         {
             SetUsedInCode();
 
-            Debug.Assert(OriginatingTypedef != null);
+            string Result;
 
-            // TODO: detect delegate call parameters to select the proper overload
-            string DelegateName = CSharpNames.ToCSharpIdentifier(OriginatingTypedef.Name);
+            if (OriginatingTypedef != null)
+            {
+                // TODO: detect delegate call parameters to select the proper overload
+                string DelegateName = CSharpNames.ToCSharpIdentifier(OriginatingTypedef.Name);
 
-            return CommandOverloadType2CSharpString(DelegateName, Source.OverloadList[0]);
+                Result = CommandOverloadType2CSharpString(DelegateName, Source.OverloadList[0]);
+            }
+            else
+                Result = "<Not supported>";
+
+            return Result;
         }
 
         private string CommandOverloadType2CSharpString(string delegateName, ICommandOverloadType overload)

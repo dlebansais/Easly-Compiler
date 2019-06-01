@@ -41,6 +41,15 @@
         /// <param name="cSharpTypeFormat">The type format.</param>
         /// <param name="cSharpNamespaceFormat">The namespace format.</param>
         string Type2CSharpString(string cSharpNamespace, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat);
+
+        /// <summary>
+        /// Gets the singleton text corresponding to this type, if any.
+        /// </summary>
+        /// <param name="outputNamespace">The current namespace.</param>
+        /// <param name="cSharpTypeFormat">The type format.</param>
+        /// <param name="cSharpNamespaceFormat">The namespace format.</param>
+        /// <param name="text">The singleton text upon return, if successful.</param>
+        bool GetSingletonString(string outputNamespace, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat, out string text);
     }
 
     /// <summary>
@@ -206,6 +215,19 @@
         public void SetUsedInCode()
         {
             IsUsedInCode = true;
+        }
+
+        /// <summary>
+        /// Gets the singleton text corresponding to this type, if any.
+        /// </summary>
+        /// <param name="outputNamespace">The current namespace.</param>
+        /// <param name="cSharpTypeFormat">The type format.</param>
+        /// <param name="cSharpNamespaceFormat">The namespace format.</param>
+        /// <param name="text">The singleton text upon return, if successful.</param>
+        public virtual bool GetSingletonString(string outputNamespace, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat, out string text)
+        {
+            text = null;
+            return false;
         }
         #endregion
 

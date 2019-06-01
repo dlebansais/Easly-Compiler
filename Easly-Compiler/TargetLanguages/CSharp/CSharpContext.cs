@@ -20,6 +20,12 @@
         /// </summary>
         /// <param name="sourceFeature">The source feature.</param>
         ICSharpFeature GetFeature(ICompiledFeature sourceFeature);
+
+        /// <summary>
+        /// Gets the C# generic from the source generic.
+        /// </summary>
+        /// <param name="sourceGeneric">The source generic.</param>
+        ICSharpGeneric GetGeneric(IGeneric sourceGeneric);
     }
 
     /// <summary>
@@ -73,6 +79,27 @@
             Debug.Assert(FeatureTable.ContainsKey(sourceFeature));
 
             return FeatureTable[sourceFeature];
+        }
+
+        /// <summary>
+        /// Gets the C# generic from the source generic.
+        /// </summary>
+        /// <param name="sourceGeneric">The source generic.</param>
+        public ICSharpGeneric GetGeneric(IGeneric sourceGeneric)
+        {
+            ICSharpGeneric Result = null;
+
+            foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
+                foreach (ICSharpGeneric Generic in Entry.Value.GenericList)
+                    if (Generic.Source == sourceGeneric)
+                    {
+                        Debug.Assert(Result == null);
+                        Result = Generic;
+                    }
+
+            Debug.Assert(Result != null);
+
+            return Result;
         }
         #endregion
     }

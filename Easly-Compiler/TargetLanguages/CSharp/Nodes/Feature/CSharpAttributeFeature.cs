@@ -26,6 +26,11 @@
         /// True if this feature as an override of a virtual parent.
         /// </summary>
         new bool IsOverride { get; }
+
+        /// <summary>
+        /// The attribute type.
+        /// </summary>
+        ICSharpType Type { get; }
     }
 
     /// <summary>
@@ -68,6 +73,11 @@
         /// The feature name.
         /// </summary>
         public string Name { get; }
+
+        /// <summary>
+        /// The attribute type.
+        /// </summary>
+        public ICSharpType Type { get; private set; }
         #endregion
 
         #region Client Interface
@@ -77,6 +87,52 @@
         /// <param name="context">The initialization context.</param>
         public override void Init(ICSharpContext context)
         {
+            Type = CSharpType.Create(context, Source.ResolvedEntityType.Item);
+        }
+
+        /// <summary>
+        /// Writes down the C# feature.
+        /// </summary>
+        /// <param name="writer">The stream on which to write.</param>
+        /// <param name="outputNamespace">Namespace for the output code.</param>
+        /// <param name="featureTextType">The write mode.</param>
+        /// <param name="exportStatus">The feature export status.</param>
+        /// <param name="isLocal">True if the feature is local to the class.</param>
+        /// <param name="isFirstFeature">True if the feature is the first in a list.</param>
+        /// <param name="isMultiline">True if there is a separating line above.</param>
+        public override void WriteCSharp(ICSharpWriter writer, string outputNamespace, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
+        {
+            isMultiline = false;
+
+            if (featureTextType == CSharpFeatureTextTypes.Implementation)
+                WriteCSharpImplementation(writer, outputNamespace, exportStatus);
+        }
+
+        private void WriteCSharpImplementation(ICSharpWriter writer, string outputNamespace, CSharpExports exportStatus)
+        {
+            bool IsEvent = false;
+
+            if (Type is ICSharpClassType AsClassType)
+            {
+                ICSharpClass Class = AsClassType.Class;
+                if (Class.InheritFromDotNetEvent)
+                    IsEvent = true;
+            }
+
+            writer.WriteDocumentation(Source);
+
+            //Assertion.WriteContract(sw, new List<IAssertion>(), EnsureList, ContractLocations.Other, false, ref IsFirstFeature, ref IsMultiline);
+
+            string TypeString = Type.Type2CSharpString(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+            string AttributeString = CSharpNames.ToCSharpIdentifier(Name);
+            string ExportString = CSharpNames.ComposedExportStatus(false, false, true, exportStatus);
+
+            if (IsEvent)
+                writer.WriteIndentedLine($"{ExportString} event {TypeString} {AttributeString};");
+            else if (Type.GetSingletonString(outputNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None, out string SingletonString))
+                writer.WriteIndentedLine($"{ExportString} {TypeString} {AttributeString} {{ get {{ return {SingletonString}; }} }}");
+            else
+                writer.WriteIndentedLine($"{ExportString} {TypeString} {AttributeString} {{ get; private set; }}");
         }
         #endregion
     }

@@ -96,15 +96,14 @@
         public virtual string CSharpText(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
         {
             string CoexistingPrecursorName = string.Empty;
-
             string CoexistingPrecursorRootName = Feature.CoexistingPrecursorName;
 
-            if (CoexistingPrecursorRootName.Length > 0)
+            if (!string.IsNullOrEmpty(CoexistingPrecursorRootName))
                 CoexistingPrecursorName = CSharpNames.ToCSharpIdentifier(CoexistingPrecursorRootName + " " + "Base");
 
             string ArgumentListText = CSharpArgument.CSharpArgumentList(cSharpNamespace, FeatureCall, destinationList);
 
-            if (CoexistingPrecursorName.Length > 0)
+            if (!string.IsNullOrEmpty(CoexistingPrecursorRootName))
                 return CoexistingPrecursorName + "(" + ArgumentListText + ")";
             else
             {

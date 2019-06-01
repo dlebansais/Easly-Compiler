@@ -36,6 +36,11 @@ namespace CompilerNode
         /// Table of resolved parameters.
         /// </summary>
         IHashtableEx<string, IScopeAttributeFeature> IndexerParameterTable { get; }
+
+        /// <summary>
+        /// Table of resolved parameters. TODO: replace IndexerParameterTable with that and rename as IndexerParameterTable.
+        /// </summary>
+        ListTableEx<IParameter> ParameterTable { get; }
     }
 
     /// <summary>
@@ -149,6 +154,7 @@ namespace CompilerNode
                 ResolvedEntityTypeName = new OnceReference<ITypeName>();
                 ResolvedEntityType = new OnceReference<ICompiledType>();
                 IndexerParameterTable = new HashtableEx<string, IScopeAttributeFeature>();
+                ParameterTable = new ListTableEx<IParameter>();
                 LocalScope = new HashtableEx<string, IScopeAttributeFeature>();
                 LocalGetScope = new HashtableEx<string, IScopeAttributeFeature>();
                 LocalSetScope = new HashtableEx<string, IScopeAttributeFeature>();
@@ -322,6 +328,11 @@ namespace CompilerNode
         /// Table of resolved parameters.
         /// </summary>
         public IHashtableEx<string, IScopeAttributeFeature> IndexerParameterTable { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+
+        /// <summary>
+        /// Table of resolved parameters. TODO: replace IndexerParameterTable with that and rename as IndexerParameterTable.
+        /// </summary>
+        public ListTableEx<IParameter> ParameterTable { get; private set; } = new ListTableEx<IParameter>();
 
         /// <summary>
         /// The name of the resolved result type.
