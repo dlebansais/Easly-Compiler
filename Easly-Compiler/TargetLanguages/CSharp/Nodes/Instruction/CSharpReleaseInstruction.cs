@@ -23,19 +23,21 @@
         /// Creates a new C# instruction.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        public static ICSharpReleaseInstruction Create(ICSharpContext context, IReleaseInstruction source)
+        public static ICSharpReleaseInstruction Create(ICSharpContext context, ICSharpFeature parentFeature, IReleaseInstruction source)
         {
-            return new CSharpReleaseInstruction(context, source);
+            return new CSharpReleaseInstruction(context, parentFeature, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpReleaseInstruction"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        protected CSharpReleaseInstruction(ICSharpContext context, IReleaseInstruction source)
-            : base(context, source)
+        protected CSharpReleaseInstruction(ICSharpContext context, ICSharpFeature parentFeature, IReleaseInstruction source)
+            : base(context, parentFeature, source)
         {
         }
         #endregion

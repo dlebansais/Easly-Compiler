@@ -117,7 +117,7 @@
         /// </summary>
         /// <param name="cSharpNamespace">The current namespace.</param>
         /// <param name="destinationList">The list of destinations.</param>
-        public virtual string CSharpText(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
+        public override string CSharpText(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
         {
             string QueryText = Query.CSharpText(cSharpNamespace, 0);
             string Result = null;

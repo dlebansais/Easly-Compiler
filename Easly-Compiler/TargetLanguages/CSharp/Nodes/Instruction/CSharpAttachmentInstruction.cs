@@ -23,19 +23,21 @@
         /// Creates a new C# instruction.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        public static ICSharpAttachmentInstruction Create(ICSharpContext context, IAttachmentInstruction source)
+        public static ICSharpAttachmentInstruction Create(ICSharpContext context, ICSharpFeature parentFeature, IAttachmentInstruction source)
         {
-            return new CSharpAttachmentInstruction(context, source);
+            return new CSharpAttachmentInstruction(context, parentFeature, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpAttachmentInstruction"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        protected CSharpAttachmentInstruction(ICSharpContext context, IAttachmentInstruction source)
-            : base(context, source)
+        protected CSharpAttachmentInstruction(ICSharpContext context, ICSharpFeature parentFeature, IAttachmentInstruction source)
+            : base(context, parentFeature, source)
         {
         }
         #endregion

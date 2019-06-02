@@ -23,19 +23,21 @@
         /// Creates a new C# instruction.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        public static ICSharpThrowInstruction Create(ICSharpContext context, IThrowInstruction source)
+        public static ICSharpThrowInstruction Create(ICSharpContext context, ICSharpFeature parentFeature, IThrowInstruction source)
         {
-            return new CSharpThrowInstruction(context, source);
+            return new CSharpThrowInstruction(context, parentFeature, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpThrowInstruction"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        protected CSharpThrowInstruction(ICSharpContext context, IThrowInstruction source)
-            : base(context, source)
+        protected CSharpThrowInstruction(ICSharpContext context, ICSharpFeature parentFeature, IThrowInstruction source)
+            : base(context, parentFeature, source)
         {
         }
         #endregion

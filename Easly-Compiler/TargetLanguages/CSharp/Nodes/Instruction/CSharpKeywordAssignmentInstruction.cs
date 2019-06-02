@@ -23,19 +23,21 @@
         /// Creates a new C# instruction.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        public static ICSharpKeywordAssignmentInstruction Create(ICSharpContext context, IKeywordAssignmentInstruction source)
+        public static ICSharpKeywordAssignmentInstruction Create(ICSharpContext context, ICSharpFeature parentFeature, IKeywordAssignmentInstruction source)
         {
-            return new CSharpKeywordAssignmentInstruction(context, source);
+            return new CSharpKeywordAssignmentInstruction(context, parentFeature, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpKeywordAssignmentInstruction"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        protected CSharpKeywordAssignmentInstruction(ICSharpContext context, IKeywordAssignmentInstruction source)
-            : base(context, source)
+        protected CSharpKeywordAssignmentInstruction(ICSharpContext context, ICSharpFeature parentFeature, IKeywordAssignmentInstruction source)
+            : base(context, parentFeature, source)
         {
         }
         #endregion

@@ -23,19 +23,21 @@
         /// Creates a new C# instruction.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        public static ICSharpOverLoopInstruction Create(ICSharpContext context, IOverLoopInstruction source)
+        public static ICSharpOverLoopInstruction Create(ICSharpContext context, ICSharpFeature parentFeature, IOverLoopInstruction source)
         {
-            return new CSharpOverLoopInstruction(context, source);
+            return new CSharpOverLoopInstruction(context, parentFeature, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpOverLoopInstruction"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        protected CSharpOverLoopInstruction(ICSharpContext context, IOverLoopInstruction source)
-            : base(context, source)
+        protected CSharpOverLoopInstruction(ICSharpContext context, ICSharpFeature parentFeature, IOverLoopInstruction source)
+            : base(context, parentFeature, source)
         {
         }
         #endregion

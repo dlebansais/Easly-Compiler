@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Collections.Generic;
     using CompilerNode;
 
     /// <summary>
@@ -11,6 +12,21 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         new IAsLongAsInstruction Source { get; }
+
+        /// <summary>
+        /// The loop condition expression.
+        /// </summary>
+        ICSharpExpression ContinueCondition { get; }
+
+        /// <summary>
+        /// The list of C# continuations.
+        /// </summary>
+        IList<ICSharpContinuation> ContinuationList { get; }
+
+        /// <summary>
+        /// Instructions for the else case. Can be null.
+        /// </summary>
+        ICSharpScope ElseInstructions { get; }
     }
 
     /// <summary>
@@ -23,20 +39,32 @@
         /// Creates a new C# instruction.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        public static ICSharpAsLongAsInstruction Create(ICSharpContext context, IAsLongAsInstruction source)
+        public static ICSharpAsLongAsInstruction Create(ICSharpContext context, ICSharpFeature parentFeature, IAsLongAsInstruction source)
         {
-            return new CSharpAsLongAsInstruction(context, source);
+            return new CSharpAsLongAsInstruction(context, parentFeature, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpAsLongAsInstruction"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        protected CSharpAsLongAsInstruction(ICSharpContext context, IAsLongAsInstruction source)
-            : base(context, source)
+        protected CSharpAsLongAsInstruction(ICSharpContext context, ICSharpFeature parentFeature, IAsLongAsInstruction source)
+            : base(context, parentFeature, source)
         {
+            ContinueCondition = CSharpExpression.Create(context, (IExpression)source.ContinueCondition);
+
+            foreach (IContinuation Continuation in source.ContinuationList)
+            {
+                ICSharpContinuation NewContinuation = CSharpContinuation.Create(context, parentFeature, Continuation);
+                ContinuationList.Add(NewContinuation);
+            }
+
+            if (source.ElseInstructions.IsAssigned)
+                ElseInstructions = CSharpScope.Create(context, parentFeature, (IScope)source.ElseInstructions.Item);
         }
         #endregion
 
@@ -45,6 +73,21 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         public new IAsLongAsInstruction Source { get { return (IAsLongAsInstruction)base.Source; } }
+
+        /// <summary>
+        /// The loop condition expression.
+        /// </summary>
+        public ICSharpExpression ContinueCondition { get; }
+
+        /// <summary>
+        /// The list of C# continuations.
+        /// </summary>
+        public IList<ICSharpContinuation> ContinuationList { get; } = new List<ICSharpContinuation>();
+
+        /// <summary>
+        /// Instructions for the else case. Can be null.
+        /// </summary>
+        public ICSharpScope ElseInstructions { get; }
         #endregion
 
         #region Client Interface
@@ -55,7 +98,43 @@
         /// <param name="outputNamespace">Namespace for the output code.</param>
         public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
         {
-            //TODO
+            // TODO scope of locals
+            string ContinueConditionString = ContinueCondition.CSharpText(outputNamespace);
+
+            for (int i = 0; i < ContinuationList.Count; i++)
+            {
+                ICSharpContinuation Item = ContinuationList[i];
+
+                if (i > 0)
+                {
+                    writer.WriteLine();
+                    writer.WriteIndentedLine($"if ({ContinueConditionString})");
+                    writer.WriteIndentedLine("{");
+                    writer.IncreaseIndent();
+                }
+
+                Item.WriteCSharpInstructions(writer, outputNamespace);
+            }
+
+            for (int i = 0; i < ContinuationList.Count; i++)
+            {
+                ICSharpContinuation Item = ContinuationList[ContinuationList.Count - 1 - i];
+
+                if (i > 0)
+                {
+                    writer.DecreaseIndent();
+                    writer.WriteIndentedLine("}");
+                    writer.WriteIndentedLine("else");
+                    Item.WriteCSharpCleanupInstructions(writer, outputNamespace);
+                }
+            }
+
+            if (ElseInstructions != null)
+            {
+                writer.WriteIndentedLine("if" + " " + "(" + "!" + "(" + ContinueConditionString + ")" + ")");
+
+                ElseInstructions.WriteCSharp(writer, outputNamespace, CSharpCurlyBracketsInsertions.Indifferent, false);
+            }
         }
         #endregion
     }

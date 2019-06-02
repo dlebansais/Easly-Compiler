@@ -62,6 +62,16 @@
         {
             return string.Empty; // TODO
         }
+
+        /// <summary>
+        /// Gets the source code corresponding to the expression.
+        /// </summary>
+        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="destinationList">The list of destinations.</param>
+        public override string CSharpText(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
+        {
+            return string.Empty; // TODO
+        }
         #endregion
     }
 }

@@ -73,7 +73,7 @@
         {
             foreach (IInstruction Instruction in source.BodyInstructionList)
             {
-                ICSharpInstruction NewInstruction = CSharpInstruction.Create(context, Instruction);
+                ICSharpInstruction NewInstruction = CSharpInstruction.Create(context, parentFeature, Instruction);
                 BodyInstructionList.Add(NewInstruction);
             }
 

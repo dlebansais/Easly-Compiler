@@ -23,19 +23,21 @@
         /// Creates a new C# instruction.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        public static ICSharpPrecursorIndexAssignmentInstruction Create(ICSharpContext context, IPrecursorIndexAssignmentInstruction source)
+        public static ICSharpPrecursorIndexAssignmentInstruction Create(ICSharpContext context, ICSharpFeature parentFeature, IPrecursorIndexAssignmentInstruction source)
         {
-            return new CSharpPrecursorIndexAssignmentInstruction(context, source);
+            return new CSharpPrecursorIndexAssignmentInstruction(context, parentFeature, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpPrecursorIndexAssignmentInstruction"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        protected CSharpPrecursorIndexAssignmentInstruction(ICSharpContext context, IPrecursorIndexAssignmentInstruction source)
-            : base(context, source)
+        protected CSharpPrecursorIndexAssignmentInstruction(ICSharpContext context, ICSharpFeature parentFeature, IPrecursorIndexAssignmentInstruction source)
+            : base(context, parentFeature, source)
         {
         }
         #endregion

@@ -23,19 +23,21 @@
         /// Creates a new C# instruction.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        public static ICSharpDebugInstruction Create(ICSharpContext context, IDebugInstruction source)
+        public static ICSharpDebugInstruction Create(ICSharpContext context, ICSharpFeature parentFeature, IDebugInstruction source)
         {
-            return new CSharpDebugInstruction(context, source);
+            return new CSharpDebugInstruction(context, parentFeature, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpDebugInstruction"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        protected CSharpDebugInstruction(ICSharpContext context, IDebugInstruction source)
-            : base(context, source)
+        protected CSharpDebugInstruction(ICSharpContext context, ICSharpFeature parentFeature, IDebugInstruction source)
+            : base(context, parentFeature, source)
         {
         }
         #endregion

@@ -23,19 +23,21 @@
         /// Creates a new C# instruction.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        public static ICSharpForLoopInstruction Create(ICSharpContext context, IForLoopInstruction source)
+        public static ICSharpForLoopInstruction Create(ICSharpContext context, ICSharpFeature parentFeature, IForLoopInstruction source)
         {
-            return new CSharpForLoopInstruction(context, source);
+            return new CSharpForLoopInstruction(context, parentFeature, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpForLoopInstruction"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        protected CSharpForLoopInstruction(ICSharpContext context, IForLoopInstruction source)
-            : base(context, source)
+        protected CSharpForLoopInstruction(ICSharpContext context, ICSharpFeature parentFeature, IForLoopInstruction source)
+            : base(context, parentFeature, source)
         {
         }
         #endregion

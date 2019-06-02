@@ -100,7 +100,7 @@
         /// </summary>
         /// <param name="cSharpNamespace">The current namespace.</param>
         /// <param name="destinationList">The list of destinations.</param>
-        public virtual string CSharpText(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
+        public override string CSharpText(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
         {
             // TODO clone of multiple result
 

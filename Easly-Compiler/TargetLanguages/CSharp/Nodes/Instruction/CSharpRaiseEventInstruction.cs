@@ -23,19 +23,21 @@
         /// Creates a new C# instruction.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        public static ICSharpRaiseEventInstruction Create(ICSharpContext context, IRaiseEventInstruction source)
+        public static ICSharpRaiseEventInstruction Create(ICSharpContext context, ICSharpFeature parentFeature, IRaiseEventInstruction source)
         {
-            return new CSharpRaiseEventInstruction(context, source);
+            return new CSharpRaiseEventInstruction(context, parentFeature, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpRaiseEventInstruction"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        protected CSharpRaiseEventInstruction(ICSharpContext context, IRaiseEventInstruction source)
-            : base(context, source)
+        protected CSharpRaiseEventInstruction(ICSharpContext context, ICSharpFeature parentFeature, IRaiseEventInstruction source)
+            : base(context, parentFeature, source)
         {
         }
         #endregion

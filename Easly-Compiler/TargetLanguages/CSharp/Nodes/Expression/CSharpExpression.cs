@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
 
@@ -23,6 +24,13 @@
         /// </summary>
         /// <param name="cSharpNamespace">The current namespace.</param>
         string CSharpText(string cSharpNamespace);
+
+        /// <summary>
+        /// Gets the source code corresponding to the expression.
+        /// </summary>
+        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="destinationList">List of destinations.</param>
+        string CSharpText(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList);
     }
 
     /// <summary>
@@ -167,6 +175,13 @@
         /// </summary>
         /// <param name="cSharpNamespace">The current namespace.</param>
         public abstract string CSharpText(string cSharpNamespace);
+
+        /// <summary>
+        /// Gets the source code corresponding to the expression.
+        /// </summary>
+        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="destinationList">List of destinations.</param>
+        public abstract string CSharpText(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList);
         #endregion
     }
 }

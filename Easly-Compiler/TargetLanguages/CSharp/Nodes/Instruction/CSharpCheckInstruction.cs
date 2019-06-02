@@ -23,19 +23,21 @@
         /// Creates a new C# instruction.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        public static ICSharpCheckInstruction Create(ICSharpContext context, ICheckInstruction source)
+        public static ICSharpCheckInstruction Create(ICSharpContext context, ICSharpFeature parentFeature, ICheckInstruction source)
         {
-            return new CSharpCheckInstruction(context, source);
+            return new CSharpCheckInstruction(context, parentFeature, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpCheckInstruction"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        protected CSharpCheckInstruction(ICSharpContext context, ICheckInstruction source)
-            : base(context, source)
+        protected CSharpCheckInstruction(ICSharpContext context, ICSharpFeature parentFeature, ICheckInstruction source)
+            : base(context, parentFeature, source)
         {
         }
         #endregion

@@ -23,19 +23,21 @@
         /// Creates a new C# instruction.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        public static ICSharpIndexAssignmentInstruction Create(ICSharpContext context, IIndexAssignmentInstruction source)
+        public static ICSharpIndexAssignmentInstruction Create(ICSharpContext context, ICSharpFeature parentFeature, IIndexAssignmentInstruction source)
         {
-            return new CSharpIndexAssignmentInstruction(context, source);
+            return new CSharpIndexAssignmentInstruction(context, parentFeature, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpIndexAssignmentInstruction"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        protected CSharpIndexAssignmentInstruction(ICSharpContext context, IIndexAssignmentInstruction source)
-            : base(context, source)
+        protected CSharpIndexAssignmentInstruction(ICSharpContext context, ICSharpFeature parentFeature, IIndexAssignmentInstruction source)
+            : base(context, parentFeature, source)
         {
         }
         #endregion

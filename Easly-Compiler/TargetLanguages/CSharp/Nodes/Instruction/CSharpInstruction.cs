@@ -9,6 +9,11 @@
     public interface ICSharpInstruction
     {
         /// <summary>
+        /// The parent feature.
+        /// </summary>
+        ICSharpFeature ParentFeature { get; }
+
+        /// <summary>
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         IInstruction Source { get; }
@@ -31,83 +36,84 @@
         /// Creates a new C# instruction.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        public static ICSharpInstruction Create(ICSharpContext context, IInstruction source)
+        public static ICSharpInstruction Create(ICSharpContext context, ICSharpFeature parentFeature, IInstruction source)
         {
             ICSharpInstruction Result = null;
 
             switch (source)
             {
                 case IAsLongAsInstruction AsAsLongAsInstruction:
-                    Result = CSharpAsLongAsInstruction.Create(context, AsAsLongAsInstruction);
+                    Result = CSharpAsLongAsInstruction.Create(context, parentFeature, AsAsLongAsInstruction);
                     break;
 
                 case IAssignmentInstruction AsAssignmentInstruction:
-                    Result = CSharpAssignmentInstruction.Create(context, AsAssignmentInstruction);
+                    Result = CSharpAssignmentInstruction.Create(context, parentFeature, AsAssignmentInstruction);
                     break;
 
                 case IAttachmentInstruction AsAttachmentInstruction:
-                    Result = CSharpAttachmentInstruction.Create(context, AsAttachmentInstruction);
+                    Result = CSharpAttachmentInstruction.Create(context, parentFeature, AsAttachmentInstruction);
                     break;
 
                 case ICheckInstruction AsCheckInstruction:
-                    Result = CSharpCheckInstruction.Create(context, AsCheckInstruction);
+                    Result = CSharpCheckInstruction.Create(context, parentFeature, AsCheckInstruction);
                     break;
 
                 case ICommandInstruction AsCommandInstruction:
-                    Result = CSharpCommandInstruction.Create(context, AsCommandInstruction);
+                    Result = CSharpCommandInstruction.Create(context, parentFeature, AsCommandInstruction);
                     break;
 
                 case ICreateInstruction AsCreateInstruction:
-                    Result = CSharpCreateInstruction.Create(context, AsCreateInstruction);
+                    Result = CSharpCreateInstruction.Create(context, parentFeature, AsCreateInstruction);
                     break;
 
                 case IDebugInstruction AsDebugInstruction:
-                    Result = CSharpDebugInstruction.Create(context, AsDebugInstruction);
+                    Result = CSharpDebugInstruction.Create(context, parentFeature, AsDebugInstruction);
                     break;
 
                 case IForLoopInstruction AsForLoopInstruction:
-                    Result = CSharpForLoopInstruction.Create(context, AsForLoopInstruction);
+                    Result = CSharpForLoopInstruction.Create(context, parentFeature, AsForLoopInstruction);
                     break;
 
                 case IIfThenElseInstruction AsIfThenElseInstruction:
-                    Result = CSharpIfThenElseInstruction.Create(context, AsIfThenElseInstruction);
+                    Result = CSharpIfThenElseInstruction.Create(context, parentFeature, AsIfThenElseInstruction);
                     break;
 
                 case IIndexAssignmentInstruction AsIndexAssignmentInstruction:
-                    Result = CSharpIndexAssignmentInstruction.Create(context, AsIndexAssignmentInstruction);
+                    Result = CSharpIndexAssignmentInstruction.Create(context, parentFeature, AsIndexAssignmentInstruction);
                     break;
 
                 case IInspectInstruction AsInspectInstruction:
-                    Result = CSharpInspectInstruction.Create(context, AsInspectInstruction);
+                    Result = CSharpInspectInstruction.Create(context, parentFeature, AsInspectInstruction);
                     break;
 
                 case IKeywordAssignmentInstruction AsKeywordAssignmentInstruction:
-                    Result = CSharpKeywordAssignmentInstruction.Create(context, AsKeywordAssignmentInstruction);
+                    Result = CSharpKeywordAssignmentInstruction.Create(context, parentFeature, AsKeywordAssignmentInstruction);
                     break;
 
                 case IOverLoopInstruction AsOverLoopInstruction:
-                    Result = CSharpOverLoopInstruction.Create(context, AsOverLoopInstruction);
+                    Result = CSharpOverLoopInstruction.Create(context, parentFeature, AsOverLoopInstruction);
                     break;
 
                 case IPrecursorIndexAssignmentInstruction AsPrecursorIndexAssignmentInstruction:
-                    Result = CSharpPrecursorIndexAssignmentInstruction.Create(context, AsPrecursorIndexAssignmentInstruction);
+                    Result = CSharpPrecursorIndexAssignmentInstruction.Create(context, parentFeature, AsPrecursorIndexAssignmentInstruction);
                     break;
 
                 case IPrecursorInstruction AsPrecursorInstruction:
-                    Result = CSharpPrecursorInstruction.Create(context, AsPrecursorInstruction);
+                    Result = CSharpPrecursorInstruction.Create(context, parentFeature, AsPrecursorInstruction);
                     break;
 
                 case IRaiseEventInstruction AsRaiseEventInstruction:
-                    Result = CSharpRaiseEventInstruction.Create(context, AsRaiseEventInstruction);
+                    Result = CSharpRaiseEventInstruction.Create(context, parentFeature, AsRaiseEventInstruction);
                     break;
 
                 case IReleaseInstruction AsReleaseInstruction:
-                    Result = CSharpReleaseInstruction.Create(context, AsReleaseInstruction);
+                    Result = CSharpReleaseInstruction.Create(context, parentFeature, AsReleaseInstruction);
                     break;
 
                 case IThrowInstruction AsThrowInstruction:
-                    Result = CSharpThrowInstruction.Create(context, AsThrowInstruction);
+                    Result = CSharpThrowInstruction.Create(context, parentFeature, AsThrowInstruction);
                     break;
             }
 
@@ -120,16 +126,23 @@
         /// Initializes a new instance of the <see cref="CSharpInstruction"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        protected CSharpInstruction(ICSharpContext context, IInstruction source)
+        protected CSharpInstruction(ICSharpContext context, ICSharpFeature parentFeature, IInstruction source)
         {
             Debug.Assert(source != null);
 
+            ParentFeature = parentFeature;
             Source = source;
         }
         #endregion
 
         #region Properties
+        /// <summary>
+        /// The parent feature.
+        /// </summary>
+        public ICSharpFeature ParentFeature { get; }
+
         /// <summary>
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>

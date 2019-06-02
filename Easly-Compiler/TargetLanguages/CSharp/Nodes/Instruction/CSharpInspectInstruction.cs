@@ -23,19 +23,21 @@
         /// Creates a new C# instruction.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        public static ICSharpInspectInstruction Create(ICSharpContext context, IInspectInstruction source)
+        public static ICSharpInspectInstruction Create(ICSharpContext context, ICSharpFeature parentFeature, IInspectInstruction source)
         {
-            return new CSharpInspectInstruction(context, source);
+            return new CSharpInspectInstruction(context, parentFeature, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpInspectInstruction"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        protected CSharpInspectInstruction(ICSharpContext context, IInspectInstruction source)
-            : base(context, source)
+        protected CSharpInspectInstruction(ICSharpContext context, ICSharpFeature parentFeature, IInspectInstruction source)
+            : base(context, parentFeature, source)
         {
         }
         #endregion

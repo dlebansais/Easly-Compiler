@@ -23,19 +23,21 @@
         /// Creates a new C# instruction.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        public static ICSharpIfThenElseInstruction Create(ICSharpContext context, IIfThenElseInstruction source)
+        public static ICSharpIfThenElseInstruction Create(ICSharpContext context, ICSharpFeature parentFeature, IIfThenElseInstruction source)
         {
-            return new CSharpIfThenElseInstruction(context, source);
+            return new CSharpIfThenElseInstruction(context, parentFeature, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpIfThenElseInstruction"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        protected CSharpIfThenElseInstruction(ICSharpContext context, IIfThenElseInstruction source)
-            : base(context, source)
+        protected CSharpIfThenElseInstruction(ICSharpContext context, ICSharpFeature parentFeature, IIfThenElseInstruction source)
+            : base(context, parentFeature, source)
         {
         }
         #endregion

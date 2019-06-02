@@ -23,19 +23,21 @@
         /// Creates a new C# instruction.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        public static ICSharpCommandInstruction Create(ICSharpContext context, ICommandInstruction source)
+        public static ICSharpCommandInstruction Create(ICSharpContext context, ICSharpFeature parentFeature, ICommandInstruction source)
         {
-            return new CSharpCommandInstruction(context, source);
+            return new CSharpCommandInstruction(context, parentFeature, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpCommandInstruction"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly instruction from which the C# instruction is created.</param>
-        protected CSharpCommandInstruction(ICSharpContext context, ICommandInstruction source)
-            : base(context, source)
+        protected CSharpCommandInstruction(ICSharpContext context, ICSharpFeature parentFeature, ICommandInstruction source)
+            : base(context, parentFeature, source)
         {
         }
         #endregion
