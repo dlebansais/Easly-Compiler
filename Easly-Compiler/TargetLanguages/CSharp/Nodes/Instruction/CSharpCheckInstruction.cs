@@ -11,6 +11,11 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         new ICheckInstruction Source { get; }
+
+        /// <summary>
+        /// The checked expression.
+        /// </summary>
+        ICSharpExpression BooleanExpression { get; }
     }
 
     /// <summary>
@@ -39,6 +44,7 @@
         protected CSharpCheckInstruction(ICSharpContext context, ICSharpFeature parentFeature, ICheckInstruction source)
             : base(context, parentFeature, source)
         {
+            BooleanExpression = CSharpExpression.Create(context, (IExpression)source.BooleanExpression);
         }
         #endregion
 
@@ -47,6 +53,11 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         public new ICheckInstruction Source { get { return (ICheckInstruction)base.Source; } }
+
+        /// <summary>
+        /// The checked expression.
+        /// </summary>
+        public ICSharpExpression BooleanExpression { get; }
         #endregion
 
         #region Client Interface
@@ -57,7 +68,9 @@
         /// <param name="outputNamespace">Namespace for the output code.</param>
         public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
         {
-            //TODO
+            string ExpressionText = BooleanExpression.CSharpText(outputNamespace);
+
+            writer.WriteIndentedLine("Debug.Assert({ExpressionText});");
         }
         #endregion
     }

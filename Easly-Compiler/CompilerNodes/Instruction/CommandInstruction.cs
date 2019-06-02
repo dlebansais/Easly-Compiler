@@ -27,9 +27,19 @@ namespace CompilerNode
         OnceReference<ICommandOverloadType> SelectedOverload { get; }
 
         /// <summary>
+        /// The selected parameters{ get; }
+        /// </summary>
+        ListTableEx<IParameter> SelectedParameterList { get; }
+
+        /// <summary>
         /// The list of resolved arguments.
         /// </summary>
         OnceReference<IList<IExpressionType>> MergedArgumentList { get; }
+
+        /// <summary>
+        /// The argument passing style.
+        /// </summary>
+        TypeArgumentStyles ArgumentStyle { get; set; }
 
         /// <summary>
         /// The resolved type corresponding to the called feature.
@@ -147,7 +157,9 @@ namespace CompilerNode
                 ResolvedException = new OnceReference<IResultException>();
                 SelectedFeature = new OnceReference<ICompiledFeature>();
                 SelectedOverload = new OnceReference<ICommandOverloadType>();
+                SelectedParameterList = new ListTableEx<IParameter>();
                 MergedArgumentList = new OnceReference<IList<IExpressionType>>();
+                ArgumentStyle = TypeArgumentStyles.None;
                 CommandFinalType = new OnceReference<IProcedureType>();
                 IsHandled = true;
             }
@@ -186,6 +198,7 @@ namespace CompilerNode
 
                 Debug.Assert(SelectedFeature.IsAssigned || !IsResolved);
                 Debug.Assert(SelectedOverload.IsAssigned || !IsResolved);
+                Debug.Assert(SelectedParameterList.IsSealed || !IsResolved);
                 Debug.Assert(MergedArgumentList.IsAssigned || !IsResolved);
                 Debug.Assert(CommandFinalType.IsAssigned || !IsResolved);
 
@@ -238,9 +251,19 @@ namespace CompilerNode
         public OnceReference<ICommandOverloadType> SelectedOverload { get; private set; } = new OnceReference<ICommandOverloadType>();
 
         /// <summary>
+        /// The selected parameters{ get; }
+        /// </summary>
+        public ListTableEx<IParameter> SelectedParameterList { get; private set; } = new ListTableEx<IParameter>();
+
+        /// <summary>
         /// The list of resolved arguments.
         /// </summary>
         public OnceReference<IList<IExpressionType>> MergedArgumentList { get; private set; } = new OnceReference<IList<IExpressionType>>();
+
+        /// <summary>
+        /// The argument passing style.
+        /// </summary>
+        public TypeArgumentStyles ArgumentStyle { get; set; }
 
         /// <summary>
         /// The resolved type corresponding to the called feature.

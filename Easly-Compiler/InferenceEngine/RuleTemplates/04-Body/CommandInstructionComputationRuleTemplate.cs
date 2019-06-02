@@ -71,6 +71,7 @@
 
             IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
             ICommandOverloadType SelectedOverload = null;
+            ListTableEx<IParameter> SelectedParameterList = null;
             IProcedureType CommandFinalType = null;
             bool IsHandled = false;
 
@@ -93,6 +94,7 @@
                     else
                     {
                         SelectedOverload = AsProcedureType.OverloadList[SelectedIndex];
+                        SelectedParameterList = ParameterTableList[SelectedIndex];
                         CommandFinalType = AsProcedureType;
                     }
                     IsHandled = true;
@@ -113,7 +115,7 @@
                 IList<IIdentifier> CommandInstructionException = SelectedOverload.ExceptionIdentifierList;
                 ResultException.Merge(ResolvedException, CommandInstructionException);
 
-                data = new Tuple<IResultException, ICompiledFeature, ICommandOverloadType, List<IExpressionType>, IProcedureType>(ResolvedException, FinalFeature, SelectedOverload, MergedArgumentList, CommandFinalType);
+                data = new Tuple<IResultException, ICompiledFeature, ICommandOverloadType, ListTableEx<IParameter>, List<IExpressionType>, TypeArgumentStyles, IProcedureType>(ResolvedException, FinalFeature, SelectedOverload, SelectedParameterList, MergedArgumentList, ArgumentStyle, CommandFinalType);
             }
 
             return Success;
@@ -126,16 +128,21 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(ICommandInstruction node, object data)
         {
-            IResultException ResolvedException = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, List<IExpressionType>, IProcedureType>)data).Item1;
-            ICompiledFeature SelectedFeature = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, List<IExpressionType>, IProcedureType>)data).Item2;
-            ICommandOverloadType SelectedOverload = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, List<IExpressionType>, IProcedureType>)data).Item3;
-            List<IExpressionType> MergedArgumentList = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, List<IExpressionType>, IProcedureType>)data).Item4;
-            IProcedureType CommandFinalType = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, List<IExpressionType>, IProcedureType>)data).Item5;
+            IResultException ResolvedException = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, ListTableEx<IParameter>, List<IExpressionType>, TypeArgumentStyles, IProcedureType>)data).Item1;
+            ICompiledFeature SelectedFeature = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, ListTableEx<IParameter>, List<IExpressionType>, TypeArgumentStyles, IProcedureType>)data).Item2;
+            ICommandOverloadType SelectedOverload = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, ListTableEx<IParameter>, List<IExpressionType>, TypeArgumentStyles, IProcedureType>)data).Item3;
+            ListTableEx<IParameter> SelectedParameterList = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, ListTableEx<IParameter>, List<IExpressionType>, TypeArgumentStyles, IProcedureType>)data).Item4;
+            List<IExpressionType> MergedArgumentList = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, ListTableEx<IParameter>, List<IExpressionType>, TypeArgumentStyles, IProcedureType>)data).Item5;
+            TypeArgumentStyles ArgumentStyle = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, ListTableEx<IParameter>, List<IExpressionType>, TypeArgumentStyles, IProcedureType>)data).Item6;
+            IProcedureType CommandFinalType = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, ListTableEx<IParameter>, List<IExpressionType>, TypeArgumentStyles, IProcedureType>)data).Item7;
 
             node.ResolvedException.Item = ResolvedException;
             node.SelectedFeature.Item = SelectedFeature;
             node.SelectedOverload.Item = SelectedOverload;
+            node.SelectedParameterList.AddRange(SelectedParameterList);
+            node.SelectedParameterList.Seal();
             node.MergedArgumentList.Item = MergedArgumentList;
+            node.ArgumentStyle = ArgumentStyle;
             node.CommandFinalType.Item = CommandFinalType;
         }
         #endregion

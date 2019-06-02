@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Collections.Generic;
     using CompilerNode;
 
     /// <summary>
@@ -11,6 +12,26 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         new IAttachmentInstruction Source { get; }
+
+        /// <summary>
+        /// The expression source to the attachment.
+        /// </summary>
+        ICSharpExpression SourceExpression { get; }
+
+        /// <summary>
+        /// List of attached entities.
+        /// </summary>
+        IList<string> EntityNameList { get; }
+
+        /// <summary>
+        /// List of attachments.
+        /// </summary>
+        IList<ICSharpAttachment> AttachmentList { get; }
+
+        /// <summary>
+        /// Instructions for the else case. Can be null.
+        /// </summary>
+        ICSharpScope ElseInstructions { get; }
     }
 
     /// <summary>
@@ -39,6 +60,22 @@
         protected CSharpAttachmentInstruction(ICSharpContext context, ICSharpFeature parentFeature, IAttachmentInstruction source)
             : base(context, parentFeature, source)
         {
+            SourceExpression = CSharpExpression.Create(context, (IExpression)source.Source);
+
+            foreach (IName EntityName in source.EntityNameList)
+            {
+                string ValidName = EntityName.ValidText.Item;
+                EntityNameList.Add(ValidName);
+            }
+
+            foreach (IAttachment Attachment in source.AttachmentList)
+            {
+                ICSharpAttachment NewAttachment = CSharpAttachment.Create(context, Attachment);
+                AttachmentList.Add(NewAttachment);
+            }
+
+            if (source.ElseInstructions.IsAssigned)
+                ElseInstructions = CSharpScope.Create(context, parentFeature, (IScope)source.ElseInstructions.Item);
         }
         #endregion
 
@@ -47,6 +84,26 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         public new IAttachmentInstruction Source { get { return (IAttachmentInstruction)base.Source; } }
+
+        /// <summary>
+        /// The expression source to the attachment.
+        /// </summary>
+        public ICSharpExpression SourceExpression { get; }
+
+        /// <summary>
+        /// List of attached entities.
+        /// </summary>
+        public IList<string> EntityNameList { get; } = new List<string>();
+
+        /// <summary>
+        /// List of attachments.
+        /// </summary>
+        public IList<ICSharpAttachment> AttachmentList { get; } = new List<ICSharpAttachment>();
+
+        /// <summary>
+        /// Instructions for the else case. Can be null.
+        /// </summary>
+        public ICSharpScope ElseInstructions { get; }
         #endregion
 
         #region Client Interface
@@ -57,7 +114,38 @@
         /// <param name="outputNamespace">Namespace for the output code.</param>
         public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
         {
-            //TODO
+            string AttachedSourceString = SourceExpression.CSharpText(outputNamespace);
+
+            string NameString = EntityNameList[0];
+
+            bool IsElseIf = false;
+            foreach (ICSharpAttachment Attachment in AttachmentList)
+            {
+                if (IsElseIf)
+                    writer.WriteLine();
+
+                ICSharpType FirstType = Attachment.AttachTypeList[0];
+
+                /*TODO
+                foreach (AttachmentAlias AliasItem in Context.AttachmentVariableTable)
+                    if (AliasItem.SourceName == NameString && AliasItem.EntityType == ResolvedAttachmentType)
+                    {
+                        AttachmentItem.WriteCSharp(sw, Context, AliasItem, AttachedSourceString, Flags);
+                        IsElseIf = true;
+                        break;
+                    }*/
+            }
+
+            writer.WriteIndentedLine("else");
+
+            if (ElseInstructions != null)
+                ElseInstructions.WriteCSharp(writer, outputNamespace, CSharpCurlyBracketsInsertions.Indifferent, false);
+            else
+            {
+                writer.IncreaseIndent();
+                writer.WriteIndentedLine("throw new InvalidCastException();");
+                writer.DecreaseIndent();
+            }
         }
         #endregion
     }
