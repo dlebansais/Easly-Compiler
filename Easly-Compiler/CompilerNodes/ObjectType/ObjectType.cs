@@ -267,13 +267,6 @@
 
             Result &= baseType.FormalGeneric.ResolvedConformanceTable.IsSealed;
 
-            /* TODO: Is this bad to not have any constraint?
-            if (baseType.FormalGeneric.ResolvedConformanceTable.Count == 0)
-            {
-                //errorList.Add(new ConformanceError(sourceLocation));
-                return false;
-            }*/
-
             foreach (KeyValuePair<ITypeName, ICompiledType> ConformingEntry in baseType.FormalGeneric.ResolvedConformanceTable)
             {
                 ICompiledType ConformingType = ConformingEntry.Value;
