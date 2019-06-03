@@ -27,24 +27,14 @@ namespace CompilerNode
         OnceReference<IDiscrete> ResolvedFinalDiscrete { get; }
 
         /// <summary>
-        /// List of parameters from the selected overload.
-        /// </summary>
-        ListTableEx<IParameter> SelectedParameterList { get; }
-
-        /// <summary>
         /// List of results from the selected overload.
         /// </summary>
         ListTableEx<IParameter> SelectedResultList { get; }
 
         /// <summary>
-        /// Resolved arguments of the call.
+        /// Details of the feature call.
         /// </summary>
-        OnceReference<IList<IExpressionType>> ResolvedArgumentList { get; }
-
-        /// <summary>
-        /// The argument passing style.
-        /// </summary>
-        TypeArgumentStyles ArgumentStyle { get; set; }
+        OnceReference<IFeatureCall> FeatureCall { get; }
 
         /// <summary>
         /// Inherit the side-by-side attribute.
@@ -157,10 +147,8 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
                 ResolvedException = new OnceReference<IResultException>();
-                SelectedParameterList = new ListTableEx<IParameter>();
                 SelectedResultList = new ListTableEx<IParameter>();
-                ResolvedArgumentList = new OnceReference<IList<IExpressionType>>();
-                ArgumentStyle = TypeArgumentStyles.None;
+                FeatureCall = new OnceReference<IFeatureCall>();
                 InheritBySideAttribute = false;
                 IsHandled = true;
             }
@@ -196,9 +184,8 @@ namespace CompilerNode
             {
                 IsResolved = ResolvedException.IsAssigned;
 
-                Debug.Assert(SelectedParameterList.IsSealed || !IsResolved);
                 Debug.Assert(SelectedResultList.IsSealed || !IsResolved);
-                Debug.Assert(ResolvedArgumentList.IsAssigned || !IsResolved);
+                Debug.Assert(FeatureCall.IsAssigned || !IsResolved);
 
                 IsHandled = true;
             }
@@ -242,25 +229,14 @@ namespace CompilerNode
         public OnceReference<IDiscrete> ResolvedFinalDiscrete { get; private set; } = new OnceReference<IDiscrete>();
 
         /// <summary>
-        /// List of parameters from the selected overload.
-        /// </summary>
-        public ListTableEx<IParameter> SelectedParameterList { get; private set; } = new ListTableEx<IParameter>();
-
-        /// <summary>
         /// List of results from the selected overload.
         /// </summary>
         public ListTableEx<IParameter> SelectedResultList { get; private set; } = new ListTableEx<IParameter>();
 
         /// <summary>
-        /// Resolved arguments of the call.
+        /// Details of the feature call.
         /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedArgumentList { get; private set; } = new OnceReference<IList<IExpressionType>>();
-
-        /// <summary>
-        /// The argument passing style.
-        /// </summary>
-        ///TODO: merge this and ResolvedArgumentList.
-        public TypeArgumentStyles ArgumentStyle { get; set; }
+        public OnceReference<IFeatureCall> FeatureCall { get; private set; } = new OnceReference<IFeatureCall>();
 
         /// <summary>
         /// Inherit the side-by-side attribute.
@@ -304,12 +280,10 @@ namespace CompilerNode
         /// <param name="expressionConstant">The expression constant upon return.</param>
         /// <param name="resolvedFinalFeature">The feature if the end of the path is a feature.</param>
         /// <param name="resolvedFinalDiscrete">The discrete if the end of the path is a discrete.</param>
-        /// <param name="selectedParameterList">The selected parameters.</param>
         /// <param name="selectedResultList">The selected results.</param>
-        /// <param name="resolvedArgumentList">The list of arguments corresponding to selected parameters.</param>
-        /// <param name="argumentStyle">The argument passing style.</param>
+        /// <param name="featureCall">Details of the feature call.</param>
         /// <param name="inheritBySideAttribute">Inherit the side-by-side attribute.</param>
-        public static bool ResolveCompilerReferences(IQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out ListTableEx<IParameter> selectedParameterList, out ListTableEx<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList, out TypeArgumentStyles argumentStyle, out bool inheritBySideAttribute)
+        public static bool ResolveCompilerReferences(IQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out ListTableEx<IParameter> selectedResultList, out IFeatureCall featureCall, out bool inheritBySideAttribute)
         {
             resolvedResult = null;
             resolvedException = null;
@@ -317,10 +291,8 @@ namespace CompilerNode
             expressionConstant = NeutralLanguageConstant.NotConstant;
             resolvedFinalFeature = null;
             resolvedFinalDiscrete = null;
-            selectedParameterList = null;
             selectedResultList = null;
-            resolvedArgumentList = null;
-            argumentStyle = TypeArgumentStyles.None;
+            featureCall = null;
 
             IQualifiedName Query = (IQualifiedName)node.Query;
             IList<IArgument> ArgumentList = node.ArgumentList;
@@ -338,27 +310,25 @@ namespace CompilerNode
             if (FinalFeature != null)
             {
                 resolvedFinalFeature = FinalFeature;
-                return ResolveFeature(node, errorList, resolvedFinalFeature, FinalTypeName, FinalType, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedParameterList, out selectedResultList, out resolvedArgumentList, out argumentStyle);
+                return ResolveFeature(node, errorList, resolvedFinalFeature, FinalTypeName, FinalType, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedResultList, out featureCall);
             }
             else
             {
                 Debug.Assert(FinalDiscrete != null);
 
                 resolvedFinalDiscrete = FinalDiscrete;
-                return ResolveDiscrete(node, errorList, resolvedFinalDiscrete, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedParameterList, out selectedResultList, out resolvedArgumentList);
+                return ResolveDiscrete(node, errorList, resolvedFinalDiscrete, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedResultList, out featureCall);
             }
         }
 
-        private static bool ResolveFeature(IQueryExpression node, IErrorList errorList, ICompiledFeature resolvedFinalFeature, ITypeName finalTypeName, ICompiledType finalType, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out ListTableEx<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList, out TypeArgumentStyles argumentStyle)
+        private static bool ResolveFeature(IQueryExpression node, IErrorList errorList, ICompiledFeature resolvedFinalFeature, ITypeName finalTypeName, ICompiledType finalType, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedResultList, out IFeatureCall featureCall)
         {
             resolvedResult = null;
             resolvedException = null;
             constantSourceList = new ListTableEx<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
-            selectedParameterList = null;
             selectedResultList = null;
-            resolvedArgumentList = null;
-            argumentStyle = TypeArgumentStyles.None;
+            featureCall = null;
 
             IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
 
@@ -369,7 +339,7 @@ namespace CompilerNode
             IList<IIdentifier> ValidPath = Query.ValidPath.Item;
 
             List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
-            if (!Argument.Validate(ArgumentList, MergedArgumentList, out argumentStyle, errorList))
+            if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, errorList))
                 return false;
 
             IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
@@ -385,15 +355,14 @@ namespace CompilerNode
                         ParameterTableList.Add(Overload.ParameterTable);
 
                     int SelectedIndex;
-                    if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, argumentStyle, errorList, node, out SelectedIndex))
+                    if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, TypeArgumentStyle, errorList, node, out SelectedIndex))
                         return false;
 
                     IQueryOverloadType SelectedOverload = AsFunctionType.OverloadList[SelectedIndex];
                     resolvedResult = new ResultType(SelectedOverload.ResultTypeList);
                     resolvedException = new ResultException(SelectedOverload.ExceptionIdentifierList);
-                    selectedParameterList = SelectedOverload.ParameterTable;
                     selectedResultList = SelectedOverload.ResultTable;
-                    resolvedArgumentList = MergedArgumentList;
+                    featureCall = new FeatureCall(SelectedOverload.ParameterTable, ArgumentList, MergedArgumentList, TypeArgumentStyle);
                     IsHandled = true;
                     break;
 
@@ -408,9 +377,8 @@ namespace CompilerNode
                     resolvedResult = new ResultType(AsPropertyType.ResolvedEntityTypeName.Item, AsPropertyType.ResolvedEntityType.Item, ValidText);
 
                     resolvedException = new ResultException(AsPropertyType.GetExceptionIdentifierList);
-                    selectedParameterList = new ListTableEx<IParameter>();
                     selectedResultList = new ListTableEx<IParameter>();
-                    resolvedArgumentList = new List<IExpressionType>();
+                    featureCall = new FeatureCall();
                     IsHandled = true;
                     break;
 
@@ -418,9 +386,8 @@ namespace CompilerNode
                     resolvedResult = new ResultType(finalTypeName, AsClassType, ValidText);
 
                     resolvedException = new ResultException();
-                    selectedParameterList = new ListTableEx<IParameter>();
                     selectedResultList = new ListTableEx<IParameter>();
-                    resolvedArgumentList = MergedArgumentList;
+                    featureCall = new FeatureCall();
                     IsHandled = true;
                     break;
 
@@ -428,9 +395,8 @@ namespace CompilerNode
                     resolvedResult = new ResultType(finalTypeName, AsFormalGenericType, ValidText);
 
                     resolvedException = new ResultException();
-                    selectedParameterList = new ListTableEx<IParameter>();
                     selectedResultList = new ListTableEx<IParameter>();
-                    resolvedArgumentList = MergedArgumentList;
+                    featureCall = new FeatureCall();
                     IsHandled = true;
                     break;
 
@@ -438,9 +404,8 @@ namespace CompilerNode
                     resolvedResult = new ResultType(finalTypeName, AsTupleType, ValidText);
 
                     resolvedException = new ResultException();
-                    selectedParameterList = new ListTableEx<IParameter>();
                     selectedResultList = new ListTableEx<IParameter>();
-                    resolvedArgumentList = MergedArgumentList;
+                    featureCall = new FeatureCall();
                     IsHandled = true;
                     break;
             }
@@ -469,15 +434,14 @@ namespace CompilerNode
             return true;
         }
 
-        private static bool ResolveDiscrete(IQueryExpression node, IErrorList errorList, IDiscrete resolvedFinalDiscrete, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out ListTableEx<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList)
+        private static bool ResolveDiscrete(IQueryExpression node, IErrorList errorList, IDiscrete resolvedFinalDiscrete, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedResultList, out IFeatureCall featureCall)
         {
             resolvedResult = null;
             resolvedException = null;
             constantSourceList = new ListTableEx<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
-            selectedParameterList = null;
             selectedResultList = null;
-            resolvedArgumentList = null;
+            featureCall = null;
 
             // This is enforced by the caller.
             bool IsNumberTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName NumberTypeName, out ICompiledType NumberType);
@@ -494,9 +458,8 @@ namespace CompilerNode
             else
                 expressionConstant = new DiscreteLanguageConstant(resolvedFinalDiscrete);
 
-            selectedParameterList = new ListTableEx<IParameter>();
             selectedResultList = new ListTableEx<IParameter>();
-            resolvedArgumentList = new List<IExpressionType>();
+            featureCall = new FeatureCall();
 
             return true;
         }

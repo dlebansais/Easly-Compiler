@@ -40,28 +40,26 @@
         /// Initializes a new instance of the <see cref="CSharpFeatureCall"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
-        /// <param name="parameterList">The list of parameters for the selected overload.</param>
-        /// <param name="argumentList">The list of arguments.</param>
-        /// <param name="argumentStyle">The argument passing style.</param>
-        public CSharpFeatureCall(ICSharpContext context, IList<IParameter> parameterList, IList<IArgument> argumentList, TypeArgumentStyles argumentStyle)
+        /// <param name="source">Details of the feature call.</param>
+        public CSharpFeatureCall(ICSharpContext context, IFeatureCall source)
         {
-            foreach (IParameter Item in parameterList)
+            foreach (IParameter Item in source.ParameterList)
             {
                 ICSharpClass Owner = context.GetClass(Item.ResolvedParameter.Location.EmbeddingClass);
                 ICSharpParameter NewParameter = CSharpParameter.Create(context, Item, Owner);
                 ParameterList.Add(NewParameter);
             }
 
-            foreach (IArgument Item in argumentList)
+            foreach (IArgument Item in source.ArgumentList)
             {
                 ICSharpArgument NewArgument = CSharpArgument.Create(context, Item);
                 ArgumentList.Add(NewArgument);
             }
 
-            Debug.Assert(parameterList.Count >= argumentList.Count);
-            Count = parameterList.Count;
+            Debug.Assert(ParameterList.Count >= ArgumentList.Count);
+            Count = ParameterList.Count;
 
-            ArgumentStyle = argumentStyle;
+            ArgumentStyle = source.TypeArgumentStyle;
         }
         #endregion
 

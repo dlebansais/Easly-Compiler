@@ -22,14 +22,9 @@ namespace CompilerNode
         OnceReference<ICommandOverloadType> SelectedOverload { get; }
 
         /// <summary>
-        /// The selected parameters{ get; }
+        /// Details of the feature call.
         /// </summary>
-        ListTableEx<IParameter> SelectedParameterList { get; }
-
-        /// <summary>
-        /// The argument passing style.
-        /// </summary>
-        TypeArgumentStyles ArgumentStyle { get; set; }
+        OnceReference<IFeatureCall> FeatureCall { get; }
 
         /// <summary>
         /// The created object type name.
@@ -151,8 +146,7 @@ namespace CompilerNode
             {
                 ResolvedException = new OnceReference<IResultException>();
                 SelectedOverload = new OnceReference<ICommandOverloadType>();
-                SelectedParameterList = new ListTableEx<IParameter>();
-                ArgumentStyle = TypeArgumentStyles.None;
+                FeatureCall = new OnceReference<IFeatureCall>();
                 ResolvedEntityTypeName = new OnceReference<ITypeName>();
                 ResolvedEntityType = new OnceReference<ICompiledType>();
                 IsHandled = true;
@@ -191,7 +185,7 @@ namespace CompilerNode
                 IsResolved = ResolvedException.IsAssigned;
 
                 Debug.Assert(SelectedOverload.IsAssigned || !IsResolved);
-                Debug.Assert(SelectedParameterList.IsSealed || !IsResolved);
+                Debug.Assert(FeatureCall.IsAssigned || !IsResolved);
                 Debug.Assert(ResolvedEntityTypeName.IsAssigned || !IsResolved);
                 Debug.Assert(ResolvedEntityType.IsAssigned || !IsResolved);
 
@@ -239,14 +233,9 @@ namespace CompilerNode
         public OnceReference<ICommandOverloadType> SelectedOverload { get; private set; } = new OnceReference<ICommandOverloadType>();
 
         /// <summary>
-        /// The selected parameters{ get; }
+        /// Details of the feature call.
         /// </summary>
-        public ListTableEx<IParameter> SelectedParameterList { get; private set; } = new ListTableEx<IParameter>();
-
-        /// <summary>
-        /// The argument passing style.
-        /// </summary>
-        public TypeArgumentStyles ArgumentStyle { get; set; }
+        public OnceReference<IFeatureCall> FeatureCall { get; private set; } = new OnceReference<IFeatureCall>();
 
         /// <summary>
         /// The created object type name.

@@ -56,7 +56,7 @@
             : base(context, parentFeature, source)
         {
             Command = CSharpQualifiedName.Create(context, (IQualifiedName)source.Command, parentFeature, null, false);
-            FeatureCall = new CSharpFeatureCall(context, source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle);
+            FeatureCall = new CSharpFeatureCall(context, source.FeatureCall.Item);
 
             IClassType FinalType = Source.CommandFinalType.Item.ResolvedBaseType.Item;
             ICSharpClass CallClass = context.GetClass(FinalType.BaseClass);

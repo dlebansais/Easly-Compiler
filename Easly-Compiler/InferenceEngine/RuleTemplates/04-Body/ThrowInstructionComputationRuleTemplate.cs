@@ -31,7 +31,7 @@
             {
                 new OnceReferenceDestinationTemplate<IThrowInstruction, ICompiledType>(nameof(IThrowInstruction.ResolvedType)),
                 new OnceReferenceDestinationTemplate<IThrowInstruction, IResultException>(nameof(IThrowInstruction.ResolvedException)),
-                new UnsealedListDestinationTemplate<IThrowInstruction, IParameter>(nameof(IThrowInstruction.SelectedParameterList)),
+                new OnceReferenceDestinationTemplate<IThrowInstruction, IFeatureCall>(nameof(IThrowInstruction.FeatureCall)),
             };
         }
         #endregion
@@ -78,7 +78,7 @@
             if (Value.Feature.Item is CreationFeature AsCreationFeature)
             {
                 List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
-                if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, ErrorList))
+                if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, ErrorList))
                     return false;
 
                 IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
@@ -89,7 +89,7 @@
                 foreach (ICommandOverloadType Overload in AsProcedureType.OverloadList)
                     ParameterTableList.Add(Overload.ParameterTable);
 
-                if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, ArgumentStyle, ErrorList, node, out int SelectedIndex))
+                if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, TypeArgumentStyle, ErrorList, node, out int SelectedIndex))
                     return false;
 
                 ICommandOverloadType SelectedOverload = AsProcedureType.OverloadList[SelectedIndex];
@@ -106,9 +106,9 @@
 
                 ResultException.Merge(ResolvedException, SelectedOverload.ExceptionIdentifierList);
 
-                ListTableEx<IParameter> SelectedParameterList = SelectedOverload.ParameterTable;
+                IFeatureCall FeatureCall = new FeatureCall(SelectedOverload.ParameterTable, node.ArgumentList, MergedArgumentList, TypeArgumentStyle);
 
-                data = new Tuple<ICompiledType, IResultException, ListTableEx<IParameter>, TypeArgumentStyles>(ResolvedType, ResolvedException, SelectedParameterList, ArgumentStyle);
+                data = new Tuple<ICompiledType, IResultException, IFeatureCall>(ResolvedType, ResolvedException, FeatureCall);
             }
             else
             {
@@ -126,15 +126,13 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IThrowInstruction node, object data)
         {
-            ICompiledType ResolvedType = ((Tuple<ICompiledType, IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item1;
-            IResultException ResolvedException = ((Tuple<ICompiledType, IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item2;
-            ListTableEx<IParameter> SelectedParameterList = ((Tuple<ICompiledType, IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item3;
-            TypeArgumentStyles ArgumentStyle = ((Tuple<ICompiledType, IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item4;
+            ICompiledType ResolvedType = ((Tuple<ICompiledType, IResultException, IFeatureCall>)data).Item1;
+            IResultException ResolvedException = ((Tuple<ICompiledType, IResultException, IFeatureCall>)data).Item2;
+            IFeatureCall FeatureCall = ((Tuple<ICompiledType, IResultException, IFeatureCall>)data).Item3;
 
             node.ResolvedType.Item = ResolvedType;
             node.ResolvedException.Item = ResolvedException;
-            node.SelectedParameterList.AddRange(SelectedParameterList);
-            node.SelectedParameterList.Seal();
+            node.FeatureCall.Item = FeatureCall;
         }
         #endregion
     }

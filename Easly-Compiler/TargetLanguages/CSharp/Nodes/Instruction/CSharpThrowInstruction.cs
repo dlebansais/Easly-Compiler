@@ -51,7 +51,7 @@
             : base(context, parentFeature, source)
         {
             ExceptionType = CSharpType.Create(context, source.ResolvedType.Item);
-            FeatureCall = new CSharpFeatureCall(context, source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle);
+            FeatureCall = new CSharpFeatureCall(context, source.FeatureCall.Item);
         }
         #endregion
 

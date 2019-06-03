@@ -17,19 +17,9 @@ namespace CompilerNode
         IList<IArgument> ArgumentList { get; }
 
         /// <summary>
-        /// List of parameters from the selected overload.
+        /// Details of the feature call.
         /// </summary>
-        ListTableEx<IParameter> SelectedParameterList { get; }
-
-        /// <summary>
-        /// Resolved arguments of the call.
-        /// </summary>
-        OnceReference<IList<IExpressionType>> ResolvedArgumentList { get; }
-
-        /// <summary>
-        /// The argument passing style.
-        /// </summary>
-        TypeArgumentStyles ArgumentStyle { get; set; }
+        OnceReference<IFeatureCall> FeatureCall { get; }
     }
 
     /// <summary>
@@ -135,9 +125,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
                 ResolvedException = new OnceReference<IResultException>();
-                SelectedParameterList = new ListTableEx<IParameter>();
-                ResolvedArgumentList = new OnceReference<IList<IExpressionType>>();
-                ArgumentStyle = TypeArgumentStyles.None;
+                FeatureCall = new OnceReference<IFeatureCall>();
                 IsHandled = true;
             }
 
@@ -171,8 +159,7 @@ namespace CompilerNode
             {
                 IsResolved = ResolvedException.IsAssigned;
 
-                Debug.Assert(SelectedParameterList.IsSealed || !IsResolved);
-                Debug.Assert(ResolvedArgumentList.IsAssigned || !IsResolved);
+                Debug.Assert(FeatureCall.IsAssigned || !IsResolved);
 
                 IsHandled = true;
             }
@@ -206,20 +193,9 @@ namespace CompilerNode
 
         #region Compiler
         /// <summary>
-        /// List of parameters from the selected overload.
+        /// Details of the feature call.
         /// </summary>
-        public ListTableEx<IParameter> SelectedParameterList { get; private set; } = new ListTableEx<IParameter>();
-
-        /// <summary>
-        /// Resolved arguments of the call.
-        /// </summary>
-        public OnceReference<IList<IExpressionType>> ResolvedArgumentList { get; private set; } = new OnceReference<IList<IExpressionType>>();
-
-        /// <summary>
-        /// The argument passing style.
-        /// </summary>
-        ///TODO: merge this and ResolvedArgumentList.
-        public TypeArgumentStyles ArgumentStyle { get; set; }
+        public OnceReference<IFeatureCall> FeatureCall { get; private set; } = new OnceReference<IFeatureCall>();
 
         /// <summary>
         /// Compares two expressions.
@@ -255,21 +231,17 @@ namespace CompilerNode
         /// <param name="resolvedException">Exceptions the expression can throw upon return.</param>
         /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
         /// <param name="expressionConstant">The expression constant upon return.</param>
-        /// <param name="selectedParameterList">The selected parameters.</param>
-        /// <param name="resolvedArgumentList">The list of arguments corresponding to selected parameters.</param>
-        /// <param name="argumentStyle">The argument passing style.</param>
-        public static bool ResolveCompilerReferences(IIndexQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList, out TypeArgumentStyles argumentStyle)
+        /// <param name="featureCall">Details of the feature call.</param>
+        public static bool ResolveCompilerReferences(IIndexQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFeatureCall featureCall)
         {
             resolvedResult = null;
             resolvedException = null;
             constantSourceList = new ListTableEx<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
-            selectedParameterList = null;
-            resolvedArgumentList = null;
-            argumentStyle = TypeArgumentStyles.None;
+            featureCall = null;
 
             IExpression IndexedExpression = (IExpression)node.IndexedExpression;
-            IList<IArgument> ArgumentList = (IList<IArgument>)node.ArgumentList;
+            IList<IArgument> ArgumentList = node.ArgumentList;
             IClass EmbeddingClass = node.EmbeddingClass;
             IResultType ResolvedIndexerResult = IndexedExpression.ResolvedResult.Item;
 
@@ -303,20 +275,19 @@ namespace CompilerNode
                 IIndexerType AsIndexerType = (IndexerType)Indexer.ResolvedFeatureType.Item;
 
                 List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
-                if (!Argument.Validate(ArgumentList, MergedArgumentList, out argumentStyle, errorList))
+                if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, errorList))
                     return false;
 
                 IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
                 ParameterTableList.Add(AsIndexerType.ParameterTable);
 
                 int SelectedIndex;
-                if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, argumentStyle, errorList, node, out SelectedIndex))
+                if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, TypeArgumentStyle, errorList, node, out SelectedIndex))
                     return false;
 
                 resolvedResult = new ResultType(AsIndexerType.ResolvedEntityTypeName.Item, AsIndexerType.ResolvedEntityType.Item, string.Empty);
                 resolvedException = new ResultException(AsIndexerType.GetExceptionIdentifierList);
-                selectedParameterList = ParameterTableList[SelectedIndex];
-                resolvedArgumentList = MergedArgumentList;
+                featureCall = new FeatureCall(ParameterTableList[SelectedIndex], ArgumentList, MergedArgumentList, TypeArgumentStyle);
 
                 // TODO: check if the result is a constant number
             }

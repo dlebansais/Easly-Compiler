@@ -12,24 +12,19 @@ namespace CompilerNode
     public interface IThrowInstruction : BaseNode.IThrowInstruction, IInstruction, INodeWithReplicatedBlocks
     {
         /// <summary>
-        /// The resolved exception type.
-        /// </summary>
-        OnceReference<ICompiledType> ResolvedType { get; }
-
-        /// <summary>
         /// Replicated list from <see cref="BaseNode.ThrowInstruction.ArgumentBlocks"/>.
         /// </summary>
         IList<IArgument> ArgumentList { get; }
 
         /// <summary>
-        /// List of parameters from the selected overload.
+        /// Details of the feature call.
         /// </summary>
-        ListTableEx<IParameter> SelectedParameterList { get; }
+        OnceReference<IFeatureCall> FeatureCall { get; }
 
         /// <summary>
-        /// The argument passing style.
+        /// The resolved exception type.
         /// </summary>
-        TypeArgumentStyles ArgumentStyle { get; set; }
+        OnceReference<ICompiledType> ResolvedType { get; }
     }
 
     /// <summary>
@@ -141,8 +136,7 @@ namespace CompilerNode
             {
                 ResolvedType = new OnceReference<ICompiledType>();
                 ResolvedException = new OnceReference<IResultException>();
-                SelectedParameterList = new ListTableEx<IParameter>();
-                ArgumentStyle = TypeArgumentStyles.None;
+                FeatureCall = new OnceReference<IFeatureCall>();
                 IsHandled = true;
             }
 
@@ -179,7 +173,7 @@ namespace CompilerNode
                 IsResolved = ResolvedType.IsAssigned;
 
                 Debug.Assert(ResolvedException.IsAssigned || !IsResolved);
-                Debug.Assert(SelectedParameterList.IsSealed || !IsResolved);
+                Debug.Assert(FeatureCall.IsAssigned || !IsResolved);
 
                 IsHandled = true;
             }
@@ -220,19 +214,14 @@ namespace CompilerNode
 
         #region Compiler
         /// <summary>
+        /// Details of the feature call.
+        /// </summary>
+        public OnceReference<IFeatureCall> FeatureCall { get; private set; } = new OnceReference<IFeatureCall>();
+
+        /// <summary>
         /// The resolved exception type.
         /// </summary>
         public OnceReference<ICompiledType> ResolvedType { get; private set; } = new OnceReference<ICompiledType>();
-
-        /// <summary>
-        /// List of parameters from the selected overload.
-        /// </summary>
-        public ListTableEx<IParameter> SelectedParameterList { get; private set; } = new ListTableEx<IParameter>();
-
-        /// <summary>
-        /// The argument passing style.
-        /// </summary>
-        public TypeArgumentStyles ArgumentStyle { get; set; }
         #endregion
 
         #region Debugging

@@ -52,7 +52,7 @@
             Feature = context.GetFeature((ICompiledFeature)source.EmbeddingFeature) as ICSharpIndexerFeature;
             Debug.Assert(Feature != null);
 
-            FeatureCall = new CSharpFeatureCall(context, source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle);
+            FeatureCall = new CSharpFeatureCall(context, source.FeatureCall.Item);
         }
         #endregion
 

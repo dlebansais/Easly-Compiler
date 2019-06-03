@@ -34,7 +34,7 @@
                 new OnceReferenceDestinationTemplate<ICommandInstruction, IResultException>(nameof(ICommandInstruction.ResolvedException)),
                 new OnceReferenceDestinationTemplate<ICommandInstruction, ICompiledFeature>(nameof(ICommandInstruction.SelectedFeature)),
                 new OnceReferenceDestinationTemplate<ICommandInstruction, ICommandOverloadType>(nameof(ICommandInstruction.SelectedOverload)),
-                new OnceReferenceDestinationTemplate<ICommandInstruction, IList<IExpressionType>>(nameof(ICommandInstruction.MergedArgumentList)),
+                new OnceReferenceDestinationTemplate<ICommandInstruction, IFeatureCall>(nameof(ICommandInstruction.FeatureCall)),
                 new OnceReferenceDestinationTemplate<ICommandInstruction, IProcedureType>(nameof(ICommandInstruction.CommandFinalType)),
             };
         }
@@ -65,8 +65,9 @@
 
             Debug.Assert(FinalFeature != null);
 
+            IList<IArgument> ArgumentList = node.ArgumentList;
             List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
-            if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, ErrorList))
+            if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, ErrorList))
                 return false;
 
             IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
@@ -115,7 +116,9 @@
                 IList<IIdentifier> CommandInstructionException = SelectedOverload.ExceptionIdentifierList;
                 ResultException.Merge(ResolvedException, CommandInstructionException);
 
-                data = new Tuple<IResultException, ICompiledFeature, ICommandOverloadType, ListTableEx<IParameter>, List<IExpressionType>, TypeArgumentStyles, IProcedureType>(ResolvedException, FinalFeature, SelectedOverload, SelectedParameterList, MergedArgumentList, ArgumentStyle, CommandFinalType);
+                IFeatureCall FeatureCall = new FeatureCall(SelectedParameterList, ArgumentList, MergedArgumentList, ArgumentStyle);
+
+                data = new Tuple<IResultException, ICompiledFeature, ICommandOverloadType, IFeatureCall, IProcedureType>(ResolvedException, FinalFeature, SelectedOverload, FeatureCall, CommandFinalType);
             }
 
             return Success;
@@ -128,21 +131,16 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(ICommandInstruction node, object data)
         {
-            IResultException ResolvedException = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, ListTableEx<IParameter>, List<IExpressionType>, TypeArgumentStyles, IProcedureType>)data).Item1;
-            ICompiledFeature SelectedFeature = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, ListTableEx<IParameter>, List<IExpressionType>, TypeArgumentStyles, IProcedureType>)data).Item2;
-            ICommandOverloadType SelectedOverload = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, ListTableEx<IParameter>, List<IExpressionType>, TypeArgumentStyles, IProcedureType>)data).Item3;
-            ListTableEx<IParameter> SelectedParameterList = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, ListTableEx<IParameter>, List<IExpressionType>, TypeArgumentStyles, IProcedureType>)data).Item4;
-            List<IExpressionType> MergedArgumentList = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, ListTableEx<IParameter>, List<IExpressionType>, TypeArgumentStyles, IProcedureType>)data).Item5;
-            TypeArgumentStyles ArgumentStyle = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, ListTableEx<IParameter>, List<IExpressionType>, TypeArgumentStyles, IProcedureType>)data).Item6;
-            IProcedureType CommandFinalType = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, ListTableEx<IParameter>, List<IExpressionType>, TypeArgumentStyles, IProcedureType>)data).Item7;
+            IResultException ResolvedException = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, IFeatureCall, IProcedureType>)data).Item1;
+            ICompiledFeature SelectedFeature = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, IFeatureCall, IProcedureType>)data).Item2;
+            ICommandOverloadType SelectedOverload = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, IFeatureCall, IProcedureType>)data).Item3;
+            IFeatureCall FeatureCall = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, IFeatureCall, IProcedureType>)data).Item4;
+            IProcedureType CommandFinalType = ((Tuple<IResultException, ICompiledFeature, ICommandOverloadType, IFeatureCall, IProcedureType>)data).Item5;
 
             node.ResolvedException.Item = ResolvedException;
             node.SelectedFeature.Item = SelectedFeature;
             node.SelectedOverload.Item = SelectedOverload;
-            node.SelectedParameterList.AddRange(SelectedParameterList);
-            node.SelectedParameterList.Seal();
-            node.ArgumentStyle = ArgumentStyle;
-            node.MergedArgumentList.Item = MergedArgumentList;
+            node.FeatureCall.Item = FeatureCall;
             node.CommandFinalType.Item = CommandFinalType;
         }
         #endregion

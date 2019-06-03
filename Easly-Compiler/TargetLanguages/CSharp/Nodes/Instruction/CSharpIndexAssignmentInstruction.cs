@@ -56,7 +56,7 @@
             : base(context, parentFeature, source)
         {
             Destination = CSharpQualifiedName.Create(context, (IQualifiedName)source.Destination, parentFeature, null, false);
-            FeatureCall = new CSharpFeatureCall(context, source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle);
+            FeatureCall = new CSharpFeatureCall(context, source.FeatureCall.Item);
             SourceExpression = CSharpExpression.Create(context, (IExpression)source.Source);
         }
         #endregion

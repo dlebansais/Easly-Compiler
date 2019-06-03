@@ -17,14 +17,9 @@
         IList<IArgument> ArgumentList { get; }
 
         /// <summary>
-        /// The list of resolved parameters for the selected overload.
+        /// Details of the feature call.
         /// </summary>
-        ListTableEx<IParameter> SelectedParameterList { get; }
-
-        /// <summary>
-        /// The argument passing style.
-        /// </summary>
-        TypeArgumentStyles ArgumentStyle { get; set; }
+        OnceReference<IFeatureCall> FeatureCall { get; }
     }
 
     /// <summary>
@@ -135,8 +130,7 @@
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
                 ResolvedException = new OnceReference<IResultException>();
-                SelectedParameterList = new ListTableEx<IParameter>();
-                ArgumentStyle = TypeArgumentStyles.None;
+                FeatureCall = new OnceReference<IFeatureCall>();
                 IsHandled = true;
             }
 
@@ -172,7 +166,7 @@
             {
                 IsResolved = ResolvedException.IsAssigned;
 
-                Debug.Assert(SelectedParameterList.IsSealed || !IsResolved);
+                Debug.Assert(FeatureCall.IsAssigned || !IsResolved);
 
                 IsHandled = true;
             }
@@ -213,14 +207,9 @@
 
         #region Compiler
         /// <summary>
-        /// The list of resolved parameters for the selected overload.
+        /// Details of the feature call.
         /// </summary>
-        public ListTableEx<IParameter> SelectedParameterList { get; private set; } = new ListTableEx<IParameter>();
-
-        /// <summary>
-        /// The argument passing style.
-        /// </summary>
-        public TypeArgumentStyles ArgumentStyle { get; set; }
+        public OnceReference<IFeatureCall> FeatureCall { get; private set; } = new OnceReference<IFeatureCall>();
         #endregion
 
         #region Debugging

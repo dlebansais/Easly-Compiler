@@ -30,7 +30,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IPrecursorInstruction, IResultException>(nameof(IPrecursorInstruction.ResolvedException)),
-                new UnsealedListDestinationTemplate<IPrecursorInstruction, IParameter>(nameof(IPrecursorInstruction.SelectedParameterList)),
+                new OnceReferenceDestinationTemplate<IPrecursorInstruction, IFeatureCall>(nameof(IPrecursorInstruction.FeatureCall)),
             };
         }
         #endregion
@@ -99,7 +99,7 @@
                     SelectedPrecursor.Item = Instance.PrecursorList[0].Precursor;
 
                 List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
-                if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, ErrorList))
+                if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, ErrorList))
                     return false;
 
                 IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
@@ -115,7 +115,7 @@
                 foreach (ICommandOverloadType Overload in AsProcedureType.OverloadList)
                     ParameterTableList.Add(Overload.ParameterTable);
 
-                if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, ArgumentStyle, ErrorList, node, out int SelectedIndex))
+                if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, TypeArgumentStyle, ErrorList, node, out int SelectedIndex))
                     return false;
 
                 ICommandOverloadType SelectedOverload = AsProcedureType.OverloadList[SelectedIndex];
@@ -129,7 +129,9 @@
 
                 ResultException.Merge(ResolvedException, PrecursorInstructionException);
 
-                data = new Tuple<IResultException, ListTableEx<IParameter>, TypeArgumentStyles>(ResolvedException, SelectedParameterList, ArgumentStyle);
+                IFeatureCall FeatureCall = new FeatureCall(SelectedParameterList, node.ArgumentList, MergedArgumentList, TypeArgumentStyle);
+
+                data = new Tuple<IResultException, IFeatureCall>(ResolvedException, FeatureCall);
             }
 
             return Success;
@@ -142,14 +144,11 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IPrecursorInstruction node, object data)
         {
-            IResultException ResolvedException = ((Tuple<IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item1;
-            ListTableEx<IParameter> SelectedParameterList = ((Tuple<IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item2;
-            TypeArgumentStyles ArgumentStyle = ((Tuple<IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item3;
+            IResultException ResolvedException = ((Tuple<IResultException, IFeatureCall>)data).Item1;
+            IFeatureCall FeatureCall = ((Tuple<IResultException, IFeatureCall>)data).Item2;
 
             node.ResolvedException.Item = ResolvedException;
-            node.SelectedParameterList.AddRange(SelectedParameterList);
-            node.SelectedParameterList.Seal();
-            node.ArgumentStyle = ArgumentStyle;
+            node.FeatureCall.Item = FeatureCall;
 
             IFeature EmbeddingFeature = node.EmbeddingFeature;
             IFeatureWithPrecursor ResolvedFeature = EmbeddingFeature.ResolvedFeature.Item as IFeatureWithPrecursor;

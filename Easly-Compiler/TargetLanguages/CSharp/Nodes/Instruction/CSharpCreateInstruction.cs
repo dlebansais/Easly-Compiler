@@ -64,7 +64,7 @@
             EntityType = CSharpType.Create(context, source.ResolvedEntityType.Item);
             CreatedObjectName = ((IIdentifier)source.EntityIdentifier).ValidText.Item;
             CreationRoutineName = ((IIdentifier)source.CreationRoutineIdentifier).ValidText.Item;
-            FeatureCall = new CSharpFeatureCall(context, source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle);
+            FeatureCall = new CSharpFeatureCall(context, source.FeatureCall.Item);
         }
         #endregion
 

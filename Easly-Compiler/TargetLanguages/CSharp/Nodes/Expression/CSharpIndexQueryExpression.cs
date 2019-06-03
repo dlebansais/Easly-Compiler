@@ -49,7 +49,7 @@
             : base(context, source)
         {
             IndexedExpression = Create(context, (IExpression)source.IndexedExpression);
-            FeatureCall = new CSharpFeatureCall(context, source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle);
+            FeatureCall = new CSharpFeatureCall(context, source.FeatureCall.Item);
         }
         #endregion
 

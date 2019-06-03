@@ -50,7 +50,7 @@
         protected CSharpPrecursorIndexAssignmentInstruction(ICSharpContext context, ICSharpFeature parentFeature, IPrecursorIndexAssignmentInstruction source)
             : base(context, parentFeature, source)
         {
-            FeatureCall = new CSharpFeatureCall(context, source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle);
+            FeatureCall = new CSharpFeatureCall(context, source.FeatureCall.Item);
             SourceExpression = CSharpExpression.Create(context, (IExpression)source.Source);
         }
         #endregion

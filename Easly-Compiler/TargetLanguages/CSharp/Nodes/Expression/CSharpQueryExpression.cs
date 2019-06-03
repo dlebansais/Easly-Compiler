@@ -59,7 +59,7 @@
         protected CSharpQueryExpression(ICSharpContext context, IQueryExpression source)
             : base(context, source)
         {
-            FeatureCall = new CSharpFeatureCall(context, source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle);
+            FeatureCall = new CSharpFeatureCall(context, source.FeatureCall.Item);
 
             if (Source.ResolvedFinalFeature.IsAssigned)
             {

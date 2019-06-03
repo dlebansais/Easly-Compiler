@@ -31,7 +31,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IPrecursorIndexAssignmentInstruction, IResultException>(nameof(IPrecursorIndexAssignmentInstruction.ResolvedException)),
-                new UnsealedListDestinationTemplate<IPrecursorIndexAssignmentInstruction, IParameter>(nameof(IPrecursorIndexAssignmentInstruction.SelectedParameterList)),
+                new OnceReferenceDestinationTemplate<IPrecursorIndexAssignmentInstruction, IFeatureCall>(nameof(IPrecursorIndexAssignmentInstruction.FeatureCall)),
             };
         }
         #endregion
@@ -69,7 +69,7 @@
 
                 ParameterTableList.Add(AsIndexerType.ParameterTable);
 
-                if (!Argument.CheckAssignmentConformance(ParameterTableList, node.ArgumentList, SourceExpression, AsIndexerType.ResolvedEntityType.Item, ErrorList, node, out ListTableEx<IParameter> SelectedParameterList, out TypeArgumentStyles ArgumentStyle))
+                if (!Argument.CheckAssignmentConformance(ParameterTableList, node.ArgumentList, SourceExpression, AsIndexerType.ResolvedEntityType.Item, ErrorList, node, out IFeatureCall FeatureCall))
                     return false;
 
                 IResultException ResolvedException = new ResultException();
@@ -81,7 +81,7 @@
 
                 ResultException.Merge(ResolvedException, AsIndexerType.SetExceptionIdentifierList);
 
-                data = new Tuple<IResultException, ListTableEx<IParameter>, TypeArgumentStyles>(ResolvedException, SelectedParameterList, ArgumentStyle);
+                data = new Tuple<IResultException, IFeatureCall>(ResolvedException, FeatureCall);
             }
             else
             {
@@ -99,14 +99,11 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IPrecursorIndexAssignmentInstruction node, object data)
         {
-            IResultException ResolvedException = ((Tuple<IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item1;
-            ListTableEx<IParameter> SelectedParameterList = ((Tuple<IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item2;
-            TypeArgumentStyles ArgumentStyle = ((Tuple<IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item3;
+            IResultException ResolvedException = ((Tuple<IResultException, IFeatureCall>)data).Item1;
+            IFeatureCall FeatureCall = ((Tuple<IResultException, IFeatureCall>)data).Item2;
 
             node.ResolvedException.Item = ResolvedException;
-            node.SelectedParameterList.AddRange(SelectedParameterList);
-            node.SelectedParameterList.Seal();
-            node.ArgumentStyle = ArgumentStyle;
+            node.FeatureCall.Item = FeatureCall;
         }
         #endregion
     }

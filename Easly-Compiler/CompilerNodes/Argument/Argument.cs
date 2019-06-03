@@ -433,18 +433,17 @@ namespace CompilerNode
         /// <param name="destinationType">The expected type for the expression.</param>
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="source">The source to use when reporting errors.</param>
-        /// <param name="selectedParameterList">The list of parameters for the selected overload upon return.</param>
-        /// <param name="argumentStyle">The argument passing style.</param>
-        public static bool CheckAssignmentConformance(IList<ListTableEx<IParameter>> parameterTableList, IList<IArgument> argumentList, IExpression sourceExpression, ICompiledType destinationType, IErrorList errorList, ISource source, out ListTableEx<IParameter> selectedParameterList, out TypeArgumentStyles argumentStyle)
+        /// <param name="featureCall">Details of the feature call.</param>
+        public static bool CheckAssignmentConformance(IList<ListTableEx<IParameter>> parameterTableList, IList<IArgument> argumentList, IExpression sourceExpression, ICompiledType destinationType, IErrorList errorList, ISource source, out IFeatureCall featureCall)
         {
-            selectedParameterList = null;
+            featureCall = null;
             IResultType SourceResult = sourceExpression.ResolvedResult.Item;
 
             List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
-            if (!Argument.Validate(argumentList, MergedArgumentList, out argumentStyle, errorList))
+            if (!Argument.Validate(argumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, errorList))
                 return false;
 
-            if (!Argument.ArgumentsConformToParameters(parameterTableList, MergedArgumentList, argumentStyle, errorList, source, out int SelectedIndex))
+            if (!Argument.ArgumentsConformToParameters(parameterTableList, MergedArgumentList, TypeArgumentStyle, errorList, source, out int SelectedIndex))
                 return false;
 
             if (SourceResult.Count != 1)
@@ -453,7 +452,7 @@ namespace CompilerNode
                 return false;
             }
 
-            selectedParameterList = parameterTableList[SelectedIndex];
+            ListTableEx<IParameter> SelectedParameterList = parameterTableList[SelectedIndex];
             ICompiledType SourceType = SourceResult.At(0).ValueType;
 
             IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
@@ -462,6 +461,8 @@ namespace CompilerNode
                 errorList.AddError(new ErrorInvalidExpression(sourceExpression));
                 return false;
             }
+
+            featureCall = new FeatureCall(SelectedParameterList, argumentList, MergedArgumentList, TypeArgumentStyle);
 
             return true;
         }

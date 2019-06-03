@@ -50,7 +50,7 @@
         protected CSharpPrecursorInstruction(ICSharpContext context, ICSharpFeature parentFeature, IPrecursorInstruction source)
             : base(context, parentFeature, source)
         {
-            FeatureCall = new CSharpFeatureCall(context, source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle);
+            FeatureCall = new CSharpFeatureCall(context, source.FeatureCall.Item);
         }
         #endregion
 
