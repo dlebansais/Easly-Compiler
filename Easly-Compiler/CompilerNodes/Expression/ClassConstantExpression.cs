@@ -285,7 +285,7 @@ namespace CompilerNode
             }
             else if (FeatureName.TableContain(FeatureTable, ValidConstantText, out Key, out IFeatureInstance FeatureInstance))
             {
-                if (FeatureInstance.Feature.Item is IConstantFeature AsConstantFeature)
+                if (FeatureInstance.Feature is IConstantFeature AsConstantFeature)
                 {
                     resolvedFinalFeature = AsConstantFeature;
                     ConstantTypeName = AsConstantFeature.ResolvedEntityTypeName.Item;

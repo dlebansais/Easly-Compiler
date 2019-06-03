@@ -237,8 +237,9 @@ namespace CompilerNode
                         return false;
                     }
 
-                    Debug.Assert(Value.Feature.IsAssigned);
-                    ICompiledFeature OperatorFeature = Value.Feature.Item;
+                    Debug.Assert(Value.Feature != null);
+
+                    ICompiledFeature OperatorFeature = Value.Feature;
                     Debug.Assert(OperatorFeature.ResolvedFeatureType.IsAssigned);
                     ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
 

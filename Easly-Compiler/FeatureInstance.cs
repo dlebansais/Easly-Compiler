@@ -13,12 +13,12 @@
         /// <summary>
         /// The class with the instance. Can be different than the class that defines the feature.
         /// </summary>
-        OnceReference<IClass> Owner { get; }
+        IClass Owner { get; }
 
         /// <summary>
         /// The feature.
         /// </summary>
-        OnceReference<ICompiledFeature> Feature { get; }
+        ICompiledFeature Feature { get; }
 
         /// <summary>
         /// Inherited with a forget clause.
@@ -114,9 +114,11 @@
         /// <param name="isDiscontinued">Inherited with a discontinue clause.</param>
         public FeatureInstance(IClass owner, ICompiledFeature feature, bool isKept, bool isDiscontinued)
         {
-            // TODO: check if oncereference is really needed.
-            Owner.Item = owner;
-            Feature.Item = feature;
+            Debug.Assert(owner != null);
+            Debug.Assert(feature != null);
+
+            Owner = owner;
+            Feature = feature;
             IsForgotten = feature.IsDeferredFeature;
             IsKept = isKept;
             IsDiscontinued = isDiscontinued;
@@ -126,12 +128,12 @@
         /// <summary>
         /// The class with the instance. Can be different than the class that defines the feature.
         /// </summary>
-        public OnceReference<IClass> Owner { get; } = new OnceReference<IClass>();
+        public IClass Owner { get; }
 
         /// <summary>
         /// The feature.
         /// </summary>
-        public OnceReference<ICompiledFeature> Feature { get; } = new OnceReference<ICompiledFeature>();
+        public ICompiledFeature Feature { get; }
 
         /// <summary>
         /// Inherited with a forget clause.
@@ -209,8 +211,7 @@
             IPrecursorInstance NewPrecursor = new PrecursorInstance(ancestor, this);
             Debug.Assert(NewPrecursor.Ancestor == ancestor);
 
-            Debug.Assert(Feature.IsAssigned);
-            IFeatureInstance ClonedObject = new FeatureInstance(Owner.Item, Feature.Item);
+            IFeatureInstance ClonedObject = new FeatureInstance(Owner, Feature);
 
             foreach (IPrecursorInstance PrecursorInstance in PrecursorList)
                 ClonedObject.PrecursorList.Add(PrecursorInstance);

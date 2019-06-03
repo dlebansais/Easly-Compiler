@@ -177,7 +177,7 @@
             }
             else
             {
-                ICompiledFeature ItemFeature = ItemInstance.Feature.Item;
+                ICompiledFeature ItemFeature = ItemInstance.Feature;
                 IsReady = IsPathGlobalItemReady(ItemFeature, nextItem, errorList, ref isInterrupted, out ItemType);
             }
 
@@ -291,7 +291,7 @@
             }
             else
             {
-                ICompiledFeature ItemFeature = ItemInstance.Feature.Item;
+                ICompiledFeature ItemFeature = ItemInstance.Feature;
                 bool IsHandled = false;
 
                 switch (ItemFeature)

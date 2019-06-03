@@ -1415,7 +1415,7 @@
 
         private static bool GetQualifiedPathFinalTypeAsFeature(IClass baseClass, ICompiledType baseType, IHashtableEx<string, IScopeAttributeFeature> localScope, IList<IIdentifier> validPath, int index, IErrorList errorList, IFeatureInstance instance, out ICompiledFeature finalFeature, out IDiscrete finalDiscrete, out ITypeName finalTypeName, out ICompiledType finalType, out bool inheritBySideAttribute)
         {
-            ICompiledFeature SourceFeature = instance.Feature.Item;
+            ICompiledFeature SourceFeature = instance.Feature;
             ITypeName ResolvedFeatureTypeName = SourceFeature.ResolvedFeatureTypeName.Item;
             ICompiledType ResolvedFeatureType = SourceFeature.ResolvedFeatureType.Item;
 
@@ -1534,7 +1534,7 @@
             }
             else if (FeatureName.TableContain(FeatureTable, ValidText, out IFeatureName Key, out IFeatureInstance Instance))
             {
-                ICompiledFeature SourceFeature = Instance.Feature.Item;
+                ICompiledFeature SourceFeature = Instance.Feature;
                 ITypeName ResolvedFeatureTypeName = SourceFeature.ResolvedFeatureTypeName.Item;
                 ICompiledType ResolvedFeatureType = SourceFeature.ResolvedFeatureType.Item;
 

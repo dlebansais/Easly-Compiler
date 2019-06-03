@@ -104,7 +104,7 @@
 
                 IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
 
-                ICompiledFeature OperatorFeature = SelectedPrecursor.Item.Feature.Item;
+                ICompiledFeature OperatorFeature = SelectedPrecursor.Item.Feature;
                 ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
                 IList<IIdentifier> PrecursorInstructionException = null;
                 ListTableEx<IParameter> SelectedParameterList = null;

@@ -343,9 +343,9 @@
                 {
                     bool ValidFeature = false;
 
-                    if (FeatureItem.Feature.Item is AttributeFeature AsAttributeFeature)
+                    if (FeatureItem.Feature is AttributeFeature AsAttributeFeature)
                         ValidFeature = true;
-                    else if (FeatureItem.Feature.Item is IPropertyFeature AsPropertyFeature)
+                    else if (FeatureItem.Feature is IPropertyFeature AsPropertyFeature)
                     {
                         bool IsHandled = false;
                         switch (AsPropertyFeature.PropertyKind)
@@ -370,7 +370,7 @@
                     }
 
                     if (ValidFeature)
-                        assignedFeatureTable.Add(ValidIdentifierText, FeatureItem.Feature.Item);
+                        assignedFeatureTable.Add(ValidIdentifierText, FeatureItem.Feature);
                     else
                     {
                         errorList.AddError(new ErrorAttributeOrPropertyRequired(identifierItem, ValidIdentifierText));

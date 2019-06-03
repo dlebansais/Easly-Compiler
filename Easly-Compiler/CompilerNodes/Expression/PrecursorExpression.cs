@@ -293,7 +293,7 @@ namespace CompilerNode
             resolvedArgumentList = null;
 
             IList<IArgument> ArgumentList = node.ArgumentList;
-            ICompiledFeature OperatorFeature = selectedPrecursor.Feature.Item;
+            ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
             ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
             ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
             IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
@@ -339,7 +339,7 @@ namespace CompilerNode
             resolvedArgumentList = null;
 
             IList<IArgument> ArgumentList = node.ArgumentList;
-            ICompiledFeature OperatorFeature = selectedPrecursor.Feature.Item;
+            ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
             ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
             ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
             IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
@@ -369,7 +369,7 @@ namespace CompilerNode
             resolvedArgumentList = null;
 
             IList<IArgument> ArgumentList = node.ArgumentList;
-            ICompiledFeature OperatorFeature = selectedPrecursor.Feature.Item;
+            ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
             ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
             ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
             IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
@@ -407,7 +407,7 @@ namespace CompilerNode
             resolvedArgumentList = null;
 
             IList<IArgument> ArgumentList = node.ArgumentList;
-            ICompiledFeature OperatorFeature = selectedPrecursor.Feature.Item;
+            ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
             ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
             ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
             IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();

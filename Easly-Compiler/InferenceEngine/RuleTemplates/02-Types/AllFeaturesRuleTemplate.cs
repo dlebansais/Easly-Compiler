@@ -109,9 +109,9 @@
                     IFeatureName Key = Entry.Key;
                     IFeatureInstance Value = Entry.Value;
 
-                    if (Value.Feature.IsAssigned)
-                        CheckIfFeatureListed(byFeatureTable, FeatureInfoItem, Key, Value);
+                    Debug.Assert(Value.Feature != null);
 
+                    CheckIfFeatureListed(byFeatureTable, FeatureInfoItem, Key, Value);
                     CheckIfFeatureNameListed(byNameTable, FeatureInfoItem, Key, Value);
                 }
             }
@@ -126,7 +126,7 @@
                 IList<InstanceNameInfo> NameList = ImportedEntry.Value;
 
                 // Feature already listed
-                if (featureInstance.Feature.Item == ImportedKey)
+                if (featureInstance.Feature == ImportedKey)
                 {
                     UpdateNameList(featureInfo, featureName, featureInstance, NameList);
                     FeatureAlreadyListed = true;
@@ -139,7 +139,7 @@
                 InstanceNameInfo NewInfo = new InstanceNameInfo(featureInfo, featureInstance, featureName);
                 InitList.Add(NewInfo);
 
-                byFeatureTable.Add(featureInstance.Feature.Item, InitList);
+                byFeatureTable.Add(featureInstance.Feature, InitList);
             }
         }
 
@@ -190,13 +190,18 @@
                 {
                     FeatureAlreadyListed = false;
 
-                    if (featureInstance.Feature.IsAssigned)
-                        foreach (InstanceNameInfo Item in InstanceList)
-                            if (Item.Instance.Feature.IsAssigned && featureInstance.Feature.Item == Item.Instance.Feature.Item)
-                            {
-                                FeatureAlreadyListed = true;
-                                break;
-                            }
+                    Debug.Assert(featureInstance.Feature != null);
+
+                    foreach (InstanceNameInfo Item in InstanceList)
+                    {
+                        Debug.Assert(Item.Instance.Feature != null);
+
+                        if (featureInstance.Feature == Item.Instance.Feature)
+                        {
+                            FeatureAlreadyListed = true;
+                            break;
+                        }
+                    }
 
                     if (!FeatureAlreadyListed)
                     {
@@ -305,7 +310,7 @@
 
             if (InstanceList.Count > 1)
             {
-                ICompiledType FeatureType = InstanceList[0].Instance.Feature.Item.ResolvedFeatureType.Item;
+                ICompiledType FeatureType = InstanceList[0].Instance.Feature.ResolvedFeatureType.Item;
 
                 for (int i = 1; i < InstanceList.Count && Result; i++)
                 {
@@ -313,7 +318,7 @@
 
                     Result &= importedInstance.IsKept == ThisInstance.Instance.IsKept;
                     Result &= importedInstance.IsDiscontinued == ThisInstance.Instance.IsDiscontinued;
-                    Result &= ObjectType.TypesHaveIdenticalSignature(FeatureType, ThisInstance.Instance.Feature.Item.ResolvedFeatureType.Item);
+                    Result &= ObjectType.TypesHaveIdenticalSignature(FeatureType, ThisInstance.Instance.Feature.ResolvedFeatureType.Item);
 
                     if (!Result)
                     {
@@ -336,9 +341,9 @@
             importedInstance.IsDiscontinued = importedInstance.EffectiveInstance.Item.Instance.IsDiscontinued;
 
             // If the effective instance is a redefine.
-            if (importedInstance.EffectiveInstance.Item.Ancestor == localClassType && importedInstance.EffectiveInstance.Item.Instance.Feature.Item.ResolvedFeatureType.IsAssigned)
+            if (importedInstance.EffectiveInstance.Item.Ancestor == localClassType && importedInstance.EffectiveInstance.Item.Instance.Feature.ResolvedFeatureType.IsAssigned)
             {
-                ICompiledType DescendantFeatureType = importedInstance.EffectiveInstance.Item.Instance.Feature.Item.ResolvedFeatureType.Item;
+                ICompiledType DescendantFeatureType = importedInstance.EffectiveInstance.Item.Instance.Feature.ResolvedFeatureType.Item;
 
                 IList<InstanceNameInfo> InstanceList = importedInstance.PrecursorInstanceList;
                 foreach (InstanceNameInfo Item in InstanceList)
@@ -346,9 +351,9 @@
                     if (Item == importedInstance.EffectiveInstance.Item)
                         continue;
 
-                    ICompiledType AncestorFeatureType = Item.Instance.Feature.Item.ResolvedFeatureType.Item;
+                    ICompiledType AncestorFeatureType = Item.Instance.Feature.ResolvedFeatureType.Item;
 
-                    if (!ObjectType.TypeConformToBase(DescendantFeatureType, AncestorFeatureType, errorList, (ISource)importedInstance.EffectiveInstance.Item.Instance.Feature.Item))
+                    if (!ObjectType.TypeConformToBase(DescendantFeatureType, AncestorFeatureType, errorList, (ISource)importedInstance.EffectiveInstance.Item.Instance.Feature))
                     {
                         errorList.AddError(new ErrorInheritanceConflict(Item.Location, Item.Name.Name));
                         Result = false;
@@ -468,7 +473,7 @@
                 if (ImportedInstance.EffectiveInstance.IsAssigned)
                 {
                     InstanceNameInfo Item = ImportedInstance.EffectiveInstance.Item;
-                    ICompiledFeature EffectiveFeature = Item.Instance.Feature.Item;
+                    ICompiledFeature EffectiveFeature = Item.Instance.Feature;
 
                     if (EffectiveFeature.HasPrecursorBody)
                     {
@@ -479,7 +484,7 @@
                             if (AncestorItem == Item)
                                 continue;
 
-                            ICompiledFeature AncestorEffectiveFeature = AncestorItem.Instance.Feature.Item;
+                            ICompiledFeature AncestorEffectiveFeature = AncestorItem.Instance.Feature;
                             if (AncestorEffectiveFeature.IsDeferredFeature)
                                 continue;
 
@@ -555,7 +560,7 @@
 
                 selectedInstanceInfo = null;
                 foreach (InstanceNameInfo Item in InstancePrecursorList)
-                    if (Item.Instance.Owner.Item == item)
+                    if (Item.Instance.Owner == item)
                     {
                         selectedInstanceInfo = Item;
                         break;
@@ -565,7 +570,7 @@
                     selectedInstanceInfo = InstancePrecursorList[0];
             }
 
-            NewInstance = new FeatureInstance(selectedInstanceInfo.Instance.Owner.Item, selectedInstanceInfo.Instance.Feature.Item, importedInstance.IsKept, importedInstance.IsDiscontinued);
+            NewInstance = new FeatureInstance(selectedInstanceInfo.Instance.Owner, selectedInstanceInfo.Instance.Feature, importedInstance.IsKept, importedInstance.IsDiscontinued);
             return NewInstance;
         }
 
@@ -574,8 +579,11 @@
             foreach (IPrecursorInstance PrecursorItem in instance.PrecursorList)
             {
                 IFeatureInstance Precursor = PrecursorItem.Precursor;
-                if (Precursor.Feature.IsAssigned && !precursorList.Contains(Precursor.Feature.Item))
-                    precursorList.Add(Precursor.Feature.Item);
+
+                Debug.Assert(Precursor.Feature != null);
+
+                if (!precursorList.Contains(Precursor.Feature))
+                    precursorList.Add(Precursor.Feature);
 
                 FillPrecursorList(precursorList, Precursor);
             }

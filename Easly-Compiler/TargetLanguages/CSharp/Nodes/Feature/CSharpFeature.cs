@@ -154,7 +154,7 @@
             Owner = owner;
             Instance = instance;
 
-            Debug.Assert(Instance.Feature.Item == Source);
+            Debug.Assert(Instance.Feature == Source);
         }
         #endregion
 

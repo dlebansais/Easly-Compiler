@@ -119,13 +119,13 @@
             }
             else if (FeatureName.TableContain(EmbeddingClass.FeatureTable, ValidText, out IFeatureName Key, out IFeatureInstance Instance))
             {
-                if (Instance.Feature.Item is IAttributeFeature AsAttributeFeature)
+                if (Instance.Feature is IAttributeFeature AsAttributeFeature)
                 {
                     attributeTypeName = AsAttributeFeature.ResolvedEntityTypeName.Item;
                     attributeType = AsAttributeFeature.ResolvedEntityType.Item;
                     Success = true;
                 }
-                else if (Instance.Feature.Item is IPropertyFeature AsPropertyFeature)
+                else if (Instance.Feature is IPropertyFeature AsPropertyFeature)
                 {
                     attributeTypeName = AsPropertyFeature.ResolvedEntityTypeName.Item;
                     attributeType = AsPropertyFeature.ResolvedEntityType.Item;
@@ -200,7 +200,7 @@
                 return false;
             }
 
-            ICompiledFeature CreationRoutineInstance = CreationFeatureInstance.Feature.Item;
+            ICompiledFeature CreationRoutineInstance = CreationFeatureInstance.Feature;
 
             if (CreationRoutineInstance is ICreationFeature AsCreationFeature)
             {

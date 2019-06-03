@@ -292,8 +292,8 @@
                         break;
                     }
 
-                    IClass SourceClass = Instance.Owner.Item;
-                    ICompiledFeature SourceFeature = Instance.Feature.Item;
+                    IClass SourceClass = Instance.Owner;
+                    ICompiledFeature SourceFeature = Instance.Feature;
                     CSharpExports ExportStatus = GetExportStatus(Key, SourceClass, cSharpClass.Source.ExportTable, (IFeature)SourceFeature);
                     if (ExportStatus == CSharpExports.Public && !(SourceFeature is ICreationFeature))
                     {
@@ -367,7 +367,7 @@
             foreach (KeyValuePair<IFeatureName, IFeatureInstance> Entry in cSharpClass.Source.FeatureTable)
             {
                 IFeatureInstance Instance = Entry.Value;
-                Debug.Assert(Instance.Feature.IsAssigned && Instance.Owner.IsAssigned);
+                Debug.Assert(Instance.Feature != null && Instance.Owner != null);
 
                 // Only create features that belong to this class directly, or are not inherited from a base class.
                 if (!IsDirectOrNotMainParentFeature(Instance, cSharpClass))
@@ -385,7 +385,7 @@
             result = null;
             bool IsHandled = false;
 
-            ICompiledFeature SourceFeature = instance.Feature.Item;
+            ICompiledFeature SourceFeature = instance.Feature;
 
             switch (SourceFeature)
             {
@@ -437,7 +437,7 @@
 
         private static bool IsDirectOrNotMainParentFeature(IFeatureInstance instance, ICSharpClass cSharpClass)
         {
-            IClass Owner = instance.Owner.Item;
+            IClass Owner = instance.Owner;
 
             // Feature directly implemented in the class?
             if (Owner == cSharpClass.Source)

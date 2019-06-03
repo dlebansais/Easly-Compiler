@@ -238,8 +238,8 @@ namespace CompilerNode
                 return false;
             }
 
-            Debug.Assert(Value.Feature.IsAssigned);
-            resolvedFeature = Value.Feature.Item;
+            Debug.Assert(Value.Feature != null);
+            resolvedFeature = Value.Feature;
 
             resolvedResult = new ResultType(resolvedFeature.ResolvedFeatureTypeName.Item, resolvedFeature.ResolvedFeatureType.Item, string.Empty);
 

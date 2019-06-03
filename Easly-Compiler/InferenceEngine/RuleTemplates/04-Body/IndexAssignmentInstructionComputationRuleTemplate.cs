@@ -75,7 +75,7 @@
                 }
 
                 IFeatureInstance IndexerInstance = IndexedFeatureTable[FeatureName.IndexerFeatureName];
-                IIndexerFeature Indexer = (IndexerFeature)IndexerInstance.Feature.Item;
+                IIndexerFeature Indexer = (IndexerFeature)IndexerInstance.Feature;
                 IIndexerType AsIndexerType = (IndexerType)Indexer.ResolvedFeatureType.Item;
 
                 IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();

@@ -507,7 +507,7 @@
 
             foreach (IPrecursorInstance Item in Instance.PrecursorList)
             {
-                ICompiledFeature SourceFeature = Item.Precursor.Feature.Item;
+                ICompiledFeature SourceFeature = Item.Precursor.Feature;
                 Debug.Assert(globalFeatureTable.ContainsKey(SourceFeature));
 
                 if (globalFeatureTable[SourceFeature] is ICSharpPropertyFeature AsPropertyPrecursor)
@@ -526,7 +526,7 @@
 
             foreach (IPrecursorInstance Item in Instance.PrecursorList)
             {
-                ICompiledFeature SourceFeature = Item.Precursor.Feature.Item;
+                ICompiledFeature SourceFeature = Item.Precursor.Feature;
                 Debug.Assert(globalFeatureTable.ContainsKey(SourceFeature));
 
                 if (globalFeatureTable[SourceFeature] is ICSharpIndexerFeature AsIndexerPrecursor)
@@ -961,7 +961,7 @@
                 if (Feature is ICSharpCreationFeature AsCreationFeature)
                     if (AsCreationFeature.Owner.ClassConstructorType == CSharpConstructorTypes.OneConstructor)
                     {
-                        ICreationFeature Constructor = (ICreationFeature)Instance.Feature.Item;
+                        ICreationFeature Constructor = (ICreationFeature)Instance.Feature;
                         foreach (ICommandOverload Overload in Constructor.OverloadList)
                             if (Overload.ParameterList.Count > 0)
                             {
@@ -1075,7 +1075,7 @@
                                 ICSharpClass ParentClass = CurrentClass.BaseClass;
 
                                 foreach (IPrecursorInstance PrecursorItem in Instance.PrecursorList)
-                                    if (PrecursorItem.Precursor.Owner.Item == ParentClass.Source)
+                                    if (PrecursorItem.Precursor.Owner == ParentClass.Source)
                                     {
                                         IsFromParent = true;
                                         break;
@@ -1099,8 +1099,8 @@
                             IPrecursorInstance PrecursorItem = Instance.PrecursorList[0];
                             IFeatureInstance CoexistingPrecursor = PrecursorItem.Precursor;
 
-                            ICompiledFeature SourcePrecursorFeature = CoexistingPrecursor.Feature.Item;
-                            IClass SourcePrecursorClass = CoexistingPrecursor.Owner.Item;
+                            ICompiledFeature SourcePrecursorFeature = CoexistingPrecursor.Feature;
+                            IClass SourcePrecursorClass = CoexistingPrecursor.Owner;
                             CSharpExports PrecursorExportStatus = CSharpExports.Private;
 
                             ICSharpFeature PrecursorFeature = null;

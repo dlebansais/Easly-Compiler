@@ -1187,7 +1187,7 @@ namespace CompilerNode
                 foreach (KeyValuePair<IFeatureName, IFeatureInstance> Entry in FeatureTable)
                 {
                     IFeatureInstance Instance = Entry.Value;
-                    ICompiledFeature SourceFeature = Instance.Feature.Item;
+                    ICompiledFeature SourceFeature = Instance.Feature;
 
                     Result |= SourceFeature.HasExternBody;
                 }

@@ -63,7 +63,7 @@
                     return false;
 
                 IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
-                ICompiledFeature OperatorFeature = SelectedPrecursor.Feature.Item;
+                ICompiledFeature OperatorFeature = SelectedPrecursor.Feature;
                 IIndexerType AsIndexerType = OperatorFeature.ResolvedFeatureType.Item as IIndexerType;
                 Debug.Assert(AsIndexerType != null);
 

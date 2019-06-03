@@ -255,7 +255,7 @@
             if (HasSideBySideAttribute)
                 foreach (IPrecursorInstance Item in Instance.PrecursorList)
                 {
-                    ICompiledFeature PrecursorFeature = Item.Precursor.Feature.Item;
+                    ICompiledFeature PrecursorFeature = Item.Precursor.Feature;
 
                     Debug.Assert(globalFeatureTable.ContainsKey(PrecursorFeature));
                     ICSharpPropertyFeature PrecursorPropertyFeature = globalFeatureTable[PrecursorFeature] as ICSharpPropertyFeature;

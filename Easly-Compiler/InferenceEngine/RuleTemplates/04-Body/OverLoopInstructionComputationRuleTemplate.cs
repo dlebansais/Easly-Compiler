@@ -69,7 +69,7 @@
                 if (IsNumberTypeAvailable && ResultType.FeatureTable.ContainsKey(FeatureName.IndexerFeatureName))
                 {
                     IFeatureInstance IndexerInstance = ResultType.FeatureTable[FeatureName.IndexerFeatureName];
-                    IIndexerFeature IndexerFeature = IndexerInstance.Feature.Item as IIndexerFeature;
+                    IIndexerFeature IndexerFeature = IndexerInstance.Feature as IIndexerFeature;
                     Debug.Assert(IndexerFeature != null);
 
                     if (IndexerFeature.IndexParameterList.Count == 1)

@@ -135,9 +135,9 @@
             bool IsConformantToEnumerable = false;
 
             if (precursorInstance.Ancestor.BaseClass.ClassGuid == LanguageClasses.OverLoopSource.Guid)
-                if (precursorInstance.Precursor.Feature.Item is IPropertyFeature AsPropertyAncestor)
+                if (precursorInstance.Precursor.Feature is IPropertyFeature AsPropertyAncestor)
                     if (AsPropertyAncestor.ValidFeatureName.Item.Name == "Item")
-                        if (featureInstance.Feature.Item is IPropertyFeature AsPropertyFeature)
+                        if (featureInstance.Feature is IPropertyFeature AsPropertyFeature)
                         {
                             Debug.Assert(indexTypeName == null);
                             Debug.Assert(indexType == null);
@@ -161,7 +161,7 @@
             indexTypeName = null;
             indexType = null;
 
-            IIndexerFeature AsIndexer = indexerInstance.Feature.Item as IIndexerFeature;
+            IIndexerFeature AsIndexer = indexerInstance.Feature as IIndexerFeature;
             Debug.Assert(AsIndexer != null);
 
             if (AsIndexer.IndexParameterList.Count == 1)

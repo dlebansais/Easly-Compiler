@@ -73,7 +73,7 @@
                 return false;
             }
 
-            if (Value.Feature.Item is CreationFeature AsCreationFeature)
+            if (Value.Feature is CreationFeature AsCreationFeature)
             {
                 List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
                 if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, ErrorList))

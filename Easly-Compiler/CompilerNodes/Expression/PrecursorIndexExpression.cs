@@ -280,7 +280,7 @@ namespace CompilerNode
             if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, errorList))
                 return false;
 
-            IIndexerFeature OperatorFeature = selectedPrecursor.Feature.Item as IIndexerFeature;
+            IIndexerFeature OperatorFeature = selectedPrecursor.Feature as IIndexerFeature;
             Debug.Assert(OperatorFeature != null);
             IIndexerType OperatorType = OperatorFeature.ResolvedFeatureType.Item as IIndexerType;
             Debug.Assert(OperatorType != null);
