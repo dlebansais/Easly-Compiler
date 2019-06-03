@@ -69,12 +69,12 @@
         /// <summary>
         /// The list of parameters for the selected overload.
         /// </summary>
-        public IList<ICSharpParameter> ParameterList { get; }
+        public IList<ICSharpParameter> ParameterList { get; } = new List<ICSharpParameter>();
 
         /// <summary>
         /// The list of arguments.
         /// </summary>
-        public IList<ICSharpArgument> ArgumentList { get; }
+        public IList<ICSharpArgument> ArgumentList { get; } = new List<ICSharpArgument>();
 
         /// <summary>
         /// The number of parameters and arguments.

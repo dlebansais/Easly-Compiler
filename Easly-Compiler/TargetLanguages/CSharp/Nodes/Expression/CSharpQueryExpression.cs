@@ -62,7 +62,16 @@
             FeatureCall = new CSharpFeatureCall(context, source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle);
 
             if (Source.ResolvedFinalFeature.IsAssigned)
-                Feature = context.GetFeature(Source.ResolvedFinalFeature.Item);
+            {
+                ICompiledFeature ResolvedFeature = Source.ResolvedFinalFeature.Item;
+                if (ResolvedFeature is IScopeAttributeFeature AsScopeAttributeFeature)
+                {
+                    ICSharpClass Owner = context.GetClass(source.EmbeddingClass);
+                    Feature = CSharpScopeAttributeFeature.Create(context, Owner, AsScopeAttributeFeature);
+                }
+                else
+                    Feature = context.GetFeature(Source.ResolvedFinalFeature.Item);
+            }
 
             if (Source.ResolvedFinalDiscrete.IsAssigned)
             {

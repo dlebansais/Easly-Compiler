@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Collections.Generic;
     using CompilerNode;
 
     /// <summary>
@@ -11,6 +12,16 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         new IPrecursorIndexAssignmentInstruction Source { get; }
+
+        /// <summary>
+        /// The feature call.
+        /// </summary>
+        ICSharpFeatureCall FeatureCall { get; }
+
+        /// <summary>
+        /// The assignment source.
+        /// </summary>
+        ICSharpExpression SourceExpression { get; }
     }
 
     /// <summary>
@@ -39,6 +50,8 @@
         protected CSharpPrecursorIndexAssignmentInstruction(ICSharpContext context, ICSharpFeature parentFeature, IPrecursorIndexAssignmentInstruction source)
             : base(context, parentFeature, source)
         {
+            FeatureCall = new CSharpFeatureCall(context, source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle);
+            SourceExpression = CSharpExpression.Create(context, (IExpression)source.Source);
         }
         #endregion
 
@@ -47,6 +60,16 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         public new IPrecursorIndexAssignmentInstruction Source { get { return (IPrecursorIndexAssignmentInstruction)base.Source; } }
+
+        /// <summary>
+        /// The feature call.
+        /// </summary>
+        public ICSharpFeatureCall FeatureCall { get; }
+
+        /// <summary>
+        /// The assignment source.
+        /// </summary>
+        public ICSharpExpression SourceExpression { get; }
         #endregion
 
         #region Client Interface
@@ -57,7 +80,10 @@
         /// <param name="outputNamespace">Namespace for the output code.</param>
         public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
         {
-            //TODO
+            string SourceString = SourceExpression.CSharpText(outputNamespace);
+            string ArgumentListString = CSharpArgument.CSharpArgumentList(outputNamespace, FeatureCall, new List<ICSharpQualifiedName>());
+
+            writer.WriteIndentedLine($"base[{ArgumentListString}] = {SourceString};");
         }
         #endregion
     }

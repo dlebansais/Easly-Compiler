@@ -11,6 +11,11 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         new IDebugInstruction Source { get; }
+
+        /// <summary>
+        /// The debugged instructions.
+        /// </summary>
+        ICSharpScope Instructions { get; }
     }
 
     /// <summary>
@@ -39,6 +44,7 @@
         protected CSharpDebugInstruction(ICSharpContext context, ICSharpFeature parentFeature, IDebugInstruction source)
             : base(context, parentFeature, source)
         {
+            Instructions = CSharpScope.Create(context, parentFeature, (IScope)source.Instructions);
         }
         #endregion
 
@@ -47,6 +53,11 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         public new IDebugInstruction Source { get { return (IDebugInstruction)base.Source; } }
+
+        /// <summary>
+        /// The debugged instructions.
+        /// </summary>
+        public ICSharpScope Instructions { get; }
         #endregion
 
         #region Client Interface
@@ -57,7 +68,9 @@
         /// <param name="outputNamespace">Namespace for the output code.</param>
         public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
         {
-            //TODO
+            writer.WriteIndentedLine("#if DEBUG");
+            Instructions.WriteCSharp(writer, outputNamespace, CSharpCurlyBracketsInsertions.Indifferent, false);
+            writer.WriteIndentedLine("#endif");
         }
         #endregion
     }

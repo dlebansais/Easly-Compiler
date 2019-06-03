@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Collections.Generic;
     using CompilerNode;
 
     /// <summary>
@@ -11,6 +12,26 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         new IOverLoopInstruction Source { get; }
+
+        /// <summary>
+        /// The loop source.
+        /// </summary>
+        ICSharpExpression OverList { get; }
+
+        /// <summary>
+        /// The list of indexers.
+        /// </summary>
+        IList<ICSharpScopeAttributeFeature> IndexerList { get; }
+
+        /// <summary>
+        /// Loop instructions.
+        /// </summary>
+        ICSharpScope LoopInstructions { get; }
+
+        /// <summary>
+        /// The exit entity. Can be null.
+        /// </summary>
+        string ExitEntityName { get; }
     }
 
     /// <summary>
@@ -39,6 +60,20 @@
         protected CSharpOverLoopInstruction(ICSharpContext context, ICSharpFeature parentFeature, IOverLoopInstruction source)
             : base(context, parentFeature, source)
         {
+            OverList = CSharpExpression.Create(context, (IExpression)source.OverList);
+            LoopInstructions = CSharpScope.Create(context, parentFeature, (IScope)source.LoopInstructions);
+
+            foreach (IName Name in source.IndexerList)
+            {
+                string IndexerName = Name.ValidText.Item;
+                IScopeAttributeFeature IndexerFeature = Source.InnerLoopScope[IndexerName];
+
+                ICSharpScopeAttributeFeature NewIndexer = CSharpScopeAttributeFeature.Create(context, ParentFeature.Owner, IndexerFeature);
+                IndexerList.Add(NewIndexer);
+            }
+
+            if (source.ExitEntityName.IsAssigned)
+                ExitEntityName = ((IIdentifier)source.ExitEntityName.Item).ValidText.Item;
         }
         #endregion
 
@@ -47,6 +82,26 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         public new IOverLoopInstruction Source { get { return (IOverLoopInstruction)base.Source; } }
+
+        /// <summary>
+        /// The loop source.
+        /// </summary>
+        public ICSharpExpression OverList { get; }
+
+        /// <summary>
+        /// The list of indexers.
+        /// </summary>
+        public IList<ICSharpScopeAttributeFeature> IndexerList { get; } = new List<ICSharpScopeAttributeFeature>();
+
+        /// <summary>
+        /// Loop instructions.
+        /// </summary>
+        public ICSharpScope LoopInstructions { get; }
+
+        /// <summary>
+        /// The exit entity. Can be null.
+        /// </summary>
+        public string ExitEntityName { get; }
         #endregion
 
         #region Client Interface
@@ -57,7 +112,43 @@
         /// <param name="outputNamespace">Namespace for the output code.</param>
         public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
         {
-            //TODO
+            string OverListString = OverList.CSharpText(outputNamespace);
+
+            ICSharpScopeAttributeFeature Indexer = IndexerList[0];
+            string IndexerNameString = Indexer.Name;
+            string TypeString = Indexer.Type.Type2CSharpString(outputNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+
+            //TODO: support multiple indexers and IterationType
+
+            if (ExitEntityName != null)
+            {
+                string ExitEntityNameString = CSharpNames.ToCSharpIdentifier(ExitEntityName);
+
+                writer.WriteIndentedLine($"{ExitEntityNameString} = false;");
+                writer.WriteIndentedLine($"foreach ({TypeString} {IndexerNameString} in {OverListString})");
+
+                writer.WriteIndentedLine("{");
+
+                LoopInstructions.WriteCSharp(writer, outputNamespace, CSharpCurlyBracketsInsertions.AlreadyInserted, false);
+
+                writer.WriteLine();
+                writer.IncreaseIndent();
+                writer.WriteIndentedLine($"if ({ExitEntityNameString})");
+                writer.IncreaseIndent();
+                writer.WriteIndentedLine("break;");
+                writer.DecreaseIndent();
+                writer.DecreaseIndent();
+                writer.WriteIndentedLine("}");
+            }
+            else
+            {
+                writer.WriteIndentedLine($"foreach ({TypeString} {IndexerNameString} in {OverListString})");
+
+                LoopInstructions.WriteCSharp(writer, outputNamespace, CSharpCurlyBracketsInsertions.Indifferent, false);
+            }
+
+            //TODO: InvariantBlocks
+            //TODO: Variant
         }
         #endregion
     }

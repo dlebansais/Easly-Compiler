@@ -29,6 +29,7 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
+                new OnceReferenceDestinationTemplate<IThrowInstruction, ICompiledType>(nameof(IThrowInstruction.ResolvedType)),
                 new OnceReferenceDestinationTemplate<IThrowInstruction, IResultException>(nameof(IThrowInstruction.ResolvedException)),
                 new UnsealedListDestinationTemplate<IThrowInstruction, IParameter>(nameof(IThrowInstruction.SelectedParameterList)),
             };
@@ -107,7 +108,7 @@
 
                 ListTableEx<IParameter> SelectedParameterList = SelectedOverload.ParameterTable;
 
-                data = new Tuple<IResultException, ListTableEx<IParameter>>(ResolvedException, SelectedParameterList);
+                data = new Tuple<ICompiledType, IResultException, ListTableEx<IParameter>, TypeArgumentStyles>(ResolvedType, ResolvedException, SelectedParameterList, ArgumentStyle);
             }
             else
             {
@@ -125,9 +126,12 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IThrowInstruction node, object data)
         {
-            IResultException ResolvedException = ((Tuple<IResultException, ListTableEx<IParameter>>)data).Item1;
-            ListTableEx<IParameter> SelectedParameterList = ((Tuple<IResultException, ListTableEx<IParameter>>)data).Item2;
+            ICompiledType ResolvedType = ((Tuple<ICompiledType, IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item1;
+            IResultException ResolvedException = ((Tuple<ICompiledType, IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item2;
+            ListTableEx<IParameter> SelectedParameterList = ((Tuple<ICompiledType, IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item3;
+            TypeArgumentStyles ArgumentStyle = ((Tuple<ICompiledType, IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item4;
 
+            node.ResolvedType.Item = ResolvedType;
             node.ResolvedException.Item = ResolvedException;
             node.SelectedParameterList.AddRange(SelectedParameterList);
             node.SelectedParameterList.Seal();

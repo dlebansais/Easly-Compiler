@@ -129,7 +129,7 @@
 
                 ResultException.Merge(ResolvedException, PrecursorInstructionException);
 
-                data = new Tuple<IResultException, ListTableEx<IParameter>>(ResolvedException, SelectedParameterList);
+                data = new Tuple<IResultException, ListTableEx<IParameter>, TypeArgumentStyles>(ResolvedException, SelectedParameterList, ArgumentStyle);
             }
 
             return Success;
@@ -142,12 +142,14 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IPrecursorInstruction node, object data)
         {
-            IResultException ResolvedException = ((Tuple<IResultException, ListTableEx<IParameter>>)data).Item1;
-            ListTableEx<IParameter> SelectedParameterList = ((Tuple<IResultException, ListTableEx<IParameter>>)data).Item2;
+            IResultException ResolvedException = ((Tuple<IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item1;
+            ListTableEx<IParameter> SelectedParameterList = ((Tuple<IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item2;
+            TypeArgumentStyles ArgumentStyle = ((Tuple<IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item3;
 
             node.ResolvedException.Item = ResolvedException;
             node.SelectedParameterList.AddRange(SelectedParameterList);
             node.SelectedParameterList.Seal();
+            node.ArgumentStyle = ArgumentStyle;
 
             IFeature EmbeddingFeature = node.EmbeddingFeature;
             IFeatureWithPrecursor ResolvedFeature = EmbeddingFeature.ResolvedFeature.Item as IFeatureWithPrecursor;

@@ -63,7 +63,7 @@
 
             foreach (IEntityDeclaration Declaration in source.EntityDeclarationList)
             {
-                ICSharpScopeAttributeFeature NewDeclaration = CSharpScopeAttributeFeature.Create(parentFeature.Owner, Declaration.ValidEntity.Item);
+                ICSharpScopeAttributeFeature NewDeclaration = CSharpScopeAttributeFeature.Create(context, parentFeature.Owner, Declaration.ValidEntity.Item);
                 EntityDeclarationList.Add(NewDeclaration);
             }
 

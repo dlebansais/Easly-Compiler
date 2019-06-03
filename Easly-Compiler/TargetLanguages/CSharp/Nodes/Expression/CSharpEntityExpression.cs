@@ -55,7 +55,16 @@
             : base(context, source)
         {
             if (Source.ResolvedFinalFeature.IsAssigned)
-                Feature = context.GetFeature(Source.ResolvedFinalFeature.Item);
+            {
+                ICompiledFeature ResolvedFeature = Source.ResolvedFinalFeature.Item;
+                if (ResolvedFeature is IScopeAttributeFeature AsScopeAttributeFeature)
+                {
+                    ICSharpClass Owner = context.GetClass(source.EmbeddingClass);
+                    Feature = CSharpScopeAttributeFeature.Create(context, Owner, AsScopeAttributeFeature);
+                }
+                else
+                    Feature = context.GetFeature(Source.ResolvedFinalFeature.Item);
+            }
 
             if (Source.ResolvedFinalDiscrete.IsAssigned)
             {
@@ -126,31 +135,31 @@
             {
                 switch (Feature)
                 {
-                    case IAttributeFeature AsAttributeFeature:
+                    case ICSharpAttributeFeature AsAttributeFeature:
                         Result = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Property" + "(" + "\"" + QueryText + "\"" + ")";
                         break;
 
-                    case IConstantFeature AsConstantFeature:
+                    case ICSharpConstantFeature AsConstantFeature:
                         Result = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Property" + "(" + "\"" + QueryText + "\"" + ")";
                         break;
 
-                    case ICreationFeature AsCreationFeature:
+                    case ICSharpCreationFeature AsCreationFeature:
                         Result = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Procedure" + "(" + "\"" + QueryText + "\"" + ")";
                         break;
 
-                    case IFunctionFeature AsFunctionFeature:
+                    case ICSharpFunctionFeature AsFunctionFeature:
                         Result = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Function" + "(" + "\"" + QueryText + "\"" + ")";
                         break;
 
-                    case IProcedureFeature AsProcedureFeature:
+                    case ICSharpProcedureFeature AsProcedureFeature:
                         Result = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Procedure" + "(" + "\"" + QueryText + "\"" + ")";
                         break;
 
-                    case IPropertyFeature AsPropertyFeature:
+                    case ICSharpPropertyFeature AsPropertyFeature:
                         Result = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Property" + "(" + "\"" + QueryText + "\"" + ")";
                         break;
 
-                    case IScopeAttributeFeature AsScopeAttributeFeature:
+                    case ICSharpScopeAttributeFeature AsScopeAttributeFeature:
                         /*
                         string FeatureString;
                         IIndexerFeature ThisFeatureAsIndexer;

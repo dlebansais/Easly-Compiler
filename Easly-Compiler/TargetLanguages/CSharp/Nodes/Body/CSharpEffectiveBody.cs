@@ -93,10 +93,8 @@
 
             foreach (IEntityDeclaration Item in source.EntityDeclarationList)
             {
-                ICSharpFeature NewDeclaration = CSharpScopeAttributeFeature.Create(Owner, Item.ValidEntity.Item);
-                NewDeclaration.Init(context);
-
-                EntityDeclarationList.Add((ICSharpScopeAttributeFeature)NewDeclaration);
+                ICSharpScopeAttributeFeature NewDeclaration = CSharpScopeAttributeFeature.Create(context, Owner, Item.ValidEntity.Item);
+                EntityDeclarationList.Add(NewDeclaration);
             }
         }
         #endregion

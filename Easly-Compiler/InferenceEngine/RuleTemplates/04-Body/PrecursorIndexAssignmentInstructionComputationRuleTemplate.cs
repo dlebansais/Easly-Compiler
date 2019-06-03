@@ -69,7 +69,7 @@
 
                 ParameterTableList.Add(AsIndexerType.ParameterTable);
 
-                if (!Argument.CheckAssignmentConformance(ParameterTableList, node.ArgumentList, SourceExpression, AsIndexerType.ResolvedEntityType.Item, ErrorList, node, out ListTableEx<IParameter> SelectedParameterList))
+                if (!Argument.CheckAssignmentConformance(ParameterTableList, node.ArgumentList, SourceExpression, AsIndexerType.ResolvedEntityType.Item, ErrorList, node, out ListTableEx<IParameter> SelectedParameterList, out TypeArgumentStyles ArgumentStyle))
                     return false;
 
                 IResultException ResolvedException = new ResultException();
@@ -81,7 +81,7 @@
 
                 ResultException.Merge(ResolvedException, AsIndexerType.SetExceptionIdentifierList);
 
-                data = new Tuple<IResultException, ListTableEx<IParameter>>(ResolvedException, SelectedParameterList);
+                data = new Tuple<IResultException, ListTableEx<IParameter>, TypeArgumentStyles>(ResolvedException, SelectedParameterList, ArgumentStyle);
             }
             else
             {
@@ -99,12 +99,14 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IPrecursorIndexAssignmentInstruction node, object data)
         {
-            IResultException ResolvedException = ((Tuple<IResultException, ListTableEx<IParameter>>)data).Item1;
-            ListTableEx<IParameter> SelectedParameterList = ((Tuple<IResultException, ListTableEx<IParameter>>)data).Item2;
+            IResultException ResolvedException = ((Tuple<IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item1;
+            ListTableEx<IParameter> SelectedParameterList = ((Tuple<IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item2;
+            TypeArgumentStyles ArgumentStyle = ((Tuple<IResultException, ListTableEx<IParameter>, TypeArgumentStyles>)data).Item3;
 
             node.ResolvedException.Item = ResolvedException;
             node.SelectedParameterList.AddRange(SelectedParameterList);
             node.SelectedParameterList.Seal();
+            node.ArgumentStyle = ArgumentStyle;
         }
         #endregion
     }

@@ -643,6 +643,8 @@
     <Compile Include="TargetLanguages\CSharp\Nodes\Body\CSharpExternBody.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\Body\CSharpEffectiveBody.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\CSharpAttachment.cs" />
+    <Compile Include="TargetLanguages\CSharp\Nodes\CSharpWith.cs" />
+    <Compile Include="TargetLanguages\CSharp\Nodes\CSharpConditional.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\CSharpScope.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\CSharpContinuation.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\CSharpClass.cs" />

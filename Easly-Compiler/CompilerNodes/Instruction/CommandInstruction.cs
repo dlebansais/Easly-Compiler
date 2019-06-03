@@ -32,14 +32,14 @@ namespace CompilerNode
         ListTableEx<IParameter> SelectedParameterList { get; }
 
         /// <summary>
-        /// The list of resolved arguments.
-        /// </summary>
-        OnceReference<IList<IExpressionType>> MergedArgumentList { get; }
-
-        /// <summary>
         /// The argument passing style.
         /// </summary>
         TypeArgumentStyles ArgumentStyle { get; set; }
+
+        /// <summary>
+        /// The list of resolved arguments.
+        /// </summary>
+        OnceReference<IList<IExpressionType>> MergedArgumentList { get; }
 
         /// <summary>
         /// The resolved type corresponding to the called feature.
@@ -158,8 +158,8 @@ namespace CompilerNode
                 SelectedFeature = new OnceReference<ICompiledFeature>();
                 SelectedOverload = new OnceReference<ICommandOverloadType>();
                 SelectedParameterList = new ListTableEx<IParameter>();
-                MergedArgumentList = new OnceReference<IList<IExpressionType>>();
                 ArgumentStyle = TypeArgumentStyles.None;
+                MergedArgumentList = new OnceReference<IList<IExpressionType>>();
                 CommandFinalType = new OnceReference<IProcedureType>();
                 IsHandled = true;
             }
@@ -256,14 +256,14 @@ namespace CompilerNode
         public ListTableEx<IParameter> SelectedParameterList { get; private set; } = new ListTableEx<IParameter>();
 
         /// <summary>
-        /// The list of resolved arguments.
-        /// </summary>
-        public OnceReference<IList<IExpressionType>> MergedArgumentList { get; private set; } = new OnceReference<IList<IExpressionType>>();
-
-        /// <summary>
         /// The argument passing style.
         /// </summary>
         public TypeArgumentStyles ArgumentStyle { get; set; }
+
+        /// <summary>
+        /// The list of resolved arguments.
+        /// </summary>
+        public OnceReference<IList<IExpressionType>> MergedArgumentList { get; private set; } = new OnceReference<IList<IExpressionType>>();
 
         /// <summary>
         /// The resolved type corresponding to the called feature.

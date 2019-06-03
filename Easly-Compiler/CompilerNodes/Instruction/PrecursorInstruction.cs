@@ -20,6 +20,11 @@ namespace CompilerNode
         /// List of parameters from the selected overload.
         /// </summary>
         ListTableEx<IParameter> SelectedParameterList { get; }
+
+        /// <summary>
+        /// The argument passing style.
+        /// </summary>
+        TypeArgumentStyles ArgumentStyle { get; set; }
     }
 
     /// <summary>
@@ -131,6 +136,7 @@ namespace CompilerNode
             {
                 ResolvedException = new OnceReference<IResultException>();
                 SelectedParameterList = new ListTableEx<IParameter>();
+                ArgumentStyle = TypeArgumentStyles.None;
                 IsHandled = true;
             }
 
@@ -210,6 +216,11 @@ namespace CompilerNode
         /// List of parameters from the selected overload.
         /// </summary>
         public ListTableEx<IParameter> SelectedParameterList { get; private set; } = new ListTableEx<IParameter>();
+
+        /// <summary>
+        /// The argument passing style.
+        /// </summary>
+        public TypeArgumentStyles ArgumentStyle { get; set; }
         #endregion
 
         #region Debugging

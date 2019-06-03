@@ -11,6 +11,11 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         new IReleaseInstruction Source { get; }
+
+        /// <summary>
+        /// The released entity.
+        /// </summary>
+        ICSharpQualifiedName ReleasedEntity { get; }
     }
 
     /// <summary>
@@ -39,6 +44,7 @@
         protected CSharpReleaseInstruction(ICSharpContext context, ICSharpFeature parentFeature, IReleaseInstruction source)
             : base(context, parentFeature, source)
         {
+            ReleasedEntity = CSharpQualifiedName.Create(context, (IQualifiedName)source.EntityName, ParentFeature, null, false);
         }
         #endregion
 
@@ -47,6 +53,11 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         public new IReleaseInstruction Source { get { return (IReleaseInstruction)base.Source; } }
+
+        /// <summary>
+        /// The released entity.
+        /// </summary>
+        public ICSharpQualifiedName ReleasedEntity { get; }
         #endregion
 
         #region Client Interface
@@ -57,7 +68,9 @@
         /// <param name="outputNamespace">Namespace for the output code.</param>
         public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
         {
-            //TODO
+            string ReleasedLink = ReleasedEntity.CSharpText(outputNamespace, 0);
+
+            writer.WriteIndentedLine($"{ReleasedLink} = null;");
         }
         #endregion
     }

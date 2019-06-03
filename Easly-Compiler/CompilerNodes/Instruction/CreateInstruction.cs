@@ -22,6 +22,16 @@ namespace CompilerNode
         OnceReference<ICommandOverloadType> SelectedOverload { get; }
 
         /// <summary>
+        /// The selected parameters{ get; }
+        /// </summary>
+        ListTableEx<IParameter> SelectedParameterList { get; }
+
+        /// <summary>
+        /// The argument passing style.
+        /// </summary>
+        TypeArgumentStyles ArgumentStyle { get; set; }
+
+        /// <summary>
         /// The created object type name.
         /// </summary>
         OnceReference<ITypeName> ResolvedEntityTypeName { get; }
@@ -141,6 +151,8 @@ namespace CompilerNode
             {
                 ResolvedException = new OnceReference<IResultException>();
                 SelectedOverload = new OnceReference<ICommandOverloadType>();
+                SelectedParameterList = new ListTableEx<IParameter>();
+                ArgumentStyle = TypeArgumentStyles.None;
                 ResolvedEntityTypeName = new OnceReference<ITypeName>();
                 ResolvedEntityType = new OnceReference<ICompiledType>();
                 IsHandled = true;
@@ -179,6 +191,7 @@ namespace CompilerNode
                 IsResolved = ResolvedException.IsAssigned;
 
                 Debug.Assert(SelectedOverload.IsAssigned || !IsResolved);
+                Debug.Assert(SelectedParameterList.IsSealed || !IsResolved);
                 Debug.Assert(ResolvedEntityTypeName.IsAssigned || !IsResolved);
                 Debug.Assert(ResolvedEntityType.IsAssigned || !IsResolved);
 
@@ -224,6 +237,16 @@ namespace CompilerNode
         /// The selected overload in the called feature.
         /// </summary>
         public OnceReference<ICommandOverloadType> SelectedOverload { get; private set; } = new OnceReference<ICommandOverloadType>();
+
+        /// <summary>
+        /// The selected parameters{ get; }
+        /// </summary>
+        public ListTableEx<IParameter> SelectedParameterList { get; private set; } = new ListTableEx<IParameter>();
+
+        /// <summary>
+        /// The argument passing style.
+        /// </summary>
+        public TypeArgumentStyles ArgumentStyle { get; set; }
 
         /// <summary>
         /// The created object type name.

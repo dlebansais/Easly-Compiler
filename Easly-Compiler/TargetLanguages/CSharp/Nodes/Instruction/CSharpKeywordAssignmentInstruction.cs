@@ -11,6 +11,11 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         new IKeywordAssignmentInstruction Source { get; }
+
+        /// <summary>
+        /// The assignment source.
+        /// </summary>
+        ICSharpExpression SourceExpression { get; }
     }
 
     /// <summary>
@@ -39,6 +44,7 @@
         protected CSharpKeywordAssignmentInstruction(ICSharpContext context, ICSharpFeature parentFeature, IKeywordAssignmentInstruction source)
             : base(context, parentFeature, source)
         {
+            SourceExpression = CSharpExpression.Create(context, (IExpression)source.Source);
         }
         #endregion
 
@@ -47,6 +53,11 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         public new IKeywordAssignmentInstruction Source { get { return (IKeywordAssignmentInstruction)base.Source; } }
+
+        /// <summary>
+        /// The assignment source.
+        /// </summary>
+        public ICSharpExpression SourceExpression { get; }
         #endregion
 
         #region Client Interface
@@ -57,7 +68,10 @@
         /// <param name="outputNamespace">Namespace for the output code.</param>
         public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
         {
-            //TODO
+            string DestinationString = Source.Destination.ToString();
+            string SourceString = SourceExpression.CSharpText(outputNamespace);
+
+            writer.WriteIndentedLine($"{DestinationString} = {SourceString};");
         }
         #endregion
     }

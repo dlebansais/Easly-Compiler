@@ -69,7 +69,7 @@
             if (!CheckCreationRoutine(node, ConstraintClassTypeList, out ICreationFeature CreationFeature))
                 return false;
 
-            if (!CheckCall(node, AttributeTypeName, AttributeType, CreationFeature, out ICommandOverloadType SelectedOverload))
+            if (!CheckCall(node, AttributeTypeName, AttributeType, CreationFeature, out ICommandOverloadType SelectedOverload, out ListTableEx<IParameter> SelectedParameterList, out TypeArgumentStyles ArgumentStyle))
                 return false;
 
             ITypeName CreatedObjectTypeName = AttributeTypeName;
@@ -93,7 +93,7 @@
 
             ResultException.Merge(ResolvedException, SelectedOverload.ExceptionIdentifierList);
 
-            data = new Tuple<IResultException, ICommandOverloadType, ITypeName, ICompiledType>(ResolvedException, SelectedOverload, CreatedObjectTypeName, CreatedObjectType);
+            data = new Tuple<IResultException, ICommandOverloadType, ListTableEx<IParameter>, TypeArgumentStyles, ITypeName, ICompiledType>(ResolvedException, SelectedOverload, SelectedParameterList, ArgumentStyle, CreatedObjectTypeName, CreatedObjectType);
 
             return Success;
         }
@@ -214,15 +214,17 @@
             }
         }
 
-        private bool CheckCall(ICreateInstruction node, ITypeName attributeTypeName, ICompiledType attributeType, ICreationFeature creationFeature, out ICommandOverloadType selectedOverload)
+        private bool CheckCall(ICreateInstruction node, ITypeName attributeTypeName, ICompiledType attributeType, ICreationFeature creationFeature, out ICommandOverloadType selectedOverload, out ListTableEx<IParameter> selectedParameterList, out TypeArgumentStyles argumentStyle)
         {
             selectedOverload = null;
+            selectedParameterList = null;
+            argumentStyle = TypeArgumentStyles.None;
 
             IClass EmbeddingClass = node.EmbeddingClass;
             IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;
 
             List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
-            if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, ErrorList))
+            if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out argumentStyle, ErrorList))
                 return false;
 
             IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
@@ -231,11 +233,11 @@
             foreach (ICommandOverloadType Overload in AsProcedureType.OverloadList)
                 ParameterTableList.Add(Overload.ParameterTable);
 
-            int SelectedIndex;
-            if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, ArgumentStyle, ErrorList, node, out SelectedIndex))
+            if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, argumentStyle, ErrorList, node, out int SelectedIndex))
                 return false;
 
             selectedOverload = AsProcedureType.OverloadList[SelectedIndex];
+            selectedParameterList = ParameterTableList[SelectedIndex];
             return true;
         }
 
@@ -246,13 +248,18 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(ICreateInstruction node, object data)
         {
-            IResultException ResolvedException = ((Tuple<IResultException, ICommandOverloadType, ITypeName, ICompiledType>)data).Item1;
-            ICommandOverloadType SelectedOverload = ((Tuple<IResultException, ICommandOverloadType, ITypeName, ICompiledType>)data).Item2;
-            ITypeName CreatedObjectTypeName = ((Tuple<IResultException, ICommandOverloadType, ITypeName, ICompiledType>)data).Item3;
-            ICompiledType CreatedObjectType = ((Tuple<IResultException, ICommandOverloadType, ITypeName, ICompiledType>)data).Item4;
+            IResultException ResolvedException = ((Tuple<IResultException, ICommandOverloadType, ListTableEx<IParameter>, TypeArgumentStyles, ITypeName, ICompiledType>)data).Item1;
+            ICommandOverloadType SelectedOverload = ((Tuple<IResultException, ICommandOverloadType, ListTableEx<IParameter>, TypeArgumentStyles, ITypeName, ICompiledType>)data).Item2;
+            ListTableEx<IParameter> SelectedParameterList = ((Tuple<IResultException, ICommandOverloadType, ListTableEx<IParameter>, TypeArgumentStyles, ITypeName, ICompiledType>)data).Item3;
+            TypeArgumentStyles ArgumentStyle = ((Tuple<IResultException, ICommandOverloadType, ListTableEx<IParameter>, TypeArgumentStyles, ITypeName, ICompiledType>)data).Item4;
+            ITypeName CreatedObjectTypeName = ((Tuple<IResultException, ICommandOverloadType, ListTableEx<IParameter>, TypeArgumentStyles, ITypeName, ICompiledType>)data).Item5;
+            ICompiledType CreatedObjectType = ((Tuple<IResultException, ICommandOverloadType, ListTableEx<IParameter>, TypeArgumentStyles, ITypeName, ICompiledType>)data).Item6;
 
             node.ResolvedException.Item = ResolvedException;
             node.SelectedOverload.Item = SelectedOverload;
+            node.SelectedParameterList.AddRange(SelectedParameterList);
+            node.SelectedParameterList.Seal();
+            node.ArgumentStyle = ArgumentStyle;
             node.ResolvedEntityTypeName.Item = CreatedObjectTypeName;
             node.ResolvedEntityType.Item = CreatedObjectType;
 

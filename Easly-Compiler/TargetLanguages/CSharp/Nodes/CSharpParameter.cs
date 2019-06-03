@@ -45,10 +45,7 @@
         protected CSharpParameter(ICSharpContext context, IParameter source, ICSharpClass owner)
             : base(source)
         {
-            ICSharpFeature ParameterFeature = CSharpScopeAttributeFeature.Create(owner, source.ResolvedParameter);
-            ParameterFeature.Init(context);
-
-            Feature = (ICSharpScopeAttributeFeature)ParameterFeature;
+            Feature = CSharpScopeAttributeFeature.Create(context, owner, source.ResolvedParameter);
         }
         #endregion
 

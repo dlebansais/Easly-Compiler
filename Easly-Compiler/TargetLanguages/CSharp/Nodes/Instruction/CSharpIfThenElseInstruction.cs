@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Collections.Generic;
     using CompilerNode;
 
     /// <summary>
@@ -11,6 +12,16 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         new IIfThenElseInstruction Source { get; }
+
+        /// <summary>
+        /// The list of conditions.
+        /// </summary>
+        IList<ICSharpConditional> ConditionalList { get; }
+
+        /// <summary>
+        /// Instructions for the else case. Can be null.
+        /// </summary>
+        ICSharpScope ElseInstructions { get; }
     }
 
     /// <summary>
@@ -39,6 +50,14 @@
         protected CSharpIfThenElseInstruction(ICSharpContext context, ICSharpFeature parentFeature, IIfThenElseInstruction source)
             : base(context, parentFeature, source)
         {
+            foreach (IConditional Conditional in source.ConditionalList)
+            {
+                ICSharpConditional NewConditional = CSharpConditional.Create(context, parentFeature, Conditional);
+                ConditionalList.Add(NewConditional);
+            }
+
+            if (source.ElseInstructions.IsAssigned)
+                ElseInstructions = CSharpScope.Create(context, parentFeature, (IScope)source.ElseInstructions.Item);
         }
         #endregion
 
@@ -47,6 +66,16 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         public new IIfThenElseInstruction Source { get { return (IIfThenElseInstruction)base.Source; } }
+
+        /// <summary>
+        /// The list of conditions.
+        /// </summary>
+        public IList<ICSharpConditional> ConditionalList { get; } = new List<ICSharpConditional>();
+
+        /// <summary>
+        /// Instructions for the else case. Can be null.
+        /// </summary>
+        public ICSharpScope ElseInstructions { get; }
         #endregion
 
         #region Client Interface
@@ -57,7 +86,22 @@
         /// <param name="outputNamespace">Namespace for the output code.</param>
         public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
         {
-            //TODO
+            bool IsElseIf = false;
+
+            foreach (ICSharpConditional Item in ConditionalList)
+            {
+                if (IsElseIf)
+                    writer.WriteLine();
+
+                Item.WriteCSharp(writer, outputNamespace, IsElseIf);
+                IsElseIf = true;
+            }
+
+            if (ElseInstructions != null)
+            {
+                writer.WriteIndentedLine("else");
+                ElseInstructions.WriteCSharp(writer, outputNamespace, CSharpCurlyBracketsInsertions.Indifferent, false);
+            }
         }
         #endregion
     }

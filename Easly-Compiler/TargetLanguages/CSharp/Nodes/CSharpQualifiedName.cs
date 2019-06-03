@@ -189,6 +189,7 @@
                         break;
 
                     case ICSharpFunctionFeature AsFunctionFeature:
+                    case ICSharpCreationFeature AsCreationFeature:
                     case ICSharpProcedureFeature AsProcedureFeature:
                         Result = $"{QueryText}()";
                         break;

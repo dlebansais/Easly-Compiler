@@ -141,8 +141,8 @@
             node.SelectedOverload.Item = SelectedOverload;
             node.SelectedParameterList.AddRange(SelectedParameterList);
             node.SelectedParameterList.Seal();
-            node.MergedArgumentList.Item = MergedArgumentList;
             node.ArgumentStyle = ArgumentStyle;
+            node.MergedArgumentList.Item = MergedArgumentList;
             node.CommandFinalType.Item = CommandFinalType;
         }
         #endregion

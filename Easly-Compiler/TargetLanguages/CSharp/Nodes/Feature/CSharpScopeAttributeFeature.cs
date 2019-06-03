@@ -71,6 +71,28 @@
         {
             Name = Source.ValidFeatureName.Item.Name;
         }
+        /// <summary>
+        /// Create a new C# local attribute.
+        /// </summary>
+        /// <param name="context">The initialization context.</param>
+        /// <param name="owner">The class where the feature is declared.</param>
+        /// <param name="source">The source Easly feature.</param>
+        public static ICSharpScopeAttributeFeature Create(ICSharpContext context, ICSharpClass owner, IScopeAttributeFeature source)
+        {
+            return new CSharpScopeAttributeFeature(context, owner, source);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CSharpScopeAttributeFeature"/> class.
+        /// </summary>
+        /// <param name="context">The initialization context.</param>
+        /// <param name="owner">The class where the feature is declared.</param>
+        /// <param name="source">The source Easly feature.</param>
+        protected CSharpScopeAttributeFeature(ICSharpContext context, ICSharpClass owner, IScopeAttributeFeature source)
+            : this(owner, source)
+        {
+            Init(context);
+        }
         #endregion
 
         #region Properties

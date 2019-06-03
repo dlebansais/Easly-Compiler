@@ -1,5 +1,7 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -11,6 +13,26 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         new ICreateInstruction Source { get; }
+
+        /// <summary>
+        /// The created object type.
+        /// </summary>
+        ICSharpType EntityType { get; }
+
+        /// <summary>
+        /// The created object name.
+        /// </summary>
+        string CreatedObjectName { get; }
+
+        /// <summary>
+        /// The creation routine name.
+        /// </summary>
+        string CreationRoutineName { get; }
+
+        /// <summary>
+        /// The feature call.
+        /// </summary>
+        ICSharpFeatureCall FeatureCall { get; }
     }
 
     /// <summary>
@@ -39,6 +61,10 @@
         protected CSharpCreateInstruction(ICSharpContext context, ICSharpFeature parentFeature, ICreateInstruction source)
             : base(context, parentFeature, source)
         {
+            EntityType = CSharpType.Create(context, source.ResolvedEntityType.Item);
+            CreatedObjectName = ((IIdentifier)source.EntityIdentifier).ValidText.Item;
+            CreationRoutineName = ((IIdentifier)source.CreationRoutineIdentifier).ValidText.Item;
+            FeatureCall = new CSharpFeatureCall(context, source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle);
         }
         #endregion
 
@@ -47,6 +73,26 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         public new ICreateInstruction Source { get { return (ICreateInstruction)base.Source; } }
+
+        /// <summary>
+        /// The created object type.
+        /// </summary>
+        public ICSharpType EntityType { get; }
+
+        /// <summary>
+        /// The created object name.
+        /// </summary>
+        public string CreatedObjectName { get; }
+
+        /// <summary>
+        /// The creation routine name.
+        /// </summary>
+        public string CreationRoutineName { get; }
+
+        /// <summary>
+        /// The feature call.
+        /// </summary>
+        public ICSharpFeatureCall FeatureCall { get; }
         #endregion
 
         #region Client Interface
@@ -57,7 +103,57 @@
         /// <param name="outputNamespace">Namespace for the output code.</param>
         public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
         {
-            //TODO
+            string EntityString = CSharpNames.ToCSharpIdentifier(CreatedObjectName);
+            string EntityTypeString = EntityType.Type2CSharpString(outputNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+
+            bool IsAnchoredToCreationType = false;
+
+            if (EntityType.Source is IAnchoredType AsAnchoredType)
+                if (AsAnchoredType.AnchorKind == BaseNode.AnchorKinds.Creation)
+                    IsAnchoredToCreationType = true;
+
+            string CreationRoutineString = CSharpNames.ToCSharpIdentifier(CreationRoutineName);
+            string ArgumentListText = CSharpArgument.CSharpArgumentList(outputNamespace, FeatureCall, new List<ICSharpQualifiedName>());
+
+            CSharpConstructorTypes ClassConstructorType = CSharpConstructorTypes.OneConstructor;
+
+            if (EntityType is ICSharpClassType AsClassType)
+            {
+                ClassConstructorType = AsClassType.Class.ClassConstructorType;
+
+                if (AsClassType.Class.Source.ClassGuid == LanguageClasses.List.Guid && CreationRoutineString == "MakeEmpty")
+                    ClassConstructorType = CSharpConstructorTypes.NoConstructor;
+            }
+
+            bool IsHandled = false;
+
+            switch (ClassConstructorType)
+            {
+                case CSharpConstructorTypes.NoConstructor:
+                case CSharpConstructorTypes.OneConstructor:
+                    if (IsAnchoredToCreationType)
+                        writer.WriteIndentedLine($"{EntityString} = Activator.CreateInstance(typeof({EntityTypeString}).Assembly.FullName, typeof({EntityTypeString}).FullName, {ArgumentListText}).Unwrap() as {EntityTypeString};");
+                    else
+                        writer.WriteIndentedLine($"{EntityString} = new {EntityTypeString}({ArgumentListText});");
+                    IsHandled = true;
+                    break;
+
+                case CSharpConstructorTypes.ManyConstructors:
+                    if (IsAnchoredToCreationType)
+                    {
+                        writer.WriteIndentedLine($"{EntityString} = Activator.CreateInstance(typeof({EntityTypeString}).Assembly.FullName, typeof({EntityTypeString}).FullName).Unwrap() as {EntityTypeString};");
+                        writer.WriteIndentedLine($"{EntityString}.{CreationRoutineString}({ArgumentListText});");
+                    }
+                    else
+                    {
+                        writer.WriteIndentedLine($"{EntityString} = new {EntityTypeString}();");
+                        writer.WriteIndentedLine($"{EntityString}.{CreationRoutineString}({ArgumentListText});");
+                    }
+                    IsHandled = true;
+                    break;
+            }
+
+            Debug.Assert(IsHandled);
         }
         #endregion
     }

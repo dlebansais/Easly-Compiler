@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Collections.Generic;
     using CompilerNode;
 
     /// <summary>
@@ -11,6 +12,16 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         new IPrecursorInstruction Source { get; }
+
+        /// <summary>
+        /// The parent feature.
+        /// </summary>
+        new ICSharpFeatureWithName ParentFeature { get; }
+
+        /// <summary>
+        /// The feature call.
+        /// </summary>
+        ICSharpFeatureCall FeatureCall { get; }
     }
 
     /// <summary>
@@ -39,6 +50,7 @@
         protected CSharpPrecursorInstruction(ICSharpContext context, ICSharpFeature parentFeature, IPrecursorInstruction source)
             : base(context, parentFeature, source)
         {
+            FeatureCall = new CSharpFeatureCall(context, source.SelectedParameterList, source.ArgumentList, source.ArgumentStyle);
         }
         #endregion
 
@@ -47,6 +59,16 @@
         /// The Easly instruction from which the C# instruction is created.
         /// </summary>
         public new IPrecursorInstruction Source { get { return (IPrecursorInstruction)base.Source; } }
+
+        /// <summary>
+        /// The parent feature.
+        /// </summary>
+        public new ICSharpFeatureWithName ParentFeature { get { return (ICSharpFeatureWithName)base.ParentFeature; } }
+
+        /// <summary>
+        /// The feature call.
+        /// </summary>
+        public ICSharpFeatureCall FeatureCall { get; }
         #endregion
 
         #region Client Interface
@@ -57,7 +79,17 @@
         /// <param name="outputNamespace">Namespace for the output code.</param>
         public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
         {
-            //TODO
+            string CoexistingPrecursorName = CSharpNames.ToCSharpIdentifier($"{ParentFeature.CoexistingPrecursorName} Base");
+
+            string ArgumentListString = CSharpArgument.CSharpArgumentList(outputNamespace, FeatureCall, new List<ICSharpQualifiedName>());
+
+            if (CoexistingPrecursorName.Length > 0)
+                writer.WriteIndentedLine($"{CoexistingPrecursorName}({ArgumentListString});");
+            else
+            {
+                string ProcedureName = CSharpNames.ToCSharpIdentifier(ParentFeature.Name);
+                writer.WriteIndentedLine($"base.{ProcedureName}({ArgumentListString});");
+            }
         }
         #endregion
     }

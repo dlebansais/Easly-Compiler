@@ -57,7 +57,12 @@
         /// <param name="outputNamespace">Namespace for the output code.</param>
         public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
         {
-            //TODO
+            // TODO: declare the event
+
+            IIdentifier QueryIdentifierItem = (IIdentifier)Source.QueryIdentifier;
+            string QueryIdentifierItemString = CSharpNames.ToCSharpIdentifier(QueryIdentifierItem.ValidText.Item);
+
+            writer.WriteIndentedLine($"{QueryIdentifierItemString}.set();");
         }
         #endregion
     }
