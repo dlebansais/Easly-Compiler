@@ -341,7 +341,8 @@ namespace CompilerNode
             BaseClass.DiscreteTable.Seal();
             BaseClass.DiscreteWithValueTable.Seal();
             BaseClass.FeatureTable.Seal();
-            BaseClass.FullClassPath = string.Empty; // TODO
+            BaseClass.ClassPath = $"Compiler.{CompilerPathGuid}.Language.{languageClass.Name}";
+            BaseClass.SetFullClassPath();
             BaseClass.GenericTable.Seal();
             BaseClass.InheritanceTable.Seal();
             BaseClass.InheritedClassTypeTable.Seal();
@@ -352,6 +353,11 @@ namespace CompilerNode
 
             return BaseClass;
         }
+
+        /// <summary>
+        /// Guid to use int the path of compiler classes.
+        /// </summary>
+        public static readonly Guid CompilerPathGuid = new Guid("E45340ED-7C93-44E5-BF34-10368129BF68");
 
         /// <summary>
         /// Compiler class 'Any'.
