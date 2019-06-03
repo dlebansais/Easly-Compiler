@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
+    using Easly;
 
     /// <summary>
     /// A rule to process <see cref="IInspectInstruction"/>.
@@ -58,17 +59,19 @@
             }
 
             ICompiledType ValueType = ResolvedResult.At(0).ValueType;
+            IHashtableEx<IFeatureName, IDiscrete> EnforcedDiscreteTable = null;
 
             if (ValueType is IClassType AsClassType)
             {
-                IClass BaseClass = AsClassType.BaseClass;
-                if (!BaseClass.IsEnumeration)
-                {
-                    // TODO: allow enum class as constant, but then test this.
-                    bool IsNumberAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName NumberTypeName, out ICompiledType NumberType);
-                    Debug.Assert(IsNumberAvailable);
+                bool IsNumberAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName NumberTypeName, out ICompiledType NumberType);
+                Debug.Assert(IsNumberAvailable);
 
-                    if (ValueType != NumberType)
+                if (ValueType != NumberType)
+                {
+                    IClass BaseClass = AsClassType.BaseClass;
+                    if (BaseClass.IsEnumeration)
+                        EnforcedDiscreteTable = BaseClass.DiscreteTable;
+                    else
                     {
                         AddSourceError(new ErrorInvalidExpression(Source));
                         return false;
@@ -87,7 +90,15 @@
                 {
                     IConstantRange ResolvedRange = RangeItem.ResolvedRange.Item;
                     if (IsRangeCompatible(CompleteRangeList, ResolvedRange))
-                        CompleteRangeList.Add(ResolvedRange);
+                    {
+                        if (EnforcedDiscreteTable != null && !IsRangeValidDiscrete(EnforcedDiscreteTable, ResolvedRange))
+                        {
+                            AddSourceError(new ErrorInvalidRange(RangeItem));
+                            Success = false;
+                        }
+                        else
+                            CompleteRangeList.Add(ResolvedRange);
+                    }
                     else
                     {
                         AddSourceError(new ErrorInvalidRange(RangeItem));
@@ -124,6 +135,29 @@
                 IsIntersecting |= Item.IsIntersecting(range);
 
             return !IsIntersecting;
+        }
+
+        private bool IsRangeValidDiscrete(IHashtableEx<IFeatureName, IDiscrete> discreteTable, IConstantRange constantRange)
+        {
+            bool IsValidRange = false;
+
+            if (constantRange.Minimum is IDiscreteLanguageConstant AsMinimum && AsMinimum.IsValueKnown && constantRange.Maximum is IDiscreteLanguageConstant AsMaximum && AsMaximum.IsValueKnown)
+            {
+                bool IsValidMinimum = false;
+                bool IsValidMaximum = false;
+
+                foreach (KeyValuePair<IFeatureName, IDiscrete> Entry in discreteTable)
+                {
+                    if (AsMinimum.Discrete == Entry.Value)
+                        IsValidMinimum = true;
+                    if (AsMaximum.Discrete == Entry.Value)
+                        IsValidMaximum = true;
+                }
+
+                IsValidRange |= IsValidMinimum && IsValidMaximum;
+            }
+
+            return IsValidRange;
         }
 
         /// <summary>
