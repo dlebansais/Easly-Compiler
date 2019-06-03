@@ -46,9 +46,10 @@
 
             IScope Instructions = (IScope)node.Instructions;
 
-            //TODO
+            IResultException ResolvedException = new ResultException();
+            ResultException.Merge(ResolvedException, Instructions.ResolvedException);
 
-            data = Instructions.ResolvedException.Item;
+            data = ResolvedException;
 
             return Success;
         }

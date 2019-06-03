@@ -78,26 +78,36 @@
                 IIndexerFeature Indexer = (IndexerFeature)IndexerInstance.Feature;
                 IIndexerType AsIndexerType = (IndexerType)Indexer.ResolvedFeatureType.Item;
 
-                IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
-                ParameterTableList.Add(AsIndexerType.ParameterTable);
+                bool IsReadOnlyIndexer = Indexer.GetterBody.IsAssigned && !Indexer.SetterBody.IsAssigned;
+                bool IsReadOnlyIndexerType = AsIndexerType.IndexerKind == BaseNode.UtilityType.ReadOnly;
+                Debug.Assert(IsReadOnlyIndexerType == IsReadOnlyIndexer);
 
-                ICompiledType DestinationType = AsIndexerType.ResolvedEntityType.Item;
-
-                if (!Argument.CheckAssignmentConformance(ParameterTableList, node.ArgumentList, Source, DestinationType, ErrorList, node, out IFeatureCall FeatureCall))
+                if (IsReadOnlyIndexer)
+                {
+                    AddSourceError(new ErrorInvalidInstruction(node));
                     return false;
+                }
+                else
+                {
+                    IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+                    ParameterTableList.Add(AsIndexerType.ParameterTable);
 
-                // TODO: check that the indexer isn't read-only
+                    ICompiledType DestinationType = AsIndexerType.ResolvedEntityType.Item;
 
-                ObjectType.FillResultPath(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, Destination.ValidResultTypePath.Item);
+                    if (!Argument.CheckAssignmentConformance(ParameterTableList, node.ArgumentList, Source, DestinationType, ErrorList, node, out IFeatureCall FeatureCall))
+                        return false;
 
-                IResultException ResolvedException = new ResultException();
+                    ObjectType.FillResultPath(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, Destination.ValidResultTypePath.Item);
 
-                ResultException.Merge(ResolvedException, AsIndexerType.SetExceptionIdentifierList);
+                    IResultException ResolvedException = new ResultException();
 
-                foreach (IArgument Item in node.ArgumentList)
-                    ResultException.Merge(ResolvedException, Item.ResolvedException.Item);
+                    ResultException.Merge(ResolvedException, AsIndexerType.SetExceptionIdentifierList);
 
-                data = new Tuple<IResultException, IFeatureCall>(ResolvedException, FeatureCall);
+                    foreach (IArgument Item in node.ArgumentList)
+                        ResultException.Merge(ResolvedException, Item.ResolvedException.Item);
+
+                    data = new Tuple<IResultException, IFeatureCall>(ResolvedException, FeatureCall);
+                }
             }
             else
             {
