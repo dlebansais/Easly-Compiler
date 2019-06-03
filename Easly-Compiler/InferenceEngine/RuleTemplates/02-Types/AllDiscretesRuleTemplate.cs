@@ -57,10 +57,8 @@
                 Debug.Assert(Inheritance.ResolvedType.IsAssigned);
                 Debug.Assert(Inheritance.DiscreteTable.IsAssigned);
 
-                IClassType InheritanceParent = Inheritance.ResolvedType.Item;
-                IHashtableEx<IFeatureName, IDiscrete> InheritedDiscreteTable = InheritanceParent.DiscreteTable;
+                IHashtableEx<IFeatureName, IDiscrete> InheritedDiscreteTable = Inheritance.DiscreteTable.Item;
 
-                // TODO: verify InheritedDiscreteTable == Inheritance.DiscreteTable since the source is on the later.
                 foreach (KeyValuePair<IFeatureName, IDiscrete> InstanceEntry in InheritedDiscreteTable)
                 {
                     IFeatureName InstanceName = InstanceEntry.Key;
