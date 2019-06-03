@@ -95,7 +95,6 @@
             Debug.Assert(!ConflictList.Contains(NameResult));
             Debug.Assert(!ConflictList.Contains(NameValue));
 
-            // Success &= CheckParameterConflicts(node, ConflictList);
             Success &= CheckIndexerKind(node, out BaseNode.UtilityType IndexerKind);
 
             if (Success)
@@ -136,27 +135,6 @@
 
             return Success;
         }
-
-        /*
-         * TODO: check if this error is really possible.
-        private bool CheckParameterConflicts(IIndexerFeature node, List<string> conflictList)
-        {
-            bool Success = true;
-
-            foreach (IEntityDeclaration Item in node.IndexParameterList)
-            {
-                IScopeAttributeFeature LocalEntity = Item.ValidEntity.Item;
-                string ValidFeatureName = LocalEntity.ValidFeatureName.Item.Name;
-
-                if (conflictList.Contains(ValidFeatureName))
-                {
-                    AddSourceError(new ErrorVariableAlreadyDefined(Item, ValidFeatureName));
-                    Success = false;
-                }
-            }
-
-            return Success;
-        }*/
 
         private bool CheckIndexerKind(IIndexerFeature node, out BaseNode.UtilityType indexerKind)
         {

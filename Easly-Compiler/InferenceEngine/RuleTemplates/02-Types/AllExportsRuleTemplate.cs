@@ -68,12 +68,10 @@
 
             foreach (IInheritance Inheritance in node.InheritanceList)
             {
-                Debug.Assert(Inheritance.ResolvedType.IsAssigned);
-                IClassType InheritanceParent = Inheritance.ResolvedType.Item;
+                Debug.Assert(Inheritance.ExportTable.IsAssigned);
 
-                IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> InheritedExportTable = InheritanceParent.ExportTable;
+                IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> InheritedExportTable = Inheritance.ExportTable.Item;
 
-                // TODO: verify InheritedExportTable == Inheritance.ExportTable since the source is on the later.
                 foreach (KeyValuePair<IFeatureName, IHashtableEx<string, IClass>> InstanceEntry in InheritedExportTable)
                 {
                     IFeatureName InstanceName = InstanceEntry.Key;
