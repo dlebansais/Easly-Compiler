@@ -250,9 +250,6 @@
             node.ResolvedEntityTypeName.Item = EntityTypeName;
             node.ResolvedEntityType.Item = EntityType;
 
-            node.IndexerParameterTable.Merge(CheckedScope);
-            node.IndexerParameterTable.Seal();
-
             foreach (KeyValuePair<string, IScopeAttributeFeature> Entry in CheckedScope)
                 node.ParameterTable.Add(new Parameter(Entry.Key, Entry.Value));
             node.ParameterTable.Seal();

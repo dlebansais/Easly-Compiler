@@ -241,7 +241,6 @@ namespace CompilerNode
         /// <summary>
         /// Inherit the side-by-side attribute.
         /// </summary>
-        ///TODO: merge this and ResolvedArgumentList.
         public bool InheritBySideAttribute { get; set; }
 
         /// <summary>
