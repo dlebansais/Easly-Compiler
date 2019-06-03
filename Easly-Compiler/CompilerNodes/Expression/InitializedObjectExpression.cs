@@ -411,8 +411,7 @@
 
                     Debug.Assert(DestinationType != null);
 
-                    IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-                    if (!ObjectType.TypeConformToBase(SourceType, DestinationType, SubstitutionTypeTable, errorList, IdentifierItem))
+                    if (!ObjectType.TypeConformToBase(SourceType, DestinationType, errorList, IdentifierItem))
                     {
                         errorList.AddError(new ErrorAssignmentMismatch(IdentifierItem));
                         return false;

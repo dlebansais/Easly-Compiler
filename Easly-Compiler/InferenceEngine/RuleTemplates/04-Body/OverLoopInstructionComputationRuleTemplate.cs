@@ -53,7 +53,6 @@
             IScope LoopInstructions = (IScope)node.LoopInstructions;
             IClass EmbeddingClass = node.EmbeddingClass;
 
-            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
             bool IsOverLoopSourceTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.OverLoopSource.Guid, node, out ITypeName OverLoopSourceTypeName, out ICompiledType OverLoopSourceType);
             bool IsNumberTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName NumberTypeName, out ICompiledType NumberType);
 
@@ -64,7 +63,7 @@
                 bool IsConformantToEnumerable = false;
                 bool IsConformantToNumericIndexer = false;
 
-                if (IsOverLoopSourceTypeAvailable && ObjectType.TypeConformToBase(ResultType, OverLoopSourceType, SubstitutionTypeTable))
+                if (IsOverLoopSourceTypeAvailable && ObjectType.TypeConformToBase(ResultType, OverLoopSourceType))
                     IsConformantToEnumerable = true;
 
                 if (IsNumberTypeAvailable && ResultType.FeatureTable.ContainsKey(FeatureName.IndexerFeatureName))

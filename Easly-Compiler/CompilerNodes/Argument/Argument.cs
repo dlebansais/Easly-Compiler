@@ -303,7 +303,6 @@ namespace CompilerNode
             OnceReference<ListTableEx<IParameter>> SelectedOverload = new OnceReference<ListTableEx<IParameter>>();
             selectedIndex = -1;
 
-            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
             for (int i = 0; i < parameterTableList.Count; i++)
             {
                 ListTableEx<IParameter> OverloadParameterList = parameterTableList[i];
@@ -329,7 +328,7 @@ namespace CompilerNode
 
                     Debug.Assert(ParameterType != null);
 
-                    IsMatching &= ObjectType.TypeConformToBase(ArgumentType, ParameterType, SubstitutionTypeTable);
+                    IsMatching &= ObjectType.TypeConformToBase(ArgumentType, ParameterType);
                 }
 
                 if (IsMatching)
@@ -370,7 +369,6 @@ namespace CompilerNode
             OnceReference<ListTableEx<IParameter>> SelectedOverload = new OnceReference<ListTableEx<IParameter>>();
             selectedIndex = -1;
 
-            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
             for (int i = 0; i < parameterTableList.Count; i++)
             {
                 ListTableEx<IParameter> OverloadParameterList = parameterTableList[i];
@@ -400,7 +398,7 @@ namespace CompilerNode
                     UnassignedParameters.Remove(OverloadParameter);
 
                     ICompiledType ParameterType = OverloadParameter.ResolvedParameter.ResolvedFeatureType.Item;
-                    IsMatching &= ObjectType.TypeConformToBase(ArgumentType, ParameterType, SubstitutionTypeTable);
+                    IsMatching &= ObjectType.TypeConformToBase(ArgumentType, ParameterType);
                 }
 
                 foreach (IParameter OverloadParameter in UnassignedParameters)
@@ -455,8 +453,7 @@ namespace CompilerNode
             ListTableEx<IParameter> SelectedParameterList = parameterTableList[SelectedIndex];
             ICompiledType SourceType = SourceResult.At(0).ValueType;
 
-            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-            if (!ObjectType.TypeConformToBase(SourceType, destinationType, SubstitutionTypeTable, errorList, sourceExpression))
+            if (!ObjectType.TypeConformToBase(SourceType, destinationType, errorList, sourceExpression))
             {
                 errorList.AddError(new ErrorInvalidExpression(sourceExpression));
                 return false;

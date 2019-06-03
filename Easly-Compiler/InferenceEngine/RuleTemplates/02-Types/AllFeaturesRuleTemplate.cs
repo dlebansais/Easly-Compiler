@@ -347,9 +347,8 @@
                         continue;
 
                     ICompiledType AncestorFeatureType = Item.Instance.Feature.Item.ResolvedFeatureType.Item;
-                    IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
 
-                    if (!ObjectType.TypeConformToBase(DescendantFeatureType, AncestorFeatureType, SubstitutionTypeTable, errorList, (ISource)importedInstance.EffectiveInstance.Item.Instance.Feature.Item))
+                    if (!ObjectType.TypeConformToBase(DescendantFeatureType, AncestorFeatureType, errorList, (ISource)importedInstance.EffectiveInstance.Item.Instance.Feature.Item))
                     {
                         errorList.AddError(new ErrorInheritanceConflict(Item.Location, Item.Name.Name));
                         Result = false;

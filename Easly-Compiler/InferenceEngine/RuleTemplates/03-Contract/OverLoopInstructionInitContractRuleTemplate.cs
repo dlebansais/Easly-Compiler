@@ -62,8 +62,6 @@
             }
             else
             {
-                IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-
                 foreach (IExpressionType Item in OverTypeList)
                 {
                     ICompiledType ResultType = Item.ValueType;
@@ -76,7 +74,7 @@
 
                     if (ResultType is IClassType AsClassType)
                     {
-                        if (IsOverLoopSourceAvailable && ObjectType.TypeConformToBase(ResultType, OverLoopSourceType, SubstitutionTypeTable))
+                        if (IsOverLoopSourceAvailable && ObjectType.TypeConformToBase(ResultType, OverLoopSourceType))
                             IsConformantToEnumerable = FindSourceItemPrecursor(AsClassType, ResultType.FeatureTable, out IndexTypeName, out IndexType);
 
                         if (AsClassType.BaseClass.FeatureTable.ContainsKey(FeatureName.IndexerFeatureName))

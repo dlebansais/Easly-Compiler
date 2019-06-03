@@ -211,8 +211,6 @@
 
             if (LeftResult.Count > 1)
             {
-                IHashtableEx<ICompiledType, ICompiledType> EmptySubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-
                 int MismatchingResultCount = 0;
                 foreach (IExpressionType LeftItem in LeftResult)
                 {
@@ -225,7 +223,7 @@
                             MatchingNameFound = true;
                             ICompiledType RightExpressionType = RightItem.ValueType;
 
-                            if (!ObjectType.TypeConformToBase(LeftExpressionType, RightExpressionType, EmptySubstitutionTypeTable) && !ObjectType.TypeConformToBase(RightExpressionType, LeftExpressionType, EmptySubstitutionTypeTable))
+                            if (!ObjectType.TypeConformToBase(LeftExpressionType, RightExpressionType) && !ObjectType.TypeConformToBase(RightExpressionType, LeftExpressionType))
                                 MismatchingResultCount++;
 
                             break;

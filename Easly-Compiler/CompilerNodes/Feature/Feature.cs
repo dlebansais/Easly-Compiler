@@ -79,8 +79,6 @@
                     SameIndexList.Add(ParameterTable[index]);
             }
 
-            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-
             bool Success = true;
             for (int i = 0; i < SameIndexList.Count && Success; i++)
             {
@@ -92,8 +90,8 @@
                     IParameter Parameter2 = SameIndexList[j];
                     ICompiledType ParameterType2 = Parameter2.ResolvedParameter.ResolvedFeatureType.Item;
 
-                    Success &= DisjoinedParameterCheck(Parameter1, Parameter2, SubstitutionTypeTable, errorList);
-                    Success &= DisjoinedParameterCheck(Parameter2, Parameter1, SubstitutionTypeTable, errorList);
+                    Success &= DisjoinedParameterCheck(Parameter1, Parameter2, errorList);
+                    Success &= DisjoinedParameterCheck(Parameter2, Parameter1, errorList);
                 }
             }
 
@@ -133,8 +131,6 @@
                     SameIndexList.Add(ParameterTable[index]);
             }
 
-            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-
             bool Success = true;
             for (int i = 0; i < SameIndexList.Count && Success; i++)
             {
@@ -146,21 +142,21 @@
                     IParameter Parameter2 = SameIndexList[j];
                     ICompiledType ParameterType2 = Parameter2.ResolvedParameter.ResolvedFeatureType.Item;
 
-                    Success &= DisjoinedParameterCheck(Parameter1, Parameter2, SubstitutionTypeTable, errorList);
-                    Success &= DisjoinedParameterCheck(Parameter2, Parameter1, SubstitutionTypeTable, errorList);
+                    Success &= DisjoinedParameterCheck(Parameter1, Parameter2, errorList);
+                    Success &= DisjoinedParameterCheck(Parameter2, Parameter1, errorList);
                 }
             }
 
             return Success;
         }
 
-        private static bool DisjoinedParameterCheck(IParameter derivedParameter, IParameter baseParameter, IHashtableEx<ICompiledType, ICompiledType> substitutionTypeTable, IErrorList errorList)
+        private static bool DisjoinedParameterCheck(IParameter derivedParameter, IParameter baseParameter, IErrorList errorList)
         {
             ICompiledType DerivedType = derivedParameter.ResolvedParameter.ResolvedFeatureType.Item;
             ICompiledType BaseType = baseParameter.ResolvedParameter.ResolvedFeatureType.Item;
             bool Success = true;
 
-            if (ObjectType.TypeConformToBase(DerivedType, BaseType, substitutionTypeTable))
+            if (ObjectType.TypeConformToBase(DerivedType, BaseType))
             {
                 errorList.AddError(new ErrorMoreBasicParameter(baseParameter.ResolvedParameter.Location));
                 Success = false;
@@ -209,8 +205,6 @@
                     SameIndexList.Add(ResultTable[index]);
             }
 
-            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-
             IParameter SelectedParameter = SameIndexList[0];
             ITypeName SelectedParameterTypeName = SelectedParameter.ResolvedParameter.ResolvedFeatureTypeName.Item;
             ICompiledType SelectedParameterType = SelectedParameter.ResolvedParameter.ResolvedFeatureType.Item;
@@ -221,7 +215,7 @@
                 ITypeName CurrentParameterTypeName = CurrentParameter.ResolvedParameter.ResolvedFeatureTypeName.Item;
                 ICompiledType CurrentParameterType = CurrentParameter.ResolvedParameter.ResolvedFeatureType.Item;
 
-                if (ObjectType.TypeConformToBase(SelectedParameterType, CurrentParameterType, SubstitutionTypeTable))
+                if (ObjectType.TypeConformToBase(SelectedParameterType, CurrentParameterType))
                 {
                     SelectedParameter = CurrentParameter;
                     SelectedParameterTypeName = CurrentParameterTypeName;
@@ -253,14 +247,12 @@
                     SameIndexList.Add(ResultTable[index]);
             }
 
-            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-
             for (int i = 0; i < SameIndexList.Count; i++)
             {
                 IParameter CurrentParameter = SameIndexList[i];
                 ICompiledType CurrentParameterType = CurrentParameter.ResolvedParameter.ResolvedFeatureType.Item;
 
-                if (!ObjectType.TypeConformToBase(CurrentParameterType, baseType, SubstitutionTypeTable))
+                if (!ObjectType.TypeConformToBase(CurrentParameterType, baseType))
                 {
                     errorList.AddError(new ErrorNonConformingType(location));
                     Success = false;

@@ -61,9 +61,7 @@
                 return false;
             }
 
-            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-
-            if (!ObjectType.TypeConformToBase(ResolvedType, ExceptionType, SubstitutionTypeTable))
+            if (!ObjectType.TypeConformToBase(ResolvedType, ExceptionType))
             {
                 AddSourceError(new ErrorExceptionTypeRequired(node));
                 return false;

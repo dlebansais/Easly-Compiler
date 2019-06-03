@@ -158,8 +158,6 @@
         {
             bool ConformanceError = false;
 
-            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-
             for (int j = 0; j < node.AttachmentList.Count; j++)
             {
                 IAttachment AttachmentItem = node.AttachmentList[j];
@@ -174,7 +172,7 @@
                         IObjectType PreviousAttachType = PreviousAttachmentItem.AttachTypeList[index];
                         ICompiledType PreviousDestinationType = PreviousAttachType.ResolvedType.Item;
 
-                        if (ObjectType.TypeConformToBase(DestinationType, PreviousDestinationType, SubstitutionTypeTable))
+                        if (ObjectType.TypeConformToBase(DestinationType, PreviousDestinationType))
                         {
                             AddSourceError(new ErrorInvalidAttachment(AttachmentItem));
                             ConformanceError = true;
@@ -190,7 +188,6 @@
         {
             bool ConformanceError = false;
             IClass EmbeddingClass = node.EmbeddingClass;
-            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
 
             for (int j = 0; j < node.AttachmentList.Count; j++)
             {
@@ -200,7 +197,7 @@
                     IObjectType AttachType = AttachmentItem.AttachTypeList[index];
                     ICompiledType DestinationType = AttachType.ResolvedType.Item;
 
-                    if (!ObjectType.TypesHaveCommonDescendant(EmbeddingClass, DestinationType, sourceType, SubstitutionTypeTable))
+                    if (!ObjectType.TypesHaveCommonDescendant(EmbeddingClass, DestinationType, sourceType))
                     {
                         AddSourceError(new ErrorInvalidAttachment(AttachmentItem));
                         ConformanceError = true;
@@ -212,7 +209,7 @@
                             IObjectType PreviousAttachType = PreviousAttachmentItem.AttachTypeList[index];
                             ICompiledType PreviousDestinationType = PreviousAttachType.ResolvedType.Item;
 
-                            if (ObjectType.TypeConformToBase(DestinationType, PreviousDestinationType, SubstitutionTypeTable))
+                            if (ObjectType.TypeConformToBase(DestinationType, PreviousDestinationType))
                             {
                                 AddSourceError(new ErrorInvalidAttachment(AttachmentItem));
                                 ConformanceError = true;

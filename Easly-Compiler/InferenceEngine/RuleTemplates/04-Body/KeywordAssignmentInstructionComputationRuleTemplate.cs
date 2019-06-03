@@ -101,9 +101,8 @@
             }
 
             IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
-            IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
 
-            if (!ObjectType.TypeConformToBase(SourceType, DestinationType, SubstitutionTypeTable, ErrorList, node))
+            if (!ObjectType.TypeConformToBase(SourceType, DestinationType, ErrorList, node))
             {
                 AddSourceError(new ErrorAssignmentMismatch(node));
                 return false;

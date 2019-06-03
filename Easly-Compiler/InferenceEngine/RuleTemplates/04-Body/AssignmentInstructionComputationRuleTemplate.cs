@@ -64,8 +64,6 @@
                 IClass EmbeddingClass = node.EmbeddingClass;
                 IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;
 
-                IHashtableEx<ICompiledType, ICompiledType> SubstitutionTypeTable = new HashtableEx<ICompiledType, ICompiledType>();
-
                 for (int i = 0; i < node.DestinationList.Count; i++)
                 {
                     IQualifiedName Destination = (QualifiedName)node.DestinationList[i];
@@ -82,7 +80,7 @@
                         IPathParticipatingType DestinationType = FinalType as IPathParticipatingType;
                         Debug.Assert(DestinationType != null);
 
-                        if (!ObjectType.TypeConformToBase(SourceType, DestinationType.TypeAsDestinationOrSource, SubstitutionTypeTable))
+                        if (!ObjectType.TypeConformToBase(SourceType, DestinationType.TypeAsDestinationOrSource))
                         {
                             AddSourceError(new ErrorAssignmentMismatch(Destination));
                             Success = false;
