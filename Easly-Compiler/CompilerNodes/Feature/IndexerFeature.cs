@@ -186,7 +186,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                IsResolved = ResolvedFeature.IsAssigned; // TODO confirm
+                IsResolved = ResolvedFeature.IsAssigned;
                 IsHandled = true;
             }
 
