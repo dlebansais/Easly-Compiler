@@ -13,6 +13,11 @@ namespace CompilerNode
     public interface IAttributeFeature : BaseNode.IAttributeFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature
     {
         /// <summary>
+        /// Replicated list from <see cref="BaseNode.AttributeFeature.EnsureBlocks"/>.
+        /// </summary>
+        IList<IAssertion> EnsureList { get; }
+
+        /// <summary>
         /// The name of the resolved attribute type.
         /// </summary>
         OnceReference<ITypeName> ResolvedEntityTypeName { get; }

@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
 
@@ -17,6 +18,16 @@
         /// The parent feature.
         /// </summary>
         ICSharpFeature ParentFeature { get; }
+
+        /// <summary>
+        /// The list of require C# assertions.
+        /// </summary>
+        IList<ICSharpAssertion> RequireList { get; }
+
+        /// <summary>
+        /// The list of ensure C# assertions.
+        /// </summary>
+        IList<ICSharpAssertion> EnsureList { get; }
     }
 
     /// <summary>
@@ -71,6 +82,18 @@
 
             ParentFeature = parentFeature;
             Source = source;
+
+            foreach (IAssertion Assertion in source.RequireList)
+            {
+                ICSharpAssertion NewAssertion = CSharpAssertion.Create(context, Assertion);
+                RequireList.Add(NewAssertion);
+            }
+
+            foreach (IAssertion Assertion in source.EnsureList)
+            {
+                ICSharpAssertion NewAssertion = CSharpAssertion.Create(context, Assertion);
+                EnsureList.Add(NewAssertion);
+            }
         }
         #endregion
 
@@ -84,6 +107,16 @@
         /// The parent feature.
         /// </summary>
         public ICSharpFeature ParentFeature { get; }
+
+        /// <summary>
+        /// The list of require C# assertions.
+        /// </summary>
+        public IList<ICSharpAssertion> RequireList { get; } = new List<ICSharpAssertion>();
+
+        /// <summary>
+        /// The list of ensure C# assertions.
+        /// </summary>
+        public IList<ICSharpAssertion> EnsureList { get; } = new List<ICSharpAssertion>();
         #endregion
     }
 }

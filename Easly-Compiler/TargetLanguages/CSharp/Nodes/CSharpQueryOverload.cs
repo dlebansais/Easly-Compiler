@@ -133,7 +133,7 @@
                 switch (Body)
                 {
                     case ICSharpDeferredBody AsDeferredBody:
-                        //Assertion.WriteContract(sw, AsDeferredBody.RequireList, AsDeferredBody.EnsureList, ContractLocations.Other, true, ref IsFirstFeature, ref IsMultiline);
+                        CSharpAssertion.WriteContract(writer, AsDeferredBody.RequireList, AsDeferredBody.EnsureList, CSharpContractLocations.Other, true, ref isFirstFeature, ref isMultiline);
                         ExportStatusText = CSharpNames.ComposedExportStatus(false, true, false, exportStatus);
                         writer.WriteIndentedLine($"{ExportStatusText} {ResultType} {nameString}({ArgumentEntityList});");
                         isMultiline = false;
@@ -141,7 +141,7 @@
                         break;
 
                     case ICSharpEffectiveBody AsEffectiveBody:
-                        //Assertion.WriteContract(sw, AsEffectiveBody.RequireList, AsEffectiveBody.EnsureList, ContractLocations.Other, true, ref IsFirstFeature, ref IsMultiline);
+                        CSharpAssertion.WriteContract(writer, AsEffectiveBody.RequireList, AsEffectiveBody.EnsureList, CSharpContractLocations.Other, true, ref isFirstFeature, ref isMultiline);
 
                         CSharpBodyFlags Flags = CSharpBodyFlags.MandatoryCurlyBrackets;
                         string ResultString = string.Empty;

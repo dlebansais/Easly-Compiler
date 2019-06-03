@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Collections.Generic;
     using CompilerNode;
 
     /// <summary>
@@ -31,6 +32,11 @@
         /// The attribute type.
         /// </summary>
         ICSharpType Type { get; }
+
+        /// <summary>
+        /// The list of ensure C# assertions.
+        /// </summary>
+        IList<ICSharpAssertion> EnsureList { get; }
     }
 
     /// <summary>
@@ -78,6 +84,11 @@
         /// The attribute type.
         /// </summary>
         public ICSharpType Type { get; private set; }
+
+        /// <summary>
+        /// The list of ensure C# assertions.
+        /// </summary>
+        public IList<ICSharpAssertion> EnsureList { get; } = new List<ICSharpAssertion>();
         #endregion
 
         #region Client Interface
@@ -88,6 +99,12 @@
         public override void Init(ICSharpContext context)
         {
             Type = CSharpType.Create(context, Source.ResolvedEntityType.Item);
+
+            foreach (IAssertion Assertion in Source.EnsureList)
+            {
+                ICSharpAssertion NewAssertion = CSharpAssertion.Create(context, Assertion);
+                EnsureList.Add(NewAssertion);
+            }
         }
 
         /// <summary>
@@ -105,10 +122,10 @@
             isMultiline = false;
 
             if (featureTextType == CSharpFeatureTextTypes.Implementation)
-                WriteCSharpImplementation(writer, outputNamespace, exportStatus);
+                WriteCSharpImplementation(writer, outputNamespace, exportStatus, ref isFirstFeature, ref isMultiline);
         }
 
-        private void WriteCSharpImplementation(ICSharpWriter writer, string outputNamespace, CSharpExports exportStatus)
+        private void WriteCSharpImplementation(ICSharpWriter writer, string outputNamespace, CSharpExports exportStatus, ref bool isFirstFeature, ref bool isMultiline)
         {
             bool IsEvent = false;
 
@@ -121,7 +138,7 @@
 
             writer.WriteDocumentation(Source);
 
-            //Assertion.WriteContract(sw, new List<IAssertion>(), EnsureList, ContractLocations.Other, false, ref IsFirstFeature, ref IsMultiline);
+            CSharpAssertion.WriteContract(writer, new List<ICSharpAssertion>(), EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
 
             string TypeString = Type.Type2CSharpString(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
             string AttributeString = CSharpNames.ToCSharpIdentifier(Name);

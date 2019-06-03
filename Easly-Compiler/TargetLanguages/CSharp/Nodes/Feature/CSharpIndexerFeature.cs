@@ -216,13 +216,13 @@
             {
                 if (GetterBody is ICSharpDeferredBody AsDeferredGetterBody)
                 {
-                    //Assertion.WriteContract(sw, AsDeferredBody.RequireList, AsDeferredBody.EnsureList, ContractLocations.Getter, false, ref IsFirstFeature, ref IsMultiline);
+                    CSharpAssertion.WriteContract(writer, AsDeferredGetterBody.RequireList, AsDeferredGetterBody.EnsureList, CSharpContractLocations.Getter, false, ref isFirstFeature, ref isMultiline);
                     isMultiline = false;
                 }
 
                 if (SetterBody is ICSharpDeferredBody AsDeferredSetterBody)
                 {
-                    //Assertion.WriteContract(sw, AsDeferredBody.RequireList, AsDeferredBody.EnsureList, ContractLocations.Setter, false, ref IsFirstFeature, ref IsMultiline);
+                    CSharpAssertion.WriteContract(writer, AsDeferredSetterBody.RequireList, AsDeferredSetterBody.EnsureList, CSharpContractLocations.Setter, false, ref isFirstFeature, ref isMultiline);
                 }
 
                 string ExportStatusText = CSharpNames.ComposedExportStatus(false, true, false, exportStatus);
@@ -256,7 +256,7 @@
                     {
                         isMultiline = false;
 
-                        //Assertion.WriteContract(sw, AsPrecursorBody.RequireList, AsPrecursorBody.EnsureList, ContractLocations.Other, false, ref IsFirstFeature, ref IsMultiline);
+                        CSharpAssertion.WriteContract(writer, AsPrecursorGetterBody.RequireList, AsPrecursorGetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
                         writer.WriteIndentedLine("get");
                         writer.WriteIndentedLine("{");
                         writer.IncreaseIndent();
@@ -271,7 +271,7 @@
                     {
                         isMultiline = false;
 
-                        //Assertion.WriteContract(sw, AsPrecursorBody.RequireList, AsPrecursorBody.EnsureList, ContractLocations.Other, false, ref IsFirstFeature, ref IsMultiline);
+                        CSharpAssertion.WriteContract(writer, AsPrecursorSetterBody.RequireList, AsPrecursorSetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
                         writer.WriteIndentedLine("set");
                         writer.WriteIndentedLine("{");
                         writer.IncreaseIndent();
@@ -283,7 +283,6 @@
                     else if (IsForcedReadWrite)
                         writer.WriteIndentedLine("set { throw new InvalidOperationException(); }");
                 }
-
                 else
                 {
                     if (GetterBody != null)
@@ -292,7 +291,7 @@
                         {
                             isMultiline = false;
 
-                            //Assertion.WriteContract(sw, AsEffectiveBody.RequireList, AsEffectiveBody.EnsureList, ContractLocations.Other, false, ref IsFirstFeature, ref IsMultiline);
+                            CSharpAssertion.WriteContract(writer, AsEffectiveGetterBody.RequireList, AsEffectiveGetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
                             writer.WriteIndentedLine("get");
                             AsEffectiveGetterBody.WriteCSharp(writer, outputNamespace, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasResult, ResultType, false, new List<string>());
                         }
@@ -306,7 +305,7 @@
                         {
                             isMultiline = false;
 
-                            //Assertion.WriteContract(sw, AsEffectiveBody.RequireList, AsEffectiveBody.EnsureList, ContractLocations.Other, false, ref IsFirstFeature, ref IsMultiline);
+                            CSharpAssertion.WriteContract(writer, AsEffectiveSetterBody.RequireList, AsEffectiveSetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
                             writer.WriteIndentedLine("set");
                             AsEffectiveSetterBody.WriteCSharp(writer, outputNamespace, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasValue, string.Empty, false, new List<string>());
                         }

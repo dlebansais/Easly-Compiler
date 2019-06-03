@@ -19,16 +19,6 @@
         IList<ICSharpInstruction> BodyInstructionList { get; }
 
         /// <summary>
-        /// The list of require C# assertions.
-        /// </summary>
-        IList<ICSharpAssertion> RequireList { get; }
-
-        /// <summary>
-        /// The list of ensure C# assertions.
-        /// </summary>
-        IList<ICSharpAssertion> EnsureList { get; }
-
-        /// <summary>
         /// The list of local variables.
         /// </summary>
         IList<ICSharpScopeAttributeFeature> EntityDeclarationList { get; }
@@ -77,18 +67,6 @@
                 BodyInstructionList.Add(NewInstruction);
             }
 
-            foreach (IAssertion Assertion in source.EnsureList)
-            {
-                ICSharpAssertion NewAssertion = CSharpAssertion.Create(context, Assertion);
-                EnsureList.Add(NewAssertion);
-            }
-
-            foreach (IAssertion Assertion in source.RequireList)
-            {
-                ICSharpAssertion NewAssertion = CSharpAssertion.Create(context, Assertion);
-                RequireList.Add(NewAssertion);
-            }
-
             ICSharpClass Owner = parentFeature.Owner;
 
             foreach (IEntityDeclaration Item in source.EntityDeclarationList)
@@ -109,16 +87,6 @@
         /// The list of instructions in the body.
         /// </summary>
         public IList<ICSharpInstruction> BodyInstructionList { get; } = new List<ICSharpInstruction>();
-
-        /// <summary>
-        /// The list of require C# assertions.
-        /// </summary>
-        public IList<ICSharpAssertion> RequireList { get; } = new List<ICSharpAssertion>();
-
-        /// <summary>
-        /// The list of ensure C# assertions.
-        /// </summary>
-        public IList<ICSharpAssertion> EnsureList { get; } = new List<ICSharpAssertion>();
 
         /// <summary>
         /// The list of local variables.

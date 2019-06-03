@@ -395,7 +395,7 @@
                     ICSharpDeferredBody DeferredGetterBody = GetterBody as ICSharpDeferredBody;
                     Debug.Assert(DeferredGetterBody != null);
 
-                    //Assertion.WriteContract(sw, AsDeferredBody.RequireList, AsDeferredBody.EnsureList, ContractLocations.Other, false, ref IsFirstFeature, ref IsMultiline);
+                    CSharpAssertion.WriteContract(writer, DeferredGetterBody.RequireList, DeferredGetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
 
                     string ExportStatusText = CSharpNames.ComposedExportStatus(false, true, false, exportStatus);
                     writer.WriteIndentedLine($"{ExportStatusText} {resultType} {propertyName} {{ get; protected set; }}");
@@ -426,7 +426,7 @@
                         Debug.Assert(EffectiveGetterBody != null);
 
                         isMultiline = false;
-                        //Assertion.WriteContract(sw, AsEffectiveBody.RequireList, AsEffectiveBody.EnsureList, ContractLocations.Other, false, ref IsFirstFeature, ref IsMultiline);
+                        CSharpAssertion.WriteContract(writer, EffectiveGetterBody.RequireList, EffectiveGetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
 
                         writer.WriteIndentedLine("get");
                         EffectiveGetterBody.WriteCSharp(writer, outputNamespace, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasResult, resultType, false, new List<string>());
@@ -474,7 +474,7 @@
                     ICSharpDeferredBody DeferredSetterBody = SetterBody as ICSharpDeferredBody;
                     Debug.Assert(DeferredSetterBody != null);
 
-                    //Assertion.WriteContract(sw, AsDeferredBody.RequireList, AsDeferredBody.EnsureList, ContractLocations.Other, false, ref IsFirstFeature, ref IsMultiline);
+                    CSharpAssertion.WriteContract(writer, DeferredSetterBody.RequireList, DeferredSetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
 
                     string ExportStatusText = CSharpNames.ComposedExportStatus(false, true, false, exportStatus);
                     writer.WriteIndentedLine($"{ExportStatusText} {resultType} {propertyName} {{ protected get; set; }}");
@@ -508,7 +508,7 @@
                         Debug.Assert(EffectiveSetterBody != null);
 
                         isMultiline = false;
-                        //Assertion.WriteContract(sw, AsEffectiveBody.RequireList, AsEffectiveBody.EnsureList, ContractLocations.Other, false, ref IsFirstFeature, ref IsMultiline);
+                        CSharpAssertion.WriteContract(writer, EffectiveSetterBody.RequireList, EffectiveSetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
 
                         writer.WriteIndentedLine("set");
                         EffectiveSetterBody.WriteCSharp(writer, outputNamespace, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasValue, string.Empty, false, new List<string>());
@@ -570,7 +570,7 @@
                         ICSharpDeferredBody DeferredGetterBody = GetterBody as ICSharpDeferredBody;
                         Debug.Assert(DeferredGetterBody != null);
 
-                        //Assertion.WriteContract(sw, AsDeferredBody.RequireList, AsDeferredBody.EnsureList, ContractLocations.Getter, false, ref IsFirstFeature, ref IsGetterMultiline);
+                        CSharpAssertion.WriteContract(writer, DeferredGetterBody.RequireList, DeferredGetterBody.EnsureList, CSharpContractLocations.Getter, false, ref isFirstFeature, ref IsGetterMultiline);
                         IsSetterMultiline = false;
                     }
 
@@ -579,7 +579,7 @@
                         ICSharpDeferredBody DeferredSetterBody = SetterBody as ICSharpDeferredBody;
                         Debug.Assert(DeferredSetterBody != null);
 
-                        //Assertion.WriteContract(sw, AsDeferredBody.RequireList, AsDeferredBody.EnsureList, ContractLocations.Setter, false, ref IsFirstFeature, ref IsSetterMultiline);
+                        CSharpAssertion.WriteContract(writer, DeferredSetterBody.RequireList, DeferredSetterBody.EnsureList, CSharpContractLocations.Setter, false, ref isFirstFeature, ref IsSetterMultiline);
                     }
 
                     string ExportStatusText = CSharpNames.ComposedExportStatus(false, true, false, exportStatus);
@@ -610,7 +610,7 @@
                             Debug.Assert(EffectiveGetterBody != null);
 
                             isMultiline = false;
-                            //Assertion.WriteContract(sw, AsEffectiveBody.RequireList, AsEffectiveBody.EnsureList, ContractLocations.Other, false, ref IsFirstFeature, ref IsMultiline);
+                            CSharpAssertion.WriteContract(writer, EffectiveGetterBody.RequireList, EffectiveGetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
 
                             writer.WriteIndentedLine("get");
                             EffectiveGetterBody.WriteCSharp(writer, outputNamespace, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasResult, resultType, false, new List<string>());
@@ -624,7 +624,7 @@
                             Debug.Assert(EffectiveSetterBody != null);
 
                             isMultiline = false;
-                            //Assertion.WriteContract(sw, AsEffectiveBody.RequireList, AsEffectiveBody.EnsureList, ContractLocations.Other, false, ref IsFirstFeature, ref IsMultiline);
+                            CSharpAssertion.WriteContract(writer, EffectiveSetterBody.RequireList, EffectiveSetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
 
                             writer.WriteIndentedLine("set");
                             EffectiveSetterBody.WriteCSharp(writer, outputNamespace, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasValue, string.Empty, false, new List<string>());
@@ -688,7 +688,7 @@
                         ICSharpDeferredBody DeferredGetterBody = GetterBody as ICSharpDeferredBody;
                         Debug.Assert(DeferredGetterBody != null);
 
-                        //Assertion.WriteContract(sw, AsDeferredBody.RequireList, AsDeferredBody.EnsureList, ContractLocations.Getter, false, ref IsFirstFeature, ref IsGetterMultiline);
+                        CSharpAssertion.WriteContract(writer, DeferredGetterBody.RequireList, DeferredGetterBody.EnsureList, CSharpContractLocations.Getter, false, ref isFirstFeature, ref IsGetterMultiline);
                         IsSetterMultiline = false;
                     }
 
@@ -697,7 +697,7 @@
                         ICSharpDeferredBody DeferredSetterBody = SetterBody as ICSharpDeferredBody;
                         Debug.Assert(DeferredSetterBody != null);
 
-                        //Assertion.WriteContract(sw, AsDeferredBody.RequireList, AsDeferredBody.EnsureList, ContractLocations.Setter, false, ref IsFirstFeature, ref IsSetterMultiline);
+                        CSharpAssertion.WriteContract(writer, DeferredSetterBody.RequireList, DeferredSetterBody.EnsureList, CSharpContractLocations.Setter, false, ref isFirstFeature, ref IsSetterMultiline);
                     }
 
                     string ExportStatusText = CSharpNames.ComposedExportStatus(false, true, false, exportStatus);
@@ -735,7 +735,7 @@
                             Debug.Assert(EffectiveGetterBody != null);
 
                             isMultiline = false;
-                            //Assertion.WriteContract(sw, AsEffectiveBody.RequireList, AsEffectiveBody.EnsureList, ContractLocations.Other, false, ref IsFirstFeature, ref IsMultiline);
+                            CSharpAssertion.WriteContract(writer, EffectiveGetterBody.RequireList, EffectiveGetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
 
                             writer.WriteIndentedLine("get");
                             EffectiveGetterBody.WriteCSharp(writer, outputNamespace, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasResult, resultType, false, new List<string>());
@@ -749,7 +749,7 @@
                             Debug.Assert(EffectiveSetterBody != null);
 
                             isMultiline = false;
-                            //Assertion.WriteContract(sw, AsEffectiveBody.RequireList, AsEffectiveBody.EnsureList, ContractLocations.Other, false, ref IsFirstFeature, ref IsMultiline);
+                            CSharpAssertion.WriteContract(writer, EffectiveSetterBody.RequireList, EffectiveSetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
 
                             writer.WriteIndentedLine("set");
                             EffectiveSetterBody.WriteCSharp(writer, outputNamespace, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasValue, string.Empty, false, new List<string>());

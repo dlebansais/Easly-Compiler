@@ -118,17 +118,17 @@
             switch (Body)
             {
                 case ICSharpDeferredBody AsDeferredBody:
-                    WriteCSharpImplementationDeferred(writer, outputNamespace, isOverride, nameString, exportStatus, isConstructor, ref isFirstFeature, ref isMultiline);
+                    WriteCSharpImplementationDeferred(writer, outputNamespace, AsDeferredBody, isOverride, nameString, exportStatus, isConstructor, ref isFirstFeature, ref isMultiline);
                     IsHandled = true;
                     break;
 
                 case ICSharpEffectiveBody AsEffectiveBody:
-                    WriteCSharpImplementationEffective(writer, outputNamespace, isOverride, nameString, exportStatus, isConstructor, ref isFirstFeature, ref isMultiline);
+                    WriteCSharpImplementationEffective(writer, outputNamespace, AsEffectiveBody, isOverride, nameString, exportStatus, isConstructor, ref isFirstFeature, ref isMultiline);
                     IsHandled = true;
                     break;
 
                 case ICSharpPrecursorBody AsPrecursorBody:
-                    WriteCSharpImplementationPrecursor(writer, outputNamespace, isOverride, nameString, exportStatus, isConstructor, ref isFirstFeature, ref isMultiline);
+                    WriteCSharpImplementationPrecursor(writer, outputNamespace, AsPrecursorBody, isOverride, nameString, exportStatus, isConstructor, ref isFirstFeature, ref isMultiline);
                     IsHandled = true;
                     break;
             }
@@ -136,11 +136,11 @@
             Debug.Assert(IsHandled);
         }
 
-        private void WriteCSharpImplementationDeferred(ICSharpWriter writer, string outputNamespace, bool isOverride, string nameString, CSharpExports exportStatus, bool isConstructor, ref bool isFirstFeature, ref bool isMultiline)
+        private void WriteCSharpImplementationDeferred(ICSharpWriter writer, string outputNamespace, ICSharpDeferredBody deferredBody, bool isOverride, string nameString, CSharpExports exportStatus, bool isConstructor, ref bool isFirstFeature, ref bool isMultiline)
         {
             CSharpArgument.BuildParameterList(ParameterList, outputNamespace, out string ParameterEntityList, out string ParameterNameList);
 
-            //Assertion.WriteContract(sw, AsDeferredBody.RequireList, AsDeferredBody.EnsureList, ContractLocations.Other, true, ref IsFirstFeature, ref IsMultiline);
+            CSharpAssertion.WriteContract(writer, deferredBody.RequireList, deferredBody.EnsureList, CSharpContractLocations.Other, true, ref isFirstFeature, ref isMultiline);
 
             string ExportStatusText = CSharpNames.ComposedExportStatus(false, true, false, exportStatus);
             writer.WriteIndentedLine($"{ExportStatusText} void {nameString}({ParameterEntityList});");
@@ -148,11 +148,11 @@
             isMultiline = false;
         }
 
-        private void WriteCSharpImplementationEffective(ICSharpWriter writer, string outputNamespace, bool isOverride, string nameString, CSharpExports exportStatus, bool isConstructor, ref bool isFirstFeature, ref bool isMultiline)
+        private void WriteCSharpImplementationEffective(ICSharpWriter writer, string outputNamespace, ICSharpEffectiveBody effectiveBody, bool isOverride, string nameString, CSharpExports exportStatus, bool isConstructor, ref bool isFirstFeature, ref bool isMultiline)
         {
             CSharpArgument.BuildParameterList(ParameterList, outputNamespace, out string ParameterEntityList, out string ParameterNameList);
 
-            //Assertion.WriteContract(sw, AsEffectiveBody.RequireList, AsEffectiveBody.EnsureList, ContractLocations.Other, true, ref IsFirstFeature, ref IsMultiline);
+            CSharpAssertion.WriteContract(writer, effectiveBody.RequireList, effectiveBody.EnsureList, CSharpContractLocations.Other, true, ref isFirstFeature, ref isMultiline);
 
             bool SkipFirstInstruction = false;
 
@@ -215,7 +215,7 @@
             }
         }
 
-        private void WriteCSharpImplementationPrecursor(ICSharpWriter writer, string outputNamespace, bool isOverride, string nameString, CSharpExports exportStatus, bool isConstructor, ref bool isFirstFeature, ref bool isMultiline)
+        private void WriteCSharpImplementationPrecursor(ICSharpWriter writer, string outputNamespace, ICSharpPrecursorBody precursorBody, bool isOverride, string nameString, CSharpExports exportStatus, bool isConstructor, ref bool isFirstFeature, ref bool isMultiline)
         {
             CSharpArgument.BuildParameterList(ParameterList, outputNamespace, out string ParameterEntityList, out string ParameterNameList);
 
