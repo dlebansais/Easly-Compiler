@@ -49,10 +49,10 @@
             data = null;
             bool Success = true;
 
-            Success &= EntityExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IResultException ResolvedException, out ListTableEx<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out ICompiledFeature ResolvedFinalFeature, out IDiscrete ResolvedFinalDiscrete);
+            Success &= EntityExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IResultException ResolvedException, out SealableList<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out ICompiledFeature ResolvedFinalFeature, out IDiscrete ResolvedFinalDiscrete);
 
             if (Success)
-                data = new Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, ICompiledFeature, IDiscrete>(ResolvedResult, ResolvedException, ConstantSourceList, ExpressionConstant, ResolvedFinalFeature, ResolvedFinalDiscrete);
+                data = new Tuple<IResultType, IResultException, SealableList<IExpression>, ILanguageConstant, ICompiledFeature, IDiscrete>(ResolvedResult, ResolvedException, ConstantSourceList, ExpressionConstant, ResolvedFinalFeature, ResolvedFinalDiscrete);
 
             return Success;
         }
@@ -64,12 +64,12 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IEntityExpression node, object data)
         {
-            IResultType ResolvedResult = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, ICompiledFeature, IDiscrete>)data).Item1;
-            IResultException ResolvedException = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, ICompiledFeature, IDiscrete>)data).Item2;
-            ListTableEx<IExpression> ConstantSourceList = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, ICompiledFeature, IDiscrete>)data).Item3;
-            ILanguageConstant ExpressionConstant = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, ICompiledFeature, IDiscrete>)data).Item4;
-            ICompiledFeature ResolvedFinalFeature = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, ICompiledFeature, IDiscrete>)data).Item5;
-            IDiscrete ResolvedFinalDiscrete = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, ICompiledFeature, IDiscrete>)data).Item6;
+            IResultType ResolvedResult = ((Tuple<IResultType, IResultException, SealableList<IExpression>, ILanguageConstant, ICompiledFeature, IDiscrete>)data).Item1;
+            IResultException ResolvedException = ((Tuple<IResultType, IResultException, SealableList<IExpression>, ILanguageConstant, ICompiledFeature, IDiscrete>)data).Item2;
+            SealableList<IExpression> ConstantSourceList = ((Tuple<IResultType, IResultException, SealableList<IExpression>, ILanguageConstant, ICompiledFeature, IDiscrete>)data).Item3;
+            ILanguageConstant ExpressionConstant = ((Tuple<IResultType, IResultException, SealableList<IExpression>, ILanguageConstant, ICompiledFeature, IDiscrete>)data).Item4;
+            ICompiledFeature ResolvedFinalFeature = ((Tuple<IResultType, IResultException, SealableList<IExpression>, ILanguageConstant, ICompiledFeature, IDiscrete>)data).Item5;
+            IDiscrete ResolvedFinalDiscrete = ((Tuple<IResultType, IResultException, SealableList<IExpression>, ILanguageConstant, ICompiledFeature, IDiscrete>)data).Item6;
 
             node.ResolvedResult.Item = ResolvedResult;
             node.ConstantSourceList.AddRange(ConstantSourceList);

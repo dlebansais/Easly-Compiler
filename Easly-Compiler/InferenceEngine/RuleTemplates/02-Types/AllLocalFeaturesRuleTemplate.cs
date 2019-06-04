@@ -54,7 +54,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IClass node, object data)
         {
-            IHashtableEx<IFeatureName, IFeatureInstance> LocalFeatureTable = node.LocalFeatureTable;
+            ISealableDictionary<IFeatureName, IFeatureInstance> LocalFeatureTable = node.LocalFeatureTable;
             LocalFeatureTable.Seal();
 
             node.LocalNamespaceTable.Add("Feature", LocalFeatureTable);

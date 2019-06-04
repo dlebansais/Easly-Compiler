@@ -31,8 +31,8 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IGenericType, IClass>(nameof(IGenericType.BaseClass)),
-                new OnceReferenceDestinationTemplate<IGenericType, IHashtableEx<string, ICompiledType>>(nameof(IGenericType.ResolvedTypeArgumentTable)),
-                new OnceReferenceDestinationTemplate<IGenericType, IHashtableEx<string, IObjectType>>(nameof(IGenericType.ResolvedArgumentLocationTable)),
+                new OnceReferenceDestinationTemplate<IGenericType, ISealableDictionary<string, ICompiledType>>(nameof(IGenericType.ResolvedTypeArgumentTable)),
+                new OnceReferenceDestinationTemplate<IGenericType, ISealableDictionary<string, IObjectType>>(nameof(IGenericType.ResolvedArgumentLocationTable)),
                 new OnceReferenceDestinationTemplate<IGenericType, ITypeName>(nameof(IGenericType.ResolvedTypeName)),
                 new OnceReferenceDestinationTemplate<IGenericType, ICompiledType>(nameof(IGenericType.ResolvedType)),
             };
@@ -56,10 +56,10 @@
             Debug.Assert(ClassIdentifier.ValidText.IsAssigned);
             string ValidIdentifier = ClassIdentifier.ValidText.Item;
             IClass EmbeddingClass = node.EmbeddingClass;
-            IHashtableEx<string, IImportedClass> ImportedClassTable = EmbeddingClass.ImportedClassTable;
+            ISealableDictionary<string, IImportedClass> ImportedClassTable = EmbeddingClass.ImportedClassTable;
 
-            IHashtableEx<string, ICompiledType> ResolvedTable = new HashtableEx<string, ICompiledType>();
-            IHashtableEx<string, IObjectType> LocationTable = new HashtableEx<string, IObjectType>();
+            ISealableDictionary<string, ICompiledType> ResolvedTable = new SealableDictionary<string, ICompiledType>();
+            ISealableDictionary<string, IObjectType> LocationTable = new SealableDictionary<string, IObjectType>();
 
             if (!ImportedClassTable.ContainsKey(ValidIdentifier))
             {
@@ -105,7 +105,7 @@
                     if (Success)
                     {
                         ClassType.ResolveType(EmbeddingClass.TypeTable, BaseClass, ResolvedTable, EmbeddingClass.ResolvedClassType.Item, out ITypeName ValidResolvedTypeName, out ICompiledType ValidResolvedType);
-                        data = new Tuple<IClass, TypeArgumentStyles, IHashtableEx<string, ICompiledType>, IHashtableEx<string, IObjectType>, ITypeName, ICompiledType>(BaseClass, ArgumentStyle, ResolvedTable, LocationTable, ValidResolvedTypeName, ValidResolvedType);
+                        data = new Tuple<IClass, TypeArgumentStyles, ISealableDictionary<string, ICompiledType>, ISealableDictionary<string, IObjectType>, ITypeName, ICompiledType>(BaseClass, ArgumentStyle, ResolvedTable, LocationTable, ValidResolvedTypeName, ValidResolvedType);
                     }
                 }
             }
@@ -148,7 +148,7 @@
             return Success;
         }
 
-        private bool CheckPositionalTypeArgumentsValidity(IGenericType node, IClass baseClass, IHashtableEx<string, ICompiledType> resolvedTable, IHashtableEx<string, IObjectType> locationTable)
+        private bool CheckPositionalTypeArgumentsValidity(IGenericType node, IClass baseClass, ISealableDictionary<string, ICompiledType> resolvedTable, ISealableDictionary<string, IObjectType> locationTable)
         {
             IIdentifier ClassIdentifier = (IIdentifier)node.ClassIdentifier;
             Debug.Assert(ClassIdentifier.ValidText.IsAssigned);
@@ -190,7 +190,7 @@
             return true;
         }
 
-        private bool CheckAssignmentTypeArgumentsValidity(IGenericType node, IClass baseClass, IHashtableEx<string, ICompiledType> resolvedTable, IHashtableEx<string, IObjectType> locationTable)
+        private bool CheckAssignmentTypeArgumentsValidity(IGenericType node, IClass baseClass, ISealableDictionary<string, ICompiledType> resolvedTable, ISealableDictionary<string, IObjectType> locationTable)
         {
             bool Result = true;
             List<string> ValidNameList = new List<string>();
@@ -247,12 +247,12 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IGenericType node, object data)
         {
-            node.BaseClass.Item = ((Tuple<IClass, TypeArgumentStyles, IHashtableEx<string, ICompiledType>, IHashtableEx<string, IObjectType>, ITypeName, ICompiledType>)data).Item1;
-            node.SetArgumentStyle(((Tuple<IClass, TypeArgumentStyles, IHashtableEx<string, ICompiledType>, IHashtableEx<string, IObjectType>, ITypeName, ICompiledType>)data).Item2);
-            node.ResolvedTypeArgumentTable.Item = ((Tuple<IClass, TypeArgumentStyles, IHashtableEx<string, ICompiledType>, IHashtableEx<string, IObjectType>, ITypeName, ICompiledType>)data).Item3;
-            node.ResolvedArgumentLocationTable.Item = ((Tuple<IClass, TypeArgumentStyles, IHashtableEx<string, ICompiledType>, IHashtableEx<string, IObjectType>, ITypeName, ICompiledType>)data).Item4;
-            node.ResolvedTypeName.Item = ((Tuple<IClass, TypeArgumentStyles, IHashtableEx<string, ICompiledType>, IHashtableEx<string, IObjectType>, ITypeName, ICompiledType>)data).Item5;
-            node.ResolvedType.Item = ((Tuple<IClass, TypeArgumentStyles, IHashtableEx<string, ICompiledType>, IHashtableEx<string, IObjectType>, ITypeName, ICompiledType>)data).Item6;
+            node.BaseClass.Item = ((Tuple<IClass, TypeArgumentStyles, ISealableDictionary<string, ICompiledType>, ISealableDictionary<string, IObjectType>, ITypeName, ICompiledType>)data).Item1;
+            node.SetArgumentStyle(((Tuple<IClass, TypeArgumentStyles, ISealableDictionary<string, ICompiledType>, ISealableDictionary<string, IObjectType>, ITypeName, ICompiledType>)data).Item2);
+            node.ResolvedTypeArgumentTable.Item = ((Tuple<IClass, TypeArgumentStyles, ISealableDictionary<string, ICompiledType>, ISealableDictionary<string, IObjectType>, ITypeName, ICompiledType>)data).Item3;
+            node.ResolvedArgumentLocationTable.Item = ((Tuple<IClass, TypeArgumentStyles, ISealableDictionary<string, ICompiledType>, ISealableDictionary<string, IObjectType>, ITypeName, ICompiledType>)data).Item4;
+            node.ResolvedTypeName.Item = ((Tuple<IClass, TypeArgumentStyles, ISealableDictionary<string, ICompiledType>, ISealableDictionary<string, IObjectType>, ITypeName, ICompiledType>)data).Item5;
+            node.ResolvedType.Item = ((Tuple<IClass, TypeArgumentStyles, ISealableDictionary<string, ICompiledType>, ISealableDictionary<string, IObjectType>, ITypeName, ICompiledType>)data).Item6;
         }
         #endregion
     }

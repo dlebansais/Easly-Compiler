@@ -82,7 +82,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IResultType>();
-                ConstantSourceList = new ListTableEx<IExpression>();
+                ConstantSourceList = new SealableList<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
                 IsHandled = true;
             }
@@ -147,7 +147,7 @@ namespace CompilerNode
         /// <summary>
         /// The list of sources for a constant, if any.
         /// </summary>
-        public ListTableEx<IExpression> ConstantSourceList { get; private set; } = new ListTableEx<IExpression>();
+        public SealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
 
         /// <summary>
         /// Specific constant number.
@@ -195,11 +195,11 @@ namespace CompilerNode
         /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
         /// <param name="expressionConstant">The expression constant upon return.</param>
         /// <param name="resolvedFinalFeature">The matching feature upon return.</param>
-        public static bool ResolveCompilerReferences(IOldExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature)
+        public static bool ResolveCompilerReferences(IOldExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature)
         {
             resolvedResult = null;
             resolvedException = null;
-            constantSourceList = new ListTableEx<IExpression>();
+            constantSourceList = new SealableList<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
             resolvedFinalFeature = null;
 
@@ -214,7 +214,7 @@ namespace CompilerNode
                 return false;
             }
 
-            IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
+            ISealableDictionary<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
             Debug.Assert(LocalScope != null);
 
             if (node.EmbeddingBody == null && node.EmbeddingAssertion == null)

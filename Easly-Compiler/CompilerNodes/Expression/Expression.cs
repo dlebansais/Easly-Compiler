@@ -29,7 +29,7 @@ namespace CompilerNode
         /// <summary>
         /// The list of sources for a constant, if any.
         /// </summary>
-        ListTableEx<IExpression> ConstantSourceList { get; }
+        SealableList<IExpression> ConstantSourceList { get; }
 
         /// <summary>
         /// The constant expression, if assigned.

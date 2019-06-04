@@ -61,7 +61,7 @@
                 Success = false;
             }
 
-            ListTableEx<IParameter> ParameterTable = new ListTableEx<IParameter>();
+            SealableList<IParameter> ParameterTable = new SealableList<IParameter>();
 
             foreach (IEntityDeclaration Item in node.IndexParameterList)
             {
@@ -79,7 +79,7 @@
             }
 
             if (Success)
-                data = new Tuple<IClassType, ListTableEx<IParameter>>(BaseType, ParameterTable);
+                data = new Tuple<IClassType, SealableList<IParameter>>(BaseType, ParameterTable);
 
             return Success;
         }
@@ -91,8 +91,8 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IIndexerType node, object data)
         {
-            IClassType BaseType = ((Tuple<IClassType, ListTableEx<IParameter>>)data).Item1;
-            ListTableEx<IParameter> ParameterTable = ((Tuple<IClassType, ListTableEx<IParameter>>)data).Item2;
+            IClassType BaseType = ((Tuple<IClassType, SealableList<IParameter>>)data).Item1;
+            SealableList<IParameter> ParameterTable = ((Tuple<IClassType, SealableList<IParameter>>)data).Item2;
 
             IClass EmbeddingClass = node.EmbeddingClass;
             IObjectType BaseTypeItem = (IObjectType)node.BaseType;

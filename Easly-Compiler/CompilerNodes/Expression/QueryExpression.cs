@@ -29,7 +29,7 @@ namespace CompilerNode
         /// <summary>
         /// List of results from the selected overload.
         /// </summary>
-        ListTableEx<IParameter> SelectedResultList { get; }
+        SealableList<IParameter> SelectedResultList { get; }
 
         /// <summary>
         /// Details of the feature call.
@@ -138,7 +138,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IResultType>();
-                ConstantSourceList = new ListTableEx<IExpression>();
+                ConstantSourceList = new SealableList<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
                 ResolvedFinalFeature = new OnceReference<ICompiledFeature>();
                 ResolvedFinalDiscrete = new OnceReference<IDiscrete>();
@@ -147,7 +147,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
                 ResolvedException = new OnceReference<IResultException>();
-                SelectedResultList = new ListTableEx<IParameter>();
+                SelectedResultList = new SealableList<IParameter>();
                 FeatureCall = new OnceReference<IFeatureCall>();
                 InheritBySideAttribute = false;
                 IsHandled = true;
@@ -209,7 +209,7 @@ namespace CompilerNode
         /// <summary>
         /// The list of sources for a constant, if any.
         /// </summary>
-        public ListTableEx<IExpression> ConstantSourceList { get; private set; } = new ListTableEx<IExpression>();
+        public SealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
 
         /// <summary>
         /// Specific constant number.
@@ -231,7 +231,7 @@ namespace CompilerNode
         /// <summary>
         /// List of results from the selected overload.
         /// </summary>
-        public ListTableEx<IParameter> SelectedResultList { get; private set; } = new ListTableEx<IParameter>();
+        public SealableList<IParameter> SelectedResultList { get; private set; } = new SealableList<IParameter>();
 
         /// <summary>
         /// Details of the feature call.
@@ -282,11 +282,11 @@ namespace CompilerNode
         /// <param name="selectedResultList">The selected results.</param>
         /// <param name="featureCall">Details of the feature call.</param>
         /// <param name="inheritBySideAttribute">Inherit the side-by-side attribute.</param>
-        public static bool ResolveCompilerReferences(IQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out ListTableEx<IParameter> selectedResultList, out IFeatureCall featureCall, out bool inheritBySideAttribute)
+        public static bool ResolveCompilerReferences(IQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out SealableList<IParameter> selectedResultList, out IFeatureCall featureCall, out bool inheritBySideAttribute)
         {
             resolvedResult = null;
             resolvedException = null;
-            constantSourceList = new ListTableEx<IExpression>();
+            constantSourceList = new SealableList<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
             resolvedFinalFeature = null;
             resolvedFinalDiscrete = null;
@@ -299,7 +299,7 @@ namespace CompilerNode
             IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;
             IList<IIdentifier> ValidPath = Query.ValidPath.Item;
 
-            IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
+            ISealableDictionary<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
 
             if (!ObjectType.GetQualifiedPathFinalType(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, errorList, out ICompiledFeature FinalFeature, out IDiscrete FinalDiscrete, out ITypeName FinalTypeName, out ICompiledType FinalType, out inheritBySideAttribute))
                 return false;
@@ -320,16 +320,16 @@ namespace CompilerNode
             }
         }
 
-        private static bool ResolveFeature(IQueryExpression node, IErrorList errorList, ICompiledFeature resolvedFinalFeature, ITypeName finalTypeName, ICompiledType finalType, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedResultList, out IFeatureCall featureCall)
+        private static bool ResolveFeature(IQueryExpression node, IErrorList errorList, ICompiledFeature resolvedFinalFeature, ITypeName finalTypeName, ICompiledType finalType, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out SealableList<IParameter> selectedResultList, out IFeatureCall featureCall)
         {
             resolvedResult = null;
             resolvedException = null;
-            constantSourceList = new ListTableEx<IExpression>();
+            constantSourceList = new SealableList<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
             selectedResultList = null;
             featureCall = null;
 
-            IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
+            ISealableDictionary<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
 
             IQualifiedName Query = (IQualifiedName)node.Query;
             IList<IArgument> ArgumentList = node.ArgumentList;
@@ -341,7 +341,7 @@ namespace CompilerNode
             if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, errorList))
                 return false;
 
-            IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+            IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
             IIdentifier LastIdentifier = ValidPath[ValidPath.Count - 1];
             string ValidText = LastIdentifier.ValidText.Item;
             bool IsHandled = false;
@@ -376,7 +376,7 @@ namespace CompilerNode
                     resolvedResult = new ResultType(AsPropertyType.ResolvedEntityTypeName.Item, AsPropertyType.ResolvedEntityType.Item, ValidText);
 
                     resolvedException = new ResultException(AsPropertyType.GetExceptionIdentifierList);
-                    selectedResultList = new ListTableEx<IParameter>();
+                    selectedResultList = new SealableList<IParameter>();
                     featureCall = new FeatureCall();
                     IsHandled = true;
                     break;
@@ -385,7 +385,7 @@ namespace CompilerNode
                     resolvedResult = new ResultType(finalTypeName, AsClassType, ValidText);
 
                     resolvedException = new ResultException();
-                    selectedResultList = new ListTableEx<IParameter>();
+                    selectedResultList = new SealableList<IParameter>();
                     featureCall = new FeatureCall();
                     IsHandled = true;
                     break;
@@ -394,7 +394,7 @@ namespace CompilerNode
                     resolvedResult = new ResultType(finalTypeName, AsFormalGenericType, ValidText);
 
                     resolvedException = new ResultException();
-                    selectedResultList = new ListTableEx<IParameter>();
+                    selectedResultList = new SealableList<IParameter>();
                     featureCall = new FeatureCall();
                     IsHandled = true;
                     break;
@@ -403,7 +403,7 @@ namespace CompilerNode
                     resolvedResult = new ResultType(finalTypeName, AsTupleType, ValidText);
 
                     resolvedException = new ResultException();
-                    selectedResultList = new ListTableEx<IParameter>();
+                    selectedResultList = new SealableList<IParameter>();
                     featureCall = new FeatureCall();
                     IsHandled = true;
                     break;
@@ -433,11 +433,11 @@ namespace CompilerNode
             return true;
         }
 
-        private static bool ResolveDiscrete(IQueryExpression node, IErrorList errorList, IDiscrete resolvedFinalDiscrete, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedResultList, out IFeatureCall featureCall)
+        private static bool ResolveDiscrete(IQueryExpression node, IErrorList errorList, IDiscrete resolvedFinalDiscrete, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out SealableList<IParameter> selectedResultList, out IFeatureCall featureCall)
         {
             resolvedResult = null;
             resolvedException = null;
-            constantSourceList = new ListTableEx<IExpression>();
+            constantSourceList = new SealableList<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
             selectedResultList = null;
             featureCall = null;
@@ -457,7 +457,7 @@ namespace CompilerNode
             else
                 expressionConstant = new DiscreteLanguageConstant(resolvedFinalDiscrete);
 
-            selectedResultList = new ListTableEx<IParameter>();
+            selectedResultList = new SealableList<IParameter>();
             featureCall = new FeatureCall();
 
             return true;

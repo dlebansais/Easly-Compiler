@@ -4,7 +4,7 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is a sealed <see cref="IHashtableEx"/> hash table.
+    /// The source is a sealed <see cref="ISealableDictionary"/> hash table.
     /// </summary>
     public interface ISealedTableSourceTemplate : ISourceTemplate
     {
@@ -12,24 +12,24 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is a sealed <see cref="IHashtableEx{TKey, TValue}"/> hash table.
+    /// The source is a sealed <see cref="ISealableDictionary{TKey, TValue}"/> hash table.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TKey">Type of the key.</typeparam>
     /// <typeparam name="TValue">Type of the value.</typeparam>
-    public interface ISealedTableSourceTemplate<TSource, TKey, TValue> : ISourceTemplate<TSource, IHashtableEx<TKey, TValue>>
+    public interface ISealedTableSourceTemplate<TSource, TKey, TValue> : ISourceTemplate<TSource, ISealableDictionary<TKey, TValue>>
         where TSource : ISource
     {
     }
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is a sealed <see cref="IHashtableEx{TKey, TValue}"/> hash table.
+    /// The source is a sealed <see cref="ISealableDictionary{TKey, TValue}"/> hash table.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TKey">Type of the key.</typeparam>
     /// <typeparam name="TValue">Type of the value.</typeparam>
-    public class SealedTableSourceTemplate<TSource, TKey, TValue> : SourceTemplate<TSource, IHashtableEx<TKey, TValue>>, ISealedTableSourceTemplate<TSource, TKey, TValue>, ISealedTableSourceTemplate
+    public class SealedTableSourceTemplate<TSource, TKey, TValue> : SourceTemplate<TSource, ISealableDictionary<TKey, TValue>>, ISealedTableSourceTemplate<TSource, TKey, TValue>, ISealedTableSourceTemplate
         where TSource : ISource
     {
         #region Init
@@ -55,7 +55,7 @@
             data = null;
             bool Result = false;
 
-            IHashtableEx<TKey, TValue> Value = GetSourceObject(node, out bool IsInterrupted);
+            ISealableDictionary<TKey, TValue> Value = GetSourceObject(node, out bool IsInterrupted);
             if (!IsInterrupted && Value.IsSealed)
             {
                 data = Value;

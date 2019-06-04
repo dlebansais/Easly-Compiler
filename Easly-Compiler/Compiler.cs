@@ -884,7 +884,7 @@
             foreach (IClass Class in root.ClassList)
                 IsClassNamesValid &= Class.CheckClassNames(ClassTable, ValidatedClassList, ErrorList);
 
-            foreach (KeyValuePair<string, IHashtableEx<string, IClass>> Entry in ClassTable)
+            foreach (KeyValuePair<string, ISealableDictionary<string, IClass>> Entry in ClassTable)
             {
                 string ValidClassName = Entry.Key;
 
@@ -918,7 +918,7 @@
             foreach (ILibrary Library in root.LibraryList)
                 IsLibraryNamesValid &= Library.CheckLibraryNames(LibraryTable, ValidatedLibraryList, ErrorList);
 
-            foreach (KeyValuePair<string, IHashtableEx<string, ILibrary>> Entry in LibraryTable)
+            foreach (KeyValuePair<string, ISealableDictionary<string, ILibrary>> Entry in LibraryTable)
             {
                 string ValidLibraryName = Entry.Key;
 
@@ -1022,8 +1022,8 @@
             return Success;
         }
 
-        private IHashtableEx<string, IHashtableEx<string, IClass>> ClassTable = new HashtableEx<string, IHashtableEx<string, IClass>>();
-        private IHashtableEx<string, IHashtableEx<string, ILibrary>> LibraryTable = new HashtableEx<string, IHashtableEx<string, ILibrary>>();
+        private ISealableDictionary<string, ISealableDictionary<string, IClass>> ClassTable = new SealableDictionary<string, ISealableDictionary<string, IClass>>();
+        private ISealableDictionary<string, ISealableDictionary<string, ILibrary>> LibraryTable = new SealableDictionary<string, ISealableDictionary<string, ILibrary>>();
         #endregion
 
         #region Inference

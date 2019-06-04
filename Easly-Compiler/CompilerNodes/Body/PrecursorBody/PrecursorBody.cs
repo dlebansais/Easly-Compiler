@@ -145,7 +145,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                ResolvedTagTable = new HashtableEx<string, IExpression>();
+                ResolvedTagTable = new SealableDictionary<string, IExpression>();
                 ResolvedResult = new OnceReference<IResultType>();
                 ResolvedRequireList = new OnceReference<IList<IAssertion>>();
                 ResolvedEnsureList = new OnceReference<IList<IAssertion>>();
@@ -201,7 +201,7 @@ namespace CompilerNode
         /// <summary>
         /// Tags for tag expressions.
         /// </summary>
-        public IHashtableEx<string, IExpression> ResolvedTagTable { get; private set; } = new HashtableEx<string, IExpression>();
+        public ISealableDictionary<string, IExpression> ResolvedTagTable { get; private set; } = new SealableDictionary<string, IExpression>();
 
         /// <summary>
         /// Types of results.
@@ -240,7 +240,7 @@ namespace CompilerNode
         /// <summary>
         /// Entities local to a scope.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> LocalScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> LocalScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
 
         /// <summary>
         /// The resolved precursor type name.

@@ -62,9 +62,9 @@
             string NameResult = Result.ValidFeatureName.Item.Name;
             string NameValue = Value.ValidFeatureName.Item.Name;
 
-            IHashtableEx<string, IScopeAttributeFeature> CheckedGetScope = new HashtableEx<string, IScopeAttributeFeature>();
+            ISealableDictionary<string, IScopeAttributeFeature> CheckedGetScope = new SealableDictionary<string, IScopeAttributeFeature>();
             CheckedGetScope.Add(NameResult, Result);
-            IHashtableEx<string, IScopeAttributeFeature> CheckedSetScope = new HashtableEx<string, IScopeAttributeFeature>();
+            ISealableDictionary<string, IScopeAttributeFeature> CheckedSetScope = new SealableDictionary<string, IScopeAttributeFeature>();
             CheckedSetScope.Add(NameValue, Value);
 
             IList<string> ConflictList = new List<string>();

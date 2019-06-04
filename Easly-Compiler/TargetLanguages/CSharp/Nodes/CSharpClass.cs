@@ -70,12 +70,12 @@
         /// <summary>
         /// The table of implicit delegates.
         /// </summary>
-        IHashtableEx<ITypeName, ICompiledType> DelegateTable { get; }
+        ISealableDictionary<ITypeName, ICompiledType> DelegateTable { get; }
 
         /// <summary>
         /// The table of explicit delegates.
         /// </summary>
-        IHashtableEx<ITypeName, ICompiledType> TypedefDelegateTable { get; }
+        ISealableDictionary<ITypeName, ICompiledType> TypedefDelegateTable { get; }
 
         /// <summary>
         /// True if the class shares its name with another from a different 'From' source.
@@ -276,12 +276,12 @@
         /// <summary>
         /// The table of implicit delegates.
         /// </summary>
-        public IHashtableEx<ITypeName, ICompiledType> DelegateTable { get; } = new HashtableEx<ITypeName, ICompiledType>();
+        public ISealableDictionary<ITypeName, ICompiledType> DelegateTable { get; } = new SealableDictionary<ITypeName, ICompiledType>();
 
         /// <summary>
         /// The table of explicit delegates.
         /// </summary>
-        public IHashtableEx<ITypeName, ICompiledType> TypedefDelegateTable { get; } = new HashtableEx<ITypeName, ICompiledType>();
+        public ISealableDictionary<ITypeName, ICompiledType> TypedefDelegateTable { get; } = new SealableDictionary<ITypeName, ICompiledType>();
 
         /// <summary>
         /// True if the class shares its name with another from a different 'From' source.
@@ -948,9 +948,9 @@
             OrderedRegionList.Add(DescendantInterfaceRegion);
             OrderedRegionList.Add(ImplementationRegion);
 
-            IHashtableEx<string, IHashtableEx<string, ICSharpFeature>> RegionTable = new HashtableEx<string, IHashtableEx<string, ICSharpFeature>>();
+            ISealableDictionary<string, ISealableDictionary<string, ICSharpFeature>> RegionTable = new SealableDictionary<string, ISealableDictionary<string, ICSharpFeature>>();
             foreach (string Region in OrderedRegionList)
-                RegionTable.Add(Region, new HashtableEx<string, ICSharpFeature>());
+                RegionTable.Add(Region, new SealableDictionary<string, ICSharpFeature>());
 
             ICSharpCreationFeature ConstructorOverride = null;
 
@@ -1001,10 +1001,10 @@
                 if (!OrderedRegionList.Contains(BelongingRegion))
                 {
                     OrderedRegionList.Add(BelongingRegion);
-                    RegionTable.Add(BelongingRegion, new HashtableEx<string, ICSharpFeature>());
+                    RegionTable.Add(BelongingRegion, new SealableDictionary<string, ICSharpFeature>());
                 }
 
-                IHashtableEx<string, ICSharpFeature> Region = RegionTable[BelongingRegion];
+                ISealableDictionary<string, ICSharpFeature> Region = RegionTable[BelongingRegion];
 
                 if (Feature is ICSharpFeatureWithName AsFeatureWithName)
                     Region.Add(AsFeatureWithName.Name, Feature);
@@ -1019,7 +1019,7 @@
             foreach (string BelongingRegion in OrderedRegionList)
             {
                 int WrittenFeatures = 0;
-                IHashtableEx<string, ICSharpFeature> Region = RegionTable[BelongingRegion];
+                ISealableDictionary<string, ICSharpFeature> Region = RegionTable[BelongingRegion];
                 if (Region.Count > 0 || (BelongingRegion == InitRegion && ConstructorOverride != null))
                 {
                     if (IsFirstRegion)

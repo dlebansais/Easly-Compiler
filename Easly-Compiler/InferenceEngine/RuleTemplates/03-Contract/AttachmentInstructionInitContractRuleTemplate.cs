@@ -80,7 +80,7 @@
                     foreach (IAttachment Attachment in node.AttachmentList)
                     {
                         IObjectType AttachedType = Attachment.AttachTypeList[i];
-                        IHashtableEx<string, IScopeAttributeFeature> CheckedScope = Attachment.FullScope;
+                        ISealableDictionary<string, IScopeAttributeFeature> CheckedScope = Attachment.FullScope;
 
                         IList<IClass> AssignedSingleClassList = new List<IClass>();
                         IErrorList CheckErrorList = new ErrorList();

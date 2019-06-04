@@ -70,9 +70,9 @@
             data = null;
             bool Success = true;
 
-            IHashtableEx<string, IScopeAttributeFeature> CheckedScope = new HashtableEx<string, IScopeAttributeFeature>();
-            IHashtableEx<string, IScopeAttributeFeature> CheckedGetScope = new HashtableEx<string, IScopeAttributeFeature>();
-            IHashtableEx<string, IScopeAttributeFeature> CheckedSetScope = new HashtableEx<string, IScopeAttributeFeature>();
+            ISealableDictionary<string, IScopeAttributeFeature> CheckedScope = new SealableDictionary<string, IScopeAttributeFeature>();
+            ISealableDictionary<string, IScopeAttributeFeature> CheckedGetScope = new SealableDictionary<string, IScopeAttributeFeature>();
+            ISealableDictionary<string, IScopeAttributeFeature> CheckedSetScope = new SealableDictionary<string, IScopeAttributeFeature>();
 
             string NameResult = resultFeature.ValidFeatureName.Item.Name;
             string NameValue = valueFeature.ValidFeatureName.Item.Name;
@@ -98,12 +98,12 @@
             Success &= CheckIndexerKind(node, out BaseNode.UtilityType IndexerKind);
 
             if (Success)
-                data = new Tuple<BaseNode.UtilityType, IHashtableEx<string, IScopeAttributeFeature>, IHashtableEx<string, IScopeAttributeFeature>, IHashtableEx<string, IScopeAttributeFeature>>(IndexerKind, CheckedScope, CheckedGetScope, CheckedSetScope);
+                data = new Tuple<BaseNode.UtilityType, ISealableDictionary<string, IScopeAttributeFeature>, ISealableDictionary<string, IScopeAttributeFeature>, ISealableDictionary<string, IScopeAttributeFeature>>(IndexerKind, CheckedScope, CheckedGetScope, CheckedSetScope);
 
             return Success;
         }
 
-        private bool CheckParameters(IIndexerFeature node, IScopeAttributeFeature resultFeature, IScopeAttributeFeature valueFeature, IHashtableEx<string, IScopeAttributeFeature> checkedScope)
+        private bool CheckParameters(IIndexerFeature node, IScopeAttributeFeature resultFeature, IScopeAttributeFeature valueFeature, ISealableDictionary<string, IScopeAttributeFeature> checkedScope)
         {
             bool Success = true;
             string NameResult = resultFeature.ValidFeatureName.Item.Name;
@@ -177,10 +177,10 @@
             IClass EmbeddingClass = node.EmbeddingClass;
             IObjectType TypeToResolve = (IObjectType)node.EntityType;
 
-            BaseNode.UtilityType IndexerKind = ((Tuple<BaseNode.UtilityType, IHashtableEx<string, IScopeAttributeFeature>, IHashtableEx<string, IScopeAttributeFeature>, IHashtableEx<string, IScopeAttributeFeature>>)data).Item1;
-            IHashtableEx<string, IScopeAttributeFeature> CheckedScope = ((Tuple<BaseNode.UtilityType, IHashtableEx<string, IScopeAttributeFeature>, IHashtableEx<string, IScopeAttributeFeature>, IHashtableEx<string, IScopeAttributeFeature>>)data).Item2;
-            IHashtableEx<string, IScopeAttributeFeature> CheckedGetScope = ((Tuple<BaseNode.UtilityType, IHashtableEx<string, IScopeAttributeFeature>, IHashtableEx<string, IScopeAttributeFeature>, IHashtableEx<string, IScopeAttributeFeature>>)data).Item3;
-            IHashtableEx<string, IScopeAttributeFeature> CheckedSetScope = ((Tuple<BaseNode.UtilityType, IHashtableEx<string, IScopeAttributeFeature>, IHashtableEx<string, IScopeAttributeFeature>, IHashtableEx<string, IScopeAttributeFeature>>)data).Item4;
+            BaseNode.UtilityType IndexerKind = ((Tuple<BaseNode.UtilityType, ISealableDictionary<string, IScopeAttributeFeature>, ISealableDictionary<string, IScopeAttributeFeature>, ISealableDictionary<string, IScopeAttributeFeature>>)data).Item1;
+            ISealableDictionary<string, IScopeAttributeFeature> CheckedScope = ((Tuple<BaseNode.UtilityType, ISealableDictionary<string, IScopeAttributeFeature>, ISealableDictionary<string, IScopeAttributeFeature>, ISealableDictionary<string, IScopeAttributeFeature>>)data).Item2;
+            ISealableDictionary<string, IScopeAttributeFeature> CheckedGetScope = ((Tuple<BaseNode.UtilityType, ISealableDictionary<string, IScopeAttributeFeature>, ISealableDictionary<string, IScopeAttributeFeature>, ISealableDictionary<string, IScopeAttributeFeature>>)data).Item3;
+            ISealableDictionary<string, IScopeAttributeFeature> CheckedSetScope = ((Tuple<BaseNode.UtilityType, ISealableDictionary<string, IScopeAttributeFeature>, ISealableDictionary<string, IScopeAttributeFeature>, ISealableDictionary<string, IScopeAttributeFeature>>)data).Item4;
 
             ITypeName BaseTypeName = EmbeddingClass.ResolvedClassTypeName.Item;
             IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;

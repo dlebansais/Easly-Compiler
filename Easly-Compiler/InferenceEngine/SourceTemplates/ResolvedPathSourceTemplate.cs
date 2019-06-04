@@ -76,8 +76,8 @@
                     LocalEntityList.AddRange(AsEffectiveBody.EntityDeclarationList);
 
                 IClass Class = node.EmbeddingClass;
-                IHashtableEx<IFeatureName, IFeatureInstance> LocalFeatureTable = Class.LocalFeatureTable;
-                IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable = Class.FeatureTable;
+                ISealableDictionary<IFeatureName, IFeatureInstance> LocalFeatureTable = Class.LocalFeatureTable;
+                ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable = Class.FeatureTable;
 
                 IErrorList ErrorList = new ErrorList();
                 if (IsPathReady(Path, LocalEntityList, LocalFeatureTable, FeatureTable, ErrorList, out ITypeName ResolvedPathTypeName, out ICompiledType ResolvedPathType))
@@ -101,12 +101,12 @@
         /// <param name="resolvedPathTypeName">The target type name upon return.</param>
         /// <param name="resolvedPathType">The target type upon return.</param>
         /// <returns>True if the path could be resolved to the target.</returns>
-        public static bool IsPathReady(IList<IIdentifier> path, List<IEntityDeclaration> localEntityList, IHashtableEx<IFeatureName, IFeatureInstance> localFeatureTable, IHashtableEx<IFeatureName, IFeatureInstance> featureTable, IErrorList errorList, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
+        public static bool IsPathReady(IList<IIdentifier> path, List<IEntityDeclaration> localEntityList, ISealableDictionary<IFeatureName, IFeatureInstance> localFeatureTable, ISealableDictionary<IFeatureName, IFeatureInstance> featureTable, IErrorList errorList, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
         {
             resolvedPathTypeName = null;
             resolvedPathType = null;
 
-            IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable;
+            ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable;
 
             // We start with a feature table. The full table if available, the local table otherwise.
             /*
@@ -150,7 +150,7 @@
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="isInterrupted">Set if an error is found.</param>
         /// <returns>False to stop; True to continue with the next step.</returns>
-        public static bool IsPathItemReady(IIdentifier item, IIdentifier nextItem, ref List<IEntityDeclaration> localEntityList, ref IHashtableEx<IFeatureName, IFeatureInstance> featureTable, IErrorList errorList, ref bool isInterrupted)
+        public static bool IsPathItemReady(IIdentifier item, IIdentifier nextItem, ref List<IEntityDeclaration> localEntityList, ref ISealableDictionary<IFeatureName, IFeatureInstance> featureTable, IErrorList errorList, ref bool isInterrupted)
         {
             Debug.Assert(featureTable.IsSealed);
             Debug.Assert(item.ValidText.IsAssigned);
@@ -258,7 +258,7 @@
         /// <param name="resolvedPathTypeName">The target type name upon return.</param>
         /// <param name="resolvedPathType">The target type upon return.</param>
         /// <returns>True if the path step could be resolved, or an error was found.</returns>
-        public static bool IsLastPathItemReady(IIdentifier item, List<IEntityDeclaration> localEntityList, IHashtableEx<IFeatureName, IFeatureInstance> featureTable, IErrorList errorList, ref bool isInterrupted, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
+        public static bool IsLastPathItemReady(IIdentifier item, List<IEntityDeclaration> localEntityList, ISealableDictionary<IFeatureName, IFeatureInstance> featureTable, IErrorList errorList, ref bool isInterrupted, out ITypeName resolvedPathTypeName, out ICompiledType resolvedPathType)
         {
             Debug.Assert(featureTable.IsSealed);
             Debug.Assert(item.ValidText.IsAssigned);

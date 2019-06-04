@@ -5,7 +5,7 @@
 
     /// <summary>
     /// Specifies a destination for a <see cref="IRuleTemplate"/>.
-    /// The destination is an unsealed <see cref="IListTableEx"/>.
+    /// The destination is an unsealed <see cref="ISealableList"/>.
     /// </summary>
     public interface IUnsealedListDestinationTemplate : IDestinationTemplate
     {
@@ -13,22 +13,22 @@
 
     /// <summary>
     /// Specifies a destination for a <see cref="IRuleTemplate"/>.
-    /// The destination is an unsealed <see cref="ListTableEx{TItem}"/>.
+    /// The destination is an unsealed <see cref="SealableList{TItem}"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TItem">Type of the item.</typeparam>
-    public interface IUnsealedListDestinationTemplate<TSource, TItem> : IDestinationTemplate<TSource, ListTableEx<TItem>>
+    public interface IUnsealedListDestinationTemplate<TSource, TItem> : IDestinationTemplate<TSource, SealableList<TItem>>
         where TSource : ISource
     {
     }
 
     /// <summary>
     /// Specifies a destination for a <see cref="IRuleTemplate"/>.
-    /// The destination is an unsealed <see cref="ListTableEx{TItem}"/>.
+    /// The destination is an unsealed <see cref="SealableList{TItem}"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TItem">Type of the item.</typeparam>
-    public class UnsealedListDestinationTemplate<TSource, TItem> : DestinationTemplate<TSource, ListTableEx<TItem>>, IUnsealedListDestinationTemplate<TSource, TItem>, IUnsealedListDestinationTemplate
+    public class UnsealedListDestinationTemplate<TSource, TItem> : DestinationTemplate<TSource, SealableList<TItem>>, IUnsealedListDestinationTemplate<TSource, TItem>, IUnsealedListDestinationTemplate
         where TSource : ISource
     {
         #region Init
@@ -50,7 +50,7 @@
         /// <param name="node">The node for which the value is to be checked.</param>
         public override bool IsSet(TSource node)
         {
-            ListTableEx<TItem> ListValue = GetDestinationObject(node);
+            SealableList<TItem> ListValue = GetDestinationObject(node);
             Debug.Assert(ListValue == GetDestinationObject((ISource)node));
 
             return ListValue.IsSealed;

@@ -47,8 +47,8 @@
             bool Success = true;
             data = null;
 
-            IHashtableEx<string, IScopeAttributeFeature> CheckedScope = new HashtableEx<string, IScopeAttributeFeature>();
-            ListTableEx<IParameter> ParameterTable = new ListTableEx<IParameter>();
+            ISealableDictionary<string, IScopeAttributeFeature> CheckedScope = new SealableDictionary<string, IScopeAttributeFeature>();
+            SealableList<IParameter> ParameterTable = new SealableList<IParameter>();
 
             foreach (EntityDeclaration Item in node.ParameterList)
             {
@@ -83,7 +83,7 @@
             }
 
             if (Success)
-                data = new Tuple<IHashtableEx<string, IScopeAttributeFeature>, ListTableEx<IParameter>>(CheckedScope, ParameterTable);
+                data = new Tuple<ISealableDictionary<string, IScopeAttributeFeature>, SealableList<IParameter>>(CheckedScope, ParameterTable);
 
             return Success;
         }
@@ -96,8 +96,8 @@
         public override void Apply(ICommandOverload node, object data)
         {
             IClass EmbeddingClass = node.EmbeddingClass;
-            IHashtableEx<string, IScopeAttributeFeature> CheckedScope = ((Tuple<IHashtableEx<string, IScopeAttributeFeature>, ListTableEx<IParameter>>)data).Item1;
-            ListTableEx<IParameter> ParameterTable = ((Tuple<IHashtableEx<string, IScopeAttributeFeature>, ListTableEx<IParameter>>)data).Item2;
+            ISealableDictionary<string, IScopeAttributeFeature> CheckedScope = ((Tuple<ISealableDictionary<string, IScopeAttributeFeature>, SealableList<IParameter>>)data).Item1;
+            SealableList<IParameter> ParameterTable = ((Tuple<ISealableDictionary<string, IScopeAttributeFeature>, SealableList<IParameter>>)data).Item2;
 
             node.ParameterTable.AddRange(ParameterTable);
             node.ParameterTable.Seal();

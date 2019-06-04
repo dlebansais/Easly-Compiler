@@ -118,7 +118,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IResultType>();
-                ConstantSourceList = new ListTableEx<IExpression>();
+                ConstantSourceList = new SealableList<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
                 IsHandled = true;
             }
@@ -183,7 +183,7 @@ namespace CompilerNode
         /// <summary>
         /// The list of sources for a constant, if any.
         /// </summary>
-        public ListTableEx<IExpression> ConstantSourceList { get; private set; } = new ListTableEx<IExpression>();
+        public SealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
 
         /// <summary>
         /// Specific constant number.
@@ -243,19 +243,19 @@ namespace CompilerNode
         /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
         /// <param name="expressionConstant">The expression constant upon return.</param>
         /// <param name="featureCall">Details of the feature call.</param>
-        public static bool ResolveCompilerReferences(IPrecursorExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFeatureCall featureCall)
+        public static bool ResolveCompilerReferences(IPrecursorExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFeatureCall featureCall)
         {
             resolvedResult = null;
             resolvedException = null;
-            constantSourceList = new ListTableEx<IExpression>();
+            constantSourceList = new SealableList<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
             featureCall = null;
 
             IOptionalReference<BaseNode.IObjectType> AncestorType = node.AncestorType;
             IList<IArgument> ArgumentList = node.ArgumentList;
             IClass EmbeddingClass = node.EmbeddingClass;
-            IHashtableEx<string, IImportedClass> ClassTable = EmbeddingClass.ImportedClassTable;
-            IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable = EmbeddingClass.FeatureTable;
+            ISealableDictionary<string, IImportedClass> ClassTable = EmbeddingClass.ImportedClassTable;
+            ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable = EmbeddingClass.FeatureTable;
             IFeature InnerFeature = node.EmbeddingFeature;
 
             if (InnerFeature is IndexerFeature)
@@ -274,7 +274,7 @@ namespace CompilerNode
             if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, errorList))
                 return false;
 
-            if (!ResolveCall(node, SelectedPrecursor, MergedArgumentList, TypeArgumentStyle, errorList, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out ListTableEx<IParameter> SelectedParameterList, out List<IExpressionType> ResolvedArgumentList))
+            if (!ResolveCall(node, SelectedPrecursor, MergedArgumentList, TypeArgumentStyle, errorList, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out SealableList<IParameter> SelectedParameterList, out List<IExpressionType> ResolvedArgumentList))
                 return false;
 
             featureCall = new FeatureCall(SelectedParameterList, ArgumentList, ResolvedArgumentList, TypeArgumentStyle);
@@ -283,11 +283,11 @@ namespace CompilerNode
             return true;
         }
 
-        private static bool ResolveCall(IPrecursorExpression node, IFeatureInstance selectedPrecursor, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        private static bool ResolveCall(IPrecursorExpression node, IFeatureInstance selectedPrecursor, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out SealableList<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
         {
             resolvedResult = null;
             resolvedException = null;
-            constantSourceList = new ListTableEx<IExpression>();
+            constantSourceList = new SealableList<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
             selectedParameterList = null;
             resolvedArgumentList = null;
@@ -296,7 +296,7 @@ namespace CompilerNode
             ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
             ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
             ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
-            IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+            IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
             bool IsHandled = false;
             bool Success = false;
 
@@ -329,11 +329,11 @@ namespace CompilerNode
             return Success;
         }
 
-        private static bool ResolveCallFunction(IPrecursorExpression node, IFeatureInstance selectedPrecursor, IFunctionType callType, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        private static bool ResolveCallFunction(IPrecursorExpression node, IFeatureInstance selectedPrecursor, IFunctionType callType, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out SealableList<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
         {
             resolvedResult = null;
             resolvedException = null;
-            constantSourceList = new ListTableEx<IExpression>();
+            constantSourceList = new SealableList<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
             selectedParameterList = null;
             resolvedArgumentList = null;
@@ -342,7 +342,7 @@ namespace CompilerNode
             ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
             ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
             ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
-            IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+            IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
 
             foreach (IQueryOverloadType Overload in callType.OverloadList)
                 ParameterTableList.Add(Overload.ParameterTable);
@@ -359,11 +359,11 @@ namespace CompilerNode
             return true;
         }
 
-        private static bool ResolveCallClass(IPrecursorExpression node, IFeatureInstance selectedPrecursor, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        private static bool ResolveCallClass(IPrecursorExpression node, IFeatureInstance selectedPrecursor, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out SealableList<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
         {
             resolvedResult = null;
             resolvedException = null;
-            constantSourceList = new ListTableEx<IExpression>();
+            constantSourceList = new SealableList<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
             selectedParameterList = null;
             resolvedArgumentList = null;
@@ -372,7 +372,7 @@ namespace CompilerNode
             ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
             ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
             ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
-            IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+            IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
 
             if (ArgumentList.Count > 0)
             {
@@ -384,7 +384,7 @@ namespace CompilerNode
                 resolvedResult = new ResultType(OperatorTypeName, OperatorType, string.Empty);
 
                 resolvedException = new ResultException();
-                selectedParameterList = new ListTableEx<IParameter>();
+                selectedParameterList = new SealableList<IParameter>();
                 resolvedArgumentList = new List<IExpressionType>();
 
                 if (OperatorFeature is IConstantFeature AsConstantFeature)
@@ -397,11 +397,11 @@ namespace CompilerNode
             return true;
         }
 
-        private static bool ResolveCallProperty(IPrecursorExpression node, IFeatureInstance selectedPrecursor, IPropertyType callType, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ListTableEx<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        private static bool ResolveCallProperty(IPrecursorExpression node, IFeatureInstance selectedPrecursor, IPropertyType callType, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out SealableList<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
         {
             resolvedResult = null;
             resolvedException = null;
-            constantSourceList = new ListTableEx<IExpression>();
+            constantSourceList = new SealableList<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
             selectedParameterList = null;
             resolvedArgumentList = null;
@@ -410,7 +410,7 @@ namespace CompilerNode
             ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
             ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
             ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
-            IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+            IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
 
             IPropertyFeature Property = (IPropertyFeature)OperatorFeature;
             string PropertyName = ((IFeatureWithName)Property).EntityName.Text;
@@ -425,7 +425,7 @@ namespace CompilerNode
                 resolvedException = new ResultException(GetterBody.ExceptionIdentifierList);
             }
 
-            selectedParameterList = new ListTableEx<IParameter>();
+            selectedParameterList = new SealableList<IParameter>();
             resolvedArgumentList = new List<IExpressionType>();
 
             return true;

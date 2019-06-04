@@ -29,7 +29,7 @@
         /// <summary>
         /// The list of features assigned in the resolved type.
         /// </summary>
-        IHashtableEx<string, ICompiledFeature> AssignedFeatureTable { get; }
+        ISealableDictionary<string, ICompiledFeature> AssignedFeatureTable { get; }
     }
 
     /// <summary>
@@ -128,11 +128,11 @@
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IResultType>();
-                ConstantSourceList = new ListTableEx<IExpression>();
+                ConstantSourceList = new SealableList<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
                 ResolvedClassTypeName = new OnceReference<ITypeName>();
                 ResolvedClassType = new OnceReference<IClassType>();
-                AssignedFeatureTable = new HashtableEx<string, ICompiledFeature>();
+                AssignedFeatureTable = new SealableDictionary<string, ICompiledFeature>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
@@ -195,7 +195,7 @@
         /// <summary>
         /// The list of sources for a constant, if any.
         /// </summary>
-        public ListTableEx<IExpression> ConstantSourceList { get; private set; } = new ListTableEx<IExpression>();
+        public SealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
 
         /// <summary>
         /// Specific constant number.
@@ -217,7 +217,7 @@
         /// <summary>
         /// The list of features assigned in the resolved type.
         /// </summary>
-        public IHashtableEx<string, ICompiledFeature> AssignedFeatureTable { get; private set; } = new HashtableEx<string, ICompiledFeature>();
+        public ISealableDictionary<string, ICompiledFeature> AssignedFeatureTable { get; private set; } = new SealableDictionary<string, ICompiledFeature>();
 
         /// <summary>
         /// Compares two expressions.
@@ -263,15 +263,15 @@
         /// <param name="initializedObjectTypeName">The initialized object type name upon return.</param>
         /// <param name="initializedObjectType">The initialized object type upon return.</param>
         /// <param name="assignedFeatureTable">The table of assigned values upon return.</param>
-        public static bool ResolveCompilerReferences(IInitializedObjectExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ITypeName initializedObjectTypeName, out IClassType initializedObjectType, out IHashtableEx<string, ICompiledFeature> assignedFeatureTable)
+        public static bool ResolveCompilerReferences(IInitializedObjectExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ITypeName initializedObjectTypeName, out IClassType initializedObjectType, out ISealableDictionary<string, ICompiledFeature> assignedFeatureTable)
         {
             resolvedResult = null;
             resolvedException = null;
-            constantSourceList = new ListTableEx<IExpression>();
+            constantSourceList = new SealableList<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
             initializedObjectTypeName = null;
             initializedObjectType = null;
-            assignedFeatureTable = new HashtableEx<string, ICompiledFeature>();
+            assignedFeatureTable = new SealableDictionary<string, ICompiledFeature>();
 
             IIdentifier ClassIdentifier = (IIdentifier)node.ClassIdentifier;
             IList<IAssignmentArgument> AssignmentList = node.AssignmentList;
@@ -304,7 +304,7 @@
             return true;
         }
 
-        private static bool CheckAssignemntList(IInitializedObjectExpression node, IErrorList errorList, IHashtableEx<IFeatureName, IFeatureInstance> featureTable, ListTableEx<IExpression> constantSourceList, IHashtableEx<string, ICompiledFeature> assignedFeatureTable)
+        private static bool CheckAssignemntList(IInitializedObjectExpression node, IErrorList errorList, ISealableDictionary<IFeatureName, IFeatureInstance> featureTable, SealableList<IExpression> constantSourceList, ISealableDictionary<string, ICompiledFeature> assignedFeatureTable)
         {
             bool Success = true;
             IList<IAssignmentArgument> AssignmentList = node.AssignmentList;
@@ -327,7 +327,7 @@
             return Success;
         }
 
-        private static bool CheckAssignemntIdentifier(IErrorList errorList, IHashtableEx<IFeatureName, IFeatureInstance> featureTable, IHashtableEx<string, ICompiledFeature> assignedFeatureTable, IIdentifier identifierItem)
+        private static bool CheckAssignemntIdentifier(IErrorList errorList, ISealableDictionary<IFeatureName, IFeatureInstance> featureTable, ISealableDictionary<string, ICompiledFeature> assignedFeatureTable, IIdentifier identifierItem)
         {
             bool Success = true;
             string ValidIdentifierText = identifierItem.ValidText.Item;
@@ -387,7 +387,7 @@
             return Success;
         }
 
-        private static bool ResolveObjectInitialization(IInitializedObjectExpression node, IErrorList errorList, IHashtableEx<string, ICompiledFeature> assignedFeatureTable)
+        private static bool ResolveObjectInitialization(IInitializedObjectExpression node, IErrorList errorList, ISealableDictionary<string, ICompiledFeature> assignedFeatureTable)
         {
             IList<IAssignmentArgument> AssignmentList = node.AssignmentList;
 

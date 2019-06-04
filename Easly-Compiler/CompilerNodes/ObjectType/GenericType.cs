@@ -29,17 +29,17 @@ namespace CompilerNode
         /// <summary>
         /// Table of argument identifiers for assignment.
         /// </summary>
-        IHashtableEx<string, IIdentifier> ArgumentIdentifierTable { get; }
+        ISealableDictionary<string, IIdentifier> ArgumentIdentifierTable { get; }
 
         /// <summary>
         /// Resolved types for arguments.
         /// </summary>
-        OnceReference<IHashtableEx<string, ICompiledType>> ResolvedTypeArgumentTable { get; }
+        OnceReference<ISealableDictionary<string, ICompiledType>> ResolvedTypeArgumentTable { get; }
 
         /// <summary>
         /// Resolved locations for arguments.
         /// </summary>
-        OnceReference<IHashtableEx<string, IObjectType>> ResolvedArgumentLocationTable { get; }
+        OnceReference<ISealableDictionary<string, IObjectType>> ResolvedArgumentLocationTable { get; }
 
         /// <summary>
         /// Sets the style of type arguments.
@@ -147,9 +147,9 @@ namespace CompilerNode
                 ArgumentStyle = (TypeArgumentStyles)(-1);
                 ResolvedTypeName = new OnceReference<ITypeName>();
                 ResolvedType = new OnceReference<ICompiledType>();
-                ArgumentIdentifierTable = new HashtableEx<string, IIdentifier>();
-                ResolvedTypeArgumentTable = new OnceReference<IHashtableEx<string, ICompiledType>>();
-                ResolvedArgumentLocationTable = new OnceReference<IHashtableEx<string, IObjectType>>();
+                ArgumentIdentifierTable = new SealableDictionary<string, IIdentifier>();
+                ResolvedTypeArgumentTable = new OnceReference<ISealableDictionary<string, ICompiledType>>();
+                ResolvedArgumentLocationTable = new OnceReference<ISealableDictionary<string, IObjectType>>();
                 IsHandled = true;
             }
 
@@ -212,17 +212,17 @@ namespace CompilerNode
         /// <summary>
         /// Table of argument identifiers for assignment.
         /// </summary>
-        public IHashtableEx<string, IIdentifier> ArgumentIdentifierTable { get; private set; } = new HashtableEx<string, IIdentifier>();
+        public ISealableDictionary<string, IIdentifier> ArgumentIdentifierTable { get; private set; } = new SealableDictionary<string, IIdentifier>();
 
         /// <summary>
         /// Resolved types for arguments.
         /// </summary>
-        public OnceReference<IHashtableEx<string, ICompiledType>> ResolvedTypeArgumentTable { get; private set; } = new OnceReference<IHashtableEx<string, ICompiledType>>();
+        public OnceReference<ISealableDictionary<string, ICompiledType>> ResolvedTypeArgumentTable { get; private set; } = new OnceReference<ISealableDictionary<string, ICompiledType>>();
 
         /// <summary>
         /// Resolved locations for arguments.
         /// </summary>
-        public OnceReference<IHashtableEx<string, IObjectType>> ResolvedArgumentLocationTable { get; private set; } = new OnceReference<IHashtableEx<string, IObjectType>>();
+        public OnceReference<ISealableDictionary<string, IObjectType>> ResolvedArgumentLocationTable { get; private set; } = new OnceReference<ISealableDictionary<string, IObjectType>>();
 
         /// <summary>
         /// Sets the style of type arguments.

@@ -21,7 +21,7 @@
     /// <typeparam name="TKey">Type of the key for each item.</typeparam>
     /// <typeparam name="TValue">Type of the value for each item.</typeparam>
     /// <typeparam name="TRef">Type of the reference in each item value.</typeparam>
-    public interface IOnceReferenceTableSourceTemplate<TSource, TKey, TValue, TRef> : ISourceTemplate<TSource, IHashtableEx<TKey, TValue>>
+    public interface IOnceReferenceTableSourceTemplate<TSource, TKey, TValue, TRef> : ISourceTemplate<TSource, ISealableDictionary<TKey, TValue>>
         where TSource : ISource
         where TRef : class
     {
@@ -35,7 +35,7 @@
     /// <typeparam name="TKey">Type of the key for each item.</typeparam>
     /// <typeparam name="TValue">Type of the value for each item.</typeparam>
     /// <typeparam name="TRef">Type of the reference in each item value.</typeparam>
-    public class OnceReferenceTableSourceTemplate<TSource, TKey, TValue, TRef> : SourceTemplate<TSource, IHashtableEx<TKey, TValue>>, IOnceReferenceTableSourceTemplate<TSource, TKey, TValue, TRef>, IOnceReferenceTableSourceTemplate
+    public class OnceReferenceTableSourceTemplate<TSource, TKey, TValue, TRef> : SourceTemplate<TSource, ISealableDictionary<TKey, TValue>>, IOnceReferenceTableSourceTemplate<TSource, TKey, TValue, TRef>, IOnceReferenceTableSourceTemplate
         where TSource : ISource
         where TRef : class
     {
@@ -69,7 +69,7 @@
 
             IList<TRef> ReadyReferenceList = new List<TRef>();
 
-            IHashtableEx<TKey, TValue> ValueTable = GetSourceObject(node, out bool IsInterrupted);
+            ISealableDictionary<TKey, TValue> ValueTable = GetSourceObject(node, out bool IsInterrupted);
 
             if (!IsInterrupted)
             {

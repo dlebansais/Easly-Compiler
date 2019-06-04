@@ -1358,7 +1358,7 @@
         /// <param name="finalTypeName">The type name of the result.</param>
         /// <param name="finalType">The type of the result.</param>
         /// <param name="inheritBySideAttribute">Inherited from an effective body.</param>
-        public static bool GetQualifiedPathFinalType(IClass baseClass, ICompiledType baseType, IHashtableEx<string, IScopeAttributeFeature> localScope, IList<IIdentifier> validPath, int index, IErrorList errorList, out ICompiledFeature finalFeature, out IDiscrete finalDiscrete, out ITypeName finalTypeName, out ICompiledType finalType, out bool inheritBySideAttribute)
+        public static bool GetQualifiedPathFinalType(IClass baseClass, ICompiledType baseType, ISealableDictionary<string, IScopeAttributeFeature> localScope, IList<IIdentifier> validPath, int index, IErrorList errorList, out ICompiledFeature finalFeature, out IDiscrete finalDiscrete, out ITypeName finalTypeName, out ICompiledType finalType, out bool inheritBySideAttribute)
         {
             finalFeature = null;
             finalDiscrete = null;
@@ -1366,7 +1366,7 @@
             finalType = null;
             inheritBySideAttribute = false;
 
-            IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable = baseType.FeatureTable;
+            ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable = baseType.FeatureTable;
 
             IIdentifier ValidIdentifier = validPath[index];
             string ValidText = ValidIdentifier.ValidText.Item;
@@ -1386,7 +1386,7 @@
             }
         }
 
-        private static bool GetQualifiedPathFinalTypeFromLocal(IClass baseClass, ICompiledType baseType, IHashtableEx<string, IScopeAttributeFeature> localScope, IList<IIdentifier> validPath, int index, IErrorList errorList, out ICompiledFeature finalFeature, out IDiscrete finalDiscrete, out ITypeName finalTypeName, out ICompiledType finalType, out bool inheritBySideAttribute)
+        private static bool GetQualifiedPathFinalTypeFromLocal(IClass baseClass, ICompiledType baseType, ISealableDictionary<string, IScopeAttributeFeature> localScope, IList<IIdentifier> validPath, int index, IErrorList errorList, out ICompiledFeature finalFeature, out IDiscrete finalDiscrete, out ITypeName finalTypeName, out ICompiledType finalType, out bool inheritBySideAttribute)
         {
             IIdentifier ValidIdentifier = validPath[index];
             string ValidText = ValidIdentifier.ValidText.Item;
@@ -1399,7 +1399,7 @@
                 ICompiledType ResolvedFeatureType = localScope[ValidText].ResolvedFeatureType.Item;
                 ResolvedFeatureType.InstanciateType(baseClass.ResolvedClassType.Item, ref ResolvedFeatureTypeName, ref ResolvedFeatureType);
 
-                IHashtableEx<string, IScopeAttributeFeature> NewScope = ScopeFromType(ResolvedFeatureType);
+                ISealableDictionary<string, IScopeAttributeFeature> NewScope = ScopeFromType(ResolvedFeatureType);
                 return GetQualifiedPathFinalType(baseClass, ResolvedFeatureType, NewScope, validPath, index + 1, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
             }
             else
@@ -1413,7 +1413,7 @@
             }
         }
 
-        private static bool GetQualifiedPathFinalTypeAsFeature(IClass baseClass, ICompiledType baseType, IHashtableEx<string, IScopeAttributeFeature> localScope, IList<IIdentifier> validPath, int index, IErrorList errorList, IFeatureInstance instance, out ICompiledFeature finalFeature, out IDiscrete finalDiscrete, out ITypeName finalTypeName, out ICompiledType finalType, out bool inheritBySideAttribute)
+        private static bool GetQualifiedPathFinalTypeAsFeature(IClass baseClass, ICompiledType baseType, ISealableDictionary<string, IScopeAttributeFeature> localScope, IList<IIdentifier> validPath, int index, IErrorList errorList, IFeatureInstance instance, out ICompiledFeature finalFeature, out IDiscrete finalDiscrete, out ITypeName finalTypeName, out ICompiledType finalType, out bool inheritBySideAttribute)
         {
             ICompiledFeature SourceFeature = instance.Feature;
             ITypeName ResolvedFeatureTypeName = SourceFeature.ResolvedFeatureTypeName.Item;
@@ -1429,7 +1429,7 @@
 
             if (index + 1 < validPath.Count)
             {
-                IHashtableEx<string, IScopeAttributeFeature> NewScope = ScopeFromType(ResolvedFeatureType);
+                ISealableDictionary<string, IScopeAttributeFeature> NewScope = ScopeFromType(ResolvedFeatureType);
                 return GetQualifiedPathFinalType(baseClass, ResolvedFeatureType, NewScope, validPath, index + 1, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
             }
             else
@@ -1453,7 +1453,7 @@
             ICompiledType ResolvedFeatureType = Imported.ResolvedClassType.Item;
             ResolvedFeatureType.InstanciateType(baseClass.ResolvedClassType.Item, ref ResolvedFeatureTypeName, ref ResolvedFeatureType);
 
-            IHashtableEx<string, IScopeAttributeFeature> NewScope = ScopeFromType(ResolvedFeatureType);
+            ISealableDictionary<string, IScopeAttributeFeature> NewScope = ScopeFromType(ResolvedFeatureType);
             return GetQualifiedPathFinalType(baseClass, ResolvedFeatureType, NewScope, validPath, index + 1, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
         }
 
@@ -1466,7 +1466,7 @@
             IIdentifier ValidIdentifier = validPath[index];
             string ValidText = ValidIdentifier.ValidText.Item;
 
-            IHashtableEx<IFeatureName, IDiscrete> DiscreteTable = baseType.DiscreteTable;
+            ISealableDictionary<IFeatureName, IDiscrete> DiscreteTable = baseType.DiscreteTable;
 
             if (FeatureName.TableContain(DiscreteTable, ValidText, out IFeatureName Key, out IDiscrete Discrete))
             {
@@ -1488,9 +1488,9 @@
             }
         }
 
-        private static IHashtableEx<string, IScopeAttributeFeature> ScopeFromType(ICompiledType type)
+        private static ISealableDictionary<string, IScopeAttributeFeature> ScopeFromType(ICompiledType type)
         {
-            IHashtableEx<string, IScopeAttributeFeature> Result = new HashtableEx<string, IScopeAttributeFeature>();
+            ISealableDictionary<string, IScopeAttributeFeature> Result = new SealableDictionary<string, IScopeAttributeFeature>();
 
             if (type is ITupleType AsTupleType)
             {
@@ -1516,9 +1516,9 @@
         /// <param name="validPath">The path.</param>
         /// <param name="index">Index of the current identifier in the path.</param>
         /// <param name="resultPath">The path receiving updated elements.</param>
-        public static void FillResultPath(IClass baseClass, ICompiledType baseType, IHashtableEx<string, IScopeAttributeFeature> localScope, IList<IIdentifier> validPath, int index, IList<IExpressionType> resultPath)
+        public static void FillResultPath(IClass baseClass, ICompiledType baseType, ISealableDictionary<string, IScopeAttributeFeature> localScope, IList<IIdentifier> validPath, int index, IList<IExpressionType> resultPath)
         {
-            IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable = baseType.FeatureTable;
+            ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable = baseType.FeatureTable;
             string ValidText = validPath[index].ValidText.Item;
 
             if (index == 0 && localScope.ContainsKey(ValidText))

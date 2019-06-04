@@ -118,7 +118,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IResultType>();
-                ConstantSourceList = new ListTableEx<IExpression>();
+                ConstantSourceList = new SealableList<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
                 IsHandled = true;
             }
@@ -183,7 +183,7 @@ namespace CompilerNode
         /// <summary>
         /// The list of sources for a constant, if any.
         /// </summary>
-        public ListTableEx<IExpression> ConstantSourceList { get; private set; } = new ListTableEx<IExpression>();
+        public SealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
 
         /// <summary>
         /// Specific constant number.
@@ -231,11 +231,11 @@ namespace CompilerNode
         /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
         /// <param name="expressionConstant">The expression constant upon return.</param>
         /// <param name="featureCall">Details of the feature call.</param>
-        public static bool ResolveCompilerReferences(IPrecursorIndexExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFeatureCall featureCall)
+        public static bool ResolveCompilerReferences(IPrecursorIndexExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFeatureCall featureCall)
         {
             resolvedResult = null;
             resolvedException = null;
-            constantSourceList = new ListTableEx<IExpression>();
+            constantSourceList = new SealableList<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
             featureCall = null;
 
@@ -243,8 +243,8 @@ namespace CompilerNode
             IList<IArgument> ArgumentList = node.ArgumentList;
             IClass EmbeddingClass = node.EmbeddingClass;
 
-            IHashtableEx<string, IImportedClass> ClassTable = EmbeddingClass.ImportedClassTable;
-            IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable = EmbeddingClass.FeatureTable;
+            ISealableDictionary<string, IImportedClass> ClassTable = EmbeddingClass.ImportedClassTable;
+            ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable = EmbeddingClass.FeatureTable;
             IFeature InnerFeature = node.EmbeddingFeature;
 
             if (InnerFeature is IIndexerFeature AsIndexerFeature)
@@ -266,11 +266,11 @@ namespace CompilerNode
             return true;
         }
 
-        private static bool ResolveSelectedPrecursor(IPrecursorIndexExpression node, IFeatureInstance selectedPrecursor, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFeatureCall featureCall)
+        private static bool ResolveSelectedPrecursor(IPrecursorIndexExpression node, IFeatureInstance selectedPrecursor, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFeatureCall featureCall)
         {
             resolvedResult = null;
             resolvedException = null;
-            constantSourceList = new ListTableEx<IExpression>();
+            constantSourceList = new SealableList<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
             featureCall = null;
 
@@ -285,7 +285,7 @@ namespace CompilerNode
             IIndexerType OperatorType = OperatorFeature.ResolvedFeatureType.Item as IIndexerType;
             Debug.Assert(OperatorType != null);
 
-            IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+            IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
             ParameterTableList.Add(OperatorType.ParameterTable);
 
             int SelectedIndex;

@@ -69,7 +69,7 @@
         /// <summary>
         /// Table of resolved parameters.
         /// </summary>
-        ListTableEx<IParameter> ParameterTable { get; }
+        SealableList<IParameter> ParameterTable { get; }
     }
 
     /// <summary>
@@ -285,13 +285,13 @@
                 ResolvedBaseType = new OnceReference<IClassType>();
                 ResolvedEntityTypeName = new OnceReference<ITypeName>();
                 ResolvedEntityType = new OnceReference<ICompiledType>();
-                ParameterTable = new ListTableEx<IParameter>();
+                ParameterTable = new SealableList<IParameter>();
                 ResolvedTypeName = new OnceReference<ITypeName>();
                 ResolvedType = new OnceReference<ICompiledType>();
-                DiscreteTable = new HashtableEx<IFeatureName, IDiscrete>();
-                FeatureTable = new HashtableEx<IFeatureName, IFeatureInstance>();
-                ExportTable = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
-                ConformanceTable = new HashtableEx<ITypeName, ICompiledType>();
+                DiscreteTable = new SealableDictionary<IFeatureName, IDiscrete>();
+                FeatureTable = new SealableDictionary<IFeatureName, IFeatureInstance>();
+                ExportTable = new SealableDictionary<IFeatureName, ISealableDictionary<string, IClass>>();
+                ConformanceTable = new SealableDictionary<ITypeName, ICompiledType>();
                 InstancingRecordList = new List<TypeInstancingRecord>();
                 OriginatingTypedef = new OnceReference<ITypedef>();
                 IsHandled = true;
@@ -352,7 +352,7 @@
         /// <summary>
         /// Table of resolved parameters.
         /// </summary>
-        public ListTableEx<IParameter> ParameterTable { get; private set; } = new ListTableEx<IParameter>();
+        public SealableList<IParameter> ParameterTable { get; private set; } = new SealableList<IParameter>();
         #endregion
 
         #region Implementation of IObjectType
@@ -371,22 +371,22 @@
         /// <summary>
         /// Discretes available in this type.
         /// </summary>
-        public IHashtableEx<IFeatureName, IDiscrete> DiscreteTable { get; private set; } = new HashtableEx<IFeatureName, IDiscrete>();
+        public ISealableDictionary<IFeatureName, IDiscrete> DiscreteTable { get; private set; } = new SealableDictionary<IFeatureName, IDiscrete>();
 
         /// <summary>
         /// Features available in this type.
         /// </summary>
-        public IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable { get; private set; } = new HashtableEx<IFeatureName, IFeatureInstance>();
+        public ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable { get; private set; } = new SealableDictionary<IFeatureName, IFeatureInstance>();
 
         /// <summary>
         /// Exports available in this type.
         /// </summary>
-        public IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> ExportTable { get; private set; } = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
+        public ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> ExportTable { get; private set; } = new SealableDictionary<IFeatureName, ISealableDictionary<string, IClass>>();
 
         /// <summary>
         /// Table of conforming types.
         /// </summary>
-        public IHashtableEx<ITypeName, ICompiledType> ConformanceTable { get; private set; } = new HashtableEx<ITypeName, ICompiledType>();
+        public ISealableDictionary<ITypeName, ICompiledType> ConformanceTable { get; private set; } = new SealableDictionary<ITypeName, ICompiledType>();
 
         /// <summary>
         /// List of type instancing.
@@ -535,7 +535,7 @@
         /// <param name="setExceptionIdentifierList">The list of known exceptions thrown for the setter.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void ResolveType(IHashtableEx<ITypeName, ICompiledType> typeTable, ITypeName baseTypeName, IClassType baseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType indexerKind, IList<IEntityDeclaration> indexParameterList, BaseNode.ParameterEndStatus parameterEnd, IList<IAssertion> getRequireList, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IAssertion> setEnsureList, IList<IIdentifier> setExceptionIdentifierList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void ResolveType(ISealableDictionary<ITypeName, ICompiledType> typeTable, ITypeName baseTypeName, IClassType baseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType indexerKind, IList<IEntityDeclaration> indexParameterList, BaseNode.ParameterEndStatus parameterEnd, IList<IAssertion> getRequireList, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IAssertion> setEnsureList, IList<IIdentifier> setExceptionIdentifierList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
             if (!TypeTableContaining(typeTable, baseType, entityType, indexerKind, indexParameterList, parameterEnd, getRequireList, getEnsureList, getExceptionIdentifierList, setRequireList, setEnsureList, setExceptionIdentifierList, out resolvedTypeName, out resolvedType))
             {
@@ -561,7 +561,7 @@
         /// <param name="setExceptionIdentifierList">The list of known exceptions thrown for the setter.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static bool TypeTableContaining(IHashtableEx<ITypeName, ICompiledType> typeTable, ICompiledType baseType, ICompiledType entityType, BaseNode.UtilityType indexerKind, IList<IEntityDeclaration> indexParameterList, BaseNode.ParameterEndStatus parameterEnd, IList<IAssertion> getRequireList, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IAssertion> setEnsureList, IList<IIdentifier> setExceptionIdentifierList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static bool TypeTableContaining(ISealableDictionary<ITypeName, ICompiledType> typeTable, ICompiledType baseType, ICompiledType entityType, BaseNode.UtilityType indexerKind, IList<IEntityDeclaration> indexParameterList, BaseNode.ParameterEndStatus parameterEnd, IList<IAssertion> getRequireList, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IAssertion> setEnsureList, IList<IIdentifier> setExceptionIdentifierList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
             resolvedTypeName = null;
             resolvedType = null;

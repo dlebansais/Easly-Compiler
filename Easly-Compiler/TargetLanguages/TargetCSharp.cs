@@ -311,7 +311,7 @@
             return Result;
         }
 
-        private static CSharpExports GetExportStatus(IFeatureName name, IClass sourceClass, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IFeature sourceFeature)
+        private static CSharpExports GetExportStatus(IFeatureName name, IClass sourceClass, ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> exportTable, IFeature sourceFeature)
         {
             bool IsExportedToClient;
 
@@ -324,7 +324,7 @@
 
             else
             {
-                bool IsExported = FeatureName.TableContain(exportTable, FeatureExport, out IFeatureName ExportName, out IHashtableEx<string, IClass> ExportList);
+                bool IsExported = FeatureName.TableContain(exportTable, FeatureExport, out IFeatureName ExportName, out ISealableDictionary<string, IClass> ExportList);
                 Debug.Assert(IsExported);
                 Debug.Assert(ExportList.Count > 0);
 

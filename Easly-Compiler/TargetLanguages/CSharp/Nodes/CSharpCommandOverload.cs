@@ -199,7 +199,7 @@
                                 if ((AsCreationFeature = AsCommandInstruction.SelectedFeature.Item as ICreationFeature) != null)
                                 {
                                     ICommandOverloadType SelectedOverload = AsCommandInstruction.SelectedOverload.Item;
-                                    ListTableEx<Parameter> SelectedParameterList = SelectedOverload.ParameterTable;
+                                    SealableList<Parameter> SelectedParameterList = SelectedOverload.ParameterTable;
                                     string ArgumentListString = CSharpRootOutput.CSharpArgumentList(Context, SelectedParameterList, AsCommandInstruction.ArgumentList, new List<IQualifiedName>());
 
                                     SkipFirstInstruction = true;

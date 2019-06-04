@@ -54,7 +54,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IClass node, object data)
         {
-            IHashtableEx<IFeatureName, IDiscrete> LocalDiscreteTable = node.LocalDiscreteTable;
+            ISealableDictionary<IFeatureName, IDiscrete> LocalDiscreteTable = node.LocalDiscreteTable;
             LocalDiscreteTable.Seal();
 
             node.LocalNamespaceTable.Add("Discrete", LocalDiscreteTable);

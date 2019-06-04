@@ -26,7 +26,7 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new UnsealedTableDestinationTemplate<IClass, IFeatureName, IHashtableEx<string, IClass>>(nameof(IClass.LocalExportTable)),
+                new UnsealedTableDestinationTemplate<IClass, IFeatureName, ISealableDictionary<string, IClass>>(nameof(IClass.LocalExportTable)),
             };
         }
         #endregion
@@ -54,7 +54,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IClass node, object data)
         {
-            IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> LocalExportTable = node.LocalExportTable;
+            ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> LocalExportTable = node.LocalExportTable;
             LocalExportTable.Seal();
 
             node.LocalNamespaceTable.Add("Export", LocalExportTable);

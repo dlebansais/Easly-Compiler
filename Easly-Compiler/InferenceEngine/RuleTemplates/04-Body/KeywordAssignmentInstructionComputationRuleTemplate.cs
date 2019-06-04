@@ -100,7 +100,7 @@
                 return false;
             }
 
-            IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
+            ISealableDictionary<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
 
             if (!ObjectType.TypeConformToBase(SourceType, DestinationType, ErrorList, node))
             {

@@ -86,16 +86,16 @@
             destinationTypeName = null;
 
             IClass EmbeddingClass = node.EmbeddingClass;
-            IHashtableEx<string, string> SourceIdentifierTable = new HashtableEx<string, string>(); // string (source) -> string (destination)
-            IHashtableEx<string, string> DestinationIdentifierTable = new HashtableEx<string, string>(); // string (destination) -> string (source)
-            IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> RenamedExportTable = classType.ExportTable.CloneUnsealed();
-            IHashtableEx<IFeatureName, ITypedefType> RenamedTypedefTable = classType.TypedefTable.CloneUnsealed();
-            IHashtableEx<IFeatureName, IDiscrete> RenamedDiscreteTable = classType.DiscreteTable.CloneUnsealed();
-            IHashtableEx<IFeatureName, IFeatureInstance> RenamedFeatureTable = classType.FeatureTable.CloneUnsealed();
+            ISealableDictionary<string, string> SourceIdentifierTable = new SealableDictionary<string, string>(); // string (source) -> string (destination)
+            ISealableDictionary<string, string> DestinationIdentifierTable = new SealableDictionary<string, string>(); // string (destination) -> string (source)
+            ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> RenamedExportTable = classType.ExportTable.CloneUnsealed();
+            ISealableDictionary<IFeatureName, ITypedefType> RenamedTypedefTable = classType.TypedefTable.CloneUnsealed();
+            ISealableDictionary<IFeatureName, IDiscrete> RenamedDiscreteTable = classType.DiscreteTable.CloneUnsealed();
+            ISealableDictionary<IFeatureName, IFeatureInstance> RenamedFeatureTable = classType.FeatureTable.CloneUnsealed();
 
             bool AllRenameValid = true;
             foreach (KeyValuePair<IIdentifier, IIdentifier> Entry in node.RenameTable)
-                if (!CheckRename(Entry, new IHashtableIndex<IFeatureName>[] { RenamedExportTable, RenamedTypedefTable, RenamedDiscreteTable, RenamedFeatureTable }, SourceIdentifierTable, DestinationIdentifierTable, (IFeatureName item) => item.Name, (string name) => new FeatureName(name)))
+                if (!CheckRename(Entry, new IDictionaryIndex<IFeatureName>[] { RenamedExportTable, RenamedTypedefTable, RenamedDiscreteTable, RenamedFeatureTable }, SourceIdentifierTable, DestinationIdentifierTable, (IFeatureName item) => item.Name, (string name) => new FeatureName(name)))
                     AllRenameValid = false;
 
             if (AllRenameValid)
@@ -116,13 +116,13 @@
             destinationTypeName = null;
 
             IClass EmbeddingClass = node.EmbeddingClass;
-            IHashtableEx<string, string> SourceIdentifierTable = new HashtableEx<string, string>(); // string (source) -> string (destination)
-            IHashtableEx<string, string> DestinationIdentifierTable = new HashtableEx<string, string>(); // string (destination) -> string (source)
-            IHashtableEx<IFeatureName, IFeatureInstance> RenamedFieldTable = tupleType.FeatureTable.CloneUnsealed();
+            ISealableDictionary<string, string> SourceIdentifierTable = new SealableDictionary<string, string>(); // string (source) -> string (destination)
+            ISealableDictionary<string, string> DestinationIdentifierTable = new SealableDictionary<string, string>(); // string (destination) -> string (source)
+            ISealableDictionary<IFeatureName, IFeatureInstance> RenamedFieldTable = tupleType.FeatureTable.CloneUnsealed();
 
             bool AllRenameValid = true;
             foreach (KeyValuePair<IIdentifier, IIdentifier> Entry in node.RenameTable)
-                if (!CheckRename(Entry, new IHashtableEx<IFeatureName, IFeatureInstance>[] { RenamedFieldTable }, SourceIdentifierTable, DestinationIdentifierTable, (IFeatureName item) => item.Name, (string name) => new FeatureName(name)))
+                if (!CheckRename(Entry, new ISealableDictionary<IFeatureName, IFeatureInstance>[] { RenamedFieldTable }, SourceIdentifierTable, DestinationIdentifierTable, (IFeatureName item) => item.Name, (string name) => new FeatureName(name)))
                     AllRenameValid = false;
 
             if (AllRenameValid)
@@ -135,15 +135,15 @@
             return Success;
         }
 
-        private bool CheckRename(KeyValuePair<IIdentifier, IIdentifier> entry, IHashtableIndex<IFeatureName>[] renamedItemTables, IHashtableEx<string, string> sourceIdentifierTable, IHashtableEx<string, string> destinationIdentifierTable, Func<IFeatureName, string> key2String, Func<string, IFeatureName> string2Key)
+        private bool CheckRename(KeyValuePair<IIdentifier, IIdentifier> entry, IDictionaryIndex<IFeatureName>[] renamedItemTables, ISealableDictionary<string, string> sourceIdentifierTable, ISealableDictionary<string, string> destinationIdentifierTable, Func<IFeatureName, string> key2String, Func<string, IFeatureName> string2Key)
         {
             IIdentifier SourceIdentifier = entry.Key;
             IIdentifier DestinationIdentifier = entry.Value;
 
-            OnceReference<IHashtableEx> SourceTable = new OnceReference<IHashtableEx>();
+            OnceReference<ISealableDictionary> SourceTable = new OnceReference<ISealableDictionary>();
             OnceReference<IFeatureName> SourceKey = new OnceReference<IFeatureName>();
             OnceReference<object> SourceItem = new OnceReference<object>();
-            foreach (IHashtableEx Table in renamedItemTables)
+            foreach (ISealableDictionary Table in renamedItemTables)
             {
                 foreach (System.Collections.DictionaryEntry SourceEntry in (System.Collections.IDictionary)Table)
                 {
@@ -170,7 +170,7 @@
                 return false;
             }
 
-            foreach (IHashtableEx Table in renamedItemTables)
+            foreach (ISealableDictionary Table in renamedItemTables)
                 foreach (System.Collections.DictionaryEntry SourceEntry in (System.Collections.IDictionary)Table)
                 {
                     IFeatureName EntryKey = SourceEntry.Key as IFeatureName;

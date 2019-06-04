@@ -18,12 +18,12 @@
         /// <summary>
         /// Arguments if the class is generic.
         /// </summary>
-        IHashtableEx<string, ICompiledType> TypeArgumentTable { get; }
+        ISealableDictionary<string, ICompiledType> TypeArgumentTable { get; }
 
         /// <summary>
         /// Typedefs available in this type.
         /// </summary>
-       IHashtableEx<IFeatureName, ITypedefType> TypedefTable { get; }
+       ISealableDictionary<IFeatureName, ITypedefType> TypedefTable { get; }
 
         /// <summary>
         /// Creates a clone of this type with renamed identifiers.
@@ -33,7 +33,7 @@
         /// <param name="renamedDiscreteTable">The rename table for discretes.</param>
         /// <param name="renamedFeatureTable">The rename table for features.</param>
         /// <param name="instancingClassType">The type that is requesting cloning.</param>
-        IClassType CloneWithRenames(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> renamedExportTable, IHashtableEx<IFeatureName, ITypedefType> renamedTypedefTable, IHashtableEx<IFeatureName, IDiscrete> renamedDiscreteTable, IHashtableEx<IFeatureName, IFeatureInstance> renamedFeatureTable, IClassType instancingClassType);
+        IClassType CloneWithRenames(ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> renamedExportTable, ISealableDictionary<IFeatureName, ITypedefType> renamedTypedefTable, ISealableDictionary<IFeatureName, IDiscrete> renamedDiscreteTable, ISealableDictionary<IFeatureName, IFeatureInstance> renamedFeatureTable, IClassType instancingClassType);
 
         /// <summary>
         /// True if an instance of the class is cloned at some point.
@@ -61,7 +61,7 @@
 
         private static IClassType AssignTypeToClassAny(IClass classAny)
         {
-            IClassType Result = new ClassType(classAny, new HashtableEx<string, ICompiledType>(), null, null);
+            IClassType Result = new ClassType(classAny, new SealableDictionary<string, ICompiledType>(), null, null);
             classAny.ResolvedClassTypeName.Item = new TypeName(classAny.ValidClassName);
             classAny.ResolvedClassType.Item = Result;
             classAny.ResolvedAsCompiledType.Item = Result;
@@ -109,7 +109,7 @@
         /// </summary>
         /// <param name="baseClass">The class used to instanciate this type.</param>
         /// <param name="typeArgumentTable">Arguments if the class is generic.</param>
-        public ClassType(IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable)
+        public ClassType(IClass baseClass, ISealableDictionary<string, ICompiledType> typeArgumentTable)
         {
             Debug.Assert(!baseClass.ResolvedClassType.IsAssigned);
 
@@ -123,9 +123,9 @@
         /// <param name="baseClass">The class used to instanciate this type.</param>
         /// <param name="typeArgumentTable">Arguments if the class is generic.</param>
         /// <param name="instancingClassType">The class type if this instance is a derivation (such as renaming).</param>
-        public static IClassType Create(IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType)
+        public static IClassType Create(IClass baseClass, ISealableDictionary<string, ICompiledType> typeArgumentTable, IClassType instancingClassType)
         {
-            IHashtableEx<ITypeName, ICompiledType> ConformanceTable = new HashtableEx<ITypeName, ICompiledType>();
+            ISealableDictionary<ITypeName, ICompiledType> ConformanceTable = new SealableDictionary<ITypeName, ICompiledType>();
 
             if (baseClass.ResolvedClassType.IsAssigned)
             {
@@ -157,7 +157,7 @@
         /// <param name="typeArgumentTable">Arguments if the class is generic.</param>
         /// <param name="instancingClassType">The class type if this instance is a derivation (such as renaming).</param>
         /// <param name="conformanceTable">The initialized conformance table.</param>
-        private ClassType(IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, IHashtableEx<ITypeName, ICompiledType> conformanceTable)
+        private ClassType(IClass baseClass, ISealableDictionary<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, ISealableDictionary<ITypeName, ICompiledType> conformanceTable)
         {
             BaseClass = baseClass;
             TypeArgumentTable = typeArgumentTable;
@@ -190,32 +190,32 @@
         /// <summary>
         /// Arguments if the class is generic.
         /// </summary>
-        public IHashtableEx<string, ICompiledType> TypeArgumentTable { get; }
+        public ISealableDictionary<string, ICompiledType> TypeArgumentTable { get; }
 
         /// <summary>
         /// Typedefs available in this type.
         /// </summary>
-        public IHashtableEx<IFeatureName, ITypedefType> TypedefTable { get; private set; } = new HashtableEx<IFeatureName, ITypedefType>();
+        public ISealableDictionary<IFeatureName, ITypedefType> TypedefTable { get; private set; } = new SealableDictionary<IFeatureName, ITypedefType>();
 
         /// <summary>
         /// Discretes available in this type.
         /// </summary>
-        public IHashtableEx<IFeatureName, IDiscrete> DiscreteTable { get; private set; } = new HashtableEx<IFeatureName, IDiscrete>();
+        public ISealableDictionary<IFeatureName, IDiscrete> DiscreteTable { get; private set; } = new SealableDictionary<IFeatureName, IDiscrete>();
 
         /// <summary>
         /// Features available in this type.
         /// </summary>
-        public IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable { get; private set; } = new HashtableEx<IFeatureName, IFeatureInstance>();
+        public ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable { get; private set; } = new SealableDictionary<IFeatureName, IFeatureInstance>();
 
         /// <summary>
         /// Exports available in this type.
         /// </summary>
-        public IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> ExportTable { get; private set; } = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
+        public ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> ExportTable { get; private set; } = new SealableDictionary<IFeatureName, ISealableDictionary<string, IClass>>();
 
         /// <summary>
         /// Table of conforming types.
         /// </summary>
-        public IHashtableEx<ITypeName, ICompiledType> ConformanceTable { get; private set; } = new HashtableEx<ITypeName, ICompiledType>();
+        public ISealableDictionary<ITypeName, ICompiledType> ConformanceTable { get; private set; } = new SealableDictionary<ITypeName, ICompiledType>();
 
         /// <summary>
         /// List of type instancing.
@@ -346,7 +346,7 @@
         {
             bool IsNewInstance = false;
 
-            IHashtableEx<string, ICompiledType> InstancedTypeArgumentTable = new HashtableEx<string, ICompiledType>();
+            ISealableDictionary<string, ICompiledType> InstancedTypeArgumentTable = new SealableDictionary<string, ICompiledType>();
             foreach (KeyValuePair<string, ICompiledType> TypeArgument in TypeArgumentTable)
             {
                 ITypeName InstancedTypeArgumentName = null;
@@ -374,7 +374,7 @@
         /// <param name="instancingClassType">The class type to instanciate.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void ResolveType(IHashtableEx<ITypeName, ICompiledType> typeTable, IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void ResolveType(ISealableDictionary<ITypeName, ICompiledType> typeTable, IClass baseClass, ISealableDictionary<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
             resolvedTypeName = null;
             resolvedType = null;
@@ -394,7 +394,7 @@
         /// <param name="typeArgumentTable">The generic arguments used when creating the class type.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static bool TypeTableContaining(IHashtableEx<ITypeName, ICompiledType> typeTable, IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static bool TypeTableContaining(ISealableDictionary<ITypeName, ICompiledType> typeTable, IClass baseClass, ISealableDictionary<string, ICompiledType> typeArgumentTable, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
             resolvedTypeName = null;
             resolvedType = null;
@@ -404,7 +404,7 @@
                 if (Entry.Value is IClassType AsClassType)
                     if (AsClassType.BaseClass == baseClass)
                     {
-                        IHashtableEx<string, ICompiledType> ResolvedTypeArgumentTable = AsClassType.TypeArgumentTable;
+                        ISealableDictionary<string, ICompiledType> ResolvedTypeArgumentTable = AsClassType.TypeArgumentTable;
                         bool AllArgumentsEqual = true;
 
                         foreach (KeyValuePair<string, ICompiledType> TypeArgumentEntry in typeArgumentTable)
@@ -437,7 +437,7 @@
         /// <param name="instancingClassType">The class type to instanciate.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void BuildType(IClass baseClass, IHashtableEx<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void BuildType(IClass baseClass, ISealableDictionary<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
             resolvedTypeName = null;
             resolvedType = null;
@@ -521,7 +521,7 @@
         /// <param name="renamedDiscreteTable">The rename table for discretes.</param>
         /// <param name="renamedFeatureTable">The rename table for features.</param>
         /// <param name="instancingClassType">The type that is requesting cloning.</param>
-        public IClassType CloneWithRenames(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> renamedExportTable, IHashtableEx<IFeatureName, ITypedefType> renamedTypedefTable, IHashtableEx<IFeatureName, IDiscrete> renamedDiscreteTable, IHashtableEx<IFeatureName, IFeatureInstance> renamedFeatureTable, IClassType instancingClassType)
+        public IClassType CloneWithRenames(ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> renamedExportTable, ISealableDictionary<IFeatureName, ITypedefType> renamedTypedefTable, ISealableDictionary<IFeatureName, IDiscrete> renamedDiscreteTable, ISealableDictionary<IFeatureName, IFeatureInstance> renamedFeatureTable, IClassType instancingClassType)
         {
             IClassType ClonedType = Create(BaseClass, TypeArgumentTable, instancingClassType);
 

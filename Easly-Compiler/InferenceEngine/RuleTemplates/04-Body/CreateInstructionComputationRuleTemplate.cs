@@ -80,7 +80,7 @@
                 IQualifiedName Processor = (IQualifiedName)node.Processor.Item;
                 IList<IIdentifier> ValidPath = Processor.ValidPath.Item;
 
-                IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
+                ISealableDictionary<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
 
                 if (!ObjectType.GetQualifiedPathFinalType(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, ErrorList, out ICompiledFeature FinalFeature, out IDiscrete FinalDiscrete, out ITypeName FinalTypeName, out ICompiledType FinalType, out bool InheritBySideAttribute))
                     return false;
@@ -108,7 +108,7 @@
             string ValidText = EntityIdentifier.ValidText.Item;
             IClass EmbeddingClass = node.EmbeddingClass;
             IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;
-            IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
+            ISealableDictionary<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
 
             if (LocalScope.ContainsKey(ValidText))
             {
@@ -226,7 +226,7 @@
             if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, ErrorList))
                 return false;
 
-            IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+            IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
 
             IProcedureType AsProcedureType = (IProcedureType)creationFeature.ResolvedFeatureType.Item;
             foreach (ICommandOverloadType Overload in AsProcedureType.OverloadList)

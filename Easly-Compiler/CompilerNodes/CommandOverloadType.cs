@@ -39,7 +39,7 @@
         /// <summary>
         /// Table of parameters for this overload.
         /// </summary>
-        ListTableEx<IParameter> ParameterTable { get; }
+        SealableList<IParameter> ParameterTable { get; }
     }
 
     /// <summary>
@@ -192,7 +192,7 @@
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 TypeName = null;
-                ParameterTable = new ListTableEx<IParameter>();
+                ParameterTable = new SealableList<IParameter>();
                 IsHandled = true;
             }
 
@@ -234,7 +234,7 @@
         /// <summary>
         /// Table of parameters for this overload.
         /// </summary>
-        public ListTableEx<IParameter> ParameterTable { get; private set; } = new ListTableEx<IParameter>();
+        public SealableList<IParameter> ParameterTable { get; private set; } = new SealableList<IParameter>();
 
         /// <summary>
         /// Finds or creates an overload type with the corresponding parameters.

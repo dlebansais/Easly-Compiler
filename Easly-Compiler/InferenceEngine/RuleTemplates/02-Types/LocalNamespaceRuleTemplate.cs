@@ -22,7 +22,7 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new SealedTableSourceTemplate<IClass, string, ICompiledType>(nameof(IClass.LocalGenericTable)),
-                new SealedTableSourceTemplate<IClass, IFeatureName, IHashtableEx<string, IClass>>(nameof(IClass.LocalExportTable)),
+                new SealedTableSourceTemplate<IClass, IFeatureName, ISealableDictionary<string, IClass>>(nameof(IClass.LocalExportTable)),
                 new SealedTableSourceTemplate<IClass, IFeatureName, ITypedefType>(nameof(IClass.LocalTypedefTable)),
                 new SealedTableSourceTemplate<IClass, IFeatureName, IDiscrete>(nameof(IClass.LocalDiscreteTable)),
                 new SealedTableSourceTemplate<IClass, IFeatureName, IFeatureInstance>(nameof(IClass.LocalFeatureTable)),
@@ -31,7 +31,7 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new UnsealedTableDestinationTemplate<IClass, string, IHashtableEx>(nameof(IClass.LocalNamespaceTable)),
+                new UnsealedTableDestinationTemplate<IClass, string, ISealableDictionary>(nameof(IClass.LocalNamespaceTable)),
             };
         }
         #endregion

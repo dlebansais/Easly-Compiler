@@ -44,17 +44,17 @@
         /// <summary>
         /// Table of parameters for this overload.
         /// </summary>
-        ListTableEx<IParameter> ParameterTable { get; }
+        SealableList<IParameter> ParameterTable { get; }
 
         /// <summary>
         /// Table of results for this overload.
         /// </summary>
-        ListTableEx<IParameter> ResultTable { get; }
+        SealableList<IParameter> ResultTable { get; }
 
         /// <summary>
         /// Table of conformant results for this overload.
         /// </summary>
-        ListTableEx<ICompiledType> ConformantResultTable { get; }
+        SealableList<ICompiledType> ConformantResultTable { get; }
 
         /// <summary>
         /// List of result types for each results.
@@ -223,9 +223,9 @@
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 TypeName = null;
-                ParameterTable = new ListTableEx<IParameter>();
-                ResultTable = new ListTableEx<IParameter>();
-                ConformantResultTable = new ListTableEx<ICompiledType>();
+                ParameterTable = new SealableList<IParameter>();
+                ResultTable = new SealableList<IParameter>();
+                ConformantResultTable = new SealableList<ICompiledType>();
                 ResultTypeList = new List<IExpressionType>();
                 IsHandled = true;
             }
@@ -270,17 +270,17 @@
         /// <summary>
         /// Table of parameters for this overload.
         /// </summary>
-        public ListTableEx<IParameter> ParameterTable { get; private set; } = new ListTableEx<IParameter>();
+        public SealableList<IParameter> ParameterTable { get; private set; } = new SealableList<IParameter>();
 
         /// <summary>
         /// Table of results for this overload.
         /// </summary>
-        public ListTableEx<IParameter> ResultTable { get; private set; } = new ListTableEx<IParameter>();
+        public SealableList<IParameter> ResultTable { get; private set; } = new SealableList<IParameter>();
 
         /// <summary>
         /// Table of conformant results for this overload.
         /// </summary>
-        public ListTableEx<ICompiledType> ConformantResultTable { get; private set; } = new ListTableEx<ICompiledType>();
+        public SealableList<ICompiledType> ConformantResultTable { get; private set; } = new SealableList<ICompiledType>();
 
         /// <summary>
         /// List of result types for each results.

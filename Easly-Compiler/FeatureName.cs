@@ -61,7 +61,7 @@
         /// <param name="name">The name to check.</param>
         /// <param name="key">The feature name found upon return.</param>
         /// <param name="value">The associated value.</param>
-        public static bool TableContain<TValue>(IHashtableEx<IFeatureName, TValue> table, string name, out IFeatureName key, out TValue value)
+        public static bool TableContain<TValue>(ISealableDictionary<IFeatureName, TValue> table, string name, out IFeatureName key, out TValue value)
         {
             key = null;
             value = default;

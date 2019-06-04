@@ -92,7 +92,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IResultType>();
-                ConstantSourceList = new ListTableEx<IExpression>();
+                ConstantSourceList = new SealableList<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
                 SelectedFeature = new OnceReference<IFunctionFeature>();
                 SelectedOverload = new OnceReference<IQueryOverload>();
@@ -159,7 +159,7 @@ namespace CompilerNode
         /// <summary>
         /// The list of sources for a constant, if any.
         /// </summary>
-        public ListTableEx<IExpression> ConstantSourceList { get; private set; } = new ListTableEx<IExpression>();
+        public SealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
 
         /// <summary>
         /// Specific constant number.
@@ -220,11 +220,11 @@ namespace CompilerNode
         /// <param name="selectedFeature">The matching feature upon return.</param>
         /// <param name="selectedOverload">The matching overload in <paramref name="selectedFeature"/> upon return.</param>
         /// <param name="selectedOverloadType">The matching overload type upon return.</param>
-        public static bool ResolveCompilerReferences(IUnaryOperatorExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFunctionFeature selectedFeature, out IQueryOverload selectedOverload, out IQueryOverloadType selectedOverloadType)
+        public static bool ResolveCompilerReferences(IUnaryOperatorExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFunctionFeature selectedFeature, out IQueryOverload selectedOverload, out IQueryOverloadType selectedOverloadType)
         {
             resolvedResult = null;
             resolvedException = null;
-            constantSourceList = new ListTableEx<IExpression>();
+            constantSourceList = new SealableList<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
             selectedFeature = null;
             selectedOverload = null;
@@ -244,7 +244,7 @@ namespace CompilerNode
             if (RightExpressionType is IClassType AsClassType)
             {
                 IClass RightBaseClass = AsClassType.BaseClass;
-                IHashtableEx<IFeatureName, IFeatureInstance> RightFeatureTable = RightBaseClass.FeatureTable;
+                ISealableDictionary<IFeatureName, IFeatureInstance> RightFeatureTable = RightBaseClass.FeatureTable;
 
                 if (!FeatureName.TableContain(RightFeatureTable, ValidText, out IFeatureName Key, out IFeatureInstance Value))
                 {

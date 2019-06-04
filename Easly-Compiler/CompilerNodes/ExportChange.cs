@@ -19,7 +19,7 @@ namespace CompilerNode
         /// <summary>
         /// Table of valid identifiers.
         /// </summary>
-        IHashtableEx<string, IIdentifier> IdentifierTable { get; }
+        ISealableDictionary<string, IIdentifier> IdentifierTable { get; }
 
         /// <summary>
         /// Valid export identifier.
@@ -32,7 +32,7 @@ namespace CompilerNode
         /// <param name="importedClassTable">The table of imported classes</param>
         /// <param name="exportTable">The list of exports to change.</param>
         /// <param name="errorList">The list of errors found.</param>
-        bool ApplyChange(IHashtableEx<string, IImportedClass> importedClassTable, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IErrorList errorList);
+        bool ApplyChange(ISealableDictionary<string, IImportedClass> importedClassTable, ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> exportTable, IErrorList errorList);
     }
 
     /// <summary>
@@ -126,7 +126,7 @@ namespace CompilerNode
 
             if (ruleTemplateList == RuleTemplateSet.Identifiers)
             {
-                IdentifierTable = new HashtableEx<string, IIdentifier>();
+                IdentifierTable = new SealableDictionary<string, IIdentifier>();
                 ValidExportIdentifier = new OnceReference<string>();
                 IsHandled = true;
             }
@@ -169,7 +169,7 @@ namespace CompilerNode
         /// <summary>
         /// Table of valid identifiers.
         /// </summary>
-        public IHashtableEx<string, IIdentifier> IdentifierTable { get; private set; } = new HashtableEx<string, IIdentifier>();
+        public ISealableDictionary<string, IIdentifier> IdentifierTable { get; private set; } = new SealableDictionary<string, IIdentifier>();
 
         /// <summary>
         /// Valid export identifier.
@@ -182,13 +182,13 @@ namespace CompilerNode
         /// <param name="importedClassTable">The table of imported classes</param>
         /// <param name="exportTable">The list of exports to change.</param>
         /// <param name="errorList">The list of errors found.</param>
-        public virtual bool ApplyChange(IHashtableEx<string, IImportedClass> importedClassTable, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IErrorList errorList)
+        public virtual bool ApplyChange(ISealableDictionary<string, IImportedClass> importedClassTable, ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> exportTable, IErrorList errorList)
         {
-            if (!ExportIdentifierExists(exportTable, errorList, out IFeatureName CurrentExportName, out IHashtableEx<string, IClass> CurrentClassTable))
+            if (!ExportIdentifierExists(exportTable, errorList, out IFeatureName CurrentExportName, out ISealableDictionary<string, IClass> CurrentClassTable))
                 return false;
 
-            IHashtableEx<string, IHashtableEx<string, IClass>> ListedExportTable = new HashtableEx<string, IHashtableEx<string, IClass>>(); // string (export name) -> hashtable // string (class name) -> Class
-            IHashtableEx<string, IClass> ListedClassTable = new HashtableEx<string, IClass>(); // string (class name) -> Class
+            ISealableDictionary<string, ISealableDictionary<string, IClass>> ListedExportTable = new SealableDictionary<string, ISealableDictionary<string, IClass>>(); // string (export name) -> hashtable // string (class name) -> Class
+            ISealableDictionary<string, IClass> ListedClassTable = new SealableDictionary<string, IClass>(); // string (class name) -> Class
 
             bool InvalidExportChange = false;
             foreach (IIdentifier IdentifierItem in IdentifierList)
@@ -196,7 +196,7 @@ namespace CompilerNode
                 Debug.Assert(IdentifierItem.ValidText.IsAssigned);
                 string ValidIdentifier = IdentifierItem.ValidText.Item;
 
-                if (FeatureName.TableContain(exportTable, ValidIdentifier, out IFeatureName EntryName, out IHashtableEx<string, IClass> ListedExport))
+                if (FeatureName.TableContain(exportTable, ValidIdentifier, out IFeatureName EntryName, out ISealableDictionary<string, IClass> ListedExport))
                 {
                     Debug.Assert(!ListedExportTable.ContainsKey(ValidIdentifier));
                     ListedExportTable.Add(ValidIdentifier, ListedExport);
@@ -221,7 +221,7 @@ namespace CompilerNode
             return true;
         }
 
-        private bool ExportIdentifierExists(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IErrorList errorList, out IFeatureName currentExportName, out IHashtableEx<string, IClass> currentClassTable)
+        private bool ExportIdentifierExists(ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> exportTable, IErrorList errorList, out IFeatureName currentExportName, out ISealableDictionary<string, IClass> currentClassTable)
         {
             currentExportName = null;
             currentClassTable = null;
@@ -231,7 +231,7 @@ namespace CompilerNode
             Debug.Assert(NodeExportIdentifier.ValidText.IsAssigned);
             string ValidIdentifier = NodeExportIdentifier.ValidText.Item;
 
-            foreach (KeyValuePair<IFeatureName, IHashtableEx<string, IClass>> Entry in exportTable)
+            foreach (KeyValuePair<IFeatureName, ISealableDictionary<string, IClass>> Entry in exportTable)
             {
                 IFeatureName EntryName = Entry.Key;
                 if (EntryName.Name == ValidIdentifier)
@@ -249,9 +249,9 @@ namespace CompilerNode
             return Found;
         }
 
-        private void UpdateTables(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IFeatureName currentExportName, IHashtableEx<string, IClass> currentClassTable, IHashtableEx<string, IHashtableEx<string, IClass>> listedExportTable, IHashtableEx<string, IClass> listedClassTable)
+        private void UpdateTables(ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> exportTable, IFeatureName currentExportName, ISealableDictionary<string, IClass> currentClassTable, ISealableDictionary<string, ISealableDictionary<string, IClass>> listedExportTable, ISealableDictionary<string, IClass> listedClassTable)
         {
-            IHashtableEx<string, IClass> ChangedClassTable = new HashtableEx<string, IClass>();
+            ISealableDictionary<string, IClass> ChangedClassTable = new SealableDictionary<string, IClass>();
 
             foreach (KeyValuePair<string, IClass> ListedEntry in currentClassTable)
             {
@@ -262,9 +262,9 @@ namespace CompilerNode
                     ChangedClassTable.Add(ClassIdentifier, ListedClass);
             }
 
-            foreach (KeyValuePair<string, IHashtableEx<string, IClass>> Entry in listedExportTable)
+            foreach (KeyValuePair<string, ISealableDictionary<string, IClass>> Entry in listedExportTable)
             {
-                IHashtableEx<string, IClass> ClassTable = Entry.Value;
+                ISealableDictionary<string, IClass> ClassTable = Entry.Value;
 
                 foreach (KeyValuePair<string, IClass> ListedEntry in ClassTable)
                 {

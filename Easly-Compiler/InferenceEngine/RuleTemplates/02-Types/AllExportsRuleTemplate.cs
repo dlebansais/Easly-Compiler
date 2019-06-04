@@ -23,14 +23,14 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceSourceTemplate<IClass, IClassType>(nameof(IClass.ResolvedClassType)),
-                new SealedTableSourceTemplate<IClass, IFeatureName, IHashtableEx<string, IClass>>(nameof(IClass.LocalExportTable)),
+                new SealedTableSourceTemplate<IClass, IFeatureName, ISealableDictionary<string, IClass>>(nameof(IClass.LocalExportTable)),
                 new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, IClassType>(nameof(IClass.InheritanceList), nameof(IInheritance.ResolvedType)),
-                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>>(nameof(IClass.InheritanceList), nameof(IInheritance.ExportTable)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>>>(nameof(IClass.InheritanceList), nameof(IInheritance.ExportTable)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new UnsealedTableDestinationTemplate<IClass, IFeatureName, IHashtableEx<string, IClass>>(nameof(IClass.ExportTable)),
+                new UnsealedTableDestinationTemplate<IClass, IFeatureName, ISealableDictionary<string, IClass>>(nameof(IClass.ExportTable)),
             };
         }
         #endregion
@@ -49,7 +49,7 @@
             data = null;
 
             Debug.Assert(node.LocalExportTable.IsSealed);
-            IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> MergedExportTable = node.LocalExportTable.CloneUnsealed();
+            ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> MergedExportTable = node.LocalExportTable.CloneUnsealed();
 
             Success = !HasConflictingEntry(node, MergedExportTable);
             if (Success)
@@ -62,7 +62,7 @@
             return Success;
         }
 
-        private bool HasConflictingEntry(IClass node, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> mergedExportTable)
+        private bool HasConflictingEntry(IClass node, ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> mergedExportTable)
         {
             bool Result = false;
 
@@ -70,18 +70,18 @@
             {
                 Debug.Assert(Inheritance.ExportTable.IsAssigned);
 
-                IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> InheritedExportTable = Inheritance.ExportTable.Item;
+                ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> InheritedExportTable = Inheritance.ExportTable.Item;
 
-                foreach (KeyValuePair<IFeatureName, IHashtableEx<string, IClass>> InstanceEntry in InheritedExportTable)
+                foreach (KeyValuePair<IFeatureName, ISealableDictionary<string, IClass>> InstanceEntry in InheritedExportTable)
                 {
                     IFeatureName InstanceName = InstanceEntry.Key;
-                    IHashtableEx<string, IClass> InstanceItem = InstanceEntry.Value;
+                    ISealableDictionary<string, IClass> InstanceItem = InstanceEntry.Value;
                     bool ConflictingEntry = false;
 
-                    foreach (KeyValuePair<IFeatureName, IHashtableEx<string, IClass>> Entry in mergedExportTable)
+                    foreach (KeyValuePair<IFeatureName, ISealableDictionary<string, IClass>> Entry in mergedExportTable)
                     {
                         IFeatureName LocalName = Entry.Key;
-                        IHashtableEx<string, IClass> LocalItem = Entry.Value;
+                        ISealableDictionary<string, IClass> LocalItem = Entry.Value;
 
                         if (InstanceName.Name == LocalName.Name)
                         {
@@ -108,28 +108,28 @@
             return Result;
         }
 
-        private bool MergeExportEntry(IClass node, IExport export, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> mergedExportTable)
+        private bool MergeExportEntry(IClass node, IExport export, ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> mergedExportTable)
         {
             bool Success = true;
 
-            IHashtableEx<IFeatureName, IIdentifier> ListedExportList = MergeExportClassIdentifiers(node, export, mergedExportTable, ref Success);
+            ISealableDictionary<IFeatureName, IIdentifier> ListedExportList = MergeExportClassIdentifiers(node, export, mergedExportTable, ref Success);
             IList<IFeatureName> ListedIdentifiers = new List<IFeatureName>(ListedExportList.Indexes);
 
-            List<IHashtableEx<string, IClass>> OtherClassTableList = new List<IHashtableEx<string, IClass>>();
+            List<ISealableDictionary<string, IClass>> OtherClassTableList = new List<ISealableDictionary<string, IClass>>();
             foreach (IFeatureName ExportName in ListedIdentifiers)
             {
-                IHashtableEx<string, IClass> OtherClassTable = mergedExportTable[ExportName];
+                ISealableDictionary<string, IClass> OtherClassTable = mergedExportTable[ExportName];
                 OtherClassTableList.Add(OtherClassTable);
             }
 
-            IHashtableEx<string, IClass> FilledClassTable = new HashtableEx<string, IClass>();
+            ISealableDictionary<string, IClass> FilledClassTable = new SealableDictionary<string, IClass>();
 
-            foreach (IHashtableEx<string, IClass> OtherClassTable in OtherClassTableList)
+            foreach (ISealableDictionary<string, IClass> OtherClassTable in OtherClassTableList)
                 ResolveAsExportIdentifier(OtherClassTable, FilledClassTable);
 
             CheckMultipleClassIdentifiers(node, export, FilledClassTable, ref Success);
 
-            IHashtableEx<string, IClass> ClassTable = node.LocalExportTable[export.ValidExportName.Item];
+            ISealableDictionary<string, IClass> ClassTable = node.LocalExportTable[export.ValidExportName.Item];
             foreach (KeyValuePair<string, IClass> Entry in FilledClassTable)
             {
                 string ClassIdentifier = Entry.Key;
@@ -143,10 +143,10 @@
             return Success;
         }
 
-        private IHashtableEx<IFeatureName, IIdentifier> MergeExportClassIdentifiers(IClass node, IExport export, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> mergedExportTable, ref bool success)
+        private ISealableDictionary<IFeatureName, IIdentifier> MergeExportClassIdentifiers(IClass node, IExport export, ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> mergedExportTable, ref bool success)
         {
             IList<string> ListedClassList = new List<string>();
-            IHashtableEx<IFeatureName, IIdentifier> ListedExportList = new HashtableEx<IFeatureName, IIdentifier>();
+            ISealableDictionary<IFeatureName, IIdentifier> ListedExportList = new SealableDictionary<IFeatureName, IIdentifier>();
 
             for (int i = 0; i < export.ClassIdentifierList.Count; i++)
             {
@@ -159,7 +159,7 @@
                     ListedClassList.Add(LanguageClasses.Any.Name);
                 else if (node.ImportedClassTable.ContainsKey(ValidText))
                     ListedClassList.Add(ValidText);
-                else if (FeatureName.TableContain(mergedExportTable, ValidText, out IFeatureName Key, out IHashtableEx<string, IClass> Item))
+                else if (FeatureName.TableContain(mergedExportTable, ValidText, out IFeatureName Key, out ISealableDictionary<string, IClass> Item))
                 {
                     if (ListedExportList.ContainsKey(Key))
                     {
@@ -179,7 +179,7 @@
             return ListedExportList;
         }
 
-        private void ResolveAsExportIdentifier(IHashtableEx<string, IClass> otherClassTable, IHashtableEx<string, IClass> classTable)
+        private void ResolveAsExportIdentifier(ISealableDictionary<string, IClass> otherClassTable, ISealableDictionary<string, IClass> classTable)
         {
             foreach (KeyValuePair<string, IClass> Entry in otherClassTable)
             {
@@ -191,7 +191,7 @@
             }
         }
 
-        private void CheckMultipleClassIdentifiers(IClass node, IExport export, IHashtableEx<string, IClass> filledClassTable, ref bool success)
+        private void CheckMultipleClassIdentifiers(IClass node, IExport export, ISealableDictionary<string, IClass> filledClassTable, ref bool success)
         {
             for (int i = 0; i < export.ClassIdentifierList.Count; i++)
             {
@@ -220,7 +220,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IClass node, object data)
         {
-            IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> MergedExportTable = (IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>)data;
+            ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> MergedExportTable = (ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>>)data;
 
             Debug.Assert(node.ResolvedClassType.IsAssigned);
             IClassType ThisClassType = node.ResolvedClassType.Item;

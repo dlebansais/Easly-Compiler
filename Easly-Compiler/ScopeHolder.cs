@@ -13,7 +13,7 @@
         /// <summary>
         /// Entities local to a scope.
         /// </summary>
-        IHashtableEx<string, IScopeAttributeFeature> LocalScope { get; }
+        ISealableDictionary<string, IScopeAttributeFeature> LocalScope { get; }
 
         /// <summary>
         /// List of scopes containing the current instance.
@@ -23,7 +23,7 @@
         /// <summary>
         /// All reachable entities.
         /// </summary>
-        IHashtableEx<string, IScopeAttributeFeature> FullScope { get; }
+        ISealableDictionary<string, IScopeAttributeFeature> FullScope { get; }
     }
 
     /// <summary>
@@ -36,7 +36,7 @@
         /// </summary>
         /// <param name="source">The local scope.</param>
         /// <param name="innerScopeList">The list of inner scopes.</param>
-        public static void RecursiveAdd(IHashtableEx<string, IScopeAttributeFeature> source, IList<IScopeHolder> innerScopeList)
+        public static void RecursiveAdd(ISealableDictionary<string, IScopeAttributeFeature> source, IList<IScopeHolder> innerScopeList)
         {
             foreach (IScopeHolder Item in innerScopeList)
             {
@@ -51,7 +51,7 @@
         /// <param name="source">The scope where the check is performed.</param>
         /// <param name="innerScopeList">The list of inner scopes.</param>
         /// <param name="conflictList">The list of conflicting names.</param>
-        public static void RecursiveCheck(IHashtableEx<string, IScopeAttributeFeature> source, IList<IScopeHolder> innerScopeList, IList<string> conflictList)
+        public static void RecursiveCheck(ISealableDictionary<string, IScopeAttributeFeature> source, IList<IScopeHolder> innerScopeList, IList<string> conflictList)
         {
             foreach (IScopeHolder Item in innerScopeList)
             {
@@ -74,7 +74,7 @@
         /// <param name="assignedSingleClassList">The list of assigned single class attributes.</param>
         /// <param name="source">The location where to report errors.</param>
         /// <param name="errorList">The list of errors found.</param>
-        public static bool HasConflictingSingleAttributes(IHashtableEx<string, IScopeAttributeFeature> scope, IList<IScopeHolder> innerScopeList, IList<IClass> assignedSingleClassList, ISource source, IErrorList errorList)
+        public static bool HasConflictingSingleAttributes(ISealableDictionary<string, IScopeAttributeFeature> scope, IList<IScopeHolder> innerScopeList, IList<IClass> assignedSingleClassList, ISource source, IErrorList errorList)
         {
             bool IsAssigned = false;
 

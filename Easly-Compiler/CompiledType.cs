@@ -12,22 +12,22 @@
         /// <summary>
         /// Discretes available in this type.
         /// </summary>
-        IHashtableEx<IFeatureName, IDiscrete> DiscreteTable { get; }
+        ISealableDictionary<IFeatureName, IDiscrete> DiscreteTable { get; }
 
         /// <summary>
         /// Features available in this type.
         /// </summary>
-        IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable { get; }
+        ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable { get; }
 
         /// <summary>
         /// Exports available in this type.
         /// </summary>
-        IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> ExportTable { get; }
+        ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> ExportTable { get; }
 
         /// <summary>
         /// Table of conforming types.
         /// </summary>
-        IHashtableEx<ITypeName, ICompiledType> ConformanceTable { get; }
+        ISealableDictionary<ITypeName, ICompiledType> ConformanceTable { get; }
 
         /// <summary>
         /// List of type instancing.

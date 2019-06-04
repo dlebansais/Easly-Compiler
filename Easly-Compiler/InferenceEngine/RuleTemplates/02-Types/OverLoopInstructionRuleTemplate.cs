@@ -45,7 +45,7 @@
             bool Success = true;
             data = null;
 
-            IHashtableEx<string, IScopeAttributeFeature> CheckedScope = new HashtableEx<string, IScopeAttributeFeature>();
+            ISealableDictionary<string, IScopeAttributeFeature> CheckedScope = new SealableDictionary<string, IScopeAttributeFeature>();
             IClass EmbeddingClass = node.EmbeddingClass;
 
             foreach (IName Item in node.IndexerList)
@@ -88,7 +88,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IOverLoopInstruction node, object data)
         {
-            IHashtableEx<string, IScopeAttributeFeature> CheckedScope = (IHashtableEx<string, IScopeAttributeFeature>)data;
+            ISealableDictionary<string, IScopeAttributeFeature> CheckedScope = (ISealableDictionary<string, IScopeAttributeFeature>)data;
             node.InnerLoopScope.Merge(CheckedScope);
             node.InnerLoopScope.Seal();
 

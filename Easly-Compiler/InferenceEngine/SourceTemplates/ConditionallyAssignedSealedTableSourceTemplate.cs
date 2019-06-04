@@ -6,7 +6,7 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is an assigned <see cref="IOptionalReference"/> where the assigned node has a property that must be a sealed <see cref="IHashtableEx"/> hash table.
+    /// The source is an assigned <see cref="IOptionalReference"/> where the assigned node has a property that must be a sealed <see cref="ISealableDictionary"/> hash table.
     /// </summary>
     public interface IConditionallyAssignedSealedTableSourceTemplate : ISourceTemplate
     {
@@ -14,7 +14,7 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is an assigned <see cref="IOptionalReference{TRef}"/> where the assigned node has a property that must be a sealed <see cref="IHashtableEx{TKey, TValue}"/> hash table.
+    /// The source is an assigned <see cref="IOptionalReference{TRef}"/> where the assigned node has a property that must be a sealed <see cref="ISealableDictionary{TKey, TValue}"/> hash table.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TRef">Type of the optional node.</typeparam>
@@ -28,7 +28,7 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is an assigned <see cref="IOptionalReference{TRef}"/> where the assigned node has a property that must be a sealed <see cref="IHashtableEx{TKey, TValue}"/> hash table.
+    /// The source is an assigned <see cref="IOptionalReference{TRef}"/> where the assigned node has a property that must be a sealed <see cref="ISealableDictionary{TKey, TValue}"/> hash table.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TRef">Type of the optional node.</typeparam>
@@ -43,14 +43,14 @@
         /// Initializes a new instance of the <see cref="ConditionallyAssignedSealedTableSourceTemplate{TSource, TRef, TKey, TValue}"/> class.
         /// </summary>
         /// <param name="path">Path to the <see cref="IOptionalReference{TRef}"/> in the source object.</param>
-        /// <param name="propertyName">The name of the <see cref="IHashtableEx{TKey, TValue}"/> property to check in the optional node.</param>
+        /// <param name="propertyName">The name of the <see cref="ISealableDictionary{TKey, TValue}"/> property to check in the optional node.</param>
         /// <param name="startingPoint">The starting point for the path.</param>
         public ConditionallyAssignedSealedTableSourceTemplate(string path, string propertyName, ITemplatePathStart<TSource> startingPoint = null)
             : base(path, startingPoint)
         {
             ItemProperty = BaseNodeHelper.NodeTreeHelper.GetPropertyOf(typeof(TRef), propertyName);
             Debug.Assert(ItemProperty != null);
-            Debug.Assert(ItemProperty.PropertyType.GetInterface(typeof(IHashtableEx).Name) != null);
+            Debug.Assert(ItemProperty.PropertyType.GetInterface(typeof(ISealableDictionary).Name) != null);
         }
 
         private PropertyInfo ItemProperty;
@@ -73,7 +73,7 @@
                 if (OptionalValue.IsAssigned)
                 {
                     TRef Value = (TRef)OptionalValue.Item;
-                    IHashtableEx<TKey, TValue> ValueTable = ItemProperty.GetValue(Value) as IHashtableEx<TKey, TValue>;
+                    ISealableDictionary<TKey, TValue> ValueTable = ItemProperty.GetValue(Value) as ISealableDictionary<TKey, TValue>;
                     Debug.Assert(ValueTable != null);
                     if (ValueTable.IsSealed)
                     {

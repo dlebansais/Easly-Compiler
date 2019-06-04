@@ -247,7 +247,7 @@
 
             else
             {
-                FeatureName.TableContain(Owner.Source.ExportTable, ExportIdentifier, out IFeatureName ExportName, out IHashtableEx<string, IClass> ExportList);
+                FeatureName.TableContain(Owner.Source.ExportTable, ExportIdentifier, out IFeatureName ExportName, out ISealableDictionary<string, IClass> ExportList);
                 Debug.Assert(ExportList.Count > 0);
 
                 if (ExportList.Count > 1)

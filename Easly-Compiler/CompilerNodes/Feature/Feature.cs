@@ -33,7 +33,7 @@
         /// <param name="errorList">The list of errors found.</param>
         public static bool DisjoinedParameterCheck(IList<ICommandOverloadType> overloadList, IErrorList errorList)
         {
-            IHashtableEx<int, IList<ICommandOverloadType>> UnmixedOverloadsTable = new HashtableEx<int, IList<ICommandOverloadType>>();
+            ISealableDictionary<int, IList<ICommandOverloadType>> UnmixedOverloadsTable = new SealableDictionary<int, IList<ICommandOverloadType>>();
 
             foreach (ICommandOverloadType Overload in overloadList)
             {
@@ -74,7 +74,7 @@
 
             foreach (ICommandOverloadType Overload in overloadList)
             {
-                ListTableEx<IParameter> ParameterTable = Overload.ParameterTable;
+                SealableList<IParameter> ParameterTable = Overload.ParameterTable;
                 if (index < ParameterTable.Count)
                     SameIndexList.Add(ParameterTable[index]);
             }
@@ -126,7 +126,7 @@
 
             foreach (IQueryOverloadType Overload in overloadList)
             {
-                ListTableEx<IParameter> ParameterTable = Overload.ParameterTable;
+                SealableList<IParameter> ParameterTable = Overload.ParameterTable;
                 if (index < ParameterTable.Count)
                     SameIndexList.Add(ParameterTable[index]);
             }
@@ -200,7 +200,7 @@
 
             foreach (IQueryOverloadType Overload in overloadList)
             {
-                ListTableEx<IParameter> ResultTable = Overload.ResultTable;
+                SealableList<IParameter> ResultTable = Overload.ResultTable;
                 if (index < ResultTable.Count)
                     SameIndexList.Add(ResultTable[index]);
             }
@@ -242,7 +242,7 @@
 
             foreach (IQueryOverloadType Overload in overloadList)
             {
-                ListTableEx<IParameter> ResultTable = Overload.ResultTable;
+                SealableList<IParameter> ResultTable = Overload.ResultTable;
                 if (index < ResultTable.Count)
                     SameIndexList.Add(ResultTable[index]);
             }

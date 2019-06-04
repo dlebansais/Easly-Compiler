@@ -156,10 +156,10 @@ namespace CompilerNode
                 ResolvedBaseType = new OnceReference<IClassType>();
                 ResolvedTypeName = new OnceReference<ITypeName>();
                 ResolvedType = new OnceReference<ICompiledType>();
-                DiscreteTable = new HashtableEx<IFeatureName, IDiscrete>();
-                FeatureTable = new HashtableEx<IFeatureName, IFeatureInstance>();
-                ExportTable = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
-                ConformanceTable = new HashtableEx<ITypeName, ICompiledType>();
+                DiscreteTable = new SealableDictionary<IFeatureName, IDiscrete>();
+                FeatureTable = new SealableDictionary<IFeatureName, IFeatureInstance>();
+                ExportTable = new SealableDictionary<IFeatureName, ISealableDictionary<string, IClass>>();
+                ConformanceTable = new SealableDictionary<ITypeName, ICompiledType>();
                 InstancingRecordList = new List<TypeInstancingRecord>();
                 OriginatingTypedef = new OnceReference<ITypedef>();
                 IsHandled = true;
@@ -223,22 +223,22 @@ namespace CompilerNode
         /// <summary>
         /// Discretes available in this type.
         /// </summary>
-        public IHashtableEx<IFeatureName, IDiscrete> DiscreteTable { get; private set; } = new HashtableEx<IFeatureName, IDiscrete>();
+        public ISealableDictionary<IFeatureName, IDiscrete> DiscreteTable { get; private set; } = new SealableDictionary<IFeatureName, IDiscrete>();
 
         /// <summary>
         /// Features available in this type.
         /// </summary>
-        public IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable { get; private set; } = new HashtableEx<IFeatureName, IFeatureInstance>();
+        public ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable { get; private set; } = new SealableDictionary<IFeatureName, IFeatureInstance>();
 
         /// <summary>
         /// Exports available in this type.
         /// </summary>
-        public IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> ExportTable { get; private set; } = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
+        public ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> ExportTable { get; private set; } = new SealableDictionary<IFeatureName, ISealableDictionary<string, IClass>>();
 
         /// <summary>
         /// Table of conforming types.
         /// </summary>
-        public IHashtableEx<ITypeName, ICompiledType> ConformanceTable { get; private set; } = new HashtableEx<ITypeName, ICompiledType>();
+        public ISealableDictionary<ITypeName, ICompiledType> ConformanceTable { get; private set; } = new SealableDictionary<ITypeName, ICompiledType>();
 
         /// <summary>
         /// List of type instancing.
@@ -330,7 +330,7 @@ namespace CompilerNode
         /// <param name="overloadList">The list of resolved overloads.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void ResolveType(IHashtableEx<ITypeName, ICompiledType> typeTable, ITypeName baseTypeName, ICompiledType baseType, IList<ICommandOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void ResolveType(ISealableDictionary<ITypeName, ICompiledType> typeTable, ITypeName baseTypeName, ICompiledType baseType, IList<ICommandOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
             if (!TypeTableContaining(typeTable, baseType, overloadList, out resolvedTypeName, out resolvedType))
             {
@@ -347,7 +347,7 @@ namespace CompilerNode
         /// <param name="overloadList">The list of resolved overloads.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static bool TypeTableContaining(IHashtableEx<ITypeName, ICompiledType> typeTable, ICompiledType baseType, IList<ICommandOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static bool TypeTableContaining(ISealableDictionary<ITypeName, ICompiledType> typeTable, ICompiledType baseType, IList<ICommandOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
             resolvedTypeName = null;
             resolvedType = null;
@@ -380,7 +380,7 @@ namespace CompilerNode
         /// <param name="typeTable">The table of existing types.</param>
         /// <param name="overload">The overload to check.</param>
         /// <param name="overloadList">The list of other overloads in the candidate procedure type.</param>
-        public static bool IsCommandOverloadMatching(IHashtableEx<ITypeName, ICompiledType> typeTable, ICommandOverloadType overload, IList<ICommandOverloadType> overloadList)
+        public static bool IsCommandOverloadMatching(ISealableDictionary<ITypeName, ICompiledType> typeTable, ICommandOverloadType overload, IList<ICommandOverloadType> overloadList)
         {
             bool IsOverloadFound = false;
 

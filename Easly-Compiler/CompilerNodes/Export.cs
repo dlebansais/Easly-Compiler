@@ -24,7 +24,7 @@ namespace CompilerNode
         /// <summary>
         /// The table of resolved class identifiers.
         /// </summary>
-        OnceReference<IHashtableEx<string, IClass>> ExportClassTable { get; }
+        OnceReference<ISealableDictionary<string, IClass>> ExportClassTable { get; }
     }
 
     /// <summary>
@@ -123,7 +123,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 ValidExportName = new OnceReference<IFeatureName>();
-                ExportClassTable = new OnceReference<IHashtableEx<string, IClass>>();
+                ExportClassTable = new OnceReference<ISealableDictionary<string, IClass>>();
                 IsHandled = true;
             }
 
@@ -165,7 +165,7 @@ namespace CompilerNode
         /// <summary>
         /// The table of resolved class identifiers.
         /// </summary>
-        public OnceReference<IHashtableEx<string, IClass>> ExportClassTable { get; set; } = new OnceReference<IHashtableEx<string, IClass>>();
+        public OnceReference<ISealableDictionary<string, IClass>> ExportClassTable { get; set; } = new OnceReference<ISealableDictionary<string, IClass>>();
         #endregion
     }
 }

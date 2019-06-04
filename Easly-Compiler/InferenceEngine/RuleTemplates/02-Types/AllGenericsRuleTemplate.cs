@@ -59,7 +59,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IClass node, object data)
         {
-            IHashtableEx<string, ICompiledType> LocalGenericTable = node.LocalGenericTable;
+            ISealableDictionary<string, ICompiledType> LocalGenericTable = node.LocalGenericTable;
 
             LocalGenericTable.Seal();
             node.LocalNamespaceTable.Add("Generic", LocalGenericTable);

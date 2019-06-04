@@ -45,7 +45,7 @@
             bool Success = true;
             data = null;
 
-            IHashtableEx<string, IScopeAttributeFeature> FieldTable = new HashtableEx<string, IScopeAttributeFeature>();
+            ISealableDictionary<string, IScopeAttributeFeature> FieldTable = new SealableDictionary<string, IScopeAttributeFeature>();
 
             foreach (IEntityDeclaration Item in node.EntityDeclarationList)
             {
@@ -78,7 +78,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(ITupleType node, object data)
         {
-            IHashtableEx<string, IScopeAttributeFeature> FieldTable = (IHashtableEx<string, IScopeAttributeFeature>)data;
+            ISealableDictionary<string, IScopeAttributeFeature> FieldTable = (ISealableDictionary<string, IScopeAttributeFeature>)data;
             IClass EmbeddingClass = node.EmbeddingClass;
 
             Debug.Assert(node.FieldTable.Count == 0);

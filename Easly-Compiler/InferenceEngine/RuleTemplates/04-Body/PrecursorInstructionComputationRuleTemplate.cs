@@ -50,7 +50,7 @@
 
             IClass EmbeddingClass = node.EmbeddingClass;
             IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;
-            IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable = EmbeddingClass.FeatureTable;
+            ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable = EmbeddingClass.FeatureTable;
             IFeature InnerFeature = node.EmbeddingFeature;
 
             if (InnerFeature is IIndexerFeature AsIndexerFeature)
@@ -102,12 +102,12 @@
                 if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, ErrorList))
                     return false;
 
-                IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+                IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
 
                 ICompiledFeature OperatorFeature = SelectedPrecursor.Item.Feature;
                 ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
                 IList<IIdentifier> PrecursorInstructionException = null;
-                ListTableEx<IParameter> SelectedParameterList = null;
+                SealableList<IParameter> SelectedParameterList = null;
 
                 // This has been checked in the type pass.
                 IProcedureType AsProcedureType = OperatorType as IProcedureType;

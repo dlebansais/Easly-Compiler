@@ -19,13 +19,13 @@ namespace CompilerNode
         /// <summary>
         /// Table of resolved fields.
         /// </summary>
-        IHashtableEx<string, IScopeAttributeFeature> FieldTable { get; }
+        ISealableDictionary<string, IScopeAttributeFeature> FieldTable { get; }
 
         /// <summary>
         /// Creates a clone of this type with renamed identifiers.
         /// </summary>
         /// <param name="renamedFieldTable">The rename table for fields.</param>
-        ITupleType CloneWithRenames(IHashtableEx<IFeatureName, IFeatureInstance> renamedFieldTable);
+        ITupleType CloneWithRenames(ISealableDictionary<IFeatureName, IFeatureInstance> renamedFieldTable);
     }
 
     /// <summary>
@@ -52,7 +52,7 @@ namespace CompilerNode
         /// <param name="entityDeclarationList">The resolved list of fields.</param>
         /// <param name="sharing">The type sharing.</param>
         /// <param name="renamedFieldTable">The list of fields to rename.</param>
-        public TupleType(IList<IEntityDeclaration> entityDeclarationList, BaseNode.SharingType sharing, IHashtableEx<IFeatureName, IFeatureInstance> renamedFieldTable)
+        public TupleType(IList<IEntityDeclaration> entityDeclarationList, BaseNode.SharingType sharing, ISealableDictionary<IFeatureName, IFeatureInstance> renamedFieldTable)
         {
             EntityDeclarationList = entityDeclarationList;
             Sharing = sharing;
@@ -157,13 +157,13 @@ namespace CompilerNode
             {
                 ResolvedTypeName = new OnceReference<ITypeName>();
                 ResolvedType = new OnceReference<ICompiledType>();
-                DiscreteTable = new HashtableEx<IFeatureName, IDiscrete>();
-                FeatureTable = new HashtableEx<IFeatureName, IFeatureInstance>();
-                ExportTable = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
-                ConformanceTable = new HashtableEx<ITypeName, ICompiledType>();
+                DiscreteTable = new SealableDictionary<IFeatureName, IDiscrete>();
+                FeatureTable = new SealableDictionary<IFeatureName, IFeatureInstance>();
+                ExportTable = new SealableDictionary<IFeatureName, ISealableDictionary<string, IClass>>();
+                ConformanceTable = new SealableDictionary<ITypeName, ICompiledType>();
                 InstancingRecordList = new List<TypeInstancingRecord>();
                 OriginatingTypedef = new OnceReference<ITypedef>();
-                FieldTable = new HashtableEx<string, IScopeAttributeFeature>();
+                FieldTable = new SealableDictionary<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
 
@@ -214,22 +214,22 @@ namespace CompilerNode
         /// <summary>
         /// Discretes available in this type.
         /// </summary>
-        public IHashtableEx<IFeatureName, IDiscrete> DiscreteTable { get; private set; } = new HashtableEx<IFeatureName, IDiscrete>();
+        public ISealableDictionary<IFeatureName, IDiscrete> DiscreteTable { get; private set; } = new SealableDictionary<IFeatureName, IDiscrete>();
 
         /// <summary>
         /// Features available in this type.
         /// </summary>
-        public IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable { get; private set; } = new HashtableEx<IFeatureName, IFeatureInstance>();
+        public ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable { get; private set; } = new SealableDictionary<IFeatureName, IFeatureInstance>();
 
         /// <summary>
         /// Exports available in this type.
         /// </summary>
-        public IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> ExportTable { get; private set; } = new HashtableEx<IFeatureName, IHashtableEx<string, IClass>>();
+        public ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> ExportTable { get; private set; } = new SealableDictionary<IFeatureName, ISealableDictionary<string, IClass>>();
 
         /// <summary>
         /// Table of conforming types.
         /// </summary>
-        public IHashtableEx<ITypeName, ICompiledType> ConformanceTable { get; private set; } = new HashtableEx<ITypeName, ICompiledType>();
+        public ISealableDictionary<ITypeName, ICompiledType> ConformanceTable { get; private set; } = new SealableDictionary<ITypeName, ICompiledType>();
 
         /// <summary>
         /// List of type instancing.
@@ -327,7 +327,7 @@ namespace CompilerNode
         /// <param name="sharing">The type sharing.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void ResolveType(IHashtableEx<ITypeName, ICompiledType> typeTable, IList<IEntityDeclaration> entityDeclarationList, BaseNode.SharingType sharing, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void ResolveType(ISealableDictionary<ITypeName, ICompiledType> typeTable, IList<IEntityDeclaration> entityDeclarationList, BaseNode.SharingType sharing, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
             if (!TypeTableContaining(typeTable, entityDeclarationList, sharing, out resolvedTypeName, out resolvedType))
             {
@@ -344,7 +344,7 @@ namespace CompilerNode
         /// <param name="sharing">The type sharing.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static bool TypeTableContaining(IHashtableEx<ITypeName, ICompiledType> typeTable, IList<IEntityDeclaration> entityDeclarationList, BaseNode.SharingType sharing, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static bool TypeTableContaining(ISealableDictionary<ITypeName, ICompiledType> typeTable, IList<IEntityDeclaration> entityDeclarationList, BaseNode.SharingType sharing, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
             resolvedTypeName = null;
             resolvedType = null;
@@ -387,7 +387,7 @@ namespace CompilerNode
         /// <param name="resolvedType">The type upon return.</param>
         public static void BuildType(IList<IEntityDeclaration> entityDeclarationList, BaseNode.SharingType sharing, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
-            ITupleType ResolvedTupleType = new TupleType(entityDeclarationList, sharing, new HashtableEx<IFeatureName, IFeatureInstance>());
+            ITupleType ResolvedTupleType = new TupleType(entityDeclarationList, sharing, new SealableDictionary<IFeatureName, IFeatureInstance>());
 
             resolvedTypeName = new TypeName(ResolvedTupleType.TypeFriendlyName);
             resolvedType = ResolvedTupleType;
@@ -398,7 +398,7 @@ namespace CompilerNode
         /// <summary>
         /// Table of resolved fields.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> FieldTable { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> FieldTable { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
 
         /// <summary>
         /// Compares two types.
@@ -425,7 +425,7 @@ namespace CompilerNode
         /// Creates a clone of this type with renamed identifiers.
         /// </summary>
         /// <param name="renamedFieldTable">The rename table for fields.</param>
-        public ITupleType CloneWithRenames(IHashtableEx<IFeatureName, IFeatureInstance> renamedFieldTable)
+        public ITupleType CloneWithRenames(ISealableDictionary<IFeatureName, IFeatureInstance> renamedFieldTable)
         {
             ITupleType ClonedTupleType = new TupleType(EntityDeclarationList, Sharing, renamedFieldTable);
 

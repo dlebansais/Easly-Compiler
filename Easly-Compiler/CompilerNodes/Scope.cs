@@ -136,9 +136,9 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                LocalScope = new HashtableEx<string, IScopeAttributeFeature>();
+                LocalScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 InnerScopes = new List<IScopeHolder>();
-                FullScope = new HashtableEx<string, IScopeAttributeFeature>();
+                FullScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
@@ -195,7 +195,7 @@ namespace CompilerNode
         /// <summary>
         /// Entities local to a scope.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> LocalScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> LocalScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
 
         /// <summary>
         /// List of scopes containing the current instance.
@@ -205,7 +205,7 @@ namespace CompilerNode
         /// <summary>
         /// All reachable entities.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> FullScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
         #endregion
 
         #region Compiler
@@ -223,12 +223,12 @@ namespace CompilerNode
         /// Gets the scope associated to a node.
         /// </summary>
         /// <param name="source">The node with a scope</param>
-        public static IHashtableEx<string, IScopeAttributeFeature> CurrentScope(ISource source)
+        public static ISealableDictionary<string, IScopeAttributeFeature> CurrentScope(ISource source)
         {
             ISource ChildSource = source;
             ISource ParentSource = source.ParentSource;
 
-            IHashtableEx<string, IScopeAttributeFeature> Result = null;
+            ISealableDictionary<string, IScopeAttributeFeature> Result = null;
             bool IsHandled;
 
             do
@@ -312,9 +312,9 @@ namespace CompilerNode
             return Result;
         }
 
-        private static IHashtableEx<string, IScopeAttributeFeature> CurrentPropertyScope(IPropertyFeature propertyFeature, ISource childSource)
+        private static ISealableDictionary<string, IScopeAttributeFeature> CurrentPropertyScope(IPropertyFeature propertyFeature, ISource childSource)
         {
-            IHashtableEx<string, IScopeAttributeFeature> Result = null;
+            ISealableDictionary<string, IScopeAttributeFeature> Result = null;
             bool IsHandled = false;
 
             if (propertyFeature.GetterBody.IsAssigned && propertyFeature.GetterBody.Item == childSource)
@@ -333,9 +333,9 @@ namespace CompilerNode
             return Result;
         }
 
-        private static IHashtableEx<string, IScopeAttributeFeature> CurrentIndexerScope(IIndexerFeature indexerFeature, ISource childSource)
+        private static ISealableDictionary<string, IScopeAttributeFeature> CurrentIndexerScope(IIndexerFeature indexerFeature, ISource childSource)
         {
-            IHashtableEx<string, IScopeAttributeFeature> Result = null;
+            ISealableDictionary<string, IScopeAttributeFeature> Result = null;
             bool IsHandled = false;
 
             if (indexerFeature.GetterBody.IsAssigned && indexerFeature.GetterBody.Item == childSource)

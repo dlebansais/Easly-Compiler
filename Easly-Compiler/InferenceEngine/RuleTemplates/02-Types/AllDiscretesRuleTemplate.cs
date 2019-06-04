@@ -25,7 +25,7 @@
                 new OnceReferenceSourceTemplate<IClass, IClassType>(nameof(IClass.ResolvedClassType)),
                 new SealedTableSourceTemplate<IClass, IFeatureName, IDiscrete>(nameof(IClass.LocalDiscreteTable)),
                 new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, IClassType>(nameof(IClass.InheritanceList), nameof(IInheritance.ResolvedType)),
-                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, IHashtableEx<IFeatureName, IDiscrete>>(nameof(IClass.InheritanceList), nameof(IInheritance.DiscreteTable)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, ISealableDictionary<IFeatureName, IDiscrete>>(nameof(IClass.InheritanceList), nameof(IInheritance.DiscreteTable)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
@@ -50,14 +50,14 @@
             data = null;
 
             Debug.Assert(node.LocalDiscreteTable.IsSealed);
-            IHashtableEx<IFeatureName, IDiscrete> MergedDiscreteTable = node.LocalDiscreteTable.CloneUnsealed();
+            ISealableDictionary<IFeatureName, IDiscrete> MergedDiscreteTable = node.LocalDiscreteTable.CloneUnsealed();
 
             foreach (IInheritance Inheritance in node.InheritanceList)
             {
                 Debug.Assert(Inheritance.ResolvedType.IsAssigned);
                 Debug.Assert(Inheritance.DiscreteTable.IsAssigned);
 
-                IHashtableEx<IFeatureName, IDiscrete> InheritedDiscreteTable = Inheritance.DiscreteTable.Item;
+                ISealableDictionary<IFeatureName, IDiscrete> InheritedDiscreteTable = Inheritance.DiscreteTable.Item;
 
                 foreach (KeyValuePair<IFeatureName, IDiscrete> InstanceEntry in InheritedDiscreteTable)
                 {
@@ -105,7 +105,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IClass node, object data)
         {
-            IHashtableEx<IFeatureName, IDiscrete> MergedDiscreteTable = (IHashtableEx<IFeatureName, IDiscrete>)data;
+            ISealableDictionary<IFeatureName, IDiscrete> MergedDiscreteTable = (ISealableDictionary<IFeatureName, IDiscrete>)data;
 
             Debug.Assert(node.ResolvedClassType.IsAssigned);
             IClassType ThisClassType = node.ResolvedClassType.Item;

@@ -97,7 +97,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IResultType>();
-                ConstantSourceList = new ListTableEx<IExpression>();
+                ConstantSourceList = new SealableList<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
                 ResolvedFinalFeature = new OnceReference<IConstantFeature>();
                 ResolvedFinalDiscrete = new OnceReference<IDiscrete>();
@@ -165,7 +165,7 @@ namespace CompilerNode
         /// <summary>
         /// The list of sources for a constant, if any.
         /// </summary>
-        public ListTableEx<IExpression> ConstantSourceList { get; private set; } = new ListTableEx<IExpression>();
+        public SealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
 
         /// <summary>
         /// Specific constant number.
@@ -232,11 +232,11 @@ namespace CompilerNode
         /// <param name="resolvedFinalDiscrete">The discrete if the end of the path is a discrete.</param>
         /// <param name="resolvedClassTypeName">The class type name upon return.</param>
         /// <param name="resolvedClassType">The class name upon return.</param>
-        public static bool ResolveCompilerReferences(IClassConstantExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IConstantFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out ITypeName resolvedClassTypeName, out IClassType resolvedClassType)
+        public static bool ResolveCompilerReferences(IClassConstantExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IConstantFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out ITypeName resolvedClassTypeName, out IClassType resolvedClassType)
         {
             resolvedResult = null;
             resolvedException = null;
-            constantSourceList = new ListTableEx<IExpression>();
+            constantSourceList = new SealableList<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
             resolvedFinalFeature = null;
             resolvedFinalDiscrete = null;
@@ -248,7 +248,7 @@ namespace CompilerNode
             IClass EmbeddingClass = node.EmbeddingClass;
             string ValidClassText = ClassIdentifier.ValidText.Item;
             string ValidConstantText = ConstantIdentifier.ValidText.Item;
-            IHashtableEx<string, IImportedClass> ClassTable = EmbeddingClass.ImportedClassTable;
+            ISealableDictionary<string, IImportedClass> ClassTable = EmbeddingClass.ImportedClassTable;
 
             if (!ClassTable.ContainsKey(ValidClassText))
             {
@@ -263,8 +263,8 @@ namespace CompilerNode
             ITypeName ConstantTypeName;
             ICompiledType ConstantType;
 
-            IHashtableEx<IFeatureName, IDiscrete> DiscreteTable = BaseClass.DiscreteTable;
-            IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable = BaseClass.FeatureTable;
+            ISealableDictionary<IFeatureName, IDiscrete> DiscreteTable = BaseClass.DiscreteTable;
+            ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable = BaseClass.FeatureTable;
 
             if (FeatureName.TableContain(DiscreteTable, ValidConstantText, out IFeatureName Key, out IDiscrete Discrete))
             {

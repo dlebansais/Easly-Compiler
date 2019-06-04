@@ -8,7 +8,7 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is a collection of nodes, each with a property that must be a sealed <see cref="IHashtableEx"/>.
+    /// The source is a collection of nodes, each with a property that must be a sealed <see cref="ISealableDictionary"/>.
     /// </summary>
     public interface ISealedTableCollectionSourceTemplate : ISourceTemplate
     {
@@ -16,7 +16,7 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is a collection of nodes, each with a property that must be a sealed <see cref="IHashtableEx{TKey, TValue}"/>.
+    /// The source is a collection of nodes, each with a property that must be a sealed <see cref="ISealableDictionary{TKey, TValue}"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TItem">Type of items in the source.</typeparam>
@@ -29,7 +29,7 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is a collection of nodes, each with a property that must be a sealed <see cref="IHashtableEx{TKey, TValue}"/>.
+    /// The source is a collection of nodes, each with a property that must be a sealed <see cref="ISealableDictionary{TKey, TValue}"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TItem">Type of items in the source.</typeparam>
@@ -43,14 +43,14 @@
         /// Initializes a new instance of the <see cref="SealedTableCollectionSourceTemplate{TSource, TItem, TKey, TValue}"/> class.
         /// </summary>
         /// <param name="path">Path to the source object.</param>
-        /// <param name="propertyName">The name of the <see cref="IHashtableEx{TKey, TValue}"/> property to check in each items of the list.</param>
+        /// <param name="propertyName">The name of the <see cref="ISealableDictionary{TKey, TValue}"/> property to check in each items of the list.</param>
         /// <param name="startingPoint">The starting point for the path.</param>
         public SealedTableCollectionSourceTemplate(string path, string propertyName, ITemplatePathStart<TSource> startingPoint = null)
             : base(path, startingPoint)
         {
             ItemProperty = BaseNodeHelper.NodeTreeHelper.GetPropertyOf(typeof(TItem), propertyName);
             Debug.Assert(ItemProperty != null);
-            Debug.Assert(ItemProperty.PropertyType.GetInterface(typeof(IHashtableEx).Name) != null);
+            Debug.Assert(ItemProperty.PropertyType.GetInterface(typeof(ISealableDictionary).Name) != null);
         }
 
         private PropertyInfo ItemProperty;
@@ -65,13 +65,13 @@
         public override bool IsReady(TSource node, out object data)
         {
             IList ItemList = GetSourceObject(node, out bool IsInterrupted);
-            IList<IHashtableEx<TKey, TValue>> ReadyValueList = new List<IHashtableEx<TKey, TValue>>();
+            IList<ISealableDictionary<TKey, TValue>> ReadyValueList = new List<ISealableDictionary<TKey, TValue>>();
 
             for (int i = 0; i < ItemList.Count && !IsInterrupted; i++)
             {
                 TItem Item = (TItem)ItemList[i];
 
-                IHashtableEx<TKey, TValue> Table = ItemProperty.GetValue(Item) as IHashtableEx<TKey, TValue>;
+                ISealableDictionary<TKey, TValue> Table = ItemProperty.GetValue(Item) as ISealableDictionary<TKey, TValue>;
                 Debug.Assert(Table != null);
 
                 if (Table.IsSealed)

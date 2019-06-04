@@ -24,7 +24,7 @@ namespace CompilerNode
         /// <summary>
         /// Scope of instructions in the loop.
         /// </summary>
-        IHashtableEx<string, IScopeAttributeFeature> InnerLoopScope { get; }
+        ISealableDictionary<string, IScopeAttributeFeature> InnerLoopScope { get; }
 
         /// <summary>
         /// Result types of initialization.
@@ -136,10 +136,10 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                InnerLoopScope = new HashtableEx<string, IScopeAttributeFeature>();
-                LocalScope = new HashtableEx<string, IScopeAttributeFeature>();
+                InnerLoopScope = new SealableDictionary<string, IScopeAttributeFeature>();
+                LocalScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 InnerScopes = new List<IScopeHolder>();
-                FullScope = new HashtableEx<string, IScopeAttributeFeature>();
+                FullScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
@@ -199,7 +199,7 @@ namespace CompilerNode
         /// <summary>
         /// Entities local to a scope.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> LocalScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> LocalScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
 
         /// <summary>
         /// List of scopes containing the current instance.
@@ -209,7 +209,7 @@ namespace CompilerNode
         /// <summary>
         /// All reachable entities.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> FullScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
         #endregion
 
         #region Implementation of IInstruction
@@ -228,7 +228,7 @@ namespace CompilerNode
         /// <summary>
         /// Scope of instructions in the loop.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> InnerLoopScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> InnerLoopScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
         #endregion
 
         #region Compiler

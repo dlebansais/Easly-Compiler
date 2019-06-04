@@ -112,9 +112,9 @@
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                LocalScope = new HashtableEx<string, IScopeAttributeFeature>();
+                LocalScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 InnerScopes = new List<IScopeHolder>();
-                FullScope = new HashtableEx<string, IScopeAttributeFeature>();
+                FullScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
@@ -183,7 +183,7 @@
         /// <summary>
         /// Entities local to a scope.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> LocalScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> LocalScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
 
         /// <summary>
         /// List of scopes containing the current instance.
@@ -193,7 +193,7 @@
         /// <summary>
         /// All reachable entities.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> FullScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
         #endregion
 
         #region Debugging

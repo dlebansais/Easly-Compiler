@@ -48,8 +48,8 @@
             bool Success = true;
             data = null;
 
-            ListTableEx<IParameter> ParameterTable = new ListTableEx<IParameter>();
-            ListTableEx<IParameter> ResultTable = new ListTableEx<IParameter>();
+            SealableList<IParameter> ParameterTable = new SealableList<IParameter>();
+            SealableList<IParameter> ResultTable = new SealableList<IParameter>();
 
             foreach (IEntityDeclaration Item in node.ParameterList)
             {
@@ -88,7 +88,7 @@
             }
 
             if (Success)
-                data = new Tuple<ListTableEx<IParameter>, ListTableEx<IParameter>>(ParameterTable, ResultTable);
+                data = new Tuple<SealableList<IParameter>, SealableList<IParameter>>(ParameterTable, ResultTable);
 
             return Success;
         }
@@ -102,8 +102,8 @@
         {
             IClass EmbeddingClass = node.EmbeddingClass;
 
-            ListTableEx<IParameter> ParameterTable = ((Tuple<ListTableEx<IParameter>, ListTableEx<IParameter>>)data).Item1;
-            ListTableEx<IParameter> ResultTable = ((Tuple<ListTableEx<IParameter>, ListTableEx<IParameter>>)data).Item2;
+            SealableList<IParameter> ParameterTable = ((Tuple<SealableList<IParameter>, SealableList<IParameter>>)data).Item1;
+            SealableList<IParameter> ResultTable = ((Tuple<SealableList<IParameter>, SealableList<IParameter>>)data).Item2;
 
             Debug.Assert(node.ParameterTable.Count == 0);
             Debug.Assert(node.ResultTable.Count == 0);

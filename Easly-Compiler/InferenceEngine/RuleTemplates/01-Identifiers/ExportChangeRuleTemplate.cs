@@ -47,7 +47,7 @@
             bool Success = true;
             data = null;
 
-            IHashtableEx<string, IIdentifier> IdentifierTable = new HashtableEx<string, IIdentifier>();
+            ISealableDictionary<string, IIdentifier> IdentifierTable = new SealableDictionary<string, IIdentifier>();
 
             foreach (IIdentifier Item in node.IdentifierList)
             {
@@ -77,7 +77,7 @@
         public override void Apply(IExportChange node, object data)
         {
             IIdentifier ExportIdentifier = (IIdentifier)node.ExportIdentifier;
-            IHashtableEx<string, IIdentifier> IdentifierTable = (IHashtableEx<string, IIdentifier>)data;
+            ISealableDictionary<string, IIdentifier> IdentifierTable = (ISealableDictionary<string, IIdentifier>)data;
 
             Debug.Assert(ExportIdentifier.ValidText.IsAssigned);
             string ValidText = ExportIdentifier.ValidText.Item;

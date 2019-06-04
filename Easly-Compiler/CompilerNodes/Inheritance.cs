@@ -69,22 +69,22 @@ namespace CompilerNode
         /// <summary>
         /// Table of association of discrete names to their instance.
         /// </summary>
-        OnceReference<IHashtableEx<IFeatureName, IDiscrete>> DiscreteTable { get; }
+        OnceReference<ISealableDictionary<IFeatureName, IDiscrete>> DiscreteTable { get; }
 
         /// <summary>
         /// Table of association of typedef names to their instance.
         /// </summary>
-        OnceReference<IHashtableEx<IFeatureName, ITypedefType>> TypedefTable { get; }
+        OnceReference<ISealableDictionary<IFeatureName, ITypedefType>> TypedefTable { get; }
 
         /// <summary>
         /// Table of association of feature names to their instance.
         /// </summary>
-        OnceReference<IHashtableEx<IFeatureName, IFeatureInstance>> FeatureTable { get; }
+        OnceReference<ISealableDictionary<IFeatureName, IFeatureInstance>> FeatureTable { get; }
 
         /// <summary>
         /// Table of association of export names to their instance.
         /// </summary>
-        OnceReference<IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>> ExportTable { get; }
+        OnceReference<ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>>> ExportTable { get; }
 
         /// <summary>
         /// The class inherited, if not cloneable.
@@ -234,10 +234,10 @@ namespace CompilerNode
                 ResolvedParentType = new OnceReference<ICompiledType>();
                 ResolvedClassParentTypeName = new OnceReference<ITypeName>();
                 ResolvedClassParentType = new OnceReference<IClassType>();
-                DiscreteTable = new OnceReference<IHashtableEx<IFeatureName, IDiscrete>>();
-                TypedefTable = new OnceReference<IHashtableEx<IFeatureName, ITypedefType>>();
-                FeatureTable = new OnceReference<IHashtableEx<IFeatureName, IFeatureInstance>>();
-                ExportTable = new OnceReference<IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>>();
+                DiscreteTable = new OnceReference<ISealableDictionary<IFeatureName, IDiscrete>>();
+                TypedefTable = new OnceReference<ISealableDictionary<IFeatureName, ITypedefType>>();
+                FeatureTable = new OnceReference<ISealableDictionary<IFeatureName, IFeatureInstance>>();
+                ExportTable = new OnceReference<ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>>>();
                 ClassGroup = new OnceReference<IClass>();
                 IsHandled = true;
             }
@@ -320,22 +320,22 @@ namespace CompilerNode
         /// <summary>
         /// Table of association of discrete names to their instance.
         /// </summary>
-        public OnceReference<IHashtableEx<IFeatureName, IDiscrete>> DiscreteTable { get; private set; } = new OnceReference<IHashtableEx<IFeatureName, IDiscrete>>();
+        public OnceReference<ISealableDictionary<IFeatureName, IDiscrete>> DiscreteTable { get; private set; } = new OnceReference<ISealableDictionary<IFeatureName, IDiscrete>>();
 
         /// <summary>
         /// Table of association of typedef names to their instance.
         /// </summary>
-        public OnceReference<IHashtableEx<IFeatureName, ITypedefType>> TypedefTable { get; private set; } = new OnceReference<IHashtableEx<IFeatureName, ITypedefType>>();
+        public OnceReference<ISealableDictionary<IFeatureName, ITypedefType>> TypedefTable { get; private set; } = new OnceReference<ISealableDictionary<IFeatureName, ITypedefType>>();
 
         /// <summary>
         /// Table of association of feature names to their instance.
         /// </summary>
-        public OnceReference<IHashtableEx<IFeatureName, IFeatureInstance>> FeatureTable { get; private set; } = new OnceReference<IHashtableEx<IFeatureName, IFeatureInstance>>();
+        public OnceReference<ISealableDictionary<IFeatureName, IFeatureInstance>> FeatureTable { get; private set; } = new OnceReference<ISealableDictionary<IFeatureName, IFeatureInstance>>();
 
         /// <summary>
         /// Table of association of export names to their instance.
         /// </summary>
-        public OnceReference<IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>> ExportTable { get; private set; } = new OnceReference<IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>>();
+        public OnceReference<ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>>> ExportTable { get; private set; } = new OnceReference<ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>>>();
 
         /// <summary>
         /// The class inherited, if not cloneable.

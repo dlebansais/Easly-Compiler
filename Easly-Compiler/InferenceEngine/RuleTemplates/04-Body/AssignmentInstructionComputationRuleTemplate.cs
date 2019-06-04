@@ -68,7 +68,7 @@
                 {
                     IQualifiedName Destination = (QualifiedName)node.DestinationList[i];
                     IList<IIdentifier> ValidPath = Destination.ValidPath.Item;
-                    IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
+                    ISealableDictionary<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
 
                     if (!ObjectType.GetQualifiedPathFinalType(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, ErrorList, out ICompiledFeature FinalFeature, out IDiscrete FinalDiscrete, out ITypeName FinalTypeName, out ICompiledType FinalType, out bool InheritBySideAttribute))
                         Success = false;

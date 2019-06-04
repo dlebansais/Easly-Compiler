@@ -167,14 +167,14 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                LocalScope = new HashtableEx<string, IScopeAttributeFeature>();
+                LocalScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 InnerScopes = new List<IScopeHolder>();
-                FullScope = new HashtableEx<string, IScopeAttributeFeature>();
+                FullScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                ResolvedTagTable = new HashtableEx<string, IExpression>();
+                ResolvedTagTable = new SealableDictionary<string, IExpression>();
                 ResolvedResult = new OnceReference<IResultType>();
                 ResolvedRequireList = new OnceReference<IList<IAssertion>>();
                 ResolvedEnsureList = new OnceReference<IList<IAssertion>>();
@@ -230,7 +230,7 @@ namespace CompilerNode
         /// <summary>
         /// Tags for tag expressions.
         /// </summary>
-        public IHashtableEx<string, IExpression> ResolvedTagTable { get; private set; } = new HashtableEx<string, IExpression>();
+        public ISealableDictionary<string, IExpression> ResolvedTagTable { get; private set; } = new SealableDictionary<string, IExpression>();
 
         /// <summary>
         /// Types of results.
@@ -269,7 +269,7 @@ namespace CompilerNode
         /// <summary>
         /// Entities local to a scope.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> LocalScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> LocalScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
 
         /// <summary>
         /// List of scopes containing the current instance.
@@ -279,7 +279,7 @@ namespace CompilerNode
         /// <summary>
         /// All reachable entities.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> FullScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
         #endregion
     }
 }

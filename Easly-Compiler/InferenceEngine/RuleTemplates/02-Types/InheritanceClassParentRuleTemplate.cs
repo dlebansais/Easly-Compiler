@@ -49,7 +49,7 @@
             IClassType ResolvedClassType = null;
 
             IClass EmbeddingClass = node.EmbeddingClass;
-            IHashtableEx<IClassType, IObjectType> InheritedClassTypeTable = EmbeddingClass.InheritedClassTypeTable;
+            ISealableDictionary<IClassType, IObjectType> InheritedClassTypeTable = EmbeddingClass.InheritedClassTypeTable;
 
             if (node.ResolvedParentType.Item is IClassType AsClassType)
             {
@@ -86,7 +86,7 @@
         {
             IClassType ResolvedClassType = (IClassType)data;
             IClass EmbeddingClass = node.EmbeddingClass;
-            IHashtableEx<IClassType, IObjectType> InheritedClassTypeTable = EmbeddingClass.InheritedClassTypeTable;
+            ISealableDictionary<IClassType, IObjectType> InheritedClassTypeTable = EmbeddingClass.InheritedClassTypeTable;
             IObjectType ParentType = (IObjectType)node.ParentType;
 
             node.ResolvedClassParentTypeName.Item = node.ResolvedParentTypeName.Item;

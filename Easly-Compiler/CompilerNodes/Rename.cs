@@ -32,7 +32,7 @@ namespace CompilerNode
         /// <param name="string2Key">Creates a key from a string.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if the rename is valid.</returns>
-        bool CheckGenericRename<TKey>(IHashtableIndex<TKey>[] renamedItemTables, IHashtableEx<string, string> sourceIdentifierTable, IHashtableEx<string, string> destinationIdentifierTable, Func<TKey, string> key2String, Func<string, TKey> string2Key, IErrorList errorList);
+        bool CheckGenericRename<TKey>(IDictionaryIndex<TKey>[] renamedItemTables, ISealableDictionary<string, string> sourceIdentifierTable, ISealableDictionary<string, string> destinationIdentifierTable, Func<TKey, string> key2String, Func<string, TKey> string2Key, IErrorList errorList);
     }
 
     /// <summary>
@@ -156,7 +156,7 @@ namespace CompilerNode
         /// <param name="string2Key">Creates a key from a string.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if the rename is valid.</returns>
-        public virtual bool CheckGenericRename<TKey>(IHashtableIndex<TKey>[] renamedItemTables, IHashtableEx<string, string> sourceIdentifierTable, IHashtableEx<string, string> destinationIdentifierTable, Func<TKey, string> key2String, Func<string, TKey> string2Key, IErrorList errorList)
+        public virtual bool CheckGenericRename<TKey>(IDictionaryIndex<TKey>[] renamedItemTables, ISealableDictionary<string, string> sourceIdentifierTable, ISealableDictionary<string, string> destinationIdentifierTable, Func<TKey, string> key2String, Func<string, TKey> string2Key, IErrorList errorList)
         {
             IIdentifier RenameSourceIdentifier = (IIdentifier)SourceIdentifier;
             IIdentifier RenameDestinationIdentifier = (IIdentifier)DestinationIdentifier;
@@ -195,10 +195,10 @@ namespace CompilerNode
             }
 
             // Check that the source name exists.
-            OnceReference<IHashtableIndex<TKey>> SourceTable = new OnceReference<IHashtableIndex<TKey>>();
+            OnceReference<IDictionaryIndex<TKey>> SourceTable = new OnceReference<IDictionaryIndex<TKey>>();
             TKey SourceKey = default;
 
-            foreach (IHashtableIndex<TKey> Table in renamedItemTables)
+            foreach (IDictionaryIndex<TKey> Table in renamedItemTables)
             {
                 foreach (TKey Entry in Table.Indexes)
                 {

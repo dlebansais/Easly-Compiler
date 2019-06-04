@@ -56,7 +56,7 @@
             IClass EmbeddingClass = node.EmbeddingClass;
             IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;
 
-            IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
+            ISealableDictionary<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
 
             if (!ObjectType.GetQualifiedPathFinalType(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, ErrorList, out ICompiledFeature FinalFeature, out IDiscrete FinalDiscrete, out ITypeName FinalTypeName, out ICompiledType FinalType, out bool InheritBySideAttribute))
                 return false;
@@ -66,7 +66,7 @@
             if (FinalType is IClassType AsClassType)
             {
                 IClass IndexedBaseClass = AsClassType.BaseClass;
-                IHashtableEx<IFeatureName, IFeatureInstance> IndexedFeatureTable = IndexedBaseClass.FeatureTable;
+                ISealableDictionary<IFeatureName, IFeatureInstance> IndexedFeatureTable = IndexedBaseClass.FeatureTable;
 
                 if (!IndexedFeatureTable.ContainsKey(FeatureName.IndexerFeatureName))
                 {
@@ -89,7 +89,7 @@
                 }
                 else
                 {
-                    IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+                    IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
                     ParameterTableList.Add(AsIndexerType.ParameterTable);
 
                     ICompiledType DestinationType = AsIndexerType.ResolvedEntityType.Item;

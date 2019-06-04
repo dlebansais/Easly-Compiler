@@ -58,7 +58,7 @@
                 Debug.Assert(ClassIdentifier.ValidText.IsAssigned);
                 string ValidIdentifier = ClassIdentifier.ValidText.Item;
 
-                IHashtableEx<string, IImportedClass> ImportedClassTable = EmbeddingClass.ImportedClassTable;
+                ISealableDictionary<string, IImportedClass> ImportedClassTable = EmbeddingClass.ImportedClassTable;
 
                 if (ValidIdentifier.ToLower() == LanguageClasses.Any.Name.ToLower())
                 {

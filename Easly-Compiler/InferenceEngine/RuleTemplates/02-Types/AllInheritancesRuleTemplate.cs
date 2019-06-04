@@ -55,7 +55,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IClass node, object data)
         {
-            IHashtableEx<IClassType, IObjectType> InheritedClassTypeTable = node.InheritedClassTypeTable;
+            ISealableDictionary<IClassType, IObjectType> InheritedClassTypeTable = node.InheritedClassTypeTable;
             InheritedClassTypeTable.Seal();
         }
         #endregion

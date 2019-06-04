@@ -46,9 +46,9 @@
             bool Success = true;
             data = null;
 
-            IHashtableEx<IIdentifier, IIdentifier> RenameTable = new HashtableEx<IIdentifier, IIdentifier>();
-            IHashtableEx<string, string> SourceToDestinationTable = new HashtableEx<string, string>();
-            IHashtableEx<string, string> DestinationToSourceTable = new HashtableEx<string, string>();
+            ISealableDictionary<IIdentifier, IIdentifier> RenameTable = new SealableDictionary<IIdentifier, IIdentifier>();
+            ISealableDictionary<string, string> SourceToDestinationTable = new SealableDictionary<string, string>();
+            ISealableDictionary<string, string> DestinationToSourceTable = new SealableDictionary<string, string>();
 
             foreach (IRename Item in node.RenameList)
             {
@@ -95,7 +95,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IConstraint node, object data)
         {
-            IHashtableEx<IIdentifier, IIdentifier> RenameTable = (IHashtableEx<IIdentifier, IIdentifier>)data;
+            ISealableDictionary<IIdentifier, IIdentifier> RenameTable = (ISealableDictionary<IIdentifier, IIdentifier>)data;
 
             Debug.Assert(node.RenameTable.Count == 0);
             node.RenameTable.Merge(RenameTable);

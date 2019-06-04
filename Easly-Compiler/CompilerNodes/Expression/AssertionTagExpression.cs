@@ -92,7 +92,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 ResolvedResult = new OnceReference<IResultType>();
-                ConstantSourceList = new ListTableEx<IExpression>();
+                ConstantSourceList = new SealableList<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
                 ResolvedBooleanExpression = new OnceReference<IExpression>();
                 IsHandled = true;
@@ -160,7 +160,7 @@ namespace CompilerNode
         /// <summary>
         /// The list of sources for a constant, if any.
         /// </summary>
-        public ListTableEx<IExpression> ConstantSourceList { get; private set; } = new ListTableEx<IExpression>();
+        public SealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
 
         /// <summary>
         /// Specific constant number.
@@ -212,7 +212,7 @@ namespace CompilerNode
         /// <param name="resolvedException">Exceptions the expression can throw upon return.</param>
         /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
         /// <param name="expressionConstant">The constant value upon return, if any.</param>
-        public static bool ResolveCompilerReferences(IAssertionTagExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ListTableEx<IExpression> constantSourceList, out ILanguageConstant expressionConstant)
+        public static bool ResolveCompilerReferences(IAssertionTagExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant)
         {
             IExpression ResolvedBooleanExpression = node.ResolvedBooleanExpression.Item;
 
@@ -220,7 +220,7 @@ namespace CompilerNode
             ResultException.Propagate(ResolvedBooleanExpression.ResolvedException, out resolvedException);
             expressionConstant = NeutralLanguageConstant.NotConstant;
 
-            constantSourceList = new ListTableEx<IExpression>()
+            constantSourceList = new SealableList<IExpression>()
             {
                 ResolvedBooleanExpression
             };

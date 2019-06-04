@@ -48,7 +48,7 @@
             bool Success = true;
             data = null;
 
-            IHashtableEx<string, IScopeAttributeFeature> CheckedScope = new HashtableEx<string, IScopeAttributeFeature>();
+            ISealableDictionary<string, IScopeAttributeFeature> CheckedScope = new SealableDictionary<string, IScopeAttributeFeature>();
 
             Debug.Assert(node.ParameterTable.Count == node.ParameterList.Count);
             for (int i = 0; i < node.ParameterTable.Count; i++)
@@ -123,7 +123,7 @@
             IClass EmbeddingClass = node.EmbeddingClass;
             IFeature EmbeddingFeature = node.EmbeddingFeature;
 
-            IHashtableEx<string, IScopeAttributeFeature> CheckedScope = (IHashtableEx<string, IScopeAttributeFeature>)data;
+            ISealableDictionary<string, IScopeAttributeFeature> CheckedScope = (ISealableDictionary<string, IScopeAttributeFeature>)data;
 
             node.LocalScope.Merge(CheckedScope);
             node.LocalScope.Seal();

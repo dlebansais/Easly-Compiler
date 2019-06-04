@@ -13,7 +13,7 @@
         /// <summary>
         /// The ancestor features.
         /// </summary>
-        public IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable { get; set; }
+        public ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable { get; set; }
 
         /// <summary>
         /// The location for error reports.

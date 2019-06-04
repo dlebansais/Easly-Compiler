@@ -58,7 +58,7 @@
             IClass EmbeddingClass = node.EmbeddingClass;
             IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;
 
-            IHashtableEx<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
+            ISealableDictionary<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
 
             if (!ObjectType.GetQualifiedPathFinalType(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, ErrorList, out ICompiledFeature FinalFeature, out IDiscrete FinalDiscrete, out ITypeName FinalTypeName, out ICompiledType FinalType, out bool InheritBySideAttribute))
                 return false;
@@ -70,9 +70,9 @@
             if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, ErrorList))
                 return false;
 
-            IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+            IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
             ICommandOverloadType SelectedOverload = null;
-            ListTableEx<IParameter> SelectedParameterList = null;
+            SealableList<IParameter> SelectedParameterList = null;
             IProcedureType CommandFinalType = null;
             bool IsHandled = false;
 

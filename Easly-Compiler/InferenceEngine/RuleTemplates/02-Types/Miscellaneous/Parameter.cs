@@ -50,7 +50,7 @@
         /// </summary>
         /// <param name="parameterTable">The table of parameters.</param>
         /// <param name="name">The name to look for.</param>
-        public static bool TableContainsName(ListTableEx<IParameter> parameterTable, string name)
+        public static bool TableContainsName(SealableList<IParameter> parameterTable, string name)
         {
             return parameterTable.Exists((IParameter item) => item.Name == name);
         }

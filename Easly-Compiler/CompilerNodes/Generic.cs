@@ -34,7 +34,7 @@ namespace CompilerNode
         /// <summary>
         /// Table of resolved conforming types.
         /// </summary>
-        IHashtableEx<ITypeName, ICompiledType> ResolvedConformanceTable { get; }
+        ISealableDictionary<ITypeName, ICompiledType> ResolvedConformanceTable { get; }
     }
 
     /// <summary>
@@ -135,7 +135,7 @@ namespace CompilerNode
                 ResolvedGenericTypeName = new OnceReference<ITypeName>();
                 ResolvedGenericType = new OnceReference<IFormalGenericType>();
                 ResolvedDefaultType = new OnceReference<ICompiledType>();
-                ResolvedConformanceTable = new HashtableEx<ITypeName, ICompiledType>();
+                ResolvedConformanceTable = new SealableDictionary<ITypeName, ICompiledType>();
                 IsHandled = true;
             }
 
@@ -187,7 +187,7 @@ namespace CompilerNode
         /// <summary>
         /// Table of resolved conforming types.
         /// </summary>
-        public IHashtableEx<ITypeName, ICompiledType> ResolvedConformanceTable { get; private set; } = new HashtableEx<ITypeName, ICompiledType>();
+        public ISealableDictionary<ITypeName, ICompiledType> ResolvedConformanceTable { get; private set; } = new SealableDictionary<ITypeName, ICompiledType>();
         #endregion
     }
 }

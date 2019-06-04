@@ -63,7 +63,7 @@
                 AddSourceError(new ErrorDuplicateName(EntityName, ValidText));
                 Success = false;
             }
-            else if (FeatureName.TableContain(EmbeddingClass.LocalExportTable, ValidText, out Key, out IHashtableEx<string, IClass> Export))
+            else if (FeatureName.TableContain(EmbeddingClass.LocalExportTable, ValidText, out Key, out ISealableDictionary<string, IClass> Export))
             {
                 AddSourceError(new ErrorDuplicateName(EntityName, ValidText));
                 Success = false;

@@ -27,12 +27,12 @@
         /// <summary>
         /// Entities local to a scope.
         /// </summary>
-        IHashtableEx<string, IScopeAttributeFeature> LocalScope { get; }
+        ISealableDictionary<string, IScopeAttributeFeature> LocalScope { get; }
 
         /// <summary>
         /// Tags for tag expressions.
         /// </summary>
-        IHashtableEx<string, IExpression> ResolvedTagTable { get; }
+        ISealableDictionary<string, IExpression> ResolvedTagTable { get; }
 
         /// <summary>
         /// Types of results.

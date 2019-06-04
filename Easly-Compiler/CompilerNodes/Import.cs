@@ -23,7 +23,7 @@ namespace CompilerNode
         /// <param name="matchingLibrary">The matching library upon return.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if library names are valid.</returns>
-        bool CheckImportConsistency(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, out ILibrary matchingLibrary, IErrorList errorList);
+        bool CheckImportConsistency(ISealableDictionary<string, ISealableDictionary<string, ILibrary>> libraryTable, out ILibrary matchingLibrary, IErrorList errorList);
 
         /// <summary>
         /// Check all rename clauses separately.
@@ -31,7 +31,7 @@ namespace CompilerNode
         /// <param name="importedClassTable">Table of imported classes.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if all rename clauses are valid.</returns>
-        bool CheckRenames(IHashtableEx<string, IImportedClass> importedClassTable, IErrorList errorList);
+        bool CheckRenames(ISealableDictionary<string, IImportedClass> importedClassTable, IErrorList errorList);
     }
 
     /// <summary>
@@ -160,12 +160,12 @@ namespace CompilerNode
         /// <param name="matchingLibrary">The matching library upon return.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if library names are valid.</returns>
-        public virtual bool CheckImportConsistency(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, out ILibrary matchingLibrary, IErrorList errorList)
+        public virtual bool CheckImportConsistency(ISealableDictionary<string, ISealableDictionary<string, ILibrary>> libraryTable, out ILibrary matchingLibrary, IErrorList errorList)
         {
             IErrorStringValidity StringError;
             string ValidFromIdentifier;
             IIdentifier ImportLibraryIdentifier = (IIdentifier)LibraryIdentifier;
-            IHashtableEx<string, ILibrary> SourceNameTable;
+            ISealableDictionary<string, ILibrary> SourceNameTable;
 
             matchingLibrary = null;
 
@@ -213,14 +213,14 @@ namespace CompilerNode
         /// <param name="importedClassTable">Table of imported classes.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if all rename clauses are valid.</returns>
-        public virtual bool CheckRenames(IHashtableEx<string, IImportedClass> importedClassTable, IErrorList errorList)
+        public virtual bool CheckRenames(ISealableDictionary<string, IImportedClass> importedClassTable, IErrorList errorList)
         {
-            IHashtableEx<string, string> SourceIdentifierTable = new HashtableEx<string, string>(); // string (source) -> string (destination)
-            IHashtableEx<string, string> DestinationIdentifierTable = new HashtableEx<string, string>(); // string (destination) -> string (source)
+            ISealableDictionary<string, string> SourceIdentifierTable = new SealableDictionary<string, string>(); // string (source) -> string (destination)
+            ISealableDictionary<string, string> DestinationIdentifierTable = new SealableDictionary<string, string>(); // string (destination) -> string (source)
 
             bool Success = true;
             foreach (IRename RenameItem in RenameList)
-                Success &= RenameItem.CheckGenericRename(new IHashtableIndex<string>[] { importedClassTable }, SourceIdentifierTable, DestinationIdentifierTable, (string key) => key, (string s) => s, errorList);
+                Success &= RenameItem.CheckGenericRename(new IDictionaryIndex<string>[] { importedClassTable }, SourceIdentifierTable, DestinationIdentifierTable, (string key) => key, (string s) => s, errorList);
 
             Debug.Assert(Success || !errorList.IsEmpty);
             return Success;

@@ -81,12 +81,12 @@
             Debug.Assert(ClassIdentifier.ValidText.IsAssigned);
             string ValidIdentifier = ClassIdentifier.ValidText.Item;
 
-            IHashtableEx<string, IImportedClass> ImportedClassTable = EmbeddingClass.ImportedClassTable;
-            IHashtableEx<string, ICompiledType> LocalGenericTable = EmbeddingClass.LocalGenericTable;
-            IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> LocalExportTable = EmbeddingClass.LocalExportTable;
-            IHashtableEx<IFeatureName, ITypedefType> LocalTypedefTable = EmbeddingClass.LocalTypedefTable;
-            IHashtableEx<IFeatureName, IDiscrete> LocalDiscreteTable = EmbeddingClass.LocalDiscreteTable;
-            IHashtableEx<IFeatureName, IFeatureInstance> LocalFeatureTable = EmbeddingClass.LocalFeatureTable;
+            ISealableDictionary<string, IImportedClass> ImportedClassTable = EmbeddingClass.ImportedClassTable;
+            ISealableDictionary<string, ICompiledType> LocalGenericTable = EmbeddingClass.LocalGenericTable;
+            ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> LocalExportTable = EmbeddingClass.LocalExportTable;
+            ISealableDictionary<IFeatureName, ITypedefType> LocalTypedefTable = EmbeddingClass.LocalTypedefTable;
+            ISealableDictionary<IFeatureName, IDiscrete> LocalDiscreteTable = EmbeddingClass.LocalDiscreteTable;
+            ISealableDictionary<IFeatureName, IFeatureInstance> LocalFeatureTable = EmbeddingClass.LocalFeatureTable;
 
             IsReady &= ImportedClassTable.IsSealed;
             IsReady &= LocalGenericTable.IsSealed;

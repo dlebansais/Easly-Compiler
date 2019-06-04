@@ -24,18 +24,18 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new SealedTableSourceTemplate<IClass, string, ICompiledType>(nameof(IClass.GenericTable)),
-                new SealedTableSourceTemplate<IClass, IFeatureName, IHashtableEx<string, IClass>>(nameof(IClass.ExportTable)),
+                new SealedTableSourceTemplate<IClass, IFeatureName, ISealableDictionary<string, IClass>>(nameof(IClass.ExportTable)),
                 new SealedTableSourceTemplate<IClass, IFeatureName, ITypedefType>(nameof(IClass.TypedefTable)),
                 new SealedTableSourceTemplate<IClass, IFeatureName, IDiscrete>(nameof(IClass.DiscreteTable)),
                 new SealedTableSourceTemplate<IClass, IFeatureName, IExpression>(nameof(IClass.DiscreteWithValueTable)),
                 new SealedTableSourceTemplate<IClass, IFeatureName, IFeatureInstance>(nameof(IClass.FeatureTable)),
-                new SealedTableSourceTemplate<IClass, string, IHashtableEx>(nameof(IClass.LocalNamespaceTable)),
+                new SealedTableSourceTemplate<IClass, string, ISealableDictionary>(nameof(IClass.LocalNamespaceTable)),
                 new SealedTableSourceTemplate<IClass, ITypeName, IClassType>(nameof(IClass.ResolvedImportedClassTable)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new UnsealedTableDestinationTemplate<IClass, string, IHashtableEx>(nameof(IClass.NamespaceTable)),
+                new UnsealedTableDestinationTemplate<IClass, string, ISealableDictionary>(nameof(IClass.NamespaceTable)),
             };
         }
         #endregion

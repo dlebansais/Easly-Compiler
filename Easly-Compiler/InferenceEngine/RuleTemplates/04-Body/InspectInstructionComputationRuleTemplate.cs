@@ -59,7 +59,7 @@
             }
 
             ICompiledType ValueType = ResolvedResult.At(0).ValueType;
-            IHashtableEx<IFeatureName, IDiscrete> EnforcedDiscreteTable = null;
+            ISealableDictionary<IFeatureName, IDiscrete> EnforcedDiscreteTable = null;
 
             if (ValueType is IClassType AsClassType)
             {
@@ -137,7 +137,7 @@
             return !IsIntersecting;
         }
 
-        private bool IsRangeValidDiscrete(IHashtableEx<IFeatureName, IDiscrete> discreteTable, IConstantRange constantRange)
+        private bool IsRangeValidDiscrete(ISealableDictionary<IFeatureName, IDiscrete> discreteTable, IConstantRange constantRange)
         {
             bool IsValidRange = false;
 

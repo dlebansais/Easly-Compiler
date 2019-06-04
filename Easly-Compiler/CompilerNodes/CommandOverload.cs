@@ -34,7 +34,7 @@ namespace CompilerNode
         /// <summary>
         /// List of overload parameters.
         /// </summary>
-        ListTableEx<IParameter> ParameterTable { get; }
+        SealableList<IParameter> ParameterTable { get; }
 
         /// <summary>
         /// The resolved associated type.
@@ -142,10 +142,10 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                LocalScope = new HashtableEx<string, IScopeAttributeFeature>();
+                LocalScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 InnerScopes = new List<IScopeHolder>();
-                FullScope = new HashtableEx<string, IScopeAttributeFeature>();
-                ParameterTable = new ListTableEx<IParameter>();
+                FullScope = new SealableDictionary<string, IScopeAttributeFeature>();
+                ParameterTable = new SealableList<IParameter>();
                 ResolvedAssociatedType = new OnceReference<ICommandOverloadType>();
                 IsHandled = true;
             }
@@ -194,7 +194,7 @@ namespace CompilerNode
         /// <summary>
         /// Entities local to a scope.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> LocalScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> LocalScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
 
         /// <summary>
         /// List of scopes containing the current instance.
@@ -204,7 +204,7 @@ namespace CompilerNode
         /// <summary>
         /// All reachable entities.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> FullScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
         #endregion
 
         #region Compiler
@@ -226,7 +226,7 @@ namespace CompilerNode
         /// <summary>
         /// List of overload parameters.
         /// </summary>
-        public ListTableEx<IParameter> ParameterTable { get; private set; } = new ListTableEx<IParameter>();
+        public SealableList<IParameter> ParameterTable { get; private set; } = new SealableList<IParameter>();
 
         /// <summary>
         /// The resolved associated type.

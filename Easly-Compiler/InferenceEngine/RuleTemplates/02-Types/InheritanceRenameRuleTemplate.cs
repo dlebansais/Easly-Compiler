@@ -28,7 +28,7 @@
                 new OnceReferenceSourceTemplate<IInheritance, IClassType>(nameof(IInheritance.ResolvedClassParentType)),
                 new SealedTableSourceTemplate<IInheritance, string, IImportedClass>(nameof(IClass.ImportedClassTable), TemplateClassStart<IInheritance>.Default),
                 new SealedTableSourceTemplate<IInheritance, IClassType, IObjectType>(nameof(IClass.InheritedClassTypeTable), TemplateClassStart<IInheritance>.Default),
-                new SealedTableSourceTemplate<IInheritance, IFeatureName, IHashtableEx<string, IClass>>(nameof(IInheritance.ResolvedClassParentType) + Dot + nameof(IClassType.ExportTable)),
+                new SealedTableSourceTemplate<IInheritance, IFeatureName, ISealableDictionary<string, IClass>>(nameof(IInheritance.ResolvedClassParentType) + Dot + nameof(IClassType.ExportTable)),
                 new SealedTableSourceTemplate<IInheritance, IFeatureName, ITypedefType>(nameof(IInheritance.ResolvedClassParentType) + Dot + nameof(IClassType.TypedefTable)),
                 new SealedTableSourceTemplate<IInheritance, IFeatureName, IDiscrete>(nameof(IInheritance.ResolvedClassParentType) + Dot + nameof(IClassType.DiscreteTable)),
                 new SealedTableSourceTemplate<IInheritance, IFeatureName, IFeatureInstance>(nameof(IInheritance.ResolvedClassParentType) + Dot + nameof(IClassType.FeatureTable)),
@@ -38,10 +38,10 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IInheritance, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>>>(nameof(IInheritance.ExportTable)),
-                new OnceReferenceDestinationTemplate<IInheritance, IHashtableEx<IFeatureName, ITypedefType>>(nameof(IInheritance.TypedefTable)),
-                new OnceReferenceDestinationTemplate<IInheritance, IHashtableEx<IFeatureName, IDiscrete>>(nameof(IInheritance.DiscreteTable)),
-                new OnceReferenceDestinationTemplate<IInheritance, IHashtableEx<IFeatureName, IFeatureInstance>>(nameof(IInheritance.FeatureTable)),
+                new OnceReferenceDestinationTemplate<IInheritance, ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>>>(nameof(IInheritance.ExportTable)),
+                new OnceReferenceDestinationTemplate<IInheritance, ISealableDictionary<IFeatureName, ITypedefType>>(nameof(IInheritance.TypedefTable)),
+                new OnceReferenceDestinationTemplate<IInheritance, ISealableDictionary<IFeatureName, IDiscrete>>(nameof(IInheritance.DiscreteTable)),
+                new OnceReferenceDestinationTemplate<IInheritance, ISealableDictionary<IFeatureName, IFeatureInstance>>(nameof(IInheritance.FeatureTable)),
                 new OnceReferenceDestinationTemplate<IInheritance, ITypeName>(nameof(IInheritance.ResolvedTypeName)),
                 new OnceReferenceDestinationTemplate<IInheritance, IClassType>(nameof(IInheritance.ResolvedType)),
             };
@@ -64,13 +64,13 @@
             IClassType ParentTypeWithRename = null;
             IClassType ResolvedParent = node.ResolvedClassParentType.Item;
 
-            IHashtableEx<string, string> SourceIdentifierTable = new HashtableEx<string, string>(); // string (source) -> string (destination)
-            IHashtableEx<string, string> DestinationIdentifierTable = new HashtableEx<string, string>(); // string (destination) -> string (source)
-            IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> RenamedExportTable = ResolvedParent.ExportTable.CloneUnsealed();
-            IHashtableEx<IFeatureName, ITypedefType> RenamedTypedefTable = ResolvedParent.TypedefTable.CloneUnsealed();
-            IHashtableEx<IFeatureName, IDiscrete> RenamedDiscreteTable = ResolvedParent.DiscreteTable.CloneUnsealed();
+            ISealableDictionary<string, string> SourceIdentifierTable = new SealableDictionary<string, string>(); // string (source) -> string (destination)
+            ISealableDictionary<string, string> DestinationIdentifierTable = new SealableDictionary<string, string>(); // string (destination) -> string (source)
+            ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> RenamedExportTable = ResolvedParent.ExportTable.CloneUnsealed();
+            ISealableDictionary<IFeatureName, ITypedefType> RenamedTypedefTable = ResolvedParent.TypedefTable.CloneUnsealed();
+            ISealableDictionary<IFeatureName, IDiscrete> RenamedDiscreteTable = ResolvedParent.DiscreteTable.CloneUnsealed();
 
-            IHashtableEx<IFeatureName, IFeatureInstance> RenamedFeatureTable = new HashtableEx<IFeatureName, IFeatureInstance>();
+            ISealableDictionary<IFeatureName, IFeatureInstance> RenamedFeatureTable = new SealableDictionary<IFeatureName, IFeatureInstance>();
             foreach (KeyValuePair<IFeatureName, IFeatureInstance> Entry in ResolvedParent.FeatureTable)
             {
                 IFeatureName AncestorFeatureName = Entry.Key;
@@ -80,7 +80,7 @@
             }
 
             foreach (IRename RenameItem in node.RenameList)
-                Success &= RenameItem.CheckGenericRename(new IHashtableIndex<IFeatureName>[] { RenamedExportTable, RenamedTypedefTable, RenamedDiscreteTable, RenamedFeatureTable }, SourceIdentifierTable, DestinationIdentifierTable, (IFeatureName item) => item.Name, (string name) => new FeatureName(name), ErrorList);
+                Success &= RenameItem.CheckGenericRename(new IDictionaryIndex<IFeatureName>[] { RenamedExportTable, RenamedTypedefTable, RenamedDiscreteTable, RenamedFeatureTable }, SourceIdentifierTable, DestinationIdentifierTable, (IFeatureName item) => item.Name, (string name) => new FeatureName(name), ErrorList);
 
             if (Success)
             {
@@ -107,16 +107,16 @@
             return Success;
         }
 
-        private bool ResolveInstancingAfterRename(IInheritance node, IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IHashtableEx<IFeatureName, ITypedefType> typedefTable, IHashtableEx<IFeatureName, IDiscrete> discreteTable, IHashtableEx<IFeatureName, IFeatureInstance> featureTable)
+        private bool ResolveInstancingAfterRename(IInheritance node, ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> exportTable, ISealableDictionary<IFeatureName, ITypedefType> typedefTable, ISealableDictionary<IFeatureName, IDiscrete> discreteTable, ISealableDictionary<IFeatureName, IFeatureInstance> featureTable)
         {
             IClass EmbeddingClass = node.EmbeddingClass;
-            IHashtableEx<string, IImportedClass> ImportedClassTable = EmbeddingClass.ImportedClassTable;
+            ISealableDictionary<string, IImportedClass> ImportedClassTable = EmbeddingClass.ImportedClassTable;
 
             bool Success = true;
 
-            Success &= ResolveIdentifierList(node.ForgetList, out IHashtableEx<string, IIdentifier> ForgetTable);
-            Success &= ResolveIdentifierList(node.KeepList, out IHashtableEx<string, IIdentifier> KeepTable);
-            Success &= ResolveIdentifierList(node.DiscontinueList, out IHashtableEx<string, IIdentifier> DiscontinueTable);
+            Success &= ResolveIdentifierList(node.ForgetList, out ISealableDictionary<string, IIdentifier> ForgetTable);
+            Success &= ResolveIdentifierList(node.KeepList, out ISealableDictionary<string, IIdentifier> KeepTable);
+            Success &= ResolveIdentifierList(node.DiscontinueList, out ISealableDictionary<string, IIdentifier> DiscontinueTable);
 
             if (!Success)
                 return false;
@@ -148,9 +148,9 @@
             return Success;
         }
 
-        private bool ResolveIdentifierList(IList<IIdentifier> identifierList, out IHashtableEx<string, IIdentifier> resultTable)
+        private bool ResolveIdentifierList(IList<IIdentifier> identifierList, out ISealableDictionary<string, IIdentifier> resultTable)
         {
-            resultTable = new HashtableEx<string, IIdentifier>();
+            resultTable = new SealableDictionary<string, IIdentifier>();
 
             foreach (IIdentifier IdentifierItem in identifierList)
             {
@@ -168,7 +168,7 @@
             return true;
         }
 
-        private bool RemoveForgottenIdentifiers(IHashtableEx<IFeatureName, IHashtableEx<string, IClass>> exportTable, IHashtableEx<IFeatureName, ITypedefType> typedefTable, IHashtableEx<IFeatureName, IDiscrete> discreteTable, IHashtableEx<IFeatureName, IFeatureInstance> featureTable, IHashtableEx<string, IIdentifier> forgetTable)
+        private bool RemoveForgottenIdentifiers(ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> exportTable, ISealableDictionary<IFeatureName, ITypedefType> typedefTable, ISealableDictionary<IFeatureName, IDiscrete> discreteTable, ISealableDictionary<IFeatureName, IFeatureInstance> featureTable, ISealableDictionary<string, IIdentifier> forgetTable)
         {
             bool Result = true;
 
@@ -219,7 +219,7 @@
             }
         }
 
-        private bool RemoveForgottenIndexer(IHashtableEx<IFeatureName, IFeatureInstance> featureTable, IInheritance inheritanceItem)
+        private bool RemoveForgottenIndexer(ISealableDictionary<IFeatureName, IFeatureInstance> featureTable, IInheritance inheritanceItem)
         {
             if (inheritanceItem.ForgetIndexer)
             {
@@ -244,7 +244,7 @@
             return true;
         }
 
-        private bool CheckIdentifierContext(IHashtableIndex<IFeatureName> testTable, IHashtableEx<string, IIdentifier> identifierTable)
+        private bool CheckIdentifierContext(IDictionaryIndex<IFeatureName> testTable, ISealableDictionary<string, IIdentifier> identifierTable)
         {
             foreach (KeyValuePair<string, IIdentifier> IdentifierEntry in identifierTable)
             {
@@ -262,7 +262,7 @@
             return true;
         }
 
-        private bool ResolveFeatureInstancingList(IHashtableEx<IFeatureName, IFeatureInstance> featureTable, IHashtableEx<string, IIdentifier> identifierTable, Action<IFeatureInstance> handler)
+        private bool ResolveFeatureInstancingList(ISealableDictionary<IFeatureName, IFeatureInstance> featureTable, ISealableDictionary<string, IIdentifier> identifierTable, Action<IFeatureInstance> handler)
         {
             foreach (KeyValuePair<string, IIdentifier> IdentifierEntry in identifierTable)
             {

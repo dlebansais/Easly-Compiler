@@ -48,10 +48,10 @@
             data = null;
             bool Success = true;
 
-            Success &= PrecursorExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IResultException ResolvedException, out ListTableEx<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out IFeatureCall FeatureCall);
+            Success &= PrecursorExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IResultException ResolvedException, out SealableList<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out IFeatureCall FeatureCall);
 
             if (Success)
-                data = new Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, IFeatureCall>(ResolvedResult, ResolvedException, ConstantSourceList, ExpressionConstant, FeatureCall);
+                data = new Tuple<IResultType, IResultException, SealableList<IExpression>, ILanguageConstant, IFeatureCall>(ResolvedResult, ResolvedException, ConstantSourceList, ExpressionConstant, FeatureCall);
 
             return Success;
         }
@@ -63,11 +63,11 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IPrecursorExpression node, object data)
         {
-            IResultType ResolvedResult = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, IFeatureCall>)data).Item1;
-            IResultException ResolvedException = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, IFeatureCall>)data).Item2;
-            ListTableEx<IExpression> ConstantSourceList = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, IFeatureCall>)data).Item3;
-            ILanguageConstant ExpressionConstant = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, IFeatureCall>)data).Item4;
-            IFeatureCall FeatureCall = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, IFeatureCall>)data).Item5;
+            IResultType ResolvedResult = ((Tuple<IResultType, IResultException, SealableList<IExpression>, ILanguageConstant, IFeatureCall>)data).Item1;
+            IResultException ResolvedException = ((Tuple<IResultType, IResultException, SealableList<IExpression>, ILanguageConstant, IFeatureCall>)data).Item2;
+            SealableList<IExpression> ConstantSourceList = ((Tuple<IResultType, IResultException, SealableList<IExpression>, ILanguageConstant, IFeatureCall>)data).Item3;
+            ILanguageConstant ExpressionConstant = ((Tuple<IResultType, IResultException, SealableList<IExpression>, ILanguageConstant, IFeatureCall>)data).Item4;
+            IFeatureCall FeatureCall = ((Tuple<IResultType, IResultException, SealableList<IExpression>, ILanguageConstant, IFeatureCall>)data).Item5;
 
             node.ResolvedException.Item = ResolvedException;
             node.FeatureCall.Item = FeatureCall;

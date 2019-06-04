@@ -79,7 +79,7 @@
                 if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, ErrorList))
                     return false;
 
-                IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+                IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
                 ICompiledType FinalType = AsCreationFeature.ResolvedFeatureType.Item;
                 IProcedureType AsProcedureType = FinalType as IProcedureType;
                 Debug.Assert(AsProcedureType != null);

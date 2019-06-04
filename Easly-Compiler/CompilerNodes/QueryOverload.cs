@@ -44,17 +44,17 @@
         /// <summary>
         /// List of resolved parameters.
         /// </summary>
-        ListTableEx<IParameter> ParameterTable { get; }
+        SealableList<IParameter> ParameterTable { get; }
 
         /// <summary>
         /// List of resolved parameters.
         /// </summary>
-        ListTableEx<IParameter> ResultTable { get; }
+        SealableList<IParameter> ResultTable { get; }
 
         /// <summary>
         /// List of resolved conformant parameter types.
         /// </summary>
-        ListTableEx<ICompiledType> ConformantResultTable { get; }
+        SealableList<ICompiledType> ConformantResultTable { get; }
 
         /// <summary>
         /// The resolved associated type.
@@ -64,7 +64,7 @@
         /// <summary>
         /// List of resolved conformant parameter types, both this overload and the associated type.
         /// </summary>
-        ListTableEx<ICompiledType> CompleteConformantResultTable { get; }
+        SealableList<ICompiledType> CompleteConformantResultTable { get; }
 
         /// <summary>
         /// The resolved body.
@@ -185,14 +185,14 @@
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                LocalScope = new HashtableEx<string, IScopeAttributeFeature>();
+                LocalScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 InnerScopes = new List<IScopeHolder>();
-                FullScope = new HashtableEx<string, IScopeAttributeFeature>();
-                ParameterTable = new ListTableEx<IParameter>();
-                ResultTable = new ListTableEx<IParameter>();
-                ConformantResultTable = new ListTableEx<ICompiledType>();
+                FullScope = new SealableDictionary<string, IScopeAttributeFeature>();
+                ParameterTable = new SealableList<IParameter>();
+                ResultTable = new SealableList<IParameter>();
+                ConformantResultTable = new SealableList<ICompiledType>();
                 ResolvedAssociatedType = new OnceReference<IQueryOverloadType>();
-                CompleteConformantResultTable = new ListTableEx<ICompiledType>();
+                CompleteConformantResultTable = new SealableList<ICompiledType>();
                 ResolvedResultTypeName = new OnceReference<ITypeName>();
                 ResolvedResultType = new OnceReference<ICompiledType>();
                 IsHandled = true;
@@ -246,7 +246,7 @@
         /// <summary>
         /// Entities local to a scope.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> LocalScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> LocalScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
 
         /// <summary>
         /// List of scopes containing the current instance.
@@ -256,7 +256,7 @@
         /// <summary>
         /// All reachable entities.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> FullScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
         #endregion
 
         #region Compiler
@@ -278,17 +278,17 @@
         /// <summary>
         /// List of resolved parameters.
         /// </summary>
-        public ListTableEx<IParameter> ParameterTable { get; private set; } = new ListTableEx<IParameter>();
+        public SealableList<IParameter> ParameterTable { get; private set; } = new SealableList<IParameter>();
 
         /// <summary>
         /// List of resolved parameters.
         /// </summary>
-        public ListTableEx<IParameter> ResultTable { get; private set; } = new ListTableEx<IParameter>();
+        public SealableList<IParameter> ResultTable { get; private set; } = new SealableList<IParameter>();
 
         /// <summary>
         /// List of resolved conformant parameter types.
         /// </summary>
-        public ListTableEx<ICompiledType> ConformantResultTable { get; private set; } = new ListTableEx<ICompiledType>();
+        public SealableList<ICompiledType> ConformantResultTable { get; private set; } = new SealableList<ICompiledType>();
 
         /// <summary>
         /// The resolved associated type.
@@ -298,7 +298,7 @@
         /// <summary>
         /// List of resolved conformant parameter types, both this overload and the associated type.
         /// </summary>
-        public ListTableEx<ICompiledType> CompleteConformantResultTable { get; private set; } = new ListTableEx<ICompiledType>();
+        public SealableList<ICompiledType> CompleteConformantResultTable { get; private set; } = new SealableList<ICompiledType>();
 
         /// <summary>
         /// The name of the resolved result type.

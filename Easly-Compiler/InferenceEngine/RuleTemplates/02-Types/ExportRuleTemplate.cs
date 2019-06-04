@@ -58,7 +58,7 @@
                 AddSourceError(new ErrorDuplicateName(EntityName, ValidText));
                 Success = false;
             }
-            else if (FeatureName.TableContain(EmbeddingClass.LocalExportTable, ValidText, out Key, out IHashtableEx<string, IClass> ExportTable))
+            else if (FeatureName.TableContain(EmbeddingClass.LocalExportTable, ValidText, out Key, out ISealableDictionary<string, IClass> ExportTable))
             {
                 AddSourceError(new ErrorDuplicateName(EntityName, ValidText));
                 Success = false;
@@ -99,7 +99,7 @@
             string ValidText = EntityName.ValidText.Item;
 
             IFeatureName ExportEntityName = new FeatureName(ValidText);
-            IHashtableEx<string, IClass> EmptyClassTable = new HashtableEx<string, IClass>();
+            ISealableDictionary<string, IClass> EmptyClassTable = new SealableDictionary<string, IClass>();
 
             Debug.Assert(!EmbeddingClass.LocalExportTable.IsSealed);
             EmbeddingClass.LocalExportTable.Add(ExportEntityName, EmptyClassTable);

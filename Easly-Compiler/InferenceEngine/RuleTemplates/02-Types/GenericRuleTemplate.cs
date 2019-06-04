@@ -52,8 +52,8 @@
             Debug.Assert(EntityName.ValidText.IsAssigned);
             string ValidText = EntityName.ValidText.Item;
 
-            IHashtableEx<string, IImportedClass> ImportedClassTable = EmbeddingClass.ImportedClassTable;
-            IHashtableEx<string, ICompiledType> LocalGenericTable = EmbeddingClass.LocalGenericTable;
+            ISealableDictionary<string, IImportedClass> ImportedClassTable = EmbeddingClass.ImportedClassTable;
+            ISealableDictionary<string, ICompiledType> LocalGenericTable = EmbeddingClass.LocalGenericTable;
 
             if (ValidText.ToLower() == LanguageClasses.Any.Name.ToLower())
             {
@@ -103,7 +103,7 @@
             Debug.Assert(EntityName.ValidText.IsAssigned);
             string ValidText = EntityName.ValidText.Item;
 
-            IHashtableEx<string, ICompiledType> LocalGenericTable = EmbeddingClass.LocalGenericTable;
+            ISealableDictionary<string, ICompiledType> LocalGenericTable = EmbeddingClass.LocalGenericTable;
 
             TypeName ResolvedTypeName = new TypeName(ValidText);
             IFormalGenericType GenericFormalType = new FormalGenericType(node, ResolvedTypeName);

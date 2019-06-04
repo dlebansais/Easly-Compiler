@@ -59,7 +59,7 @@
             data = null;
             bool Success = true;
 
-            IHashtableEx<string, IExpression> ContractTable = new HashtableEx<string, IExpression>();
+            ISealableDictionary<string, IExpression> ContractTable = new SealableDictionary<string, IExpression>();
 
             Success &= CheckTagConflict(ContractTable, node.RequireList);
             Success &= CheckTagConflict(ContractTable, node.EnsureList);
@@ -70,7 +70,7 @@
             return Success;
         }
 
-        private bool CheckTagConflict(IHashtableEx<string, IExpression> contractTable, IList<IAssertion> assertionList)
+        private bool CheckTagConflict(ISealableDictionary<string, IExpression> contractTable, IList<IAssertion> assertionList)
         {
             bool Success = true;
 
@@ -100,7 +100,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(TBody node, object data)
         {
-            IHashtableEx<string, IExpression> ContractTable = (IHashtableEx<string, IExpression>)data;
+            ISealableDictionary<string, IExpression> ContractTable = (ISealableDictionary<string, IExpression>)data;
 
             node.ResolvedTagTable.Merge(ContractTable);
             node.ResolvedTagTable.Seal();

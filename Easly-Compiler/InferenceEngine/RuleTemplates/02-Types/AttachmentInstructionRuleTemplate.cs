@@ -48,10 +48,10 @@
 
             IClass EmbeddingClass = node.EmbeddingClass;
 
-            IList<IHashtableEx<string, IScopeAttributeFeature>> CheckedScopeList = new List<IHashtableEx<string, IScopeAttributeFeature>>();
+            IList<ISealableDictionary<string, IScopeAttributeFeature>> CheckedScopeList = new List<ISealableDictionary<string, IScopeAttributeFeature>>();
 
             for (int i = 0; i < node.AttachmentList.Count; i++)
-                CheckedScopeList.Add(new HashtableEx<string, IScopeAttributeFeature>());
+                CheckedScopeList.Add(new SealableDictionary<string, IScopeAttributeFeature>());
 
             for (int Index = 0; Index < node.EntityNameList.Count; Index++)
             {
@@ -70,7 +70,7 @@
                 for (int i = 0; i < node.AttachmentList.Count; i++)
                 {
                     Attachment AttachmentItem = (Attachment)node.AttachmentList[i];
-                    IHashtableEx<string, IScopeAttributeFeature> CheckedScope = CheckedScopeList[i];
+                    ISealableDictionary<string, IScopeAttributeFeature> CheckedScope = CheckedScopeList[i];
 
                     Debug.Assert(Index < AttachmentItem.AttachTypeList.Count);
                     IObjectType AttachedType = AttachmentItem.AttachTypeList[Index];
@@ -87,7 +87,7 @@
             for (int i = 0; i < node.AttachmentList.Count; i++)
             {
                 IAttachment AttachmentItem = (Attachment)node.AttachmentList[i];
-                IHashtableEx<string, IScopeAttributeFeature> CheckedScope = CheckedScopeList[i];
+                ISealableDictionary<string, IScopeAttributeFeature> CheckedScope = CheckedScopeList[i];
                 ScopeHolder.RecursiveCheck(CheckedScope, AttachmentItem.InnerScopes, ConflictList);
             }
 
@@ -116,7 +116,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IAttachmentInstruction node, object data)
         {
-            IList<IHashtableEx<string, IScopeAttributeFeature>> CheckedScopeList = (IList<IHashtableEx<string, IScopeAttributeFeature>>)data;
+            IList<ISealableDictionary<string, IScopeAttributeFeature>> CheckedScopeList = (IList<ISealableDictionary<string, IScopeAttributeFeature>>)data;
             Debug.Assert(CheckedScopeList.Count == node.AttachmentList.Count);
 
             node.LocalScope.Seal();
@@ -124,7 +124,7 @@
             for (int i = 0; i < node.AttachmentList.Count; i++)
             {
                 IAttachment AttachmentItem = node.AttachmentList[i];
-                IHashtableEx<string, IScopeAttributeFeature> CheckedScope = CheckedScopeList[i];
+                ISealableDictionary<string, IScopeAttributeFeature> CheckedScope = CheckedScopeList[i];
                 AttachmentItem.FullScope.Merge(CheckedScope);
                 ScopeHolder.RecursiveAdd(CheckedScope, AttachmentItem.InnerScopes);
             }

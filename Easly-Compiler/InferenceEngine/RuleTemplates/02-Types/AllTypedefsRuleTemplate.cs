@@ -24,7 +24,7 @@
             {
                 new OnceReferenceSourceTemplate<IClass, IClassType>(nameof(IClass.ResolvedClassType)),
                 new SealedTableSourceTemplate<IClass, IFeatureName, ITypedefType>(nameof(IClass.LocalTypedefTable)),
-                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, IHashtableEx<IFeatureName, ITypedefType>>(nameof(IClass.InheritanceList), nameof(IInheritance.TypedefTable)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, ISealableDictionary<IFeatureName, ITypedefType>>(nameof(IClass.InheritanceList), nameof(IInheritance.TypedefTable)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
@@ -48,12 +48,12 @@
             data = null;
 
             Debug.Assert(node.LocalTypedefTable.IsSealed);
-            IHashtableEx<IFeatureName, ITypedefType> MergedTypedefTable = node.LocalTypedefTable.CloneUnsealed();
+            ISealableDictionary<IFeatureName, ITypedefType> MergedTypedefTable = node.LocalTypedefTable.CloneUnsealed();
 
             foreach (IInheritance InheritanceItem in node.InheritanceList)
             {
                 IClassType InheritanceParent = InheritanceItem.ResolvedType.Item;
-                IHashtableEx<IFeatureName, ITypedefType> InheritedTypedefTable = InheritanceParent.TypedefTable;
+                ISealableDictionary<IFeatureName, ITypedefType> InheritedTypedefTable = InheritanceParent.TypedefTable;
 
                 foreach (KeyValuePair<IFeatureName, ITypedefType> InstanceEntry in InheritedTypedefTable)
                 {
@@ -101,7 +101,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IClass node, object data)
         {
-            IHashtableEx<IFeatureName, ITypedefType> MergedTypedefTable = (IHashtableEx<IFeatureName, ITypedefType>)data;
+            ISealableDictionary<IFeatureName, ITypedefType> MergedTypedefTable = (ISealableDictionary<IFeatureName, ITypedefType>)data;
 
             Debug.Assert(node.ResolvedClassType.IsAssigned);
             IClassType ThisClassType = node.ResolvedClassType.Item;

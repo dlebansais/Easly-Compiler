@@ -34,7 +34,7 @@ namespace CompilerNode
         /// <summary>
         /// Table of imported classes.
         /// </summary>
-        IHashtableEx<string, IImportedClass> ImportedClassTable { get; }
+        ISealableDictionary<string, IImportedClass> ImportedClassTable { get; }
 
         /// <summary>
         /// List of libraries imported by this one.
@@ -53,7 +53,7 @@ namespace CompilerNode
         /// <param name="validatedLibraryList">List of classes with valid names, updated upon return.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if library names are valid.</returns>
-        bool CheckLibraryNames(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IList<ILibrary> validatedLibraryList, IErrorList errorList);
+        bool CheckLibraryNames(ISealableDictionary<string, ISealableDictionary<string, ILibrary>> libraryTable, IList<ILibrary> validatedLibraryList, IErrorList errorList);
 
         /// <summary>
         /// Initializes the list of classes belonging to the library.
@@ -61,7 +61,7 @@ namespace CompilerNode
         /// <param name="classTable">Valid class names.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if initialization succeeded.</returns>
-        bool InitLibraryTables(IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IErrorList errorList);
+        bool InitLibraryTables(ISealableDictionary<string, ISealableDictionary<string, IClass>> classTable, IErrorList errorList);
 
         /// <summary>
         /// Resolves reference from libraries to classes and other libraries.
@@ -71,7 +71,7 @@ namespace CompilerNode
         /// <param name="importChanged">Indicates that the import specifier has changed.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if the method succeeded.</returns>
-        bool Resolve(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IList<ILibrary> resolvedLibraryList, ref bool importChanged, IErrorList errorList);
+        bool Resolve(ISealableDictionary<string, ISealableDictionary<string, ILibrary>> libraryTable, IList<ILibrary> resolvedLibraryList, ref bool importChanged, IErrorList errorList);
     }
 
     /// <summary>
@@ -132,7 +132,7 @@ namespace CompilerNode
         /// <summary>
         /// Table of imported classes.
         /// </summary>
-        public IHashtableEx<string, IImportedClass> ImportedClassTable { get; } = new HashtableEx<string, IImportedClass>();
+        public ISealableDictionary<string, IImportedClass> ImportedClassTable { get; } = new SealableDictionary<string, IImportedClass>();
 
         /// <summary>
         /// List of libraries imported by this one.
@@ -151,7 +151,7 @@ namespace CompilerNode
         /// <param name="validatedLibraryList">List of classes with valid names, updated upon return.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if library names are valid.</returns>
-        public virtual bool CheckLibraryNames(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IList<ILibrary> validatedLibraryList, IErrorList errorList)
+        public virtual bool CheckLibraryNames(ISealableDictionary<string, ISealableDictionary<string, ILibrary>> libraryTable, IList<ILibrary> validatedLibraryList, IErrorList errorList)
         {
             IErrorStringValidity StringError;
             IName LibraryEntityName = (IName)EntityName;
@@ -186,7 +186,7 @@ namespace CompilerNode
 
             if (libraryTable.ContainsKey(ValidLibraryName))
             {
-                IHashtableEx<string, ILibrary> SourceNameTable = libraryTable[ValidLibraryName];
+                ISealableDictionary<string, ILibrary> SourceNameTable = libraryTable[ValidLibraryName];
 
                 if (SourceNameTable.ContainsKey(ValidSourceName))
                 {
@@ -202,7 +202,7 @@ namespace CompilerNode
             }
             else
             {
-                IHashtableEx<string, ILibrary> SourceNameTable = new HashtableEx<string, ILibrary>
+                ISealableDictionary<string, ILibrary> SourceNameTable = new SealableDictionary<string, ILibrary>
                 {
                     { ValidSourceName, this }
                 };
@@ -219,7 +219,7 @@ namespace CompilerNode
         /// <param name="classTable">Valid class names.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if initialization succeeded.</returns>
-        public virtual bool InitLibraryTables(IHashtableEx<string, IHashtableEx<string, IClass>> classTable, IErrorList errorList)
+        public virtual bool InitLibraryTables(ISealableDictionary<string, ISealableDictionary<string, IClass>> classTable, IErrorList errorList)
         {
             bool Success = true;
 
@@ -247,7 +247,7 @@ namespace CompilerNode
                         continue;
                     }
 
-                    IHashtableEx<string, IClass> SourceNameTable = classTable[ValidClassIdentifier];
+                    ISealableDictionary<string, IClass> SourceNameTable = classTable[ValidClassIdentifier];
 
                     // And it's from the same source.
                     if (!SourceNameTable.ContainsKey(ValidSourceName))
@@ -287,7 +287,7 @@ namespace CompilerNode
         /// <param name="importChanged">Indicates that the import specifier has changed.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if the method succeeded.</returns>
-        public virtual bool Resolve(IHashtableEx<string, IHashtableEx<string, ILibrary>> libraryTable, IList<ILibrary> resolvedLibraryList, ref bool importChanged, IErrorList errorList)
+        public virtual bool Resolve(ISealableDictionary<string, ISealableDictionary<string, ILibrary>> libraryTable, IList<ILibrary> resolvedLibraryList, ref bool importChanged, IErrorList errorList)
         {
             List<IImport> ToRemove = new List<IImport>();
             bool Success = true;
@@ -340,10 +340,10 @@ namespace CompilerNode
         /// <param name="matchingLibrary">The library referenced by <paramref name="importItem"/>.</param>
         /// <param name="errorList">List of errors found.</param>
         /// <returns>True if the merge succeeded.</returns>
-        public static bool MergeImports(IHashtableEx<string, IImportedClass> importedClassTable, IImport importItem, ILibrary matchingLibrary, IErrorList errorList)
+        public static bool MergeImports(ISealableDictionary<string, IImportedClass> importedClassTable, IImport importItem, ILibrary matchingLibrary, IErrorList errorList)
         {
             // Clone imported class objects from the imported library.
-            IHashtableEx<string, IImportedClass> MergedClassTable = new HashtableEx<string, IImportedClass>();
+            ISealableDictionary<string, IImportedClass> MergedClassTable = new SealableDictionary<string, IImportedClass>();
             foreach (KeyValuePair<string, IImportedClass> Entry in matchingLibrary.ImportedClassTable)
             {
                 IImportedClass Clone = new ImportedClass(Entry.Value);

@@ -35,7 +35,7 @@ namespace CompilerNode
         /// <summary>
         /// Table of resolved parameters.
         /// </summary>
-        ListTableEx<IParameter> ParameterTable { get; }
+        SealableList<IParameter> ParameterTable { get; }
     }
 
     /// <summary>
@@ -148,16 +148,16 @@ namespace CompilerNode
                 ResolvedFeature = new OnceReference<ICompiledFeature>();
                 ResolvedEntityTypeName = new OnceReference<ITypeName>();
                 ResolvedEntityType = new OnceReference<ICompiledType>();
-                ParameterTable = new ListTableEx<IParameter>();
-                LocalScope = new HashtableEx<string, IScopeAttributeFeature>();
-                LocalGetScope = new HashtableEx<string, IScopeAttributeFeature>();
-                LocalSetScope = new HashtableEx<string, IScopeAttributeFeature>();
+                ParameterTable = new SealableList<IParameter>();
+                LocalScope = new SealableDictionary<string, IScopeAttributeFeature>();
+                LocalGetScope = new SealableDictionary<string, IScopeAttributeFeature>();
+                LocalSetScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 InnerScopes = new List<IScopeHolder>();
                 InnerGetScopes = new List<IScopeHolder>();
                 InnerSetScopes = new List<IScopeHolder>();
-                FullScope = new HashtableEx<string, IScopeAttributeFeature>();
-                FullGetScope = new HashtableEx<string, IScopeAttributeFeature>();
-                FullSetScope = new HashtableEx<string, IScopeAttributeFeature>();
+                FullScope = new SealableDictionary<string, IScopeAttributeFeature>();
+                FullGetScope = new SealableDictionary<string, IScopeAttributeFeature>();
+                FullSetScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
@@ -264,17 +264,17 @@ namespace CompilerNode
         /// <summary>
         /// Entities local to a scope.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> LocalScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> LocalScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
 
         /// <summary>
         /// Entities local to a scope, getter only.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> LocalGetScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> LocalGetScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
 
         /// <summary>
         /// Entities local to a scope, setter only.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> LocalSetScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> LocalSetScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
 
         /// <summary>
         /// List of scopes containing the current instance.
@@ -294,17 +294,17 @@ namespace CompilerNode
         /// <summary>
         /// All reachable entities.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> FullScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
 
         /// <summary>
         /// All reachable entities, getter only.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> FullGetScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> FullGetScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
 
         /// <summary>
         /// All reachable entities, setter only.
         /// </summary>
-        public IHashtableEx<string, IScopeAttributeFeature> FullSetScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        public ISealableDictionary<string, IScopeAttributeFeature> FullSetScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
         #endregion
 
         #region Compiler
@@ -321,7 +321,7 @@ namespace CompilerNode
         /// <summary>
         /// Table of resolved parameters.
         /// </summary>
-        public ListTableEx<IParameter> ParameterTable { get; private set; } = new ListTableEx<IParameter>();
+        public SealableList<IParameter> ParameterTable { get; private set; } = new SealableList<IParameter>();
 
         /// <summary>
         /// The name of the resolved result type.

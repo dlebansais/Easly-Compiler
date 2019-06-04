@@ -24,7 +24,7 @@ namespace CompilerNode
         /// <summary>
         /// The list of sources for a constant, if any.
         /// </summary>
-        ListTableEx<IExpression> ConstantSourceList { get; }
+        SealableList<IExpression> ConstantSourceList { get; }
 
         /// <summary>
         /// The constant expression, if assigned.
@@ -218,7 +218,7 @@ namespace CompilerNode
 
         private static bool ValidateAssignmentStyle(IList<IArgument> argumentList, List<IExpressionType> mergedArgumentList, IErrorList errorList)
         {
-            IHashtableEx<string, IArgument> DuplicateNameTable = new HashtableEx<string, IArgument>();
+            ISealableDictionary<string, IArgument> DuplicateNameTable = new SealableDictionary<string, IArgument>();
 
             for (int i = 0; i < argumentList.Count; i++)
             {
@@ -261,7 +261,7 @@ namespace CompilerNode
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="source">The source to use for errors.</param>
         /// <param name="selectedIndex">The selected index in the list of overloads upon return.</param>
-        public static bool ArgumentsConformToParameters(IList<ListTableEx<IParameter>> parameterTableList, IReadOnlyList<IExpressionType> arguments, TypeArgumentStyles argumentStyle, IErrorList errorList, ISource source, out int selectedIndex)
+        public static bool ArgumentsConformToParameters(IList<SealableList<IParameter>> parameterTableList, IReadOnlyList<IExpressionType> arguments, TypeArgumentStyles argumentStyle, IErrorList errorList, ISource source, out int selectedIndex)
         {
             selectedIndex = -1;
             bool Result = false;
@@ -291,21 +291,21 @@ namespace CompilerNode
             return Result;
         }
 
-        private static bool NoneArgumentsConformToParameters(IList<ListTableEx<IParameter>> parameterTableList, IReadOnlyList<IExpressionType> arguments, IErrorList errorList, ISource source, out int selectedIndex)
+        private static bool NoneArgumentsConformToParameters(IList<SealableList<IParameter>> parameterTableList, IReadOnlyList<IExpressionType> arguments, IErrorList errorList, ISource source, out int selectedIndex)
         {
             Debug.Assert(arguments.Count <= 1);
 
             return PositionalArgumentsConformToParameters(parameterTableList, arguments, errorList, source, out selectedIndex);
         }
 
-        private static bool PositionalArgumentsConformToParameters(IList<ListTableEx<IParameter>> parameterTableList, IReadOnlyList<IExpressionType> arguments, IErrorList errorList, ISource source, out int selectedIndex)
+        private static bool PositionalArgumentsConformToParameters(IList<SealableList<IParameter>> parameterTableList, IReadOnlyList<IExpressionType> arguments, IErrorList errorList, ISource source, out int selectedIndex)
         {
-            OnceReference<ListTableEx<IParameter>> SelectedOverload = new OnceReference<ListTableEx<IParameter>>();
+            OnceReference<SealableList<IParameter>> SelectedOverload = new OnceReference<SealableList<IParameter>>();
             selectedIndex = -1;
 
             for (int i = 0; i < parameterTableList.Count; i++)
             {
-                ListTableEx<IParameter> OverloadParameterList = parameterTableList[i];
+                SealableList<IParameter> OverloadParameterList = parameterTableList[i];
 
                 int j;
                 bool IsMatching = true;
@@ -364,14 +364,14 @@ namespace CompilerNode
             return true;
         }
 
-        private static bool AssignmentArgumentsConformToParameters(IList<ListTableEx<IParameter>> parameterTableList, IReadOnlyList<IExpressionType> arguments, IErrorList errorList, ISource source, out int selectedIndex)
+        private static bool AssignmentArgumentsConformToParameters(IList<SealableList<IParameter>> parameterTableList, IReadOnlyList<IExpressionType> arguments, IErrorList errorList, ISource source, out int selectedIndex)
         {
-            OnceReference<ListTableEx<IParameter>> SelectedOverload = new OnceReference<ListTableEx<IParameter>>();
+            OnceReference<SealableList<IParameter>> SelectedOverload = new OnceReference<SealableList<IParameter>>();
             selectedIndex = -1;
 
             for (int i = 0; i < parameterTableList.Count; i++)
             {
-                ListTableEx<IParameter> OverloadParameterList = parameterTableList[i];
+                SealableList<IParameter> OverloadParameterList = parameterTableList[i];
                 List<IParameter> UnassignedParameters = new List<IParameter>(OverloadParameterList);
 
                 bool IsMatching = true;
@@ -432,7 +432,7 @@ namespace CompilerNode
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="source">The source to use when reporting errors.</param>
         /// <param name="featureCall">Details of the feature call.</param>
-        public static bool CheckAssignmentConformance(IList<ListTableEx<IParameter>> parameterTableList, IList<IArgument> argumentList, IExpression sourceExpression, ICompiledType destinationType, IErrorList errorList, ISource source, out IFeatureCall featureCall)
+        public static bool CheckAssignmentConformance(IList<SealableList<IParameter>> parameterTableList, IList<IArgument> argumentList, IExpression sourceExpression, ICompiledType destinationType, IErrorList errorList, ISource source, out IFeatureCall featureCall)
         {
             featureCall = null;
             IResultType SourceResult = sourceExpression.ResolvedResult.Item;
@@ -450,7 +450,7 @@ namespace CompilerNode
                 return false;
             }
 
-            ListTableEx<IParameter> SelectedParameterList = parameterTableList[SelectedIndex];
+            SealableList<IParameter> SelectedParameterList = parameterTableList[SelectedIndex];
             ICompiledType SourceType = SourceResult.At(0).ValueType;
 
             if (!ObjectType.TypeConformToBase(SourceType, destinationType, errorList, sourceExpression))

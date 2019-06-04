@@ -55,7 +55,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IClass node, object data)
         {
-            IHashtableEx<ITypeName, ICompiledType> InheritanceTable = node.InheritanceTable;
+            ISealableDictionary<ITypeName, ICompiledType> InheritanceTable = node.InheritanceTable;
 
             InheritanceTable.Seal();
             node.LocalNamespaceTable.Add("Inheritance", InheritanceTable);

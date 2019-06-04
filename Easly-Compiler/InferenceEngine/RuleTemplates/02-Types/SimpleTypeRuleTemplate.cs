@@ -95,7 +95,7 @@
             string ValidIdentifier = ClassIdentifier.ValidText.Item;
 
             IClass EmbeddingClass = node.EmbeddingClass;
-            IHashtableEx<string, ICompiledType> LocalGenericTable = EmbeddingClass.LocalGenericTable;
+            ISealableDictionary<string, ICompiledType> LocalGenericTable = EmbeddingClass.LocalGenericTable;
 
             if (LocalGenericTable.ContainsKey(ValidIdentifier))
             {

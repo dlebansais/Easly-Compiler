@@ -46,12 +46,12 @@
             data = null;
             bool Success = true;
 
-            Success &= ClassConstantExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IResultException ResolvedException, out ListTableEx<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out IConstantFeature ResolvedFinalFeature, out IDiscrete ResolvedFinalDiscrete, out ITypeName ResolvedClassTypeName, out IClassType ResolvedClassType);
+            Success &= ClassConstantExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IResultException ResolvedException, out SealableList<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out IConstantFeature ResolvedFinalFeature, out IDiscrete ResolvedFinalDiscrete, out ITypeName ResolvedClassTypeName, out IClassType ResolvedClassType);
 
             if (Success)
             {
                 Tuple<IConstantFeature, IDiscrete, ITypeName, IClassType> AdditionalData = new Tuple<IConstantFeature, IDiscrete, ITypeName, IClassType>(ResolvedFinalFeature, ResolvedFinalDiscrete, ResolvedClassTypeName, ResolvedClassType);
-                data = new Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, Tuple<IConstantFeature, IDiscrete, ITypeName, IClassType>>(ResolvedResult, ResolvedException, ConstantSourceList, ExpressionConstant, AdditionalData);
+                data = new Tuple<IResultType, IResultException, SealableList<IExpression>, ILanguageConstant, Tuple<IConstantFeature, IDiscrete, ITypeName, IClassType>>(ResolvedResult, ResolvedException, ConstantSourceList, ExpressionConstant, AdditionalData);
             }
 
             return Success;
@@ -64,11 +64,11 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IClassConstantExpression node, object data)
         {
-            IResultType ResolvedResult = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, Tuple<IConstantFeature, IDiscrete, ITypeName, IClassType>>)data).Item1;
-            IResultException ResolvedException = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, Tuple<IConstantFeature, IDiscrete, ITypeName, IClassType>>)data).Item2;
-            ListTableEx<IExpression> ConstantSourceList = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, Tuple<IConstantFeature, IDiscrete, ITypeName, IClassType>>)data).Item3;
-            ILanguageConstant ExpressionConstant = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, Tuple<IConstantFeature, IDiscrete, ITypeName, IClassType>>)data).Item4;
-            Tuple<IConstantFeature, IDiscrete, ITypeName, IClassType> AdditionalData = ((Tuple<IResultType, IResultException, ListTableEx<IExpression>, ILanguageConstant, Tuple<IConstantFeature, IDiscrete, ITypeName, IClassType>>)data).Item5;
+            IResultType ResolvedResult = ((Tuple<IResultType, IResultException, SealableList<IExpression>, ILanguageConstant, Tuple<IConstantFeature, IDiscrete, ITypeName, IClassType>>)data).Item1;
+            IResultException ResolvedException = ((Tuple<IResultType, IResultException, SealableList<IExpression>, ILanguageConstant, Tuple<IConstantFeature, IDiscrete, ITypeName, IClassType>>)data).Item2;
+            SealableList<IExpression> ConstantSourceList = ((Tuple<IResultType, IResultException, SealableList<IExpression>, ILanguageConstant, Tuple<IConstantFeature, IDiscrete, ITypeName, IClassType>>)data).Item3;
+            ILanguageConstant ExpressionConstant = ((Tuple<IResultType, IResultException, SealableList<IExpression>, ILanguageConstant, Tuple<IConstantFeature, IDiscrete, ITypeName, IClassType>>)data).Item4;
+            Tuple<IConstantFeature, IDiscrete, ITypeName, IClassType> AdditionalData = ((Tuple<IResultType, IResultException, SealableList<IExpression>, ILanguageConstant, Tuple<IConstantFeature, IDiscrete, ITypeName, IClassType>>)data).Item5;
             IConstantFeature ResolvedFinalFeature = AdditionalData.Item1;
             IDiscrete ResolvedFinalDiscrete = AdditionalData.Item2;
             ITypeName ResolvedClassTypeName = AdditionalData.Item3;

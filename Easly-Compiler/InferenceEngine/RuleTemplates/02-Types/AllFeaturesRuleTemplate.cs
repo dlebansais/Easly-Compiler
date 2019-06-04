@@ -26,7 +26,7 @@
                 new SealedTableSourceTemplate<IClass, IFeatureName, IFeatureInstance>(nameof(IClass.LocalFeatureTable)),
                 new OnceReferenceCollectionSourceTemplate<IClass, IFeature, ICompiledFeature>(nameof(IClass.FeatureList), nameof(IFeature.ResolvedFeature)),
                 new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, IClassType>(nameof(IClass.InheritanceList), nameof(IInheritance.ResolvedType)),
-                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, IHashtableEx<IFeatureName, IFeatureInstance>>(nameof(IClass.InheritanceList), nameof(IInheritance.FeatureTable)),
+                new OnceReferenceCollectionSourceTemplate<IClass, IInheritance, ISealableDictionary<IFeatureName, IFeatureInstance>>(nameof(IClass.InheritanceList), nameof(IInheritance.FeatureTable)),
                 new SealedTableCollectionSourceTemplate<IClass, IGeneric, ITypeName, ICompiledType>(nameof(IClass.GenericList), nameof(IGeneric.ResolvedConformanceTable)),
             };
 
@@ -50,13 +50,13 @@
             bool Success = true;
             data = null;
 
-            IHashtableEx<IFeatureName, IFeatureInstance> MergedFeatureTable = null;
+            ISealableDictionary<IFeatureName, IFeatureInstance> MergedFeatureTable = null;
 
             IList<AncestorFeatureInfo> FeatureTableList = new List<AncestorFeatureInfo>();
             ListLocalAndInheritedFeatures(node, FeatureTableList);
 
-            IHashtableEx<ICompiledFeature, IList<InstanceNameInfo>> ByFeatureTable; // ICompiledFeature -> List of InstanceNameInfo
-            IHashtableEx<IFeatureName, InheritedInstanceInfo> ByNameTable; // FeatureName -> InheritedInstanceInfo
+            ISealableDictionary<ICompiledFeature, IList<InstanceNameInfo>> ByFeatureTable; // ICompiledFeature -> List of InstanceNameInfo
+            ISealableDictionary<IFeatureName, InheritedInstanceInfo> ByNameTable; // FeatureName -> InheritedInstanceInfo
             SortByFeatureAndByName(FeatureTableList, out ByFeatureTable, out ByNameTable);
 
             if (!CheckInheritanceConsistency(ByFeatureTable, ByNameTable, node.ResolvedClassType.Item, ErrorList))
@@ -97,10 +97,10 @@
             }
         }
 
-        private void SortByFeatureAndByName(IList<AncestorFeatureInfo> featureTableList, out IHashtableEx<ICompiledFeature, IList<InstanceNameInfo>> byFeatureTable, out IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable)
+        private void SortByFeatureAndByName(IList<AncestorFeatureInfo> featureTableList, out ISealableDictionary<ICompiledFeature, IList<InstanceNameInfo>> byFeatureTable, out ISealableDictionary<IFeatureName, InheritedInstanceInfo> byNameTable)
         {
-            byFeatureTable = new HashtableEx<ICompiledFeature, IList<InstanceNameInfo>>(); // ICompiledFeature -> List of InstanceNameInfo
-            byNameTable = new HashtableEx<IFeatureName, InheritedInstanceInfo>(); // FeatureName -> InheritedInstanceInfo
+            byFeatureTable = new SealableDictionary<ICompiledFeature, IList<InstanceNameInfo>>(); // ICompiledFeature -> List of InstanceNameInfo
+            byNameTable = new SealableDictionary<IFeatureName, InheritedInstanceInfo>(); // FeatureName -> InheritedInstanceInfo
 
             foreach (AncestorFeatureInfo FeatureInfoItem in featureTableList)
             {
@@ -117,7 +117,7 @@
             }
         }
 
-        private void CheckIfFeatureListed(IHashtableEx<ICompiledFeature, IList<InstanceNameInfo>> byFeatureTable, AncestorFeatureInfo featureInfo, IFeatureName featureName, IFeatureInstance featureInstance)
+        private void CheckIfFeatureListed(ISealableDictionary<ICompiledFeature, IList<InstanceNameInfo>> byFeatureTable, AncestorFeatureInfo featureInfo, IFeatureName featureName, IFeatureInstance featureInstance)
         {
             bool FeatureAlreadyListed = false;
             foreach (KeyValuePair<ICompiledFeature, IList<InstanceNameInfo>> ImportedEntry in byFeatureTable)
@@ -175,7 +175,7 @@
             }
         }
 
-        private void CheckIfFeatureNameListed(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, AncestorFeatureInfo featureInfo, IFeatureName featureName, IFeatureInstance featureInstance)
+        private void CheckIfFeatureNameListed(ISealableDictionary<IFeatureName, InheritedInstanceInfo> byNameTable, AncestorFeatureInfo featureInfo, IFeatureName featureName, IFeatureInstance featureInstance)
         {
             bool FeatureAlreadyListed = false;
             bool NameAlreadyListed = false;
@@ -226,7 +226,7 @@
             }
         }
 
-        private bool CheckInheritanceConsistency(IHashtableEx<ICompiledFeature, IList<InstanceNameInfo>> byFeatureTable, IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IClassType localClassType, IErrorList errorList)
+        private bool CheckInheritanceConsistency(ISealableDictionary<ICompiledFeature, IList<InstanceNameInfo>> byFeatureTable, ISealableDictionary<IFeatureName, InheritedInstanceInfo> byNameTable, IClassType localClassType, IErrorList errorList)
         {
             if (!IsKeepDiscontinueConsistent(byFeatureTable, errorList))
                 return false;
@@ -254,7 +254,7 @@
             return true;
         }
 
-        private bool IsKeepDiscontinueConsistent(IHashtableEx<ICompiledFeature, IList<InstanceNameInfo>> byFeatureTable, IErrorList errorList)
+        private bool IsKeepDiscontinueConsistent(ISealableDictionary<ICompiledFeature, IList<InstanceNameInfo>> byFeatureTable, IErrorList errorList)
         {
             bool IsConsistent = true;
             foreach (KeyValuePair<ICompiledFeature, IList<InstanceNameInfo>> ImportedEntry in byFeatureTable)
@@ -274,7 +274,7 @@
             return IsConsistent;
         }
 
-        private bool IsSingleEffective(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IErrorList errorList)
+        private bool IsSingleEffective(ISealableDictionary<IFeatureName, InheritedInstanceInfo> byNameTable, IErrorList errorList)
         {
             bool IsSingle = true;
             foreach (KeyValuePair<IFeatureName, InheritedInstanceInfo> ImportedEntry in byNameTable)
@@ -364,20 +364,20 @@
             return Result;
         }
 
-        private bool CheckAllPrecursorSelected(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IErrorList errorList)
+        private bool CheckAllPrecursorSelected(ISealableDictionary<IFeatureName, InheritedInstanceInfo> byNameTable, IErrorList errorList)
         {
-            IList<IHashtableEx<IFeatureName, IList<ICompiledFeature>>> PrecursorSetList = new List<IHashtableEx<IFeatureName, IList<ICompiledFeature>>>(); // FeatureName -> List<ICompiledFeature> (Precursor list)
+            IList<ISealableDictionary<IFeatureName, IList<ICompiledFeature>>> PrecursorSetList = new List<ISealableDictionary<IFeatureName, IList<ICompiledFeature>>>(); // FeatureName -> List<ICompiledFeature> (Precursor list)
             CheckAllPrecursorSelectedInNameTable(byNameTable, PrecursorSetList);
 
             bool Result = true;
 
-            foreach (IHashtableEx<IFeatureName, IList<ICompiledFeature>> PrecursorSet in PrecursorSetList)
+            foreach (ISealableDictionary<IFeatureName, IList<ICompiledFeature>> PrecursorSet in PrecursorSetList)
                 Result &= CheckPrecursorSelected(byNameTable, PrecursorSet, errorList);
 
             return Result;
         }
 
-        private bool CheckPrecursorSelected(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IHashtableEx<IFeatureName, IList<ICompiledFeature>> precursorSet, IErrorList errorList)
+        private bool CheckPrecursorSelected(ISealableDictionary<IFeatureName, InheritedInstanceInfo> byNameTable, ISealableDictionary<IFeatureName, IList<ICompiledFeature>> precursorSet, IErrorList errorList)
         {
             bool Success = true;
             bool IsKept = false;
@@ -425,7 +425,7 @@
             return Success;
         }
 
-        private void CheckAllPrecursorSelectedInNameTable(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IList<IHashtableEx<IFeatureName, IList<ICompiledFeature>>> precursorSetList)
+        private void CheckAllPrecursorSelectedInNameTable(ISealableDictionary<IFeatureName, InheritedInstanceInfo> byNameTable, IList<ISealableDictionary<IFeatureName, IList<ICompiledFeature>>> precursorSetList)
         {
             foreach (KeyValuePair<IFeatureName, InheritedInstanceInfo> Entry in byNameTable)
             {
@@ -437,7 +437,7 @@
                     FillPrecursorList(PrecursorList, PrecursorItem.Instance);
 
                 bool FoundInSet = false;
-                foreach (IHashtableEx<IFeatureName, IList<ICompiledFeature>> PrecursorSet in precursorSetList)
+                foreach (ISealableDictionary<IFeatureName, IList<ICompiledFeature>> PrecursorSet in precursorSetList)
                 {
                     foreach (KeyValuePair<IFeatureName, IList<ICompiledFeature>> SetMemberEntry in PrecursorSet)
                     {
@@ -457,14 +457,14 @@
 
                 if (!FoundInSet)
                 {
-                    IHashtableEx<IFeatureName, IList<ICompiledFeature>> NewSet = new HashtableEx<IFeatureName, IList<ICompiledFeature>>();
+                    ISealableDictionary<IFeatureName, IList<ICompiledFeature>> NewSet = new SealableDictionary<IFeatureName, IList<ICompiledFeature>>();
                     NewSet.Add(Key, PrecursorList);
                     precursorSetList.Add(NewSet);
                 }
             }
         }
 
-        private bool CheckPrecursorBodiesHaveAncestor(IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, IErrorList errorList)
+        private bool CheckPrecursorBodiesHaveAncestor(ISealableDictionary<IFeatureName, InheritedInstanceInfo> byNameTable, IErrorList errorList)
         {
             foreach (KeyValuePair<IFeatureName, InheritedInstanceInfo> ImportedEntry in byNameTable)
             {
@@ -506,9 +506,9 @@
             return true;
         }
 
-        private void MergeInheritedFeatures(IClass item, IHashtableEx<IFeatureName, InheritedInstanceInfo> byNameTable, out IHashtableEx<IFeatureName, IFeatureInstance> mergedFeatureTable)
+        private void MergeInheritedFeatures(IClass item, ISealableDictionary<IFeatureName, InheritedInstanceInfo> byNameTable, out ISealableDictionary<IFeatureName, IFeatureInstance> mergedFeatureTable)
         {
-            mergedFeatureTable = new HashtableEx<IFeatureName, IFeatureInstance>();
+            mergedFeatureTable = new SealableDictionary<IFeatureName, IFeatureInstance>();
 
             foreach (KeyValuePair<IFeatureName, InheritedInstanceInfo> ImportedEntry in byNameTable)
             {
@@ -605,7 +605,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IClass node, object data)
         {
-            IHashtableEx<IFeatureName, IFeatureInstance> MergedFeatureTable = (IHashtableEx<IFeatureName, IFeatureInstance>)data;
+            ISealableDictionary<IFeatureName, IFeatureInstance> MergedFeatureTable = (ISealableDictionary<IFeatureName, IFeatureInstance>)data;
             IClassType ThisClassType = node.ResolvedClassType.Item;
 
             ThisClassType.FeatureTable.Merge(MergedFeatureTable);

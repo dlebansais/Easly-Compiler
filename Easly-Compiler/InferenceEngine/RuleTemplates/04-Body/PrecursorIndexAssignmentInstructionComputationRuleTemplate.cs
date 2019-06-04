@@ -52,8 +52,8 @@
             IExpression SourceExpression = (IExpression)node.Source;
             IResultType SourceResult = SourceExpression.ResolvedResult.Item;
             IClass EmbeddingClass = node.EmbeddingClass;
-            IHashtableEx<string, IImportedClass> ClassTable = EmbeddingClass.ImportedClassTable;
-            IHashtableEx<IFeatureName, IFeatureInstance> FeatureTable = EmbeddingClass.FeatureTable;
+            ISealableDictionary<string, IImportedClass> ClassTable = EmbeddingClass.ImportedClassTable;
+            ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable = EmbeddingClass.FeatureTable;
             IFeature InnerFeature = node.EmbeddingFeature;
 
             if (InnerFeature is IIndexerFeature AsIndexerFeature)
@@ -62,7 +62,7 @@
                 if (!Instance.FindPrecursor(node.AncestorType, ErrorList, node, out IFeatureInstance SelectedPrecursor))
                     return false;
 
-                IList<ListTableEx<IParameter>> ParameterTableList = new List<ListTableEx<IParameter>>();
+                IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
                 ICompiledFeature OperatorFeature = SelectedPrecursor.Feature;
                 IIndexerType AsIndexerType = OperatorFeature.ResolvedFeatureType.Item as IIndexerType;
                 Debug.Assert(AsIndexerType != null);

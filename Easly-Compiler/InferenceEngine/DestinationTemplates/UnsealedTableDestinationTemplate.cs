@@ -5,7 +5,7 @@
 
     /// <summary>
     /// Specifies a destination for a <see cref="IRuleTemplate"/>.
-    /// The destination is an unsealed <see cref="IHashtableEx"/>.
+    /// The destination is an unsealed <see cref="ISealableDictionary"/>.
     /// </summary>
     public interface IUnsealedTableDestinationTemplate : IDestinationTemplate
     {
@@ -13,24 +13,24 @@
 
     /// <summary>
     /// Specifies a destination for a <see cref="IRuleTemplate"/>.
-    /// The destination is an unsealed <see cref="IHashtableEx{TKey, TValue}"/>.
+    /// The destination is an unsealed <see cref="ISealableDictionary{TKey, TValue}"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TKey">Type of the key.</typeparam>
     /// <typeparam name="TValue">Type of the value.</typeparam>
-    public interface IUnsealedTableDestinationTemplate<TSource, TKey, TValue> : IDestinationTemplate<TSource, IHashtableEx<TKey, TValue>>
+    public interface IUnsealedTableDestinationTemplate<TSource, TKey, TValue> : IDestinationTemplate<TSource, ISealableDictionary<TKey, TValue>>
         where TSource : ISource
     {
     }
 
     /// <summary>
     /// Specifies a destination for a <see cref="IRuleTemplate"/>.
-    /// The destination is an unsealed <see cref="IHashtableEx{TKey, TValue}"/>.
+    /// The destination is an unsealed <see cref="ISealableDictionary{TKey, TValue}"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TKey">Type of the key.</typeparam>
     /// <typeparam name="TValue">Type of the value.</typeparam>
-    public class UnsealedTableDestinationTemplate<TSource, TKey, TValue> : DestinationTemplate<TSource, IHashtableEx<TKey, TValue>>, IUnsealedTableDestinationTemplate<TSource, TKey, TValue>, IUnsealedTableDestinationTemplate
+    public class UnsealedTableDestinationTemplate<TSource, TKey, TValue> : DestinationTemplate<TSource, ISealableDictionary<TKey, TValue>>, IUnsealedTableDestinationTemplate<TSource, TKey, TValue>, IUnsealedTableDestinationTemplate
         where TSource : ISource
     {
         #region Init
@@ -52,7 +52,7 @@
         /// <param name="node">The node for which the value is to be checked.</param>
         public override bool IsSet(TSource node)
         {
-            IHashtableEx<TKey, TValue> Value = GetDestinationObject(node);
+            ISealableDictionary<TKey, TValue> Value = GetDestinationObject(node);
             Debug.Assert(Value == GetDestinationObject((ISource)node));
 
             return Value.IsSealed;

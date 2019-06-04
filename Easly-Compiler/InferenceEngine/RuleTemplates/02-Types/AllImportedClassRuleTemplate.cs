@@ -57,7 +57,7 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IClass node, object data)
         {
-            IHashtableEx<string, IImportedClass> ResolvedImportedClassTable = node.ImportedClassTable;
+            ISealableDictionary<string, IImportedClass> ResolvedImportedClassTable = node.ImportedClassTable;
 
             foreach (KeyValuePair<string, IImportedClass> Entry in ResolvedImportedClassTable)
             {

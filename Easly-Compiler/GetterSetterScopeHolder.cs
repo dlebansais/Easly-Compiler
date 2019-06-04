@@ -12,12 +12,12 @@
         /// <summary>
         /// Entities local to a scope, getter only.
         /// </summary>
-        IHashtableEx<string, IScopeAttributeFeature> LocalGetScope { get; }
+        ISealableDictionary<string, IScopeAttributeFeature> LocalGetScope { get; }
 
         /// <summary>
         /// Entities local to a scope, setter only.
         /// </summary>
-        IHashtableEx<string, IScopeAttributeFeature> LocalSetScope { get; }
+        ISealableDictionary<string, IScopeAttributeFeature> LocalSetScope { get; }
 
         /// <summary>
         /// List of scopes containing the current instance, getter only.
@@ -32,11 +32,11 @@
         /// <summary>
         /// All reachable entities, getter only.
         /// </summary>
-        IHashtableEx<string, IScopeAttributeFeature> FullGetScope { get; }
+        ISealableDictionary<string, IScopeAttributeFeature> FullGetScope { get; }
 
         /// <summary>
         /// All reachable entities, setter only.
         /// </summary>
-        IHashtableEx<string, IScopeAttributeFeature> FullSetScope { get; }
+        ISealableDictionary<string, IScopeAttributeFeature> FullSetScope { get; }
     }
 }

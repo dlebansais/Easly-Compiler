@@ -108,7 +108,7 @@
             return Success;
         }
 
-        private bool FindSourceItemPrecursor(IClassType instancingClassType, IHashtableEx<IFeatureName, IFeatureInstance> featureTable, out ITypeName indexTypeName, out ICompiledType indexType)
+        private bool FindSourceItemPrecursor(IClassType instancingClassType, ISealableDictionary<IFeatureName, IFeatureInstance> featureTable, out ITypeName indexTypeName, out ICompiledType indexType)
         {
             bool IsConformantToEnumerable = false;
             indexTypeName = null;

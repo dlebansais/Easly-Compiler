@@ -51,7 +51,7 @@
             string ValidText = EntityName.ValidText.Item;
             IFeatureName Key;
 
-            if (FeatureName.TableContain(EmbeddingClass.LocalExportTable, ValidText, out Key, out IHashtableEx<string, IClass> ExportTable))
+            if (FeatureName.TableContain(EmbeddingClass.LocalExportTable, ValidText, out Key, out ISealableDictionary<string, IClass> ExportTable))
             {
                 AddSourceError(new ErrorDuplicateName(EntityName, ValidText));
                 Success = false;
