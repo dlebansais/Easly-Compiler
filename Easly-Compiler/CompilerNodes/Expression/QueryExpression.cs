@@ -417,6 +417,7 @@ namespace CompilerNode
             ObjectType.FillResultPath(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, Query.ValidResultTypePath.Item);
 
             IsHandled = false;
+
             switch (resolvedFinalFeature)
             {
                 case IConstantFeature AsConstantFeature:
@@ -425,10 +426,19 @@ namespace CompilerNode
                     IsHandled = true;
                     break;
 
-                default:
-                    IsHandled = true; // TODO: handle IFunctionFeature or the indexer to try to get a constant.
+                case IFunctionFeature AsFunctionFeature:
+                    AddConstantArguments(ArgumentList, constantSourceList);
+                    IsHandled = true;
+                    break;
+
+                case IAttributeFeature AsAttributeFeature:
+                case IPropertyFeature AsPropertyFeature:
+                case IScopeAttributeFeature AsScopeAttributeFeature:
+                    IsHandled = true;
                     break;
             }
+
+            Debug.Assert(IsHandled);
 
             return true;
         }
@@ -461,6 +471,29 @@ namespace CompilerNode
             featureCall = new FeatureCall();
 
             return true;
+        }
+
+        private static void AddConstantArguments(IList<IArgument> argumentList, ISealableList<IExpression> constantSourceList)
+        {
+            foreach (IArgument Argument in argumentList)
+            {
+                IExpression ArgumentSource = null;
+
+                switch (Argument)
+                {
+                    case IPositionalArgument AsPositionalArgument:
+                        ArgumentSource = (IExpression)AsPositionalArgument.Source;
+                        break;
+
+                    case IAssignmentArgument AsAssignmentArgument:
+                        ArgumentSource = (IExpression)AsAssignmentArgument.Source;
+                        break;
+                }
+
+                Debug.Assert(ArgumentSource != null);
+
+                constantSourceList.Add(ArgumentSource);
+            }
         }
         #endregion
 

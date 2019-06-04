@@ -192,5 +192,37 @@ namespace CompilerNode
 
             return Result;
         }
+
+        /// <summary>
+        /// Gets the default constant result of any expression.
+        /// </summary>
+        /// <param name="expression">The source expression.</param>
+        public static ILanguageConstant GetDefaultConstant(IExpression expression)
+        {
+            ILanguageConstant Constant = new ObjectLanguageConstant();
+
+            IResultType ResolvedResult = expression.ResolvedResult.Item;
+
+            if (ResolvedResult.Count == 1)
+            {
+                ICompiledType FinalType = ResolvedResult.At(0).ValueType;
+
+                bool IsBooleanTypeAvailable = IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, expression, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
+                bool IsNumberTypeAvailable = IsLanguageTypeAvailable(LanguageClasses.Number.Guid, expression, out ITypeName NumberTypeName, out ICompiledType NumberType);
+                bool IsCharacterTypeAvailable = IsLanguageTypeAvailable(LanguageClasses.Character.Guid, expression, out ITypeName CharacterTypeName, out ICompiledType CharacterType);
+                bool IsStringTypeAvailable = IsLanguageTypeAvailable(LanguageClasses.String.Guid, expression, out ITypeName StringTypeName, out ICompiledType StringType);
+
+                if (IsBooleanTypeAvailable && FinalType == BooleanType)
+                    Constant = new BooleanLanguageConstant();
+                else if (IsNumberTypeAvailable && FinalType == NumberType)
+                    Constant = new NumberLanguageConstant();
+                else if (IsCharacterTypeAvailable && FinalType == CharacterType)
+                    Constant = new CharacterLanguageConstant();
+                else if (IsStringTypeAvailable && FinalType == StringType)
+                    Constant = new StringLanguageConstant();
+            }
+
+            return Constant;
+        }
     }
 }

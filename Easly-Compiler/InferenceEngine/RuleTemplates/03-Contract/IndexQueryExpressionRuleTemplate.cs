@@ -72,7 +72,9 @@
             node.ResolvedResult.Item = ResolvedResult;
             node.ConstantSourceList.AddRange(ConstantSourceList);
             node.ConstantSourceList.Seal();
-            node.ExpressionConstant.Item = ExpressionConstant;
+
+            if (ConstantSourceList.Count == 0)
+                node.ExpressionConstant.Item = ExpressionConstant;
         }
         #endregion
     }

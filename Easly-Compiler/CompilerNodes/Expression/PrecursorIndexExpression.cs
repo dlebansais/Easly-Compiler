@@ -17,6 +17,11 @@ namespace CompilerNode
         IList<IArgument> ArgumentList { get; }
 
         /// <summary>
+        /// The resolved precursor.
+        /// </summary>
+        OnceReference<IFeatureInstance> ResolvedPrecursor { get; }
+
+        /// <summary>
         /// Details of the feature call.
         /// </summary>
         OnceReference<IFeatureCall> FeatureCall { get; }
@@ -120,6 +125,7 @@ namespace CompilerNode
                 ResolvedResult = new OnceReference<IResultType>();
                 ConstantSourceList = new SealableList<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
+                ResolvedPrecursor = new OnceReference<IFeatureInstance>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
@@ -152,6 +158,7 @@ namespace CompilerNode
                 IsResolved = ExpressionConstant.IsAssigned;
 
                 Debug.Assert(ResolvedResult.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedPrecursor.IsAssigned || !IsResolved);
 
                 IsHandled = true;
             }
@@ -193,6 +200,11 @@ namespace CompilerNode
 
         #region Compiler
         /// <summary>
+        /// The resolved precursor.
+        /// </summary>
+        public OnceReference<IFeatureInstance> ResolvedPrecursor { get; private set; } = new OnceReference<IFeatureInstance>();
+
+        /// <summary>
         /// Details of the feature call.
         /// </summary>
         public OnceReference<IFeatureCall> FeatureCall { get; private set; } = new OnceReference<IFeatureCall>();
@@ -230,13 +242,15 @@ namespace CompilerNode
         /// <param name="resolvedException">Exceptions the expression can throw upon return.</param>
         /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
         /// <param name="expressionConstant">The expression constant upon return.</param>
+        /// <param name="selectedPrecursor">The selected precursor.</param>
         /// <param name="featureCall">Details of the feature call.</param>
-        public static bool ResolveCompilerReferences(IPrecursorIndexExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFeatureCall featureCall)
+        public static bool ResolveCompilerReferences(IPrecursorIndexExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFeatureInstance selectedPrecursor, out IFeatureCall featureCall)
         {
             resolvedResult = null;
             resolvedException = null;
             constantSourceList = new SealableList<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
+            selectedPrecursor = null;
             featureCall = null;
 
             IOptionalReference<BaseNode.IObjectType> AncestorType = node.AncestorType;
@@ -251,10 +265,10 @@ namespace CompilerNode
             {
                 IFeatureInstance Instance = FeatureTable[FeatureName.IndexerFeatureName];
 
-                if (!Instance.FindPrecursor(node.AncestorType, errorList, node, out IFeatureInstance SelectedPrecursor))
+                if (!Instance.FindPrecursor(node.AncestorType, errorList, node, out selectedPrecursor))
                     return false;
 
-                if (!ResolveSelectedPrecursor(node, SelectedPrecursor, errorList, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out featureCall))
+                if (!ResolveSelectedPrecursor(node, selectedPrecursor, errorList, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out featureCall))
                     return false;
             }
             else
@@ -297,8 +311,32 @@ namespace CompilerNode
             resolvedException = new ResultException(OperatorType.GetExceptionIdentifierList);
             featureCall = new FeatureCall(ParameterTableList[SelectedIndex], ArgumentList, MergedArgumentList, TypeArgumentStyle);
 
-            // TODO: check if the precursor is a constant
+            AddConstantArguments(ArgumentList, constantSourceList);
+
             return true;
+        }
+
+        private static void AddConstantArguments(IList<IArgument> argumentList, ISealableList<IExpression> constantSourceList)
+        {
+            foreach (IArgument Argument in argumentList)
+            {
+                IExpression ArgumentSource = null;
+
+                switch (Argument)
+                {
+                    case IPositionalArgument AsPositionalArgument:
+                        ArgumentSource = (IExpression)AsPositionalArgument.Source;
+                        break;
+
+                    case IAssignmentArgument AsAssignmentArgument:
+                        ArgumentSource = (IExpression)AsAssignmentArgument.Source;
+                        break;
+                }
+
+                Debug.Assert(ArgumentSource != null);
+
+                constantSourceList.Add(ArgumentSource);
+            }
         }
         #endregion
 

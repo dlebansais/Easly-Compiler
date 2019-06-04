@@ -289,7 +289,7 @@ namespace CompilerNode
                 resolvedException = new ResultException(AsIndexerType.GetExceptionIdentifierList);
                 featureCall = new FeatureCall(ParameterTableList[SelectedIndex], ArgumentList, MergedArgumentList, TypeArgumentStyle);
 
-                // TODO: check if the result is a constant number
+                AddConstantArguments(ArgumentList, constantSourceList);
             }
             else
             {
@@ -298,6 +298,29 @@ namespace CompilerNode
             }
 
             return true;
+        }
+
+        private static void AddConstantArguments(IList<IArgument> argumentList, ISealableList<IExpression> constantSourceList)
+        {
+            foreach (IArgument Argument in argumentList)
+            {
+                IExpression ArgumentSource = null;
+
+                switch (Argument)
+                {
+                    case IPositionalArgument AsPositionalArgument:
+                        ArgumentSource = (IExpression)AsPositionalArgument.Source;
+                        break;
+
+                    case IAssignmentArgument AsAssignmentArgument:
+                        ArgumentSource = (IExpression)AsAssignmentArgument.Source;
+                        break;
+                }
+
+                Debug.Assert(ArgumentSource != null);
+
+                constantSourceList.Add(ArgumentSource);
+            }
         }
         #endregion
 

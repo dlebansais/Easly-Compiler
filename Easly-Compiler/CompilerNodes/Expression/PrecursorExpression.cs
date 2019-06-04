@@ -17,6 +17,11 @@ namespace CompilerNode
         IList<IArgument> ArgumentList { get; }
 
         /// <summary>
+        /// The resolved precursor.
+        /// </summary>
+        OnceReference<IFeatureInstance> ResolvedPrecursor { get; }
+
+        /// <summary>
         /// Details of the feature call.
         /// </summary>
         OnceReference<IFeatureCall> FeatureCall { get; }
@@ -120,6 +125,7 @@ namespace CompilerNode
                 ResolvedResult = new OnceReference<IResultType>();
                 ConstantSourceList = new SealableList<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
+                ResolvedPrecursor = new OnceReference<IFeatureInstance>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
@@ -152,6 +158,7 @@ namespace CompilerNode
                 IsResolved = ExpressionConstant.IsAssigned;
 
                 Debug.Assert(ResolvedResult.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedPrecursor.IsAssigned || !IsResolved);
 
                 IsHandled = true;
             }
@@ -192,6 +199,11 @@ namespace CompilerNode
         #endregion
 
         #region Compiler
+        /// <summary>
+        /// The resolved precursor.
+        /// </summary>
+        public OnceReference<IFeatureInstance> ResolvedPrecursor { get; private set; } = new OnceReference<IFeatureInstance>();
+
         /// <summary>
         /// Details of the feature call.
         /// </summary>
@@ -242,13 +254,15 @@ namespace CompilerNode
         /// <param name="resolvedException">Exceptions the expression can throw upon return.</param>
         /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
         /// <param name="expressionConstant">The expression constant upon return.</param>
+        /// <param name="selectedPrecursor">The precursor feature.</param>
         /// <param name="featureCall">Details of the feature call.</param>
-        public static bool ResolveCompilerReferences(IPrecursorExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFeatureCall featureCall)
+        public static bool ResolveCompilerReferences(IPrecursorExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFeatureInstance selectedPrecursor, out IFeatureCall featureCall)
         {
             resolvedResult = null;
             resolvedException = null;
             constantSourceList = new SealableList<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
+            selectedPrecursor = null;
             featureCall = null;
 
             IOptionalReference<BaseNode.IObjectType> AncestorType = node.AncestorType;
@@ -267,19 +281,42 @@ namespace CompilerNode
             IFeature AsNamedFeature = InnerFeature;
             IFeatureInstance Instance = FeatureTable[AsNamedFeature.ValidFeatureName.Item];
 
-            if (!Instance.FindPrecursor(node.AncestorType, errorList, node, out IFeatureInstance SelectedPrecursor))
+            if (!Instance.FindPrecursor(node.AncestorType, errorList, node, out selectedPrecursor))
                 return false;
 
             List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
             if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, errorList))
                 return false;
 
-            if (!ResolveCall(node, SelectedPrecursor, MergedArgumentList, TypeArgumentStyle, errorList, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out ISealableList<IParameter> SelectedParameterList, out List<IExpressionType> ResolvedArgumentList))
+            if (!ResolveCall(node, selectedPrecursor, MergedArgumentList, TypeArgumentStyle, errorList, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out ISealableList<IParameter> SelectedParameterList, out List<IExpressionType> ResolvedArgumentList))
                 return false;
 
             featureCall = new FeatureCall(SelectedParameterList, ArgumentList, ResolvedArgumentList, TypeArgumentStyle);
 
-            // TODO: check if the precursor is a constant number
+            bool IsHandled = false;
+
+            switch (selectedPrecursor.Feature)
+            {
+                case IConstantFeature AsConstantFeature:
+                    Debug.Assert(constantSourceList.Count == 1);
+                    //TODO improve
+                    //IExpression ConstantValue = (IExpression)AsConstantFeature.ConstantValue;
+                    //constantSourceList.Add(ConstantValue);
+                    IsHandled = true;
+                    break;
+
+                case IFunctionFeature AsFunctionFeature:
+                    AddConstantArguments(ArgumentList, constantSourceList);
+                    IsHandled = true;
+                    break;
+
+                case IPropertyFeature AsPropertyFeature:
+                    IsHandled = true;
+                    break;
+            }
+
+            Debug.Assert(IsHandled);
+
             return true;
         }
 
@@ -429,6 +466,29 @@ namespace CompilerNode
             resolvedArgumentList = new List<IExpressionType>();
 
             return true;
+        }
+
+        private static void AddConstantArguments(IList<IArgument> argumentList, ISealableList<IExpression> constantSourceList)
+        {
+            foreach (IArgument Argument in argumentList)
+            {
+                IExpression ArgumentSource = null;
+
+                switch (Argument)
+                {
+                    case IPositionalArgument AsPositionalArgument:
+                        ArgumentSource = (IExpression)AsPositionalArgument.Source;
+                        break;
+
+                    case IAssignmentArgument AsAssignmentArgument:
+                        ArgumentSource = (IExpression)AsAssignmentArgument.Source;
+                        break;
+                }
+
+                Debug.Assert(ArgumentSource != null);
+
+                constantSourceList.Add(ArgumentSource);
+            }
         }
         #endregion
 

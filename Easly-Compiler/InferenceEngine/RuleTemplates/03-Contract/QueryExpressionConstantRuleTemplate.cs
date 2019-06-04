@@ -57,15 +57,34 @@
         {
             ILanguageConstant ExpressionConstant = NeutralLanguageConstant.NotConstant;
 
-            Debug.Assert(node.ConstantSourceList.Count == 1);
-            IExpression ConstantSource = node.ConstantSourceList[0];
+            Debug.Assert(node.ConstantSourceList.Count > 0);
 
-            Debug.Assert(ConstantSource.ExpressionConstant.IsAssigned);
+            bool IsConstant = true;
+            foreach (IExpression ConstantSource in node.ConstantSourceList)
+                IsConstant &= ConstantSource.ExpressionConstant.Item != NeutralLanguageConstant.NotConstant;
 
-            if (node.ResolvedFinalDiscrete.IsAssigned)
-                ExpressionConstant = new DiscreteLanguageConstant(node.ResolvedFinalDiscrete.Item);
-            else
-                ExpressionConstant = ConstantSource.ExpressionConstant.Item;
+            if (IsConstant)
+            {
+                ExpressionConstant = new ObjectLanguageConstant();
+
+                if (node.ResolvedFinalDiscrete.IsAssigned)
+                    ExpressionConstant = new DiscreteLanguageConstant(node.ResolvedFinalDiscrete.Item);
+                else
+                {
+                    Debug.Assert(node.ResolvedFinalFeature.IsAssigned);
+                    ICompiledFeature FinalFeature = node.ResolvedFinalFeature.Item;
+
+                    if (FinalFeature is IConstantFeature AsConstantFeature)
+                    {
+                        Debug.Assert(node.ConstantSourceList.Count == 1);
+                        Debug.Assert(node.ConstantSourceList[0].ExpressionConstant.IsAssigned);
+
+                        ExpressionConstant = node.ConstantSourceList[0].ExpressionConstant.Item;
+                    }
+                    else
+                        ExpressionConstant = Expression.GetDefaultConstant(node);
+                }
+            }
 
             node.ExpressionConstant.Item = ExpressionConstant;
         }
