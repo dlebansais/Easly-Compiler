@@ -288,7 +288,7 @@ namespace CompilerNode
             if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, errorList))
                 return false;
 
-            if (!ResolveCall(node, selectedPrecursor, MergedArgumentList, TypeArgumentStyle, errorList, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out ISealableList<IParameter> SelectedParameterList, out List<IExpressionType> ResolvedArgumentList))
+            if (!ResolveCall(node, selectedPrecursor, MergedArgumentList, TypeArgumentStyle, errorList, out resolvedResult, out resolvedException, out ISealableList<IParameter> SelectedParameterList, out List<IExpressionType> ResolvedArgumentList))
                 return false;
 
             featureCall = new FeatureCall(SelectedParameterList, ArgumentList, ResolvedArgumentList, TypeArgumentStyle);
@@ -298,10 +298,8 @@ namespace CompilerNode
             switch (selectedPrecursor.Feature)
             {
                 case IConstantFeature AsConstantFeature:
-                    Debug.Assert(constantSourceList.Count == 1);
-                    //TODO improve
-                    //IExpression ConstantValue = (IExpression)AsConstantFeature.ConstantValue;
-                    //constantSourceList.Add(ConstantValue);
+                    IExpression ConstantValue = (IExpression)AsConstantFeature.ConstantValue;
+                    constantSourceList.Add(ConstantValue);
                     IsHandled = true;
                     break;
 
@@ -320,12 +318,10 @@ namespace CompilerNode
             return true;
         }
 
-        private static bool ResolveCall(IPrecursorExpression node, IFeatureInstance selectedPrecursor, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ISealableList<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        private static bool ResolveCall(IPrecursorExpression node, IFeatureInstance selectedPrecursor, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
         {
             resolvedResult = null;
             resolvedException = null;
-            constantSourceList = new SealableList<IExpression>();
-            expressionConstant = NeutralLanguageConstant.NotConstant;
             selectedParameterList = null;
             resolvedArgumentList = null;
 
@@ -340,7 +336,7 @@ namespace CompilerNode
             switch (OperatorType)
             {
                 case IFunctionType AsFunctionType:
-                    Success = ResolveCallFunction(node, selectedPrecursor, AsFunctionType, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedParameterList, out resolvedArgumentList);
+                    Success = ResolveCallFunction(node, selectedPrecursor, AsFunctionType, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out selectedParameterList, out resolvedArgumentList);
                     IsHandled = true;
                     break;
 
@@ -351,12 +347,12 @@ namespace CompilerNode
                     break;
 
                 case IClassType AsClassType:
-                    Success = ResolveCallClass(node, selectedPrecursor, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedParameterList, out resolvedArgumentList);
+                    Success = ResolveCallClass(node, selectedPrecursor, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out selectedParameterList, out resolvedArgumentList);
                     IsHandled = true;
                     break;
 
                 case IPropertyType AsPropertyType:
-                    Success = ResolveCallProperty(node, selectedPrecursor, AsPropertyType, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedParameterList, out resolvedArgumentList);
+                    Success = ResolveCallProperty(node, selectedPrecursor, AsPropertyType, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out selectedParameterList, out resolvedArgumentList);
                     IsHandled = true;
                     break;
             }
@@ -366,12 +362,10 @@ namespace CompilerNode
             return Success;
         }
 
-        private static bool ResolveCallFunction(IPrecursorExpression node, IFeatureInstance selectedPrecursor, IFunctionType callType, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ISealableList<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        private static bool ResolveCallFunction(IPrecursorExpression node, IFeatureInstance selectedPrecursor, IFunctionType callType, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
         {
             resolvedResult = null;
             resolvedException = null;
-            constantSourceList = new SealableList<IExpression>();
-            expressionConstant = NeutralLanguageConstant.NotConstant;
             selectedParameterList = null;
             resolvedArgumentList = null;
 
@@ -396,12 +390,10 @@ namespace CompilerNode
             return true;
         }
 
-        private static bool ResolveCallClass(IPrecursorExpression node, IFeatureInstance selectedPrecursor, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ISealableList<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        private static bool ResolveCallClass(IPrecursorExpression node, IFeatureInstance selectedPrecursor, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
         {
             resolvedResult = null;
             resolvedException = null;
-            constantSourceList = new SealableList<IExpression>();
-            expressionConstant = NeutralLanguageConstant.NotConstant;
             selectedParameterList = null;
             resolvedArgumentList = null;
 
@@ -423,23 +415,15 @@ namespace CompilerNode
                 resolvedException = new ResultException();
                 selectedParameterList = new SealableList<IParameter>();
                 resolvedArgumentList = new List<IExpressionType>();
-
-                if (OperatorFeature is IConstantFeature AsConstantFeature)
-                {
-                    IExpression ConstantValue = (IExpression)AsConstantFeature.ConstantValue;
-                    constantSourceList.Add(ConstantValue);
-                }
             }
 
             return true;
         }
 
-        private static bool ResolveCallProperty(IPrecursorExpression node, IFeatureInstance selectedPrecursor, IPropertyType callType, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ISealableList<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        private static bool ResolveCallProperty(IPrecursorExpression node, IFeatureInstance selectedPrecursor, IPropertyType callType, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
         {
             resolvedResult = null;
             resolvedException = null;
-            constantSourceList = new SealableList<IExpression>();
-            expressionConstant = NeutralLanguageConstant.NotConstant;
             selectedParameterList = null;
             resolvedArgumentList = null;
 
