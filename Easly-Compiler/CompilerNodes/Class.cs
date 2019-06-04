@@ -202,6 +202,16 @@ namespace CompilerNode
         ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> ExportTable { get; }
 
         /// <summary>
+        /// Table of all resolved conversion procedures in this class, direct or inherited.
+        /// </summary>
+        ISealableDictionary<IFeatureName, ICreationFeature> ConversionFromTable { get; }
+
+        /// <summary>
+        /// Table of all resolved conversion queries in this class, direct or inherited.
+        /// </summary>
+        ISealableDictionary<IFeatureName, IFunctionFeature> ConversionToTable { get; }
+
+        /// <summary>
         /// The type name for this class.
         /// </summary>
         OnceReference<ITypeName> ResolvedClassTypeName { get; }
@@ -347,6 +357,8 @@ namespace CompilerNode
             BaseClass.InheritanceTable.Seal();
             BaseClass.InheritedClassTypeTable.Seal();
             BaseClass.ExportTable.Seal();
+            BaseClass.ConversionFromTable.Seal();
+            BaseClass.ConversionToTable.Seal();
             BaseClass.TypedefTable.Seal();
             BaseClass.ValidSourceName = string.Empty;
             BaseClass.ResolvedBodyTagList.Item = new List<IBody>();
@@ -627,6 +639,8 @@ namespace CompilerNode
                 LocalNamespaceTable = new SealableDictionary<string, ISealableDictionary>();
                 LocalExportTable = new SealableDictionary<IFeatureName, ISealableDictionary<string, IClass>>();
                 ExportTable = new SealableDictionary<IFeatureName, ISealableDictionary<string, IClass>>();
+                ConversionFromTable = new SealableDictionary<IFeatureName, ICreationFeature>();
+                ConversionToTable = new SealableDictionary<IFeatureName, IFunctionFeature>();
                 ResolvedClassTypeName = new OnceReference<ITypeName>();
                 ResolvedClassType = new OnceReference<IClassType>();
                 GenericInstanceList = new List<IClassType>();
@@ -1051,6 +1065,16 @@ namespace CompilerNode
         /// Table of all resolved exports in this class, direct or inherited.
         /// </summary>
         public ISealableDictionary<IFeatureName, ISealableDictionary<string, IClass>> ExportTable { get; private set; } = new SealableDictionary<IFeatureName, ISealableDictionary<string, IClass>>();
+
+        /// <summary>
+        /// Table of all resolved conversion procedures in this class, direct or inherited.
+        /// </summary>
+        public ISealableDictionary<IFeatureName, ICreationFeature> ConversionFromTable { get; private set; } = new SealableDictionary<IFeatureName, ICreationFeature>();
+
+        /// <summary>
+        /// Table of all resolved conversion queries in this class, direct or inherited.
+        /// </summary>
+        public ISealableDictionary<IFeatureName, IFunctionFeature> ConversionToTable { get; private set; } = new SealableDictionary<IFeatureName, IFunctionFeature>();
 
         /// <summary>
         /// The type name for this class.

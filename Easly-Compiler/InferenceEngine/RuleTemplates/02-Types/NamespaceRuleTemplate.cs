@@ -31,6 +31,8 @@
                 new SealedTableSourceTemplate<IClass, IFeatureName, IFeatureInstance>(nameof(IClass.FeatureTable)),
                 new SealedTableSourceTemplate<IClass, string, ISealableDictionary>(nameof(IClass.LocalNamespaceTable)),
                 new SealedTableSourceTemplate<IClass, ITypeName, IClassType>(nameof(IClass.ResolvedImportedClassTable)),
+                new SealedTableSourceTemplate<IClass, IFeatureName, ICreationFeature>(nameof(IClass.ConversionFromTable)),
+                new SealedTableSourceTemplate<IClass, IFeatureName, IFunctionFeature>(nameof(IClass.ConversionToTable)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()

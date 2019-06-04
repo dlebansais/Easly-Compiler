@@ -67,6 +67,7 @@
     <Compile Include="CompiledBody.cs" />
     <Compile Include="CompilerNodes\Expression\ComparableExpression.cs" />
     <Compile Include="CompilerNodes\Feature\FeatureWithPrecursor.cs" />
+    <Compile Include="Errors\Inference\02-Types\ErrorInvalidConversionFeature.cs" />
     <Compile Include="Errors\Inference\03-Contract\ErrorMissingOverSourceAndIndexer.cs" />
     <Compile Include="Errors\Inference\04-Body\ErrorCreatedFeatureNotAttributeOrProperty.cs" />
     <Compile Include="Errors\Inference\04-Body\ErrorCreationFeatureRequired.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Errors\Translation\ErrorInvalidRename.cs" />
     <Compile Include="Errors\Translation\ErrorMultipleExternBody.cs" />
     <Compile Include="InferenceEngine\RuleTemplateList.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllConversionsRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\IndexQueryExpressionConstantRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\PrecursorIndexExpressionConstantRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\04-Body\PrecursorBodyComputationRuleTemplate.cs" />

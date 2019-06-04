@@ -46,6 +46,7 @@
             new AllInheritancesInstancedRuleTemplate(),
             new AllInheritancesRuleTemplate(),
             new AllLocalDiscretesRuleTemplate(),
+            new AllConversionsRuleTemplate(),
             new AllDiscretesRuleTemplate(),
             new AllLocalExportsRuleTemplate(),
             new AllExportsRuleTemplate(),
