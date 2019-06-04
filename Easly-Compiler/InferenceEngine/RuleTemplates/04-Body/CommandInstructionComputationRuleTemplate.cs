@@ -70,9 +70,9 @@
             if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles ArgumentStyle, ErrorList))
                 return false;
 
-            IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
+            IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
             ICommandOverloadType SelectedOverload = null;
-            SealableList<IParameter> SelectedParameterList = null;
+            ISealableList<IParameter> SelectedParameterList = null;
             IProcedureType CommandFinalType = null;
             bool IsHandled = false;
 

@@ -62,7 +62,7 @@
                 if (!Instance.FindPrecursor(node.AncestorType, ErrorList, node, out IFeatureInstance SelectedPrecursor))
                     return false;
 
-                IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
+                IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
                 ICompiledFeature OperatorFeature = SelectedPrecursor.Feature;
                 IIndexerType AsIndexerType = OperatorFeature.ResolvedFeatureType.Item as IIndexerType;
                 Debug.Assert(AsIndexerType != null);

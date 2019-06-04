@@ -226,7 +226,7 @@
             if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, ErrorList))
                 return false;
 
-            IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
+            IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
 
             IProcedureType AsProcedureType = (IProcedureType)creationFeature.ResolvedFeatureType.Item;
             foreach (ICommandOverloadType Overload in AsProcedureType.OverloadList)

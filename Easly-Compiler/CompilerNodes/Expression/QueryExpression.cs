@@ -29,7 +29,7 @@ namespace CompilerNode
         /// <summary>
         /// List of results from the selected overload.
         /// </summary>
-        SealableList<IParameter> SelectedResultList { get; }
+        ISealableList<IParameter> SelectedResultList { get; }
 
         /// <summary>
         /// Details of the feature call.
@@ -209,7 +209,7 @@ namespace CompilerNode
         /// <summary>
         /// The list of sources for a constant, if any.
         /// </summary>
-        public SealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
+        public ISealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
 
         /// <summary>
         /// Specific constant number.
@@ -231,7 +231,7 @@ namespace CompilerNode
         /// <summary>
         /// List of results from the selected overload.
         /// </summary>
-        public SealableList<IParameter> SelectedResultList { get; private set; } = new SealableList<IParameter>();
+        public ISealableList<IParameter> SelectedResultList { get; private set; } = new SealableList<IParameter>();
 
         /// <summary>
         /// Details of the feature call.
@@ -282,7 +282,7 @@ namespace CompilerNode
         /// <param name="selectedResultList">The selected results.</param>
         /// <param name="featureCall">Details of the feature call.</param>
         /// <param name="inheritBySideAttribute">Inherit the side-by-side attribute.</param>
-        public static bool ResolveCompilerReferences(IQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out SealableList<IParameter> selectedResultList, out IFeatureCall featureCall, out bool inheritBySideAttribute)
+        public static bool ResolveCompilerReferences(IQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out ISealableList<IParameter> selectedResultList, out IFeatureCall featureCall, out bool inheritBySideAttribute)
         {
             resolvedResult = null;
             resolvedException = null;
@@ -320,7 +320,7 @@ namespace CompilerNode
             }
         }
 
-        private static bool ResolveFeature(IQueryExpression node, IErrorList errorList, ICompiledFeature resolvedFinalFeature, ITypeName finalTypeName, ICompiledType finalType, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out SealableList<IParameter> selectedResultList, out IFeatureCall featureCall)
+        private static bool ResolveFeature(IQueryExpression node, IErrorList errorList, ICompiledFeature resolvedFinalFeature, ITypeName finalTypeName, ICompiledType finalType, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ISealableList<IParameter> selectedResultList, out IFeatureCall featureCall)
         {
             resolvedResult = null;
             resolvedException = null;
@@ -341,7 +341,7 @@ namespace CompilerNode
             if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, errorList))
                 return false;
 
-            IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
+            IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
             IIdentifier LastIdentifier = ValidPath[ValidPath.Count - 1];
             string ValidText = LastIdentifier.ValidText.Item;
             bool IsHandled = false;
@@ -433,7 +433,7 @@ namespace CompilerNode
             return true;
         }
 
-        private static bool ResolveDiscrete(IQueryExpression node, IErrorList errorList, IDiscrete resolvedFinalDiscrete, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out SealableList<IParameter> selectedResultList, out IFeatureCall featureCall)
+        private static bool ResolveDiscrete(IQueryExpression node, IErrorList errorList, IDiscrete resolvedFinalDiscrete, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ISealableList<IParameter> selectedResultList, out IFeatureCall featureCall)
         {
             resolvedResult = null;
             resolvedException = null;

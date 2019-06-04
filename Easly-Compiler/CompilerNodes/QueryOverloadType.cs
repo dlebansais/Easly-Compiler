@@ -44,17 +44,17 @@
         /// <summary>
         /// Table of parameters for this overload.
         /// </summary>
-        SealableList<IParameter> ParameterTable { get; }
+        ISealableList<IParameter> ParameterTable { get; }
 
         /// <summary>
         /// Table of results for this overload.
         /// </summary>
-        SealableList<IParameter> ResultTable { get; }
+        ISealableList<IParameter> ResultTable { get; }
 
         /// <summary>
         /// Table of conformant results for this overload.
         /// </summary>
-        SealableList<ICompiledType> ConformantResultTable { get; }
+        ISealableList<ICompiledType> ConformantResultTable { get; }
 
         /// <summary>
         /// List of result types for each results.
@@ -270,17 +270,17 @@
         /// <summary>
         /// Table of parameters for this overload.
         /// </summary>
-        public SealableList<IParameter> ParameterTable { get; private set; } = new SealableList<IParameter>();
+        public ISealableList<IParameter> ParameterTable { get; private set; } = new SealableList<IParameter>();
 
         /// <summary>
         /// Table of results for this overload.
         /// </summary>
-        public SealableList<IParameter> ResultTable { get; private set; } = new SealableList<IParameter>();
+        public ISealableList<IParameter> ResultTable { get; private set; } = new SealableList<IParameter>();
 
         /// <summary>
         /// Table of conformant results for this overload.
         /// </summary>
-        public SealableList<ICompiledType> ConformantResultTable { get; private set; } = new SealableList<ICompiledType>();
+        public ISealableList<ICompiledType> ConformantResultTable { get; private set; } = new SealableList<ICompiledType>();
 
         /// <summary>
         /// List of result types for each results.

@@ -195,7 +195,7 @@
         /// <summary>
         /// The list of sources for a constant, if any.
         /// </summary>
-        public SealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
+        public ISealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
 
         /// <summary>
         /// Specific constant number.
@@ -263,7 +263,7 @@
         /// <param name="initializedObjectTypeName">The initialized object type name upon return.</param>
         /// <param name="initializedObjectType">The initialized object type upon return.</param>
         /// <param name="assignedFeatureTable">The table of assigned values upon return.</param>
-        public static bool ResolveCompilerReferences(IInitializedObjectExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ITypeName initializedObjectTypeName, out IClassType initializedObjectType, out ISealableDictionary<string, ICompiledFeature> assignedFeatureTable)
+        public static bool ResolveCompilerReferences(IInitializedObjectExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ITypeName initializedObjectTypeName, out IClassType initializedObjectType, out ISealableDictionary<string, ICompiledFeature> assignedFeatureTable)
         {
             resolvedResult = null;
             resolvedException = null;
@@ -304,7 +304,7 @@
             return true;
         }
 
-        private static bool CheckAssignemntList(IInitializedObjectExpression node, IErrorList errorList, ISealableDictionary<IFeatureName, IFeatureInstance> featureTable, SealableList<IExpression> constantSourceList, ISealableDictionary<string, ICompiledFeature> assignedFeatureTable)
+        private static bool CheckAssignemntList(IInitializedObjectExpression node, IErrorList errorList, ISealableDictionary<IFeatureName, IFeatureInstance> featureTable, ISealableList<IExpression> constantSourceList, ISealableDictionary<string, ICompiledFeature> assignedFeatureTable)
         {
             bool Success = true;
             IList<IAssignmentArgument> AssignmentList = node.AssignmentList;

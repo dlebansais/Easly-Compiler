@@ -152,7 +152,7 @@ namespace CompilerNode
         /// <summary>
         /// The list of sources for a constant, if any.
         /// </summary>
-        public SealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
+        public ISealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
 
         /// <summary>
         /// Specific constant number.
@@ -208,7 +208,7 @@ namespace CompilerNode
         /// <param name="expressionConstant">The constant value upon return, if any.</param>
         /// <param name="selectedFeature">The matching feature upon return.</param>
         /// <param name="selectedOverload">The matching overload in <paramref name="selectedFeature"/> upon return.</param>
-        public static bool ResolveCompilerReferences(IBinaryOperatorExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFunctionFeature selectedFeature, out IQueryOverload selectedOverload)
+        public static bool ResolveCompilerReferences(IBinaryOperatorExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFunctionFeature selectedFeature, out IQueryOverload selectedOverload)
         {
             resolvedResult = null;
             resolvedException = null;
@@ -245,7 +245,7 @@ namespace CompilerNode
 
                     if (OperatorType is FunctionType AsFunctionType && OperatorFeature is IFunctionFeature AsFunctionFeature)
                     {
-                        IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
+                        IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
                         foreach (IQueryOverloadType Overload in AsFunctionType.OverloadList)
                             ParameterTableList.Add(Overload.ParameterTable);
 

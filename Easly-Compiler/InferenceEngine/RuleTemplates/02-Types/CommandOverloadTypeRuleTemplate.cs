@@ -45,7 +45,7 @@
             bool Success = true;
             data = null;
 
-            SealableList<IParameter> ParameterTable = new SealableList<IParameter>();
+            ISealableList<IParameter> ParameterTable = new SealableList<IParameter>();
 
             foreach (IEntityDeclaration Item in node.ParameterList)
             {
@@ -80,7 +80,7 @@
         public override void Apply(ICommandOverloadType node, object data)
         {
             IClass EmbeddingClass = node.EmbeddingClass;
-            SealableList<IParameter> ParameterTable = (SealableList<IParameter>)data;
+            ISealableList<IParameter> ParameterTable = (ISealableList<IParameter>)data;
 
             Debug.Assert(node.ParameterTable.Count == 0);
             node.ParameterTable.AddRange(ParameterTable);

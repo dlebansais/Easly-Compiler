@@ -224,7 +224,7 @@ namespace CompilerNode
         /// <summary>
         /// List of single classes accumulated as inheritance clauses are processed.
         /// </summary>
-        SealableList<IClass> ClassGroupList { get; }
+        ISealableList<IClass> ClassGroupList { get; }
 
         /// <summary>
         /// Combined list of all classes in the same group.
@@ -1075,7 +1075,7 @@ namespace CompilerNode
         /// <summary>
         /// List of single classes accumulated as inheritance clauses are processed.
         /// </summary>
-        public SealableList<IClass> ClassGroupList { get; private set; } = new SealableList<IClass>();
+        public ISealableList<IClass> ClassGroupList { get; private set; } = new SealableList<IClass>();
 
         /// <summary>
         /// Combined list of all classes in the same group.

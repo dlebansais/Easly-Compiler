@@ -35,7 +35,7 @@ namespace CompilerNode
         /// <summary>
         /// Table of resolved parameters.
         /// </summary>
-        SealableList<IParameter> ParameterTable { get; }
+        ISealableList<IParameter> ParameterTable { get; }
     }
 
     /// <summary>
@@ -321,7 +321,7 @@ namespace CompilerNode
         /// <summary>
         /// Table of resolved parameters.
         /// </summary>
-        public SealableList<IParameter> ParameterTable { get; private set; } = new SealableList<IParameter>();
+        public ISealableList<IParameter> ParameterTable { get; private set; } = new SealableList<IParameter>();
 
         /// <summary>
         /// The name of the resolved result type.

@@ -74,7 +74,7 @@
 
             foreach (ICommandOverloadType Overload in overloadList)
             {
-                SealableList<IParameter> ParameterTable = Overload.ParameterTable;
+                ISealableList<IParameter> ParameterTable = Overload.ParameterTable;
                 if (index < ParameterTable.Count)
                     SameIndexList.Add(ParameterTable[index]);
             }
@@ -126,7 +126,7 @@
 
             foreach (IQueryOverloadType Overload in overloadList)
             {
-                SealableList<IParameter> ParameterTable = Overload.ParameterTable;
+                ISealableList<IParameter> ParameterTable = Overload.ParameterTable;
                 if (index < ParameterTable.Count)
                     SameIndexList.Add(ParameterTable[index]);
             }
@@ -200,7 +200,7 @@
 
             foreach (IQueryOverloadType Overload in overloadList)
             {
-                SealableList<IParameter> ResultTable = Overload.ResultTable;
+                ISealableList<IParameter> ResultTable = Overload.ResultTable;
                 if (index < ResultTable.Count)
                     SameIndexList.Add(ResultTable[index]);
             }
@@ -242,7 +242,7 @@
 
             foreach (IQueryOverloadType Overload in overloadList)
             {
-                SealableList<IParameter> ResultTable = Overload.ResultTable;
+                ISealableList<IParameter> ResultTable = Overload.ResultTable;
                 if (index < ResultTable.Count)
                     SameIndexList.Add(ResultTable[index]);
             }

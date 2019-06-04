@@ -89,7 +89,7 @@
                 }
                 else
                 {
-                    IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
+                    IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
                     ParameterTableList.Add(AsIndexerType.ParameterTable);
 
                     ICompiledType DestinationType = AsIndexerType.ResolvedEntityType.Item;

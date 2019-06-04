@@ -34,7 +34,7 @@ namespace CompilerNode
         /// <summary>
         /// List of overload parameters.
         /// </summary>
-        SealableList<IParameter> ParameterTable { get; }
+        ISealableList<IParameter> ParameterTable { get; }
 
         /// <summary>
         /// The resolved associated type.
@@ -226,7 +226,7 @@ namespace CompilerNode
         /// <summary>
         /// List of overload parameters.
         /// </summary>
-        public SealableList<IParameter> ParameterTable { get; private set; } = new SealableList<IParameter>();
+        public ISealableList<IParameter> ParameterTable { get; private set; } = new SealableList<IParameter>();
 
         /// <summary>
         /// The resolved associated type.

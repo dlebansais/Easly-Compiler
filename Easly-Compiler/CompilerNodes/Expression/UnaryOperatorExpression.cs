@@ -159,7 +159,7 @@ namespace CompilerNode
         /// <summary>
         /// The list of sources for a constant, if any.
         /// </summary>
-        public SealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
+        public ISealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
 
         /// <summary>
         /// Specific constant number.
@@ -220,7 +220,7 @@ namespace CompilerNode
         /// <param name="selectedFeature">The matching feature upon return.</param>
         /// <param name="selectedOverload">The matching overload in <paramref name="selectedFeature"/> upon return.</param>
         /// <param name="selectedOverloadType">The matching overload type upon return.</param>
-        public static bool ResolveCompilerReferences(IUnaryOperatorExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFunctionFeature selectedFeature, out IQueryOverload selectedOverload, out IQueryOverloadType selectedOverloadType)
+        public static bool ResolveCompilerReferences(IUnaryOperatorExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFunctionFeature selectedFeature, out IQueryOverload selectedOverload, out IQueryOverloadType selectedOverloadType)
         {
             resolvedResult = null;
             resolvedException = null;

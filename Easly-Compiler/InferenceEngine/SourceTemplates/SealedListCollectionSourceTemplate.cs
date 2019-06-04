@@ -16,7 +16,7 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is a collection of <typeparamref name="TItem"/> nodes, each with a property that must be a sealed <see cref="SealableList{TValue}"/>.
+    /// The source is a collection of <typeparamref name="TItem"/> nodes, each with a property that must be a sealed <see cref="ISealableList{TValue}"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TItem">Type of items in the source.</typeparam>
@@ -29,7 +29,7 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is a collection of <typeparamref name="TItem"/> nodes, each with a property that must be a sealed <see cref="SealableList{TValue}"/>.
+    /// The source is a collection of <typeparamref name="TItem"/> nodes, each with a property that must be a sealed <see cref="ISealableList{TValue}"/>.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TItem">Type of items in the source.</typeparam>
@@ -43,7 +43,7 @@
         /// Initializes a new instance of the <see cref="SealedListCollectionSourceTemplate{TSource, TItem, TValue}"/> class.
         /// </summary>
         /// <param name="path">Path to the source object.</param>
-        /// <param name="propertyName">The name of the <see cref="SealableList{TValue}"/> property to check in each items of the list.</param>
+        /// <param name="propertyName">The name of the <see cref="ISealableList{TValue}"/> property to check in each items of the list.</param>
         /// <param name="startingPoint">The starting point for the path.</param>
         public SealedListCollectionSourceTemplate(string path, string propertyName, ITemplatePathStart<TSource> startingPoint = null)
             : base(path, startingPoint)
@@ -65,13 +65,13 @@
         public override bool IsReady(TSource node, out object data)
         {
             IList ItemList = GetSourceObject(node, out bool IsInterrupted);
-            IList<SealableList<TValue>> ReadyValueList = new List<SealableList<TValue>>();
+            IList<ISealableList<TValue>> ReadyValueList = new List<ISealableList<TValue>>();
 
             for (int i = 0; i < ItemList.Count && !IsInterrupted; i++)
             {
                 TItem Item = (TItem)ItemList[i];
 
-                SealableList<TValue> Value = ItemProperty.GetValue(Item) as SealableList<TValue>;
+                ISealableList<TValue> Value = ItemProperty.GetValue(Item) as ISealableList<TValue>;
                 Debug.Assert(Value != null);
 
                 if (Value.IsSealed)

@@ -14,7 +14,7 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is a sealed <see cref="SealableList{TValue}"/> list.
+    /// The source is a sealed <see cref="ISealableList{TValue}"/> list.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TValue">Type of the value.</typeparam>
@@ -25,7 +25,7 @@
 
     /// <summary>
     /// Specifies a source for a <see cref="IRuleTemplate"/>.
-    /// The source is a sealed <see cref="SealableList{TValue}"/> list.
+    /// The source is a sealed <see cref="ISealableList{TValue}"/> list.
     /// </summary>
     /// <typeparam name="TSource">The node type on which the rule applies.</typeparam>
     /// <typeparam name="TValue">Type of the value.</typeparam>
@@ -55,7 +55,7 @@
             data = null;
             bool Result = false;
 
-            SealableList<TValue> Value = GetSourceObject(node, out bool IsInterrupted) as SealableList<TValue>;
+            ISealableList<TValue> Value = GetSourceObject(node, out bool IsInterrupted) as ISealableList<TValue>;
             Debug.Assert(Value != null || IsInterrupted);
 
             if (!IsInterrupted && Value != null && Value.IsSealed)

@@ -46,21 +46,6 @@
         public ICanonicalNumber Value { get; }
 
         /// <summary>
-        /// The value as an ordered integer.
-        /// </summary>
-        /*public int OrdinalValue
-        {
-            get
-            {
-                int Result = 0;
-                bool IsParsed = Value != null && Value.TryParseInt(out Result);
-
-                Debug.Assert(IsParsed);
-                return Result;
-            }
-        }*/
-
-        /// <summary>
         /// Checks if another constant can be compared with this instance.
         /// </summary>
         /// <param name="other">The other instance.</param>

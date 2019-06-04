@@ -39,7 +39,7 @@
         /// <summary>
         /// Table of parameters for this overload.
         /// </summary>
-        SealableList<IParameter> ParameterTable { get; }
+        ISealableList<IParameter> ParameterTable { get; }
     }
 
     /// <summary>
@@ -234,7 +234,7 @@
         /// <summary>
         /// Table of parameters for this overload.
         /// </summary>
-        public SealableList<IParameter> ParameterTable { get; private set; } = new SealableList<IParameter>();
+        public ISealableList<IParameter> ParameterTable { get; private set; } = new SealableList<IParameter>();
 
         /// <summary>
         /// Finds or creates an overload type with the corresponding parameters.

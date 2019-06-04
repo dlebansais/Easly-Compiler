@@ -165,7 +165,7 @@ namespace CompilerNode
         /// <summary>
         /// The list of sources for a constant, if any.
         /// </summary>
-        public SealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
+        public ISealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
 
         /// <summary>
         /// Specific constant number.
@@ -232,7 +232,7 @@ namespace CompilerNode
         /// <param name="resolvedFinalDiscrete">The discrete if the end of the path is a discrete.</param>
         /// <param name="resolvedClassTypeName">The class type name upon return.</param>
         /// <param name="resolvedClassType">The class name upon return.</param>
-        public static bool ResolveCompilerReferences(IClassConstantExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IConstantFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out ITypeName resolvedClassTypeName, out IClassType resolvedClassType)
+        public static bool ResolveCompilerReferences(IClassConstantExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IConstantFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out ITypeName resolvedClassTypeName, out IClassType resolvedClassType)
         {
             resolvedResult = null;
             resolvedException = null;

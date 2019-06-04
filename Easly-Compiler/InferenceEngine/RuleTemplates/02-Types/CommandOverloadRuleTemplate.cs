@@ -48,7 +48,7 @@
             data = null;
 
             ISealableDictionary<string, IScopeAttributeFeature> CheckedScope = new SealableDictionary<string, IScopeAttributeFeature>();
-            SealableList<IParameter> ParameterTable = new SealableList<IParameter>();
+            ISealableList<IParameter> ParameterTable = new SealableList<IParameter>();
 
             foreach (EntityDeclaration Item in node.ParameterList)
             {
@@ -83,7 +83,7 @@
             }
 
             if (Success)
-                data = new Tuple<ISealableDictionary<string, IScopeAttributeFeature>, SealableList<IParameter>>(CheckedScope, ParameterTable);
+                data = new Tuple<ISealableDictionary<string, IScopeAttributeFeature>, ISealableList<IParameter>>(CheckedScope, ParameterTable);
 
             return Success;
         }
@@ -96,8 +96,8 @@
         public override void Apply(ICommandOverload node, object data)
         {
             IClass EmbeddingClass = node.EmbeddingClass;
-            ISealableDictionary<string, IScopeAttributeFeature> CheckedScope = ((Tuple<ISealableDictionary<string, IScopeAttributeFeature>, SealableList<IParameter>>)data).Item1;
-            SealableList<IParameter> ParameterTable = ((Tuple<ISealableDictionary<string, IScopeAttributeFeature>, SealableList<IParameter>>)data).Item2;
+            ISealableDictionary<string, IScopeAttributeFeature> CheckedScope = ((Tuple<ISealableDictionary<string, IScopeAttributeFeature>, ISealableList<IParameter>>)data).Item1;
+            ISealableList<IParameter> ParameterTable = ((Tuple<ISealableDictionary<string, IScopeAttributeFeature>, ISealableList<IParameter>>)data).Item2;
 
             node.ParameterTable.AddRange(ParameterTable);
             node.ParameterTable.Seal();

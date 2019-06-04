@@ -90,7 +90,7 @@
         /// <summary>
         /// The argument passing style.
         /// </summary>
-        public TypeArgumentStyles TypeArgumentStyle { get;}
+        public TypeArgumentStyles TypeArgumentStyle { get; }
 
         /// <summary>
         /// True if the call has no parameters or arguments.

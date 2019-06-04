@@ -61,8 +61,8 @@
             IClass EmbeddingClass = node.EmbeddingClass;
             IFeature EmbeddingFeature = node.EmbeddingFeature;
 
-            SealableList<IParameter> ParameterTable = new SealableList<IParameter>();
-            SealableList<IParameter> ResultTable = new SealableList<IParameter>();
+            ISealableList<IParameter> ParameterTable = new SealableList<IParameter>();
+            ISealableList<IParameter> ResultTable = new SealableList<IParameter>();
 
             foreach (IEntityDeclaration Item in node.ParameterList)
             {

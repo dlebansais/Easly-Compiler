@@ -102,12 +102,12 @@
                 if (!Argument.Validate(node.ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, ErrorList))
                     return false;
 
-                IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
+                IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
 
                 ICompiledFeature OperatorFeature = SelectedPrecursor.Item.Feature;
                 ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
                 IList<IIdentifier> PrecursorInstructionException = null;
-                SealableList<IParameter> SelectedParameterList = null;
+                ISealableList<IParameter> SelectedParameterList = null;
 
                 // This has been checked in the type pass.
                 IProcedureType AsProcedureType = OperatorType as IProcedureType;

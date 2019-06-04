@@ -69,7 +69,7 @@
         /// <summary>
         /// Table of resolved parameters.
         /// </summary>
-        SealableList<IParameter> ParameterTable { get; }
+        ISealableList<IParameter> ParameterTable { get; }
     }
 
     /// <summary>
@@ -352,7 +352,7 @@
         /// <summary>
         /// Table of resolved parameters.
         /// </summary>
-        public SealableList<IParameter> ParameterTable { get; private set; } = new SealableList<IParameter>();
+        public ISealableList<IParameter> ParameterTable { get; private set; } = new SealableList<IParameter>();
         #endregion
 
         #region Implementation of IObjectType

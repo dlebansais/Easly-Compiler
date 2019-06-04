@@ -183,7 +183,7 @@ namespace CompilerNode
         /// <summary>
         /// The list of sources for a constant, if any.
         /// </summary>
-        public SealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
+        public ISealableList<IExpression> ConstantSourceList { get; private set; } = new SealableList<IExpression>();
 
         /// <summary>
         /// Specific constant number.
@@ -232,7 +232,7 @@ namespace CompilerNode
         /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
         /// <param name="expressionConstant">The expression constant upon return.</param>
         /// <param name="featureCall">Details of the feature call.</param>
-        public static bool ResolveCompilerReferences(IIndexQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out SealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFeatureCall featureCall)
+        public static bool ResolveCompilerReferences(IIndexQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFeatureCall featureCall)
         {
             resolvedResult = null;
             resolvedException = null;
@@ -278,7 +278,7 @@ namespace CompilerNode
                 if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, errorList))
                     return false;
 
-                IList<SealableList<IParameter>> ParameterTableList = new List<SealableList<IParameter>>();
+                IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
                 ParameterTableList.Add(AsIndexerType.ParameterTable);
 
                 int SelectedIndex;

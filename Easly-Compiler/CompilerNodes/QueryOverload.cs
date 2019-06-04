@@ -44,17 +44,17 @@
         /// <summary>
         /// List of resolved parameters.
         /// </summary>
-        SealableList<IParameter> ParameterTable { get; }
+        ISealableList<IParameter> ParameterTable { get; }
 
         /// <summary>
         /// List of resolved parameters.
         /// </summary>
-        SealableList<IParameter> ResultTable { get; }
+        ISealableList<IParameter> ResultTable { get; }
 
         /// <summary>
         /// List of resolved conformant parameter types.
         /// </summary>
-        SealableList<ICompiledType> ConformantResultTable { get; }
+        ISealableList<ICompiledType> ConformantResultTable { get; }
 
         /// <summary>
         /// The resolved associated type.
@@ -64,7 +64,7 @@
         /// <summary>
         /// List of resolved conformant parameter types, both this overload and the associated type.
         /// </summary>
-        SealableList<ICompiledType> CompleteConformantResultTable { get; }
+        ISealableList<ICompiledType> CompleteConformantResultTable { get; }
 
         /// <summary>
         /// The resolved body.
@@ -278,17 +278,17 @@
         /// <summary>
         /// List of resolved parameters.
         /// </summary>
-        public SealableList<IParameter> ParameterTable { get; private set; } = new SealableList<IParameter>();
+        public ISealableList<IParameter> ParameterTable { get; private set; } = new SealableList<IParameter>();
 
         /// <summary>
         /// List of resolved parameters.
         /// </summary>
-        public SealableList<IParameter> ResultTable { get; private set; } = new SealableList<IParameter>();
+        public ISealableList<IParameter> ResultTable { get; private set; } = new SealableList<IParameter>();
 
         /// <summary>
         /// List of resolved conformant parameter types.
         /// </summary>
-        public SealableList<ICompiledType> ConformantResultTable { get; private set; } = new SealableList<ICompiledType>();
+        public ISealableList<ICompiledType> ConformantResultTable { get; private set; } = new SealableList<ICompiledType>();
 
         /// <summary>
         /// The resolved associated type.
@@ -298,7 +298,7 @@
         /// <summary>
         /// List of resolved conformant parameter types, both this overload and the associated type.
         /// </summary>
-        public SealableList<ICompiledType> CompleteConformantResultTable { get; private set; } = new SealableList<ICompiledType>();
+        public ISealableList<ICompiledType> CompleteConformantResultTable { get; private set; } = new SealableList<ICompiledType>();
 
         /// <summary>
         /// The name of the resolved result type.
