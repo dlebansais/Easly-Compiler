@@ -10,7 +10,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IAttributeFeature.
     /// </summary>
-    public interface IAttributeFeature : BaseNode.IAttributeFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature
+    public interface IAttributeFeature : BaseNode.IAttributeFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithEvents
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.AttributeFeature.EnsureBlocks"/>.
@@ -33,6 +33,18 @@ namespace CompilerNode
     /// </summary>
     public class AttributeFeature : BaseNode.AttributeFeature, IAttributeFeature
     {
+        #region Init
+        private static readonly BaseNode.EventType UninitializedEventType = (BaseNode.EventType)(-1);
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AttributeFeature"/> class.
+        /// </summary>
+        public AttributeFeature()
+        {
+            ResolvedEventType = UninitializedEventType;
+        }
+        #endregion
+
         #region Implementation of INodeWithReplicatedBlocks
         /// <summary>
         /// Replicated list from <see cref="BaseNode.AttributeFeature.EnsureBlocks"/>.
@@ -117,7 +129,7 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract || ruleTemplateList == RuleTemplateSet.Body)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsHandled = true;
             }
@@ -129,6 +141,11 @@ namespace CompilerNode
                 ResolvedFeature = new OnceReference<ICompiledFeature>();
                 ResolvedEntityTypeName = new OnceReference<ITypeName>();
                 ResolvedEntityType = new OnceReference<ICompiledType>();
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                ResolvedEventType = (BaseNode.EventType)(-1);
                 IsHandled = true;
             }
 
@@ -224,6 +241,27 @@ namespace CompilerNode
         /// The resolved attribute type.
         /// </summary>
         public OnceReference<ICompiledType> ResolvedEntityType { get; private set; } = new OnceReference<ICompiledType>();
+
+        /// <summary>
+        /// The resolved event type.
+        /// </summary>
+        public BaseNode.EventType ResolvedEventType { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="ResolvedEventType"/> property.
+        /// </summary>
+        /// <param name="eventType">The event type.</param>
+        /// <param name="isConflicting">True upon return if <paramref name="eventType"/> is conflicting with a previous call.</param>
+        public void SetEventType(BaseNode.EventType eventType, out bool isConflicting)
+        {
+            if (ResolvedEventType == UninitializedEventType || ResolvedEventType == eventType)
+            {
+                ResolvedEventType = eventType;
+                isConflicting = false;
+            }
+            else
+                isConflicting = true;
+        }
         #endregion
 
         #region Debugging

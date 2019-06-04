@@ -10,6 +10,15 @@ namespace CompilerNode
     /// </summary>
     public interface IRaiseEventInstruction : BaseNode.IRaiseEventInstruction, IInstruction
     {
+        /// <summary>
+        /// The event feature.
+        /// </summary>
+        OnceReference<IFeatureWithEvents> ResolvedFeature { get; }
+
+        /// <summary>
+        /// The event entity type.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedEntityType { get; }
     }
 
     /// <summary>
@@ -90,6 +99,8 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
                 ResolvedException = new OnceReference<IResultException>();
+                ResolvedFeature = new OnceReference<IFeatureWithEvents>();
+                ResolvedEntityType = new OnceReference<ICompiledType>();
                 IsHandled = true;
             }
 
@@ -124,6 +135,10 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsResolved = ResolvedException.IsAssigned;
+
+                Debug.Assert(ResolvedFeature.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedEntityType.IsAssigned || !IsResolved);
+
                 IsHandled = true;
             }
 
@@ -159,6 +174,18 @@ namespace CompilerNode
         /// All reachable entities.
         /// </summary>
         public IHashtableEx<string, IScopeAttributeFeature> FullScope { get; private set; } = new HashtableEx<string, IScopeAttributeFeature>();
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// The event feature.
+        /// </summary>
+        public OnceReference<IFeatureWithEvents> ResolvedFeature { get; private set; } = new OnceReference<IFeatureWithEvents>();
+
+        /// <summary>
+        /// The event entity type.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedEntityType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
 
         #region Debugging

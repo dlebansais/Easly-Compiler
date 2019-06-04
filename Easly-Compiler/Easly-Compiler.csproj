@@ -132,6 +132,7 @@
     <Compile Include="InferenceEngine\RuleTemplates\04-Body\ResultOfExpressionComputationRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\04-Body\UnaryNotExpressionComputationRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\04-Body\UnaryOperatorExpressionComputationRuleTemplate.cs" />
+    <Compile Include="FeatureWithEvents.cs" />
     <Compile Include="ResultException.cs" />
     <Compile Include="FeatureCall.cs" />
     <Compile Include="ResultType.cs" />

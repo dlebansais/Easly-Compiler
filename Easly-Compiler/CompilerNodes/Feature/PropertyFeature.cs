@@ -10,7 +10,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IPropertyFeature.
     /// </summary>
-    public interface IPropertyFeature : BaseNode.IPropertyFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithPrecursor, IGetterSetterScopeHolder, INodeWithResult
+    public interface IPropertyFeature : BaseNode.IPropertyFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithPrecursor, IGetterSetterScopeHolder, INodeWithResult, IFeatureWithEvents
     {
         /// <summary>
         /// The name of the resolved property type.
@@ -28,6 +28,18 @@ namespace CompilerNode
     /// </summary>
     public class PropertyFeature : BaseNode.PropertyFeature, IPropertyFeature
     {
+        #region Init
+        private static readonly BaseNode.EventType UninitializedEventType = (BaseNode.EventType)(-1);
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PropertyFeature"/> class.
+        /// </summary>
+        public PropertyFeature()
+        {
+            ResolvedEventType = UninitializedEventType;
+        }
+        #endregion
+
         #region Implementation of INodeWithReplicatedBlocks
         /// <summary>
         /// Replicated list from <see cref="BaseNode.PropertyFeature.ModifiedQueryBlocks"/>.
@@ -138,6 +150,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsCallingPrecursor = false;
+                ResolvedEventType = UninitializedEventType;
                 IsHandled = true;
             }
 
@@ -305,6 +318,27 @@ namespace CompilerNode
         /// The resolved result type.
         /// </summary>
         public OnceReference<ICompiledType> ResolvedResultType { get { return ResolvedEntityType; } }
+
+        /// <summary>
+        /// The resolved event type.
+        /// </summary>
+        public BaseNode.EventType ResolvedEventType { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="ResolvedEventType"/> property.
+        /// </summary>
+        /// <param name="eventType">The event type.</param>
+        /// <param name="isConflicting">True upon return if <paramref name="eventType"/> is conflicting with a previous call.</param>
+        public void SetEventType(BaseNode.EventType eventType, out bool isConflicting)
+        {
+            if (ResolvedEventType == UninitializedEventType || ResolvedEventType == eventType)
+            {
+                ResolvedEventType = eventType;
+                isConflicting = false;
+            }
+            else
+                isConflicting = true;
+        }
         #endregion
 
         #region Debugging
