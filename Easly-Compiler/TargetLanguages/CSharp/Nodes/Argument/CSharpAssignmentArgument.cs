@@ -62,17 +62,5 @@
         /// </summary>
         public IList<string> ParameterNameList { get; } = new List<string>();
         #endregion
-
-        #region Client Interface
-        /// <summary>
-        /// Gets the source code corresponding to the argument.
-        /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
-        public override string CSharpText(string cSharpNamespace)
-        {
-            //TODO
-            return null;
-        }
-        #endregion
     }
 }

@@ -12,6 +12,11 @@
         /// The Easly expression from which the C# expression is created.
         /// </summary>
         new IResultOfExpression Source { get; }
+
+        /// <summary>
+        /// The source expression.
+        /// </summary>
+        ICSharpExpression SourceExpression { get; }
     }
 
     /// <summary>
@@ -38,6 +43,7 @@
         protected CSharpResultOfExpression(ICSharpContext context, IResultOfExpression source)
             : base(context, source)
         {
+            SourceExpression = Create(context, (IExpression)source.Source);
         }
         #endregion
 
@@ -51,6 +57,11 @@
         /// True if the expression is complex (and requires to be surrounded with parenthesis).
         /// </summary>
         public override bool IsComplex { get { return true; } }
+
+        /// <summary>
+        /// The source expression.
+        /// </summary>
+        public ICSharpExpression SourceExpression { get; }
         #endregion
 
         #region Client Interface
@@ -70,8 +81,7 @@
         /// <param name="destinationList">The list of destinations.</param>
         public override string CSharpText(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
         {
-            //TODO
-            return "Result";
+            return SourceExpression.CSharpText(cSharpNamespace, destinationList);
         }
         #endregion
     }

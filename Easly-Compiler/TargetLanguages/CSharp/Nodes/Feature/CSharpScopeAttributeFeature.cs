@@ -172,7 +172,7 @@
         /// <param name="isMultiline">True if there is a separating line above.</param>
         public override void WriteCSharp(ICSharpWriter writer, string outputNamespace, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
         {
-            //TODO
+            WriteCSharp(writer, outputNamespace);
         }
         #endregion
     }

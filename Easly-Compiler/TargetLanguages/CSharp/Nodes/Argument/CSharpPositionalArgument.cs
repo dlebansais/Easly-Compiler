@@ -48,17 +48,5 @@
         /// </summary>
         public new IPositionalArgument Source { get { return (IPositionalArgument)base.Source; } }
         #endregion
-
-        #region Client Interface
-        /// <summary>
-        /// Gets the source code corresponding to the argument.
-        /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
-        public override string CSharpText(string cSharpNamespace)
-        {
-            //TODO
-            return null;
-        }
-        #endregion
     }
 }

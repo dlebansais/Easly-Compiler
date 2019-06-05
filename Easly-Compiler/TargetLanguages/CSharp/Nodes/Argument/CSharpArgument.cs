@@ -18,12 +18,6 @@
         /// The source expression.
         /// </summary>
         ICSharpExpression SourceExpression { get; }
-
-        /// <summary>
-        /// Gets the source code corresponding to the argument.
-        /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
-        string CSharpText(string cSharpNamespace);
     }
 
     /// <summary>
@@ -83,12 +77,6 @@
         #endregion
 
         #region Client Interface
-        /// <summary>
-        /// Gets the source code corresponding to the argument.
-        /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
-        public abstract string CSharpText(string cSharpNamespace);
-
         /// <summary>
         /// Gets the source code of arguments of a feature call.
         /// </summary>
@@ -158,7 +146,7 @@
 
                 string DestinationText = Destination.CSharpText(cSharpNamespace, 0);
 
-                Result += $"out {DestinationText }";
+                Result += $"out {DestinationText}";
             }
 
             return Result;
@@ -206,7 +194,7 @@
 
                 string DestinationText = Destination.CSharpText(cSharpNamespace, 0);
 
-                Result += $"out {DestinationText }";
+                Result += $"out {DestinationText}";
             }
 
             return Result;
