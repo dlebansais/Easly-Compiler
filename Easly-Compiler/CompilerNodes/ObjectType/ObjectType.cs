@@ -1463,7 +1463,7 @@
             else if (index == 0 && index + 1 < validPath.Count && baseClass.ImportedClassTable.ContainsKey(ValidText) && baseClass.ImportedClassTable[ValidText].Item.Cloneable == BaseNode.CloneableStatus.Single)
                 return GetQualifiedPathFinalTypeFromSingle(baseClass, validPath, index, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
             else if (index + 1 == validPath.Count)
-                return GetQualifiedPathFinalTypeAsDiscrete(baseType, validPath, index, errorList, out finalDiscrete, out finalTypeName, out finalType);
+                return GetQualifiedPathFinalTypeAsDiscrete(baseType, ValidIdentifier, errorList, out finalDiscrete, out finalTypeName, out finalType);
             else
             {
                 errorList.AddError(new ErrorUnknownIdentifier(ValidIdentifier, ValidText));
@@ -1542,33 +1542,32 @@
             return GetQualifiedPathFinalType(baseClass, ResolvedFeatureType, NewScope, validPath, index + 1, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
         }
 
-        private static bool GetQualifiedPathFinalTypeAsDiscrete(ICompiledType baseType, IList<IIdentifier> validPath, int index, IErrorList errorList, out IDiscrete finalDiscrete, out ITypeName finalTypeName, out ICompiledType finalType)
+        private static bool GetQualifiedPathFinalTypeAsDiscrete(ICompiledType baseType, IIdentifier validIdentifier, IErrorList errorList, out IDiscrete finalDiscrete, out ITypeName finalTypeName, out ICompiledType finalType)
         {
             finalDiscrete = null;
             finalTypeName = null;
             finalType = null;
 
-            IIdentifier ValidIdentifier = validPath[index];
-            string ValidText = ValidIdentifier.ValidText.Item;
+            string ValidText = validIdentifier.ValidText.Item;
 
             ISealableDictionary<IFeatureName, IDiscrete> DiscreteTable = baseType.DiscreteTable;
 
             if (FeatureName.TableContain(DiscreteTable, ValidText, out IFeatureName Key, out IDiscrete Discrete))
             {
-                if (Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, ValidIdentifier, out finalTypeName, out finalType))
+                if (Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, validIdentifier, out finalTypeName, out finalType))
                 {
                     finalDiscrete = Discrete;
                     return true;
                 }
                 else
                 {
-                    errorList.AddError(new ErrorNumberTypeMissing(ValidIdentifier));
+                    errorList.AddError(new ErrorNumberTypeMissing(validIdentifier));
                     return false;
                 }
             }
             else
             {
-                errorList.AddError(new ErrorUnknownIdentifier(ValidIdentifier, ValidText));
+                errorList.AddError(new ErrorUnknownIdentifier(validIdentifier, ValidText));
                 return false;
             }
         }
