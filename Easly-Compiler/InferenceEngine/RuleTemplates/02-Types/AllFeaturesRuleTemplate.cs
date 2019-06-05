@@ -353,7 +353,7 @@
 
                     ICompiledType AncestorFeatureType = Item.Instance.Feature.ResolvedFeatureType.Item;
 
-                    if (!ObjectType.TypeConformToBase(DescendantFeatureType, AncestorFeatureType, errorList, (ISource)importedInstance.EffectiveInstance.Item.Instance.Feature))
+                    if (!ObjectType.TypeConformToBase(DescendantFeatureType, AncestorFeatureType, errorList, (ISource)importedInstance.EffectiveInstance.Item.Instance.Feature, isConversionAllowed: false))
                     {
                         errorList.AddError(new ErrorInheritanceConflict(Item.Location, Item.Name.Name));
                         Result = false;

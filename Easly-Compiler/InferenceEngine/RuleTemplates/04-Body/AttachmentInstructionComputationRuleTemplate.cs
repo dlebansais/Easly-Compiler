@@ -172,7 +172,7 @@
                         IObjectType PreviousAttachType = PreviousAttachmentItem.AttachTypeList[index];
                         ICompiledType PreviousDestinationType = PreviousAttachType.ResolvedType.Item;
 
-                        if (ObjectType.TypeConformToBase(DestinationType, PreviousDestinationType))
+                        if (ObjectType.TypeConformToBase(DestinationType, PreviousDestinationType, isConversionAllowed: false))
                         {
                             AddSourceError(new ErrorInvalidAttachment(AttachmentItem));
                             ConformanceError = true;
@@ -209,7 +209,7 @@
                             IObjectType PreviousAttachType = PreviousAttachmentItem.AttachTypeList[index];
                             ICompiledType PreviousDestinationType = PreviousAttachType.ResolvedType.Item;
 
-                            if (ObjectType.TypeConformToBase(DestinationType, PreviousDestinationType))
+                            if (ObjectType.TypeConformToBase(DestinationType, PreviousDestinationType, isConversionAllowed: false))
                             {
                                 AddSourceError(new ErrorInvalidAttachment(AttachmentItem));
                                 ConformanceError = true;

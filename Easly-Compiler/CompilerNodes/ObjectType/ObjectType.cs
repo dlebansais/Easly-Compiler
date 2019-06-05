@@ -1,5 +1,6 @@
 ﻿namespace CompilerNode
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using Easly;
@@ -93,9 +94,10 @@
         /// </summary>
         /// <param name="derivedType">The type to check.</param>
         /// <param name="baseType">The base type.</param>
-        public static bool TypeConformToBase(ICompiledType derivedType, ICompiledType baseType)
+        /// <param name="isConversionAllowed">True if the method should try to find a conversion path from base to derived.</param>
+        public static bool TypeConformToBase(ICompiledType derivedType, ICompiledType baseType, bool isConversionAllowed)
         {
-            return TypeConformToBase(derivedType, baseType, ErrorList.Ignored, ErrorList.NoLocation);
+            return TypeConformToBase(derivedType, baseType, ErrorList.Ignored, ErrorList.NoLocation, isConversionAllowed);
         }
 
         /// <summary>
@@ -105,7 +107,121 @@
         /// <param name="baseType">The base type.</param>
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="sourceLocation">The location for reporting errors.</param>
-        public static bool TypeConformToBase(ICompiledType derivedType, ICompiledType baseType, IErrorList errorList, ISource sourceLocation)
+        /// <param name="isConversionAllowed">True if the method should try to find a conversion path from base to derived.</param>
+        public static bool TypeConformToBase(ICompiledType derivedType, ICompiledType baseType, IErrorList errorList, ISource sourceLocation, bool isConversionAllowed)
+        {
+            if (isConversionAllowed)
+            {
+                IList<ICompiledType> DerivedTypeList = new List<ICompiledType>();
+                ListConvertibleTypes(derivedType, DerivedTypeList, GetTypesConvertibleFrom);
+
+                IList<ICompiledType> BaseTypeList = new List<ICompiledType>();
+                ListConvertibleTypes(baseType, BaseTypeList, GetTypesConvertibleTo);
+
+                return TypeConformToBase(DerivedTypeList, BaseTypeList, errorList, sourceLocation);
+            }
+            else
+                return ConvertedTypeConformToBase(derivedType, baseType, errorList, sourceLocation);
+        }
+
+        private static void ListConvertibleTypes(ICompiledType type, IList<ICompiledType> typeList, Func<IClassType, IList<ICompiledType>> handler)
+        {
+            typeList.Add(type);
+
+            if (type is IClassType AsClassType)
+            {
+                IList<ICompiledType> ConvertibleTypeList = handler(AsClassType);
+
+                foreach (ICompiledType ConvertibleType in ConvertibleTypeList)
+                    typeList.Add(ConvertibleType);
+            }
+        }
+
+        private static IList<ICompiledType> GetTypesConvertibleFrom(IClassType type)
+        {
+            ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable = type.FeatureTable;
+            ISealableDictionary<IFeatureName, ICreationFeature> ConversionFromTable = type.BaseClass.ConversionFromTable;
+            IList<ICompiledType> Result = new List<ICompiledType>();
+
+            foreach (KeyValuePair<IFeatureName, ICreationFeature> Entry in ConversionFromTable)
+            {
+                ICreationFeature Feature = Entry.Value;
+
+                foreach (ICommandOverload Overload in Feature.OverloadList)
+                {
+                    ISealableList<IParameter> ParameterTable = Overload.ParameterTable;
+                    Debug.Assert(ParameterTable.IsSealed);
+                    Debug.Assert(ParameterTable.Count == 1);
+
+                    IParameter OverloadParameter = ParameterTable[0];
+                    Debug.Assert(OverloadParameter.ResolvedParameter.ResolvedFeatureType.IsAssigned);
+
+                    ICompiledType OverloadParameterType = OverloadParameter.ResolvedParameter.ResolvedFeatureType.Item;
+                    Result.Add(OverloadParameterType);
+                }
+            }
+
+            return Result;
+        }
+
+        private static IList<ICompiledType> GetTypesConvertibleTo(IClassType type)
+        {
+            ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable = type.FeatureTable;
+            ISealableDictionary<IFeatureName, IFunctionFeature> ConversionToTable = type.BaseClass.ConversionToTable;
+            IList<ICompiledType> Result = new List<ICompiledType>();
+
+            foreach (KeyValuePair<IFeatureName, IFunctionFeature> Entry in ConversionToTable)
+            {
+                IFunctionFeature Feature = Entry.Value;
+
+                foreach (IQueryOverload Overload in Feature.OverloadList)
+                {
+                    ISealableList<IParameter> ParameterTable = Overload.ParameterTable;
+                    Debug.Assert(ParameterTable.IsSealed);
+                    Debug.Assert(ParameterTable.Count == 0);
+
+                    ISealableList<IParameter> ResultTable = Overload.ResultTable;
+                    Debug.Assert(ResultTable.IsSealed);
+                    Debug.Assert(ResultTable.Count == 1);
+
+                    IParameter OverloadResult = ResultTable[0];
+                    Debug.Assert(OverloadResult.ResolvedParameter.ResolvedFeatureType.IsAssigned);
+
+                    ICompiledType OverloadResultType = OverloadResult.ResolvedParameter.ResolvedFeatureType.Item;
+                    Result.Add(OverloadResultType);
+                }
+            }
+
+            return Result;
+        }
+
+        private static bool TypeConformToBase(IList<ICompiledType> derivedTypeList, IList<ICompiledType> baseTypeList, IErrorList errorList, ISource sourceLocation)
+        {
+            bool Success = false;
+            IErrorList DirectErrorList = new ErrorList();
+
+            for (int derivedIndex = 0; derivedIndex < derivedTypeList.Count; derivedIndex++)
+            {
+                ICompiledType DerivedType = derivedTypeList[derivedIndex];
+
+                for (int baseIndex = 0; baseIndex < baseTypeList.Count; baseIndex++)
+                {
+                    ICompiledType BaseType = baseTypeList[baseIndex];
+
+                    if (derivedIndex == 0 && baseIndex == 0)
+                        Success |= ConvertedTypeConformToBase(DerivedType, BaseType, DirectErrorList, sourceLocation);
+                    else
+                        Success |= ConvertedTypeConformToBase(DerivedType, BaseType, ErrorList.Ignored, ErrorList.NoLocation);
+                }
+            }
+
+            if (!Success)
+                errorList.AddErrors(DirectErrorList);
+
+            return Success;
+        }
+
+        private static bool ConvertedTypeConformToBase(ICompiledType derivedType, ICompiledType baseType, IErrorList errorList, ISource sourceLocation)
         {
             if (IsDirectDescendantOf(derivedType, baseType, sourceLocation))
                 return true;
@@ -239,7 +355,7 @@
             foreach (KeyValuePair<ITypeName, ICompiledType> ConformingEntry in baseType.FormalGeneric.ResolvedConformanceTable)
             {
                 ICompiledType ConformingType = ConformingEntry.Value;
-                Result &= TypeConformToBase(derivedType, ConformingType, errorList, sourceLocation);
+                Result &= TypeConformToBase(derivedType, ConformingType, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             if (!derivedType.IsReference && baseType.IsReference)
@@ -293,7 +409,7 @@
             foreach (KeyValuePair<ITypeName, ICompiledType> ConformingEntry in derivedType.FormalGeneric.ResolvedConformanceTable)
             {
                 ICompiledType ConformingType = ConformingEntry.Value;
-                ConformantConstraintFound |= TypeConformToBase(ConformingType, baseType, ErrorList.Ignored, ErrorList.NoLocation);
+                ConformantConstraintFound |= TypeConformToBase(ConformingType, baseType, ErrorList.Ignored, ErrorList.NoLocation, isConversionAllowed: false);
             }
 
             if (!ConformantConstraintFound)
@@ -333,7 +449,7 @@
                 ICompiledType DerivedGenericType = DerivedEntry.Value;
                 ICompiledType BaseGenericType = baseType.TypeArgumentTable[DerivedGenericName];
 
-                Result &= TypeConformToBase(DerivedGenericType, BaseGenericType, errorList, sourceLocation);
+                Result &= TypeConformToBase(DerivedGenericType, BaseGenericType, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             return Result;
@@ -389,7 +505,7 @@
             Debug.Assert(derivedType.ResolvedBaseType.IsAssigned);
             Debug.Assert(baseType.ResolvedBaseType.IsAssigned);
 
-            if (!TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation))
+            if (!TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation, isConversionAllowed: false))
             {
                 errorList.AddError(new ErrorBaseConformance(sourceLocation, derivedType, baseType));
                 Result = false;
@@ -437,7 +553,7 @@
                 Debug.Assert(BaseParameter.ValidEntity.IsAssigned);
                 Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation);
+                Result &= TypeConformToBase(BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             for (int i = 0; i < baseType.ResultList.Count && i < derivedType.ResultList.Count; i++)
@@ -450,7 +566,7 @@
                 Debug.Assert(DerivedResult.ValidEntity.IsAssigned);
                 Debug.Assert(DerivedResult.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(DerivedResult.ValidEntity.Item.ResolvedFeatureType.Item, BaseResult.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation);
+                Result &= TypeConformToBase(DerivedResult.ValidEntity.Item.ResolvedFeatureType.Item, BaseResult.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             Result &= ExceptionListConformToBase(derivedType.ExceptionIdentifierList, baseType.ExceptionIdentifierList, errorList, sourceLocation);
@@ -465,7 +581,7 @@
             Debug.Assert(derivedType.ResolvedBaseType.IsAssigned);
             Debug.Assert(baseType.ResolvedBaseType.IsAssigned);
 
-            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation);
+            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation, isConversionAllowed: false);
 
             if (derivedType.PropertyKind == BaseNode.UtilityType.WriteOnly)
             {
@@ -491,7 +607,7 @@
             Debug.Assert(OverloadResult.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
             Debug.Assert(derivedType.ResolvedEntityType.IsAssigned);
 
-            Result &= TypeConformToBase(OverloadResult.ValidEntity.Item.ResolvedFeatureType.Item, derivedType.ResolvedEntityType.Item, errorList, sourceLocation);
+            Result &= TypeConformToBase(OverloadResult.ValidEntity.Item.ResolvedFeatureType.Item, derivedType.ResolvedEntityType.Item, errorList, sourceLocation, isConversionAllowed: false);
             Result &= ExceptionListConformToBase(derivedType.GetExceptionIdentifierList, SingleOverload.ExceptionIdentifierList, errorList, sourceLocation);
 
             return Result;
@@ -504,7 +620,7 @@
             Debug.Assert(derivedType.ResolvedBaseType.IsAssigned);
             Debug.Assert(baseType.ResolvedBaseType.IsAssigned);
 
-            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation);
+            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation, isConversionAllowed: false);
 
             if (derivedType.IndexerKind == BaseNode.UtilityType.WriteOnly)
             {
@@ -535,7 +651,7 @@
                 Debug.Assert(BaseParameter.ValidEntity.IsAssigned);
                 Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation);
+                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             IEntityDeclaration OverloadResult = SingleOverload.ResultList[0];
@@ -543,7 +659,7 @@
             Debug.Assert(OverloadResult.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
             Debug.Assert(derivedType.ResolvedEntityType.IsAssigned);
 
-            Result &= TypeConformToBase(OverloadResult.ValidEntity.Item.ResolvedFeatureType.Item, derivedType.ResolvedEntityType.Item, errorList, sourceLocation);
+            Result &= TypeConformToBase(OverloadResult.ValidEntity.Item.ResolvedFeatureType.Item, derivedType.ResolvedEntityType.Item, errorList, sourceLocation, isConversionAllowed: false);
             Result &= ExceptionListConformToBase(derivedType.GetExceptionIdentifierList, SingleOverload.ExceptionIdentifierList, errorList, sourceLocation);
 
             return Result;
@@ -599,7 +715,7 @@
             Debug.Assert(derivedType.ResolvedBaseType.IsAssigned);
             Debug.Assert(baseType.ResolvedBaseType.IsAssigned);
 
-            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation);
+            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation, isConversionAllowed: false);
 
             IErrorList AllOverloadErrorList = new ErrorList();
             foreach (ICommandOverloadType BaseOverload in baseType.OverloadList)
@@ -648,7 +764,7 @@
                 Debug.Assert(BaseParameter.ValidEntity.IsAssigned);
                 Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation);
+                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             Result &= ExceptionListConformToBase(derivedType.ExceptionIdentifierList, baseType.ExceptionIdentifierList, errorList, sourceLocation);
@@ -663,7 +779,7 @@
             Debug.Assert(derivedType.ResolvedBaseType.IsAssigned);
             Debug.Assert(baseType.ResolvedBaseType.IsAssigned);
 
-            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation);
+            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation, isConversionAllowed: false);
 
             if (derivedType.PropertyKind == BaseNode.UtilityType.ReadOnly)
             {
@@ -691,7 +807,7 @@
                 Debug.Assert(OverloadValue.ValidEntity.IsAssigned);
                 Debug.Assert(OverloadValue.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(derivedType.ResolvedEntityType.Item, OverloadValue.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation);
+                Result &= TypeConformToBase(derivedType.ResolvedEntityType.Item, OverloadValue.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
                 Result &= ExceptionListConformToBase(derivedType.SetExceptionIdentifierList, SingleOverload.ExceptionIdentifierList, errorList, sourceLocation);
             }
 
@@ -705,7 +821,7 @@
             Debug.Assert(derivedType.ResolvedBaseType.IsAssigned);
             Debug.Assert(baseType.ResolvedBaseType.IsAssigned);
 
-            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation);
+            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation, isConversionAllowed: false);
 
             if (derivedType.IndexerKind == BaseNode.UtilityType.ReadOnly)
             {
@@ -736,7 +852,7 @@
                 Debug.Assert(DerivedParameter.ValidEntity.IsAssigned);
                 Debug.Assert(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation);
+                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             if (SingleOverload.ParameterList.Count == derivedType.IndexParameterList.Count + 1)
@@ -747,7 +863,7 @@
                 Debug.Assert(LastParameter.ValidEntity.IsAssigned);
                 Debug.Assert(LastParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(derivedType.ResolvedEntityType.Item, LastParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation);
+                Result &= TypeConformToBase(derivedType.ResolvedEntityType.Item, LastParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             Result &= ExceptionListConformToBase(derivedType.SetExceptionIdentifierList, SingleOverload.ExceptionIdentifierList, errorList, sourceLocation);
@@ -805,7 +921,7 @@
             Debug.Assert(derivedType.ResolvedBaseType.IsAssigned);
             Debug.Assert(baseType.ResolvedBaseType.IsAssigned);
 
-            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation);
+            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation, isConversionAllowed: false);
 
             if (baseType.PropertyKind != BaseNode.UtilityType.ReadOnly)
             {
@@ -855,7 +971,7 @@
                 Debug.Assert(OverloadResult.ValidEntity.IsAssigned);
                 Debug.Assert(OverloadResult.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(baseType.ResolvedEntityType.Item, OverloadResult.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation);
+                Result &= TypeConformToBase(baseType.ResolvedEntityType.Item, OverloadResult.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             Result &= ExceptionListConformToBase(derivedOverload.ExceptionIdentifierList, baseType.GetExceptionIdentifierList, errorList, sourceLocation);
@@ -870,7 +986,7 @@
             Debug.Assert(derivedType.ResolvedBaseType.IsAssigned);
             Debug.Assert(baseType.ResolvedBaseType.IsAssigned);
 
-            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation);
+            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation, isConversionAllowed: false);
 
             if (baseType.PropertyKind != BaseNode.UtilityType.WriteOnly)
             {
@@ -919,7 +1035,7 @@
                 Debug.Assert(OverloadValue.ValidEntity.IsAssigned);
                 Debug.Assert(OverloadValue.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(OverloadValue.ValidEntity.Item.ResolvedFeatureType.Item, baseType.ResolvedEntityType.Item, errorList, sourceLocation);
+                Result &= TypeConformToBase(OverloadValue.ValidEntity.Item.ResolvedFeatureType.Item, baseType.ResolvedEntityType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             Result &= ExceptionListConformToBase(derivedOverload.ExceptionIdentifierList, baseType.SetExceptionIdentifierList, errorList, sourceLocation);
@@ -934,7 +1050,7 @@
             Debug.Assert(derivedType.ResolvedBaseType.IsAssigned);
             Debug.Assert(baseType.ResolvedBaseType.IsAssigned);
 
-            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation);
+            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation, isConversionAllowed: false);
 
             if ((baseType.PropertyKind == BaseNode.UtilityType.ReadOnly && derivedType.PropertyKind == BaseNode.UtilityType.WriteOnly) ||
                 (baseType.PropertyKind == BaseNode.UtilityType.WriteOnly && derivedType.PropertyKind == BaseNode.UtilityType.ReadOnly) ||
@@ -955,7 +1071,7 @@
             }
             */
 
-            Result &= TypeConformToBase(derivedType.ResolvedEntityType.Item, baseType.ResolvedEntityType.Item, errorList, sourceLocation);
+            Result &= TypeConformToBase(derivedType.ResolvedEntityType.Item, baseType.ResolvedEntityType.Item, errorList, sourceLocation, isConversionAllowed: false);
             Result &= ExceptionListConformToBase(derivedType.GetExceptionIdentifierList, baseType.GetExceptionIdentifierList, errorList, sourceLocation);
             Result &= ExceptionListConformToBase(derivedType.SetExceptionIdentifierList, baseType.SetExceptionIdentifierList, errorList, sourceLocation);
 
@@ -1012,7 +1128,7 @@
             Debug.Assert(derivedType.ResolvedBaseType.IsAssigned);
             Debug.Assert(baseType.ResolvedBaseType.IsAssigned);
 
-            Result = TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation);
+            Result = TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation, isConversionAllowed: false);
 
             if (baseType.IndexerKind != BaseNode.UtilityType.ReadOnly)
             {
@@ -1049,7 +1165,7 @@
                 Debug.Assert(BaseParameter.ValidEntity.IsAssigned);
                 Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation);
+                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             IEntityDeclaration OverloadResult = derivedOverload.ResultList[0];
@@ -1058,7 +1174,7 @@
             Debug.Assert(OverloadResult.ValidEntity.IsAssigned);
             Debug.Assert(OverloadResult.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-            Result &= TypeConformToBase(baseType.ResolvedEntityType.Item, OverloadResult.ValidEntity.Item.ResolvedFeatureType.Item, ErrorList.Ignored, ErrorList.NoLocation);
+            Result &= TypeConformToBase(baseType.ResolvedEntityType.Item, OverloadResult.ValidEntity.Item.ResolvedFeatureType.Item, ErrorList.Ignored, ErrorList.NoLocation, isConversionAllowed: false);
             Result &= ExceptionListConformToBase(derivedOverload.ExceptionIdentifierList, baseType.GetExceptionIdentifierList, errorList, sourceLocation);
 
             return Result;
@@ -1071,7 +1187,7 @@
             Debug.Assert(derivedType.ResolvedBaseType.IsAssigned);
             Debug.Assert(baseType.ResolvedBaseType.IsAssigned);
 
-            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation);
+            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation, isConversionAllowed: false);
 
             if (baseType.IndexerKind != BaseNode.UtilityType.WriteOnly)
             {
@@ -1108,7 +1224,7 @@
                 Debug.Assert(BaseParameter.ValidEntity.IsAssigned);
                 Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation);
+                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             if (derivedOverload.ParameterList.Count == baseType.IndexParameterList.Count + 1)
@@ -1119,7 +1235,7 @@
                 Debug.Assert(OverloadValue.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
                 Debug.Assert(baseType.ResolvedEntityType.IsAssigned);
 
-                Result &= TypeConformToBase(OverloadValue.ValidEntity.Item.ResolvedFeatureType.Item, baseType.ResolvedEntityType.Item, ErrorList.Ignored, ErrorList.NoLocation);
+                Result &= TypeConformToBase(OverloadValue.ValidEntity.Item.ResolvedFeatureType.Item, baseType.ResolvedEntityType.Item, ErrorList.Ignored, ErrorList.NoLocation, isConversionAllowed: false);
                 Result &= ExceptionListConformToBase(derivedOverload.ExceptionIdentifierList, baseType.SetExceptionIdentifierList, errorList, sourceLocation);
             }
 
@@ -1133,7 +1249,7 @@
             Debug.Assert(derivedType.ResolvedBaseType.IsAssigned);
             Debug.Assert(baseType.ResolvedBaseType.IsAssigned);
 
-            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation);
+            Result &= TypeConformToBase(derivedType.ResolvedBaseType.Item, baseType.ResolvedBaseType.Item, errorList, sourceLocation, isConversionAllowed: false);
 
             if ((baseType.IndexerKind == BaseNode.UtilityType.ReadOnly && derivedType.IndexerKind == BaseNode.UtilityType.WriteOnly) ||
                 (baseType.IndexerKind == BaseNode.UtilityType.WriteOnly && derivedType.IndexerKind == BaseNode.UtilityType.ReadOnly) ||
@@ -1159,13 +1275,13 @@
                 Debug.Assert(BaseParameter.ValidEntity.IsAssigned);
                 Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation);
+                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             Debug.Assert(derivedType.ResolvedEntityType.IsAssigned);
             Debug.Assert(baseType.ResolvedEntityType.IsAssigned);
 
-            Result &= TypeConformToBase(derivedType.ResolvedEntityType.Item, baseType.ResolvedEntityType.Item, errorList, sourceLocation);
+            Result &= TypeConformToBase(derivedType.ResolvedEntityType.Item, baseType.ResolvedEntityType.Item, errorList, sourceLocation, isConversionAllowed: false);
 
             /*
             if (!TypesHaveIdenticalSignature(derivedType.ResolvedEntityType.Item, baseType.ResolvedEntityType.Item))
@@ -1246,7 +1362,7 @@
                 Debug.Assert(BaseField.ValidEntity.IsAssigned);
                 Debug.Assert(BaseField.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result = TypeConformToBase(DerivedField.ValidEntity.Item.ResolvedFeatureType.Item, BaseField.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation);
+                Result = TypeConformToBase(DerivedField.ValidEntity.Item.ResolvedFeatureType.Item, BaseField.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             return Result;
@@ -1294,10 +1410,10 @@
         /// <param name="type2">The second type.</param>
         public static bool TypesHaveCommonDescendant(IClass embeddingClass, ICompiledType type1, ICompiledType type2)
         {
-            if (TypeConformToBase(type1, type2))
+            if (TypeConformToBase(type1, type2, isConversionAllowed: false))
                 return true;
 
-            if (TypeConformToBase(type2, type1))
+            if (TypeConformToBase(type2, type1, isConversionAllowed: false))
                 return false; // Acceptable, but useless. Change this to a warning.
 
             bool IsConformant = false;
@@ -1306,8 +1422,8 @@
             {
                 ICompiledType Descendant = Entry.Value;
 
-                IsConformant |= TypeConformToBase(Descendant, type1) && TypeConformToBase(Descendant, type2);
-                IsConformant |= TypeConformToBase(Descendant, type2) && TypeConformToBase(Descendant, type1);
+                IsConformant |= TypeConformToBase(Descendant, type1, isConversionAllowed: false) && TypeConformToBase(Descendant, type2, isConversionAllowed: false);
+                IsConformant |= TypeConformToBase(Descendant, type2, isConversionAllowed: false) && TypeConformToBase(Descendant, type1, isConversionAllowed: false);
             }
 
             return IsConformant;

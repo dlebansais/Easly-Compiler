@@ -223,7 +223,7 @@
                             MatchingNameFound = true;
                             ICompiledType RightExpressionType = RightItem.ValueType;
 
-                            if (!ObjectType.TypeConformToBase(LeftExpressionType, RightExpressionType) && !ObjectType.TypeConformToBase(RightExpressionType, LeftExpressionType))
+                            if (!ObjectType.TypeConformToBase(LeftExpressionType, RightExpressionType, isConversionAllowed: true) && !ObjectType.TypeConformToBase(RightExpressionType, LeftExpressionType, isConversionAllowed: true))
                                 MismatchingResultCount++;
 
                             break;

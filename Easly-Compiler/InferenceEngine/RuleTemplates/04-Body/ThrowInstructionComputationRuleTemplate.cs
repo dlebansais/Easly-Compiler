@@ -61,7 +61,7 @@
                 return false;
             }
 
-            if (!ObjectType.TypeConformToBase(ResolvedType, ExceptionType))
+            if (!ObjectType.TypeConformToBase(ResolvedType, ExceptionType, isConversionAllowed: true))
             {
                 AddSourceError(new ErrorExceptionTypeRequired(node));
                 return false;

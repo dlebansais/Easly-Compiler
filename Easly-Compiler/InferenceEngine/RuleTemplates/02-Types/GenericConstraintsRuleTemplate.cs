@@ -81,7 +81,7 @@
             ITypeName BaseTypeName = constraintItem.ResolvedParentTypeName.Item;
             ICompiledType BaseType = constraintItem.ResolvedParentType.Item;
 
-            if (node.DefaultValue.IsAssigned && !ObjectType.TypeConformToBase(node.ResolvedDefaultType.Item, BaseType, ErrorList, (IObjectType)node.DefaultValue.Item))
+            if (node.DefaultValue.IsAssigned && !ObjectType.TypeConformToBase(node.ResolvedDefaultType.Item, BaseType, ErrorList, (IObjectType)node.DefaultValue.Item, isConversionAllowed: false))
                 Success = false;
 
             if (copyConstraint == BaseNode.CopySemantic.Reference)

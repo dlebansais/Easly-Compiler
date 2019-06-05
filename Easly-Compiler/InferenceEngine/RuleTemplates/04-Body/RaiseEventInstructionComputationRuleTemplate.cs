@@ -87,7 +87,7 @@
                         AddSourceError(new ErrorEventTypeMissing(node));
                         Success = false;
                     }
-                    else if (!ObjectType.TypeConformToBase(SelectedEntityType, EventType))
+                    else if (!ObjectType.TypeConformToBase(SelectedEntityType, EventType, isConversionAllowed: true))
                     {
                         AddSourceError(new ErrorInvalidInstruction(node));
                         Success = false;

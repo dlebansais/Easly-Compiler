@@ -411,7 +411,7 @@
 
                     Debug.Assert(DestinationType != null);
 
-                    if (!ObjectType.TypeConformToBase(SourceType, DestinationType, errorList, IdentifierItem))
+                    if (!ObjectType.TypeConformToBase(SourceType, DestinationType, errorList, IdentifierItem, isConversionAllowed: true))
                     {
                         errorList.AddError(new ErrorAssignmentMismatch(IdentifierItem));
                         return false;

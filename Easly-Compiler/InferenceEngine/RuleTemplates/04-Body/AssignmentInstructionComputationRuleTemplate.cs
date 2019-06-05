@@ -80,7 +80,7 @@
                         IPathParticipatingType DestinationType = FinalType as IPathParticipatingType;
                         Debug.Assert(DestinationType != null);
 
-                        if (!ObjectType.TypeConformToBase(SourceType, DestinationType.TypeAsDestinationOrSource))
+                        if (!ObjectType.TypeConformToBase(SourceType, DestinationType.TypeAsDestinationOrSource, isConversionAllowed: true))
                         {
                             AddSourceError(new ErrorAssignmentMismatch(Destination));
                             Success = false;

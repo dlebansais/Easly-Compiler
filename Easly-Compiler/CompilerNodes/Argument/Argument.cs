@@ -328,7 +328,7 @@ namespace CompilerNode
 
                     Debug.Assert(ParameterType != null);
 
-                    IsMatching &= ObjectType.TypeConformToBase(ArgumentType, ParameterType);
+                    IsMatching &= ObjectType.TypeConformToBase(ArgumentType, ParameterType, isConversionAllowed: true);
                 }
 
                 if (IsMatching)
@@ -398,7 +398,7 @@ namespace CompilerNode
                     UnassignedParameters.Remove(OverloadParameter);
 
                     ICompiledType ParameterType = OverloadParameter.ResolvedParameter.ResolvedFeatureType.Item;
-                    IsMatching &= ObjectType.TypeConformToBase(ArgumentType, ParameterType);
+                    IsMatching &= ObjectType.TypeConformToBase(ArgumentType, ParameterType, isConversionAllowed: true);
                 }
 
                 foreach (IParameter OverloadParameter in UnassignedParameters)
@@ -453,7 +453,7 @@ namespace CompilerNode
             ISealableList<IParameter> SelectedParameterList = parameterTableList[SelectedIndex];
             ICompiledType SourceType = SourceResult.At(0).ValueType;
 
-            if (!ObjectType.TypeConformToBase(SourceType, destinationType, errorList, sourceExpression))
+            if (!ObjectType.TypeConformToBase(SourceType, destinationType, errorList, sourceExpression, isConversionAllowed: true))
             {
                 errorList.AddError(new ErrorInvalidExpression(sourceExpression));
                 return false;

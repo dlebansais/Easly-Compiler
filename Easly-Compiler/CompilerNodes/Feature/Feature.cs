@@ -27,7 +27,6 @@
     {
         /// <summary>
         /// Checks that all overloads in a list have parameters that allow them to be distinguished in a caller.
-        /// TODO include conversions in the check.
         /// </summary>
         /// <param name="overloadList">The list of overloads.</param>
         /// <param name="errorList">The list of errors found.</param>
@@ -100,7 +99,6 @@
 
         /// <summary>
         /// Checks that all overloads in a list have parameters that allow them to be distinguished in a caller.
-        /// TODO include conversions in the check.
         /// </summary>
         /// <param name="overloadList">The list of overloads.</param>
         /// <param name="location">The location where to report errors.</param>
@@ -156,7 +154,7 @@
             ICompiledType BaseType = baseParameter.ResolvedParameter.ResolvedFeatureType.Item;
             bool Success = true;
 
-            if (ObjectType.TypeConformToBase(DerivedType, BaseType))
+            if (ObjectType.TypeConformToBase(DerivedType, BaseType, isConversionAllowed: false))
             {
                 errorList.AddError(new ErrorMoreBasicParameter(baseParameter.ResolvedParameter.Location));
                 Success = false;
@@ -215,7 +213,7 @@
                 ITypeName CurrentParameterTypeName = CurrentParameter.ResolvedParameter.ResolvedFeatureTypeName.Item;
                 ICompiledType CurrentParameterType = CurrentParameter.ResolvedParameter.ResolvedFeatureType.Item;
 
-                if (ObjectType.TypeConformToBase(SelectedParameterType, CurrentParameterType))
+                if (ObjectType.TypeConformToBase(SelectedParameterType, CurrentParameterType, isConversionAllowed: false))
                 {
                     SelectedParameter = CurrentParameter;
                     SelectedParameterTypeName = CurrentParameterTypeName;
@@ -252,7 +250,7 @@
                 IParameter CurrentParameter = SameIndexList[i];
                 ICompiledType CurrentParameterType = CurrentParameter.ResolvedParameter.ResolvedFeatureType.Item;
 
-                if (!ObjectType.TypeConformToBase(CurrentParameterType, baseType))
+                if (!ObjectType.TypeConformToBase(CurrentParameterType, baseType, isConversionAllowed: false))
                 {
                     errorList.AddError(new ErrorNonConformingType(location));
                     Success = false;

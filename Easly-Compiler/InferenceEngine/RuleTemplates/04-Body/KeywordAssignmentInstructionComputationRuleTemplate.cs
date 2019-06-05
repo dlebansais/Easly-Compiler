@@ -102,7 +102,7 @@
 
             ISealableDictionary<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
 
-            if (!ObjectType.TypeConformToBase(SourceType, DestinationType, ErrorList, node))
+            if (!ObjectType.TypeConformToBase(SourceType, DestinationType, ErrorList, node, isConversionAllowed: true))
             {
                 AddSourceError(new ErrorAssignmentMismatch(node));
                 return false;

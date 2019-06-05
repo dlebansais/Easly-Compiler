@@ -74,7 +74,7 @@
 
                     if (ResultType is IClassType AsClassType)
                     {
-                        if (IsOverLoopSourceAvailable && ObjectType.TypeConformToBase(ResultType, OverLoopSourceType))
+                        if (IsOverLoopSourceAvailable && ObjectType.TypeConformToBase(ResultType, OverLoopSourceType, isConversionAllowed: true))
                             IsConformantToEnumerable = FindSourceItemPrecursor(AsClassType, ResultType.FeatureTable, out IndexTypeName, out IndexType);
 
                         if (AsClassType.BaseClass.FeatureTable.ContainsKey(FeatureName.IndexerFeatureName))

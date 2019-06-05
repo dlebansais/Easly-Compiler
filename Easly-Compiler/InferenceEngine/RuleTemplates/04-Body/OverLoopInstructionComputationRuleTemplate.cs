@@ -63,7 +63,7 @@
                 bool IsConformantToEnumerable = false;
                 bool IsConformantToNumericIndexer = false;
 
-                if (IsOverLoopSourceTypeAvailable && ObjectType.TypeConformToBase(ResultType, OverLoopSourceType))
+                if (IsOverLoopSourceTypeAvailable && ObjectType.TypeConformToBase(ResultType, OverLoopSourceType, isConversionAllowed: true))
                     IsConformantToEnumerable = true;
 
                 if (IsNumberTypeAvailable && ResultType.FeatureTable.ContainsKey(FeatureName.IndexerFeatureName))
