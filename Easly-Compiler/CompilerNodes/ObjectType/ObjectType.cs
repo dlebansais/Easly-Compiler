@@ -107,43 +107,12 @@
         /// <param name="sourceLocation">The location for reporting errors.</param>
         public static bool TypeConformToBase(ICompiledType derivedType, ICompiledType baseType, IErrorList errorList, ISource sourceLocation)
         {
-            bool Result;
-
-            if (derivedType.ConformanceTable.IsSealed)
-            {
-                Result = TypeConformToBaseWithTable(derivedType, baseType, errorList, sourceLocation);
-                Debug.Assert(Result == TypeConformToBaseWithoutTable(derivedType, baseType, ErrorList.Ignored, ErrorList.NoLocation));
-            }
-            else
-                Result = TypeConformToBaseWithoutTable(derivedType, baseType, errorList, sourceLocation);
-
-            return Result;
-        }
-
-        private static bool TypeConformToBaseWithTable(ICompiledType derivedType, ICompiledType baseType, IErrorList errorList, ISource sourceLocation)
-        {
-            bool IsConforming = false;
-
-            Debug.Assert(derivedType.ConformanceTable.IsSealed);
-
-            IsConforming |= ConformToBaseAny(derivedType, baseType);
-            IsConforming |= TypeConformDirectlyToBase(derivedType, baseType, errorList, sourceLocation);
-
-            foreach (KeyValuePair<ITypeName, ICompiledType> Entry in derivedType.ConformanceTable)
-            {
-                ICompiledType Conformance = Entry.Value;
-                IsConforming |= TypeConformToBase(Conformance, baseType, ErrorList.Ignored, ErrorList.NoLocation);
-            }
-
-            return IsConforming;
-        }
-
-        private static bool TypeConformToBaseWithoutTable(ICompiledType derivedType, ICompiledType baseType, IErrorList errorList, ISource sourceLocation)
-        {
             if (IsDirectDescendantOf(derivedType, baseType, sourceLocation))
                 return true;
+            else if (TypeConformDirectlyToBase(derivedType, baseType, errorList, sourceLocation))
+                return true;
             else
-                return TypeConformDirectlyToBase(derivedType, baseType, errorList, sourceLocation);
+                return false;
         }
 
         private static bool ConformToBaseAny(ICompiledType derivedType, ICompiledType baseType)
