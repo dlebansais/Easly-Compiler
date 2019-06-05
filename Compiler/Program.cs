@@ -5,25 +5,52 @@
     using System.IO;
     using EaslyCompiler;
 
-    class Program
+    public class Program
     {
-        static int Main(string[] args)
+        public static int Main(string[] args)
         {
-            if (args.Length < 4)
-                return -1;
+            string Namespace;
+            string SourceFileName;
+            string ErrorFileName;
+            string OutputRootFolder;
+            bool ActivateVerification;
 
-            string Namespace = args[0];
-            string SourceFileName = args[1];
-            string ErrorFileName = args[2];
-            string OutputRootFolder = args[3];
-            bool ActivateVerification = args.Length > 4 && args[4] == "V";
+            try
+            {
+                if (args.Length < 4)
+                    return -1;
 
-            if (string.IsNullOrEmpty(Namespace) || string.IsNullOrEmpty(SourceFileName) || string.IsNullOrEmpty(ErrorFileName) || string.IsNullOrEmpty(OutputRootFolder))
-                return -1;
+                Namespace = args[0];
+                SourceFileName = args[1];
+                ErrorFileName = args[2];
+                OutputRootFolder = args[3];
+                ActivateVerification = args.Length > 4 && args[4] == "V";
 
-            if (File.Exists(ErrorFileName))
-                try { File.Delete(ErrorFileName); } catch { }
+                if (string.IsNullOrEmpty(Namespace) || string.IsNullOrEmpty(SourceFileName) || string.IsNullOrEmpty(ErrorFileName) || string.IsNullOrEmpty(OutputRootFolder))
+                    return -1;
 
+                if (File.Exists(ErrorFileName))
+                    try { File.Delete(ErrorFileName); } catch { }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                return -3;
+            }
+
+            try
+            {
+                return Compile(Namespace, SourceFileName, ErrorFileName, OutputRootFolder, ActivateVerification);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                return -4;
+            }
+        }
+
+        private static int Compile(string Namespace, string SourceFileName, string ErrorFileName, string OutputRootFolder, bool ActivateVerification)
+        {
             Compiler c = new Compiler();
             c.Compile(SourceFileName);
             IErrorList ErrorList = c.ErrorList;
