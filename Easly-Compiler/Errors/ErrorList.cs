@@ -8,7 +8,7 @@
     /// <summary>
     /// A list of errors.
     /// </summary>
-    public interface IErrorList
+    public interface IErrorList : IEnumerable<IError>
     {
         /// <summary>
         /// True if the error list is empty.

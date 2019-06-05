@@ -1,11 +1,11 @@
-﻿using System.Diagnostics;
-using System.IO;
-using BaseNode;
-using EaslyCompiler;
-using PolySerializer;
-
-namespace Test
+﻿namespace Test
 {
+    using System.Diagnostics;
+    using System.IO;
+    using BaseNode;
+    using EaslyCompiler;
+    using PolySerializer;
+
     class Program
     {
         static int Main(string[] args)
