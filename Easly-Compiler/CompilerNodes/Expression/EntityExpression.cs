@@ -237,13 +237,13 @@ namespace CompilerNode
 
             Guid EntityGuid;
 
-            if (FinalFeature != null)
+            if (FinalFeature is IFeatureWithEntity AsFeatureWithEntity)
             {
                 ObjectType.FillResultPath(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, Query.ValidResultTypePath.Item);
                 resolvedFinalFeature = FinalFeature;
-                EntityGuid = FinalFeature.EntityGuid;
+                EntityGuid = AsFeatureWithEntity.EntityGuid;
 
-                expressionConstant = new EntityLanguageConstant(resolvedFinalFeature);
+                expressionConstant = new EntityLanguageConstant(AsFeatureWithEntity);
             }
             else
             {

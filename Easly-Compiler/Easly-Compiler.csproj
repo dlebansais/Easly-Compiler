@@ -78,6 +78,7 @@
     <Compile Include="Errors\Inference\04-Body\ErrorInvalidAttachment.cs" />
     <Compile Include="Errors\Translation\ErrorInvalidRename.cs" />
     <Compile Include="Errors\Translation\ErrorMultipleExternBody.cs" />
+    <Compile Include="FeatureWithEntity.cs" />
     <Compile Include="InferenceEngine\RuleTemplateList.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllConversionsRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\IndexQueryExpressionConstantRuleTemplate.cs" />

@@ -10,7 +10,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IProcedureFeature.
     /// </summary>
-    public interface IProcedureFeature : BaseNode.IProcedureFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithPrecursor
+    public interface IProcedureFeature : BaseNode.IProcedureFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithPrecursor, IFeatureWithEntity
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.ProcedureFeature.OverloadBlocks"/>.

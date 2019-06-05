@@ -23,7 +23,7 @@
         /// Initializes a new instance of the <see cref="EntityLanguageConstant"/> class.
         /// </summary>
         /// <param name="value">The constant value.</param>
-        public EntityLanguageConstant(ICompiledFeature value)
+        public EntityLanguageConstant(IFeatureWithEntity value)
         {
             Value = value.Location;
         }

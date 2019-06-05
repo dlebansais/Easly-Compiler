@@ -10,7 +10,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IAttributeFeature.
     /// </summary>
-    public interface IAttributeFeature : BaseNode.IAttributeFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithEvents
+    public interface IAttributeFeature : BaseNode.IAttributeFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithEvents, IFeatureWithEntity
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.AttributeFeature.EnsureBlocks"/>.

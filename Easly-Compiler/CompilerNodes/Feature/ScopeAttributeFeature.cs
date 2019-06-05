@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IScopeAttributeFeature.
     /// </summary>
-    public interface IScopeAttributeFeature : IFeatureWithName, ICompiledFeature
+    public interface IScopeAttributeFeature : IFeatureWithName, ICompiledFeature, IFeatureWithEntity
     {
         /// <summary>
         /// The resolved feature name.
