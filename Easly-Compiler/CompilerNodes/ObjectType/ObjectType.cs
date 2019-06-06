@@ -113,10 +113,10 @@
             if (isConversionAllowed)
             {
                 IList<ICompiledType> DerivedTypeList = new List<ICompiledType>();
-                ListConvertibleTypes(derivedType, DerivedTypeList, GetTypesConvertibleFrom);
+                ListConvertibleTypes(derivedType, DerivedTypeList, GetTypesConvertibleTo);
 
                 IList<ICompiledType> BaseTypeList = new List<ICompiledType>();
-                ListConvertibleTypes(baseType, BaseTypeList, GetTypesConvertibleTo);
+                ListConvertibleTypes(baseType, BaseTypeList, GetTypesConvertibleFrom);
 
                 return TypeConformToBase(DerivedTypeList, BaseTypeList, errorList, sourceLocation);
             }

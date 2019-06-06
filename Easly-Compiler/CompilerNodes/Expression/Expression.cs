@@ -197,16 +197,13 @@ namespace CompilerNode
         /// Gets the default constant result of any expression.
         /// </summary>
         /// <param name="expression">The source expression.</param>
-        public static ILanguageConstant GetDefaultConstant(IExpression expression)
+        /// <param name="resultType">The expression result type.</param>
+        public static ILanguageConstant GetDefaultConstant(IExpression expression, IResultType resultType)
         {
             ILanguageConstant Constant = new ObjectLanguageConstant();
 
-            IResultType ResolvedResult = expression.ResolvedResult.Item;
-
-            if (ResolvedResult.Count == 1)
+            if (resultType.TryGetResult(out ICompiledType FinalType))
             {
-                ICompiledType FinalType = ResolvedResult.At(0).ValueType;
-
                 bool IsBooleanTypeAvailable = IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, expression, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
                 bool IsNumberTypeAvailable = IsLanguageTypeAvailable(LanguageClasses.Number.Guid, expression, out ITypeName NumberTypeName, out ICompiledType NumberType);
                 bool IsCharacterTypeAvailable = IsLanguageTypeAvailable(LanguageClasses.Character.Guid, expression, out ITypeName CharacterTypeName, out ICompiledType CharacterType);

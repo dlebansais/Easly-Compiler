@@ -64,7 +64,7 @@
                 IsConstant &= ConstantSource.ExpressionConstant.Item != NeutralLanguageConstant.NotConstant;
 
             if (IsConstant)
-                ExpressionConstant = Expression.GetDefaultConstant(node);
+                ExpressionConstant = Expression.GetDefaultConstant(node, node.ResolvedResult.Item);
 
             node.ExpressionConstant.Item = ExpressionConstant;
         }

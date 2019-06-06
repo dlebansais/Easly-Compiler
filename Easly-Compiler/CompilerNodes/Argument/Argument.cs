@@ -463,5 +463,54 @@ namespace CompilerNode
 
             return true;
         }
+
+        /// <summary>
+        /// Adds to a list of constant sources from a list of arguments.
+        /// </summary>
+        /// <param name="expression">The source expression.</param>
+        /// <param name="resultType">The expression result type.</param>
+        /// <param name="argumentList">The list of arguments.</param>
+        /// <param name="constantSourceList">The list of constant sources.</param>
+        /// <param name="expressionConstant">The constant if there are no arguments upon return.</param>
+        public static void AddConstantArguments(IExpression expression, IResultType resultType, IList<IArgument> argumentList, ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant)
+        {
+            if (argumentList.Count == 0)
+                expressionConstant = Expression.GetDefaultConstant(expression, resultType);
+            else
+            {
+                expressionConstant = NeutralLanguageConstant.NotConstant;
+                AddConstantArguments(argumentList, constantSourceList);
+            }
+        }
+
+        /// <summary>
+        /// Adds to a list of constant sources from a list of arguments.
+        /// </summary>
+        /// <param name="argumentList">The list of arguments.</param>
+        /// <param name="constantSourceList">The list of constant sources.</param>
+        public static void AddConstantArguments(IList<IArgument> argumentList, ISealableList<IExpression> constantSourceList)
+        {
+            Debug.Assert(argumentList.Count > 0);
+
+            foreach (IArgument Argument in argumentList)
+            {
+                IExpression ArgumentSource = null;
+
+                switch (Argument)
+                {
+                    case IPositionalArgument AsPositionalArgument:
+                        ArgumentSource = (IExpression)AsPositionalArgument.Source;
+                        break;
+
+                    case IAssignmentArgument AsAssignmentArgument:
+                        ArgumentSource = (IExpression)AsAssignmentArgument.Source;
+                        break;
+                }
+
+                Debug.Assert(ArgumentSource != null);
+
+                constantSourceList.Add(ArgumentSource);
+            }
+        }
     }
 }

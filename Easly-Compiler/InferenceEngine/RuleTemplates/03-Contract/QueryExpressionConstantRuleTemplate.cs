@@ -82,7 +82,7 @@
                         ExpressionConstant = node.ConstantSourceList[0].ExpressionConstant.Item;
                     }
                     else
-                        ExpressionConstant = Expression.GetDefaultConstant(node);
+                        ExpressionConstant = Expression.GetDefaultConstant(node, node.ResolvedResult.Item);
                 }
             }
 

@@ -427,13 +427,14 @@ namespace CompilerNode
                     break;
 
                 case IFunctionFeature AsFunctionFeature:
-                    AddConstantArguments(ArgumentList, constantSourceList);
+                    Argument.AddConstantArguments(node, resolvedResult, ArgumentList, constantSourceList, out expressionConstant);
                     IsHandled = true;
                     break;
 
                 case IAttributeFeature AsAttributeFeature:
                 case IPropertyFeature AsPropertyFeature:
                 case IScopeAttributeFeature AsScopeAttributeFeature:
+                    expressionConstant = Expression.GetDefaultConstant(node, resolvedResult);
                     IsHandled = true;
                     break;
             }
@@ -471,29 +472,6 @@ namespace CompilerNode
             featureCall = new FeatureCall();
 
             return true;
-        }
-
-        private static void AddConstantArguments(IList<IArgument> argumentList, ISealableList<IExpression> constantSourceList)
-        {
-            foreach (IArgument Argument in argumentList)
-            {
-                IExpression ArgumentSource = null;
-
-                switch (Argument)
-                {
-                    case IPositionalArgument AsPositionalArgument:
-                        ArgumentSource = (IExpression)AsPositionalArgument.Source;
-                        break;
-
-                    case IAssignmentArgument AsAssignmentArgument:
-                        ArgumentSource = (IExpression)AsAssignmentArgument.Source;
-                        break;
-                }
-
-                Debug.Assert(ArgumentSource != null);
-
-                constantSourceList.Add(ArgumentSource);
-            }
         }
         #endregion
 
