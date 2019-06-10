@@ -71,10 +71,16 @@
             ITypeName BaseTypeName = BaseTypeItem.ResolvedTypeName.Item;
             ICompiledType BaseType = BaseTypeItem.ResolvedType.Item;
 
-            ProcedureType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType, node.OverloadList, out ITypeName ResolvedTypeName, out ICompiledType ResolvedType);
+            try
+            {
+                ProcedureType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType, node.OverloadList, out ITypeName ResolvedTypeName, out ICompiledType ResolvedType);
+                node.ResolvedTypeName.Item = ResolvedTypeName;
+                node.ResolvedType.Item = ResolvedType;
+            }
+            catch
+            {
 
-            node.ResolvedTypeName.Item = ResolvedTypeName;
-            node.ResolvedType.Item = ResolvedType;
+            }
         }
         #endregion
     }

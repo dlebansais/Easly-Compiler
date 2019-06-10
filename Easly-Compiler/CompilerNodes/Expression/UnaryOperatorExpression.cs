@@ -243,8 +243,7 @@ namespace CompilerNode
 
             if (RightExpressionType is IClassType AsClassType)
             {
-                IClass RightBaseClass = AsClassType.BaseClass;
-                ISealableDictionary<IFeatureName, IFeatureInstance> RightFeatureTable = RightBaseClass.FeatureTable;
+                ISealableDictionary<IFeatureName, IFeatureInstance> RightFeatureTable = AsClassType.FeatureTable;
 
                 if (!FeatureName.TableContain(RightFeatureTable, ValidText, out IFeatureName Key, out IFeatureInstance Value))
                 {

@@ -228,8 +228,7 @@ namespace CompilerNode
                 {
                     string OperatorName = Operator.ValidText.Item;
 
-                    IClass LeftBaseClass = AsClassType.BaseClass;
-                    ISealableDictionary<IFeatureName, IFeatureInstance> LeftFeatureTable = LeftBaseClass.FeatureTable;
+                    ISealableDictionary<IFeatureName, IFeatureInstance> LeftFeatureTable = AsClassType.FeatureTable;
 
                     if (!FeatureName.TableContain(LeftFeatureTable, OperatorName, out IFeatureName Key, out IFeatureInstance Value))
                     {

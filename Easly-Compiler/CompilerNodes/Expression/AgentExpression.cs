@@ -227,19 +227,62 @@ namespace CompilerNode
 
             IIdentifier Delegated = (IIdentifier)node.Delegated;
 
-            IClass EmbeddingClass = node.EmbeddingClass;
-            ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable = EmbeddingClass.FeatureTable;
             Debug.Assert(Delegated.ValidText.IsAssigned);
             string ValidText = Delegated.ValidText.Item;
 
-            if (!FeatureName.TableContain(FeatureTable, ValidText, out IFeatureName Key, out IFeatureInstance Value))
+            IFeatureInstance FeatureInstance;
+
+            if (node.BaseType.IsAssigned)
             {
-                errorList.AddError(new ErrorUnknownIdentifier(node, ValidText));
-                return false;
+                IObjectType BaseType = (IObjectType)node.BaseType.Item;
+                ICompiledType ResolvedBaseType = BaseType.ResolvedType.Item;
+
+                if (ResolvedBaseType is IClassType AsClassType)
+                {
+                    if (!FeatureName.TableContain(AsClassType.FeatureTable, ValidText, out IFeatureName Key, out FeatureInstance))
+                    {
+                        errorList.AddError(new ErrorUnknownIdentifier(node, ValidText));
+                        return false;
+                    }
+                }
+                else if (ResolvedBaseType is IFormalGenericType AsFormalGenericType)
+                {
+                    FeatureInstance = null;
+
+                    foreach (IConstraint Item in AsFormalGenericType.FormalGeneric.ConstraintList)
+                        if (Item.ResolvedTypeWithRename.Item is IClassType Parent)
+                        {
+                            if (!FeatureName.TableContain(Parent.FeatureTable, ValidText, out IFeatureName Key, out FeatureInstance))
+                            {
+                                errorList.AddError(new ErrorUnknownIdentifier(node, ValidText));
+                                return false;
+                            }
+                        }
+
+                    if (FeatureInstance == null)
+                    {
+                        errorList.AddError(new ErrorUnknownIdentifier(node, ValidText));
+                        return false;
+                    }
+                }
+                else
+                {
+                    errorList.AddError(new ErrorClassTypeRequired(node));
+                    return false;
+                }
+            }
+            else
+            {
+                IClass EmbeddingClass = node.EmbeddingClass;
+                if (!FeatureName.TableContain(EmbeddingClass.FeatureTable, ValidText, out IFeatureName Key, out FeatureInstance))
+                {
+                    errorList.AddError(new ErrorUnknownIdentifier(node, ValidText));
+                    return false;
+                }
             }
 
-            Debug.Assert(Value.Feature != null);
-            resolvedFeature = Value.Feature;
+            Debug.Assert(FeatureInstance.Feature != null);
+            resolvedFeature = FeatureInstance.Feature;
 
             resolvedResult = new ResultType(resolvedFeature.ResolvedFeatureTypeName.Item, resolvedFeature.ResolvedFeatureType.Item, string.Empty);
 
