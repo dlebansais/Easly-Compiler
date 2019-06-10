@@ -72,11 +72,12 @@
             IResultType CommonResults = (IResultType)data;
 
             IClass EmbeddingClass = node.EmbeddingClass;
-            IObjectType BaseTypeItem = (IObjectType)node.BaseType;
-            ITypeName BaseTypeName = BaseTypeItem.ResolvedTypeName.Item;
-            ICompiledType BaseType = BaseTypeItem.ResolvedType.Item;
+            IObjectType BaseType = (IObjectType)node.BaseType;
+            ITypeName BaseTypeName = BaseType.ResolvedTypeName.Item;
+            ICompiledTypeWithFeature ResolvedBaseType = BaseType.ResolvedType.Item as ICompiledTypeWithFeature;
+            Debug.Assert(BaseType != null);
 
-            FunctionType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType, node.OverloadList, out ITypeName ResolvedTypeName, out ICompiledType ResolvedType);
+            FunctionType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType, ResolvedBaseType, node.OverloadList, out ITypeName ResolvedTypeName, out ICompiledType ResolvedType);
 
             node.ResolvedTypeName.Item = ResolvedTypeName;
             node.ResolvedType.Item = ResolvedType;

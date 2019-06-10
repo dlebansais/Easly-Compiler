@@ -575,8 +575,7 @@
             // TODO: detect delegate call parameters to select the proper overload
             foreach (KeyValuePair<ITypeName, ICompiledType> Item in Source.TypeTable)
             {
-                IClassType BaseType;
-                IClass BaseClass;
+                ICompiledTypeWithFeature BaseType;
                 ITypeName ResolvedTypeName;
                 ICompiledType ResolvedType;
 
@@ -584,7 +583,6 @@
                 {
                     case IFunctionType AsFunctionType:
                         BaseType = AsFunctionType.ResolvedBaseType.Item;
-                        BaseClass = BaseType.BaseClass;
 
                         if (!FunctionType.TypeTableContaining(DelegateTable, BaseType, AsFunctionType.OverloadList, out ResolvedTypeName, out ResolvedType))
                             DelegateTable.Add(Item.Key, Item.Value);
@@ -592,7 +590,6 @@
 
                     case IProcedureType AsProcedureType:
                         BaseType = AsProcedureType.ResolvedBaseType.Item;
-                        BaseClass = BaseType.BaseClass;
 
                         if (!ProcedureType.TypeTableContaining(DelegateTable, BaseType, AsProcedureType.OverloadList, out ResolvedTypeName, out ResolvedType))
                             DelegateTable.Add(Item.Key, Item.Value);

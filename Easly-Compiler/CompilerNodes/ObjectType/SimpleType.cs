@@ -41,6 +41,25 @@ namespace CompilerNode
     /// </summary>
     public class SimpleType : BaseNode.SimpleType, ISimpleType
     {
+        #region Init
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleType"/> class.
+        /// This constructor is required for deserialization.
+        /// </summary>
+        public SimpleType()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleType"/> class.
+        /// </summary>
+        /// <param name="classIdentifier">The class identifier</param>
+        public SimpleType(IIdentifier classIdentifier)
+        {
+            ClassIdentifier = classIdentifier;
+        }
+        #endregion
+
         #region Implementation of ISource
         /// <summary>
         /// The parent node, null if root.

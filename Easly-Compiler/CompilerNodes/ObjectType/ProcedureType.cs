@@ -24,7 +24,7 @@ namespace CompilerNode
         /// <summary>
         /// Resolved type for the base type.
         /// </summary>
-        OnceReference<IClassType> ResolvedBaseType { get; }
+        OnceReference<ICompiledTypeWithFeature> ResolvedBaseType { get; }
     }
 
     /// <summary>
@@ -49,15 +49,16 @@ namespace CompilerNode
         /// Initializes a new instance of the <see cref="ProcedureType"/> class.
         /// </summary>
         /// <param name="baseTypeName">Name of the resolved base type.</param>
-        /// <param name="baseType">The resolved base type.</param>
+        /// <param name="baseType">The base type.</param>
+        /// <param name="resolvedBaseType">The resolved base type.</param>
         /// <param name="overloadList">The list of resolved overloads.</param>
-        public ProcedureType(ITypeName baseTypeName, IClassType baseType, IList<ICommandOverloadType> overloadList)
+        public ProcedureType(ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, IList<ICommandOverloadType> overloadList)
             : this()
         {
             BaseType = baseType;
 
             ResolvedBaseTypeName.Item = baseTypeName;
-            ResolvedBaseType.Item = baseType;
+            ResolvedBaseType.Item = resolvedBaseType;
             OverloadList = overloadList;
         }
         #endregion
@@ -153,7 +154,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 ResolvedBaseTypeName = new OnceReference<ITypeName>();
-                ResolvedBaseType = new OnceReference<IClassType>();
+                ResolvedBaseType = new OnceReference<ICompiledTypeWithFeature>();
                 ResolvedTypeName = new OnceReference<ITypeName>();
                 ResolvedType = new OnceReference<ICompiledType>();
                 DiscreteTable = new SealableDictionary<IFeatureName, IDiscrete>();
@@ -204,7 +205,7 @@ namespace CompilerNode
         /// <summary>
         /// Resolved type for the base type.
         /// </summary>
-        public OnceReference<IClassType> ResolvedBaseType { get; private set; } = new OnceReference<IClassType>();
+        public OnceReference<ICompiledTypeWithFeature> ResolvedBaseType { get; private set; } = new OnceReference<ICompiledTypeWithFeature>();
         #endregion
 
         #region Implementation of IObjectType
@@ -316,7 +317,7 @@ namespace CompilerNode
             }
 
             if (IsNewInstance)
-                ResolveType(instancingClassType.BaseClass.TypeTable, InstancedBaseTypeName, InstancedBaseType, InstancedOverloadList, out resolvedTypeName, out resolvedType);
+                ResolveType(instancingClassType.BaseClass.TypeTable, InstancedBaseTypeName, (IObjectType)BaseType, (ICompiledTypeWithFeature)InstancedBaseType, InstancedOverloadList, out resolvedTypeName, out resolvedType);
         }
         #endregion
 
@@ -326,15 +327,16 @@ namespace CompilerNode
         /// </summary>
         /// <param name="typeTable">The table of existing types.</param>
         /// <param name="baseTypeName">Name of the resolved base type.</param>
-        /// <param name="baseType">The resolved base type.</param>
+        /// <param name="baseType">The base type.</param>
+        /// <param name="resolvedBaseType">The resolved base type.</param>
         /// <param name="overloadList">The list of resolved overloads.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void ResolveType(ISealableDictionary<ITypeName, ICompiledType> typeTable, ITypeName baseTypeName, ICompiledType baseType, IList<ICommandOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void ResolveType(ISealableDictionary<ITypeName, ICompiledType> typeTable, ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, IList<ICommandOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
-            if (!TypeTableContaining(typeTable, baseType, overloadList, out resolvedTypeName, out resolvedType))
+            if (!TypeTableContaining(typeTable, resolvedBaseType, overloadList, out resolvedTypeName, out resolvedType))
             {
-                BuildType(baseTypeName, baseType, overloadList, out resolvedTypeName, out resolvedType);
+                BuildType(baseTypeName, baseType, resolvedBaseType, overloadList, out resolvedTypeName, out resolvedType);
                 typeTable.Add(resolvedTypeName, resolvedType);
             }
         }
@@ -347,7 +349,7 @@ namespace CompilerNode
         /// <param name="overloadList">The list of resolved overloads.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static bool TypeTableContaining(ISealableDictionary<ITypeName, ICompiledType> typeTable, ICompiledType baseType, IList<ICommandOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static bool TypeTableContaining(ISealableDictionary<ITypeName, ICompiledType> typeTable, ICompiledTypeWithFeature baseType, IList<ICommandOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
             resolvedTypeName = null;
             resolvedType = null;
@@ -421,13 +423,14 @@ namespace CompilerNode
         /// Creates a procedure type with resolved arguments.
         /// </summary>
         /// <param name="baseTypeName">Name of the resolved base type.</param>
-        /// <param name="baseType">The resolved base type.</param>
+        /// <param name="baseType">The base type.</param>
+        /// <param name="resolvedBaseType">The resolved base type.</param>
         /// <param name="overloadList">The list of resolved overloads.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void BuildType(ITypeName baseTypeName, ICompiledType baseType, IList<ICommandOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void BuildType(ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, IList<ICommandOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
-            IProcedureType ResolvedProcedureType = new ProcedureType(baseTypeName, (IClassType)baseType, overloadList);
+            IProcedureType ResolvedProcedureType = new ProcedureType(baseTypeName, baseType, resolvedBaseType, overloadList);
 
             resolvedTypeName = new TypeName(ResolvedProcedureType.TypeFriendlyName);
             resolvedType = ResolvedProcedureType;

@@ -8,8 +8,13 @@
     /// <summary>
     /// Compiler-only IClassType.
     /// </summary>
-    public interface IClassType : BaseNode.IShareableType, ICompiledType, IPathParticipatingType
+    public interface IClassType : BaseNode.IShareableType, ICompiledTypeWithFeature, IPathParticipatingType
     {
+        /// <summary>
+        /// The source from which this type is issued.
+        /// </summary>
+        IObjectType SourceType { get; }
+
         /// <summary>
         /// The class used to instanciate this type.
         /// </summary>
@@ -107,14 +112,17 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassType"/> class.
         /// </summary>
+        /// <param name="sourceType">The source from which this type is issued.</param>
         /// <param name="baseClass">The class used to instanciate this type.</param>
         /// <param name="typeArgumentTable">Arguments if the class is generic.</param>
-        public ClassType(IClass baseClass, ISealableDictionary<string, ICompiledType> typeArgumentTable)
+        public ClassType(IObjectType sourceType, IClass baseClass, ISealableDictionary<string, ICompiledType> typeArgumentTable)
         {
             Debug.Assert(!baseClass.ResolvedClassType.IsAssigned);
 
+            SourceType = sourceType;
             BaseClass = baseClass;
             TypeArgumentTable = typeArgumentTable;
+            ConformingClassTypeList.Add(this);
         }
 
         /// <summary>
@@ -181,22 +189,7 @@
         }
         #endregion
 
-        #region Properties
-        /// <summary>
-        /// The class used to instanciate this type.
-        /// </summary>
-        public IClass BaseClass { get; }
-
-        /// <summary>
-        /// Arguments if the class is generic.
-        /// </summary>
-        public ISealableDictionary<string, ICompiledType> TypeArgumentTable { get; }
-
-        /// <summary>
-        /// Typedefs available in this type.
-        /// </summary>
-        public ISealableDictionary<IFeatureName, ITypedefType> TypedefTable { get; private set; } = new SealableDictionary<IFeatureName, ITypedefType>();
-
+        #region Implementation of ICompiledTypeWithFeature
         /// <summary>
         /// Discretes available in this type.
         /// </summary>
@@ -284,9 +277,9 @@
         public ICompiledType TypeAsDestinationOrSource { get { return this; } }
 
         /// <summary>
-        /// True if an instance of the class is cloned at some point.
+        /// The list of class types this type conforms to.
         /// </summary>
-        public bool IsUsedInCloneOf { get; private set; }
+        public IList<IClassType> ConformingClassTypeList { get; private set; } = new List<IClassType>();
         #endregion
 
         #region Client Interface
@@ -480,6 +473,31 @@
         #endregion
 
         #region Compiler
+        /// <summary>
+        /// The source from which this type is issued.
+        /// </summary>
+        public IObjectType SourceType { get; }
+
+        /// <summary>
+        /// The class used to instanciate this type.
+        /// </summary>
+        public IClass BaseClass { get; }
+
+        /// <summary>
+        /// Arguments if the class is generic.
+        /// </summary>
+        public ISealableDictionary<string, ICompiledType> TypeArgumentTable { get; }
+
+        /// <summary>
+        /// Typedefs available in this type.
+        /// </summary>
+        public ISealableDictionary<IFeatureName, ITypedefType> TypedefTable { get; private set; } = new SealableDictionary<IFeatureName, ITypedefType>();
+
+        /// <summary>
+        /// True if an instance of the class is cloned at some point.
+        /// </summary>
+        public bool IsUsedInCloneOf { get; private set; }
+
         /// <summary>
         /// Compares two types.
         /// </summary>

@@ -58,9 +58,23 @@
             Command = CSharpQualifiedName.Create(context, (IQualifiedName)source.Command, parentFeature, null, false);
             FeatureCall = new CSharpFeatureCall(context, source.FeatureCall.Item);
 
-            IClassType FinalType = Source.CommandFinalType.Item.ResolvedBaseType.Item;
-            ICSharpClass CallClass = context.GetClass(FinalType.BaseClass);
-            SkipLastInPath = CallClass.InheritFromDotNetEvent;
+            ICompiledTypeWithFeature FinalType = Source.CommandFinalType.Item.ResolvedBaseType.Item;
+            IList<IClassType> ConformingClassTypeList = FinalType.ConformingClassTypeList;
+
+            bool InheritFromDotNetEvent = false;
+            bool IsNumberGuid = false;
+            foreach (IClassType Item in ConformingClassTypeList)
+            {
+                IClass BaseClass = Item.BaseClass;
+
+                ICSharpClass CallClass = context.GetClass(BaseClass);
+                InheritFromDotNetEvent |= CallClass.InheritFromDotNetEvent;
+
+                IsNumberGuid = BaseClass.ClassGuid == LanguageClasses.Number.Guid;
+            }
+
+            SkipLastInPath = InheritFromDotNetEvent;
+            IsCallingNumberFeature = IsNumberGuid;
         }
         #endregion
 
@@ -84,6 +98,11 @@
         /// True if the call should skip the last identifier in the path.
         /// </summary>
         public bool SkipLastInPath { get; }
+
+        /// <summary>
+        /// True if calling a feature of the Number class.
+        /// </summary>
+        public bool IsCallingNumberFeature { get; }
         #endregion
 
         #region Client Interface
@@ -94,11 +113,9 @@
         /// <param name="outputNamespace">Namespace for the output code.</param>
         public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
         {
-            IClassType FinalType = Source.CommandFinalType.Item.ResolvedBaseType.Item;
-            IClass BaseClass = FinalType.BaseClass;
             string CommandText;
 
-            if (BaseClass.ClassGuid == LanguageClasses.Number.Guid)
+            if (IsCallingNumberFeature)
             {
                 CommandText = Command.CSharpText(outputNamespace, 0);
                 IList<IIdentifier> ValidPath = ((IQualifiedName)Source.Command).ValidPath.Item;

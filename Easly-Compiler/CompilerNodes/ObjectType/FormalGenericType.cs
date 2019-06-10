@@ -8,7 +8,7 @@
     /// <summary>
     /// Compiler-only IFormalGenericType.
     /// </summary>
-    public interface IFormalGenericType : ICompiledType, IPathParticipatingType
+    public interface IFormalGenericType : ICompiledTypeWithFeature, IPathParticipatingType
     {
         /// <summary>
         /// The generic from which this instance is issued.
@@ -63,7 +63,7 @@
         public ITypeName ResolvedTypeName { get; }
         #endregion
 
-        #region Implementation of ICompiledType
+        #region Implementation of ICompiledTypeWithFeature
         /// <summary>
         /// Discretes available in this type.
         /// </summary>
@@ -152,6 +152,23 @@
         /// The type to use instead of this type for a source or destination type, for the purpose of path searching.
         /// </summary>
         public ICompiledType TypeAsDestinationOrSource { get { return this; } }
+
+        /// <summary>
+        /// The list of class types this type conforms to.
+        /// </summary>
+        public IList<IClassType> ConformingClassTypeList
+        {
+            get
+            {
+                IList<IClassType> Result = new List<IClassType>();
+
+                foreach (IConstraint Constraint in FormalGeneric.ConstraintList)
+                    if (Constraint.ResolvedTypeWithRename.IsAssigned && Constraint.ResolvedTypeWithRename.Item is IClassType AsClassType)
+                        Result.Add(AsClassType);
+
+                return Result;
+            }
+        }
 
         /// <summary>
         /// Creates an instance of a class type, or reuse an existing instance.

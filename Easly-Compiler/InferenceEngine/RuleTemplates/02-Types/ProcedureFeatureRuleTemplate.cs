@@ -92,15 +92,14 @@
         public override void Apply(IProcedureFeature node, object data)
         {
             IClass EmbeddingClass = node.EmbeddingClass;
-
             ITypeName BaseTypeName = EmbeddingClass.ResolvedClassTypeName.Item;
-            ICompiledType BaseType = EmbeddingClass.ResolvedClassType.Item;
+            IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;
 
             IList<ICommandOverloadType> OverloadList = new List<ICommandOverloadType>();
             foreach (ICommandOverload Item in node.OverloadList)
                 OverloadList.Add(Item.ResolvedAssociatedType.Item);
 
-            ProcedureType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType, OverloadList, out ITypeName ResolvedProcedureTypeName, out ICompiledType ResolvedProcedureType);
+            ProcedureType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType.SourceType, BaseType, OverloadList, out ITypeName ResolvedProcedureTypeName, out ICompiledType ResolvedProcedureType);
             node.ResolvedFeatureTypeName.Item = ResolvedProcedureTypeName;
             node.ResolvedFeatureType.Item = ResolvedProcedureType;
 

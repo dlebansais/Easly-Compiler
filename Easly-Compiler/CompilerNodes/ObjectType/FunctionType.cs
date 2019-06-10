@@ -24,7 +24,7 @@ namespace CompilerNode
         /// <summary>
         /// Resolved type for the base type.
         /// </summary>
-        OnceReference<IClassType> ResolvedBaseType { get; }
+        OnceReference<ICompiledTypeWithFeature> ResolvedBaseType { get; }
 
         /// <summary>
         /// Resolved type name for the most common result of all overloads.
@@ -61,13 +61,13 @@ namespace CompilerNode
         /// <param name="baseTypeName">Name of the resolved base type.</param>
         /// <param name="baseType">The resolved base type.</param>
         /// <param name="overloadList">The list of resolved overloads.</param>
-        public FunctionType(ITypeName baseTypeName, IClassType baseType, IList<IQueryOverloadType> overloadList)
+        public FunctionType(ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, IList<IQueryOverloadType> overloadList)
             : this()
         {
             BaseType = baseType;
 
             ResolvedBaseTypeName.Item = baseTypeName;
-            ResolvedBaseType.Item = baseType;
+            ResolvedBaseType.Item = resolvedBaseType;
             OverloadList = overloadList;
         }
         #endregion
@@ -163,7 +163,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 ResolvedBaseTypeName = new OnceReference<ITypeName>();
-                ResolvedBaseType = new OnceReference<IClassType>();
+                ResolvedBaseType = new OnceReference<ICompiledTypeWithFeature>();
                 ResolvedTypeName = new OnceReference<ITypeName>();
                 ResolvedType = new OnceReference<ICompiledType>();
                 MostCommonTypeName = new OnceReference<ITypeName>();
@@ -218,7 +218,7 @@ namespace CompilerNode
         /// <summary>
         /// Resolved type for the base type.
         /// </summary>
-        public OnceReference<IClassType> ResolvedBaseType { get; private set; } = new OnceReference<IClassType>();
+        public OnceReference<ICompiledTypeWithFeature> ResolvedBaseType { get; private set; } = new OnceReference<ICompiledTypeWithFeature>();
 
         /// <summary>
         /// Resolved type name for the most common result of all overloads.
@@ -341,7 +341,7 @@ namespace CompilerNode
             }
 
             if (IsNewInstance)
-                ResolveType(instancingClassType.BaseClass.TypeTable, InstancedBaseTypeName, InstancedBaseType, InstancedOverloadList, out resolvedTypeName, out resolvedType);
+                ResolveType(instancingClassType.BaseClass.TypeTable, InstancedBaseTypeName, (IObjectType)BaseType, (ICompiledTypeWithFeature)InstancedBaseType, InstancedOverloadList, out resolvedTypeName, out resolvedType);
         }
         #endregion
 
@@ -355,11 +355,11 @@ namespace CompilerNode
         /// <param name="overloadList">The list of resolved overloads.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void ResolveType(ISealableDictionary<ITypeName, ICompiledType> typeTable, ITypeName baseTypeName, ICompiledType baseType, IList<IQueryOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void ResolveType(ISealableDictionary<ITypeName, ICompiledType> typeTable, ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, IList<IQueryOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
-            if (!TypeTableContaining(typeTable, baseType, overloadList, out resolvedTypeName, out resolvedType))
+            if (!TypeTableContaining(typeTable, resolvedBaseType, overloadList, out resolvedTypeName, out resolvedType))
             {
-                BuildType(baseTypeName, baseType, overloadList, out resolvedTypeName, out resolvedType);
+                BuildType(baseTypeName, baseType, resolvedBaseType, overloadList, out resolvedTypeName, out resolvedType);
                 typeTable.Add(resolvedTypeName, resolvedType);
             }
         }
@@ -465,9 +465,9 @@ namespace CompilerNode
         /// <param name="overloadList">The list of resolved overloads.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void BuildType(ITypeName baseTypeName, ICompiledType baseType, IList<IQueryOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void BuildType(ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, IList<IQueryOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
-            FunctionType ResolvedFunctionType = new FunctionType(baseTypeName, (IClassType)baseType, overloadList);
+            FunctionType ResolvedFunctionType = new FunctionType(baseTypeName, baseType, resolvedBaseType, overloadList);
 
             foreach (IQueryOverloadType Item in overloadList)
                 foreach (IEntityDeclaration Entity in Item.ResultList)

@@ -109,7 +109,7 @@
 
             ITypeName ResolvedFunctionTypeName;
             ICompiledType ResolvedFunctionType;
-            FunctionType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType, OverloadList, out ResolvedFunctionTypeName, out ResolvedFunctionType);
+            FunctionType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType.SourceType, BaseType, OverloadList, out ResolvedFunctionTypeName, out ResolvedFunctionType);
 
             node.ResolvedFeatureTypeName.Item = ResolvedFunctionTypeName;
             node.ResolvedFeatureType.Item = ResolvedFunctionType;
