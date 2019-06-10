@@ -59,7 +59,8 @@ namespace CompilerNode
         /// Initializes a new instance of the <see cref="FunctionType"/> class.
         /// </summary>
         /// <param name="baseTypeName">Name of the resolved base type.</param>
-        /// <param name="baseType">The resolved base type.</param>
+        /// <param name="baseType">The base type.</param>
+        /// <param name="resolvedBaseType">The resolved base type.</param>
         /// <param name="overloadList">The list of resolved overloads.</param>
         public FunctionType(ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, IList<IQueryOverloadType> overloadList)
             : this()
@@ -351,7 +352,8 @@ namespace CompilerNode
         /// </summary>
         /// <param name="typeTable">The table of existing types.</param>
         /// <param name="baseTypeName">Name of the resolved base type.</param>
-        /// <param name="baseType">The resolved base type.</param>
+        /// <param name="baseType">The base type.</param>
+        /// <param name="resolvedBaseType">The resolved base type.</param>
         /// <param name="overloadList">The list of resolved overloads.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
@@ -461,7 +463,8 @@ namespace CompilerNode
         /// Creates a function type with resolved arguments.
         /// </summary>
         /// <param name="baseTypeName">Name of the resolved base type.</param>
-        /// <param name="baseType">The resolved base type.</param>
+        /// <param name="baseType">The base type.</param>
+        /// <param name="resolvedBaseType">The resolved base type.</param>
         /// <param name="overloadList">The list of resolved overloads.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
