@@ -1509,8 +1509,8 @@
 
             ResolvedFeatureType = PathParticipatingType.TypeAsDestinationOrSource;
 
-            Debug.Assert(baseType is IClassType);
-            ResolvedFeatureType.InstanciateType((IClassType)baseType, ref ResolvedFeatureTypeName, ref ResolvedFeatureType);
+            Debug.Assert(baseType is ICompiledTypeWithFeature);
+            ResolvedFeatureType.InstanciateType((ICompiledTypeWithFeature)baseType, ref ResolvedFeatureTypeName, ref ResolvedFeatureType);
 
             if (index + 1 < validPath.Count)
             {
@@ -1627,8 +1627,8 @@
 
                 ResolvedFeatureType = PathParticipatingType.TypeAsDestinationOrSource;
 
-                Debug.Assert(baseType is IClassType);
-                ResolvedFeatureType.InstanciateType((IClassType)baseType, ref ResolvedFeatureTypeName, ref ResolvedFeatureType);
+                Debug.Assert(baseType is ICompiledTypeWithFeature);
+                ResolvedFeatureType.InstanciateType((ICompiledTypeWithFeature)baseType, ref ResolvedFeatureTypeName, ref ResolvedFeatureType);
 
                 resultPath.Add(new ExpressionType(ResolvedFeatureTypeName, ResolvedFeatureType, string.Empty));
 

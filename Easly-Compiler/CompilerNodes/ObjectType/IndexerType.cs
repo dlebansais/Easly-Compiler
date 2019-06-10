@@ -466,7 +466,7 @@
         /// <param name="instancingClassType">The class type to instanciate.</param>
         /// <param name="resolvedTypeName">The proposed type instance name.</param>
         /// <param name="resolvedType">The proposed type instance.</param>
-        public void InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType)
+        public void InstanciateType(ICompiledTypeWithFeature instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType)
         {
             bool IsNewInstance = false;
 
@@ -509,8 +509,8 @@
 
             if (IsNewInstance)
             {
-                Debug.Assert(InstancedBaseType is IClassType);
-                ResolveType(instancingClassType.BaseClass.TypeTable, InstancedBaseTypeName, (IClassType)InstancedBaseType, InstancedEntityTypeName, InstancedEntityType, IndexerKind, InstancedIndexParameterList, ParameterEnd, GetRequireList, GetEnsureList, GetExceptionIdentifierList, SetRequireList, SetEnsureList, SetExceptionIdentifierList, out resolvedTypeName, out resolvedType);
+                ISealableDictionary<ITypeName, ICompiledType> TypeTable = instancingClassType.GetTypeTable();
+                ResolveType(TypeTable, InstancedBaseTypeName, (IClassType)InstancedBaseType, InstancedEntityTypeName, InstancedEntityType, IndexerKind, InstancedIndexParameterList, ParameterEnd, GetRequireList, GetEnsureList, GetExceptionIdentifierList, SetRequireList, SetEnsureList, SetExceptionIdentifierList, out resolvedTypeName, out resolvedType);
             }
         }
         #endregion

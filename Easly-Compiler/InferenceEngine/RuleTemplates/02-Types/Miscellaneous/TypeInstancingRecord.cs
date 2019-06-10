@@ -10,7 +10,7 @@
         /// <summary>
         /// The class type.
         /// </summary>
-        public IClassType InstancingClassType { get; set; }
+        public ICompiledTypeWithFeature InstancingClassType { get; set; }
 
         /// <summary>
         /// The name of the instance.

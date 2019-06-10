@@ -241,7 +241,7 @@
         /// </summary>
         /// <param name="instancingClassType">The type attempting to find the overload type.</param>
         /// <param name="instancedOverload">The new overload type upon return if not found.</param>
-        public static void InstanciateCommandOverloadType(IClassType instancingClassType, ref ICommandOverloadType instancedOverload)
+        public static void InstanciateCommandOverloadType(ICompiledTypeWithFeature instancingClassType, ref ICommandOverloadType instancedOverload)
         {
             bool IsNewInstance = false;
 

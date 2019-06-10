@@ -292,7 +292,7 @@
         /// </summary>
         /// <param name="instancingClassType">The type attempting to find the overload type.</param>
         /// <param name="instancedOverload">The new overload type upon return if not found.</param>
-        public static void InstanciateQueryOverloadType(IClassType instancingClassType, ref IQueryOverloadType instancedOverload)
+        public static void InstanciateQueryOverloadType(ICompiledTypeWithFeature instancingClassType, ref IQueryOverloadType instancedOverload)
         {
             bool IsNewInstance = false;
 

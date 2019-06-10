@@ -292,7 +292,7 @@ namespace CompilerNode
         /// <param name="instancingClassType">The class type to instanciate.</param>
         /// <param name="resolvedTypeName">The proposed type instance name.</param>
         /// <param name="resolvedType">The proposed type instance.</param>
-        public void InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType)
+        public void InstanciateType(ICompiledTypeWithFeature instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType)
         {
             bool IsNewInstance = false;
 
@@ -314,7 +314,10 @@ namespace CompilerNode
             }
 
             if (IsNewInstance)
-                ResolveType(instancingClassType.BaseClass.TypeTable, EntityDeclarationList, Sharing, out resolvedTypeName, out resolvedType);
+            {
+                ISealableDictionary<ITypeName, ICompiledType> TypeTable = instancingClassType.GetTypeTable();
+                ResolveType(TypeTable, EntityDeclarationList, Sharing, out resolvedTypeName, out resolvedType);
+            }
         }
         #endregion
 

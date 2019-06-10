@@ -131,7 +131,7 @@
         /// <param name="baseClass">The class used to instanciate this type.</param>
         /// <param name="typeArgumentTable">Arguments if the class is generic.</param>
         /// <param name="instancingClassType">The class type if this instance is a derivation (such as renaming).</param>
-        public static IClassType Create(IClass baseClass, ISealableDictionary<string, ICompiledType> typeArgumentTable, IClassType instancingClassType)
+        public static IClassType Create(IClass baseClass, ISealableDictionary<string, ICompiledType> typeArgumentTable, ICompiledTypeWithFeature instancingClassType)
         {
             ISealableDictionary<ITypeName, ICompiledType> ConformanceTable = new SealableDictionary<ITypeName, ICompiledType>();
 
@@ -165,7 +165,7 @@
         /// <param name="typeArgumentTable">Arguments if the class is generic.</param>
         /// <param name="instancingClassType">The class type if this instance is a derivation (such as renaming).</param>
         /// <param name="conformanceTable">The initialized conformance table.</param>
-        private ClassType(IClass baseClass, ISealableDictionary<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, ISealableDictionary<ITypeName, ICompiledType> conformanceTable)
+        private ClassType(IClass baseClass, ISealableDictionary<string, ICompiledType> typeArgumentTable, ICompiledTypeWithFeature instancingClassType, ISealableDictionary<ITypeName, ICompiledType> conformanceTable)
         {
             BaseClass = baseClass;
             TypeArgumentTable = typeArgumentTable;
@@ -280,6 +280,14 @@
         /// The list of class types this type conforms to.
         /// </summary>
         public IList<IClassType> ConformingClassTypeList { get; private set; } = new List<IClassType>();
+
+        /// <summary>
+        /// Gets the type table for this type.
+        /// </summary>
+        public ISealableDictionary<ITypeName, ICompiledType> GetTypeTable()
+        {
+            return BaseClass.TypeTable;
+        }
         #endregion
 
         #region Client Interface
@@ -302,7 +310,7 @@
 
             foreach (TypeInstancingRecord Record in resolvedClassType.InstancingRecordList)
             {
-                IClassType InstancingClassType = Record.InstancingClassType;
+                ICompiledTypeWithFeature InstancingClassType = Record.InstancingClassType;
                 ITypeName ResolvedTypeName = Record.ResolvedTypeName;
                 ICompiledType ResolvedType = Record.ResolvedType;
 
@@ -335,7 +343,7 @@
         /// <param name="instancingClassType">The class type to instanciate.</param>
         /// <param name="resolvedTypeName">The proposed type instance name.</param>
         /// <param name="resolvedType">The proposed type instance.</param>
-        public void InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType)
+        public void InstanciateType(ICompiledTypeWithFeature instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType)
         {
             bool IsNewInstance = false;
 
@@ -353,7 +361,10 @@
             }
 
             if (IsNewInstance)
-                ResolveType(instancingClassType.BaseClass.TypeTable, BaseClass, InstancedTypeArgumentTable, instancingClassType, out resolvedTypeName, out resolvedType);
+            {
+                ISealableDictionary<ITypeName, ICompiledType> TypeTable = instancingClassType.GetTypeTable();
+                ResolveType(TypeTable, BaseClass, InstancedTypeArgumentTable, instancingClassType, out resolvedTypeName, out resolvedType);
+            }
         }
         #endregion
 
@@ -367,7 +378,7 @@
         /// <param name="instancingClassType">The class type to instanciate.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void ResolveType(ISealableDictionary<ITypeName, ICompiledType> typeTable, IClass baseClass, ISealableDictionary<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void ResolveType(ISealableDictionary<ITypeName, ICompiledType> typeTable, IClass baseClass, ISealableDictionary<string, ICompiledType> typeArgumentTable, ICompiledTypeWithFeature instancingClassType, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
             resolvedTypeName = null;
             resolvedType = null;
@@ -430,7 +441,7 @@
         /// <param name="instancingClassType">The class type to instanciate.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void BuildType(IClass baseClass, ISealableDictionary<string, ICompiledType> typeArgumentTable, IClassType instancingClassType, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void BuildType(IClass baseClass, ISealableDictionary<string, ICompiledType> typeArgumentTable, ICompiledTypeWithFeature instancingClassType, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
             resolvedTypeName = null;
             resolvedType = null;

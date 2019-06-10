@@ -47,7 +47,6 @@
             FormalGeneric = formalGeneric;
             ResolvedTypeName = resolvedTypeName;
             DiscreteTable.Seal();
-            FeatureTable.Seal();
         }
         #endregion
 
@@ -171,19 +170,32 @@
         }
 
         /// <summary>
+        /// Gets the type table for this type.
+        /// </summary>
+        public ISealableDictionary<ITypeName, ICompiledType> GetTypeTable()
+        {
+            return FormalGeneric.TypeTable;
+        }
+
+        /// <summary>
         /// Creates an instance of a class type, or reuse an existing instance.
         /// </summary>
         /// <param name="instancingClassType">The class type to instanciate.</param>
         /// <param name="resolvedTypeName">The proposed type instance name.</param>
         /// <param name="resolvedType">The proposed type instance.</param>
-        public void InstanciateType(IClassType instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType)
+        public void InstanciateType(ICompiledTypeWithFeature instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType)
         {
-            foreach (KeyValuePair<string, ICompiledType> TypeArgument in instancingClassType.TypeArgumentTable)
-                if (TypeArgument.Key == TypeFriendlyName)
-                {
-                    resolvedType = TypeArgument.Value;
-                    break;
-                }
+            if (instancingClassType is IClassType AsClassType)
+            {
+                ISealableDictionary<string, ICompiledType> TypeArgumentTable = AsClassType.TypeArgumentTable;
+
+                foreach (KeyValuePair<string, ICompiledType> TypeArgument in TypeArgumentTable)
+                    if (TypeArgument.Key == TypeFriendlyName)
+                    {
+                        resolvedType = TypeArgument.Value;
+                        break;
+                    }
+            }
         }
         #endregion
 

@@ -35,6 +35,11 @@ namespace CompilerNode
         /// Table of resolved conforming types.
         /// </summary>
         ISealableDictionary<ITypeName, ICompiledType> ResolvedConformanceTable { get; }
+
+        /// <summary>
+        /// Table of all types used in this class.
+        /// </summary>
+        ISealableDictionary<ITypeName, ICompiledType> TypeTable { get; }
     }
 
     /// <summary>
@@ -136,6 +141,7 @@ namespace CompilerNode
                 ResolvedGenericType = new OnceReference<IFormalGenericType>();
                 ResolvedDefaultType = new OnceReference<ICompiledType>();
                 ResolvedConformanceTable = new SealableDictionary<ITypeName, ICompiledType>();
+                TypeTable = new SealableDictionary<ITypeName, ICompiledType>();
                 IsHandled = true;
             }
 
@@ -188,6 +194,11 @@ namespace CompilerNode
         /// Table of resolved conforming types.
         /// </summary>
         public ISealableDictionary<ITypeName, ICompiledType> ResolvedConformanceTable { get; private set; } = new SealableDictionary<ITypeName, ICompiledType>();
+
+        /// <summary>
+        /// Table of all types used in this class.
+        /// </summary>
+        public ISealableDictionary<ITypeName, ICompiledType> TypeTable { get; private set; } = new SealableDictionary<ITypeName, ICompiledType>();
         #endregion
     }
 }

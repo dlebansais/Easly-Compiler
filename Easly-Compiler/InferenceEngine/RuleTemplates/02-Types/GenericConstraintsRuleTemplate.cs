@@ -144,6 +144,18 @@
             }
 
             GenericType.ConformanceTable.Seal();
+
+            foreach (IConstraint Constraint in node.ConstraintList)
+                if (Constraint.ResolvedTypeWithRename.IsAssigned && Constraint.ResolvedTypeWithRename.Item is IClassType AsClassType)
+                {
+                    foreach (KeyValuePair<IFeatureName, IFeatureInstance> Entry in AsClassType.FeatureTable)
+                    {
+                        Debug.Assert(!GenericType.FeatureTable.ContainsKey(Entry.Key));
+                        GenericType.FeatureTable.Add(Entry);
+                    }
+                }
+
+            GenericType.FeatureTable.Seal();
         }
         #endregion
     }
