@@ -74,7 +74,7 @@
                 IList<ICSharpClassType> Result = new List<ICSharpClassType>();
 
                 foreach (ICSharpConstraint Constraint in Generic.ConstraintList)
-                    if (Constraint.Type is ICSharpClassType AsClassType)
+                    if (Constraint.TypeWithRename is ICSharpClassType AsClassType)
                         Result.Add(AsClassType);
 
                 return Result;

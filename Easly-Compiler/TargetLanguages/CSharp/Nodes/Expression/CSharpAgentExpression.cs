@@ -58,16 +58,14 @@
 
                 foreach (ICSharpClassType ClassType in BaseType.ConformingClassTypeList)
                 {
-                    foreach (ICSharpFeature Feature in ClassType.Class.FeatureList)
+                    foreach (KeyValuePair<IFeatureName, IFeatureInstance> Entry in ClassType.Source.FeatureTable)
                     {
-                        if (Feature is ICSharpFeatureWithName AsFeatureWithName)
+                        if (Entry.Key.Name == DelegatedName)
                         {
-                            if (AsFeatureWithName.Name == DelegatedName)
-                            {
-                                Debug.Assert(Delegated == null);
-                                Delegated = AsFeatureWithName;
-                                Delegated = context.GetFeature(source.ResolvedFeature.Item) as ICSharpFeatureWithName;
-                            }
+                            Debug.Assert(Delegated == null);
+
+                            ICompiledFeature Feature = Entry.Value.Feature;
+                            Delegated = context.GetFeature(Feature) as ICSharpFeatureWithName;
                         }
                     }
                 }

@@ -11,6 +11,11 @@
         /// The corresponding type.
         /// </summary>
         ICSharpType Type { get; }
+
+        /// <summary>
+        /// The corresponding type with renamed features.
+        /// </summary>
+        ICSharpType TypeWithRename { get; }
     }
 
     /// <summary>
@@ -38,6 +43,7 @@
             : base(source)
         {
             Type = CSharpType.Create(context, source.ResolvedConformingType.Item);
+            TypeWithRename = CSharpType.Create(context, source.ResolvedTypeWithRename.Item);
         }
         #endregion
 
@@ -46,6 +52,11 @@
         /// The corresponding type.
         /// </summary>
         public ICSharpType Type { get; }
+
+        /// <summary>
+        /// The corresponding type with renamed features.
+        /// </summary>
+        public ICSharpType TypeWithRename { get; }
         #endregion
     }
 }
