@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
 
@@ -12,6 +13,11 @@
         /// The Easly type from which the C# type is created.
         /// </summary>
         new IProcedureType Source { get; }
+
+        /// <summary>
+        /// The list of overloads.
+        /// </summary>
+        IList<ICSharpCommandOverloadType> OverloadTypeList { get; }
     }
 
     /// <summary>
@@ -38,6 +44,13 @@
         protected CSharpProcedureType(ICSharpContext context, IProcedureType source)
             : base(context, source)
         {
+            Debug.Assert(source.OverloadList.Count > 0);
+
+            foreach (ICommandOverloadType OverloadType in source.OverloadList)
+            {
+                ICSharpCommandOverloadType NewOverloadType = CSharpCommandOverloadType.Create(context, OverloadType, null);
+                OverloadTypeList.Add(NewOverloadType);
+            }
         }
 
         /// <summary>
@@ -60,6 +73,15 @@
         protected CSharpProcedureType(ICSharpContext context, IProcedureType source, ICSharpTypedef originatingTypedef)
             : base(context, source, originatingTypedef)
         {
+            ICSharpClass Owner = context.GetClass(source.EmbeddingClass);
+
+            Debug.Assert(source.OverloadList.Count > 0);
+
+            foreach (ICommandOverloadType OverloadType in source.OverloadList)
+            {
+                ICSharpCommandOverloadType NewOverloadType = CSharpCommandOverloadType.Create(context, OverloadType, Owner);
+                OverloadTypeList.Add(NewOverloadType);
+            }
         }
         #endregion
 
@@ -68,6 +90,11 @@
         /// The Easly type from which the C# type is created.
         /// </summary>
         public new IProcedureType Source { get { return (IProcedureType)base.Source; } }
+
+        /// <summary>
+        /// The list of overloads.
+        /// </summary>
+        public IList<ICSharpCommandOverloadType> OverloadTypeList { get; } = new List<ICSharpCommandOverloadType>();
 
         /// <summary>
         /// True if the type can be used in the interface 'I' text format.
@@ -88,15 +115,26 @@
 
             string Result;
 
+            // TODO: detect delegate call parameters to select the proper overload
+
             if (OriginatingTypedef != null)
             {
-                // TODO: detect delegate call parameters to select the proper overload
                 string DelegateName = CSharpNames.ToCSharpIdentifier(OriginatingTypedef.Name);
 
                 Result = CommandOverloadType2CSharpString(DelegateName, Source.OverloadList[0]);
             }
             else
-                Result = "<Not supported>";
+            {
+                ICSharpCommandOverloadType OverloadType = OverloadTypeList[0];
+
+                if (OverloadType.ParameterList.Count > 0)
+                {
+                    CSharpArgument.BuildParameterList(OverloadType.ParameterList, cSharpNamespace, out string ParameterListText, out string ParameterNameListText);
+                    Result = $"Action<{ParameterListText}>";
+                }
+                else
+                    Result = "Action";
+            }
 
             return Result;
         }

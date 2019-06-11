@@ -656,6 +656,8 @@
     <Compile Include="TargetLanguages\CSharp\Nodes\Body\CSharpExternBody.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\Body\CSharpEffectiveBody.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\CSharpAttachment.cs" />
+    <Compile Include="TargetLanguages\CSharp\Nodes\CSharpCommandOverloadType.cs" />
+    <Compile Include="TargetLanguages\CSharp\Nodes\CSharpQueryOverloadType.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\CSharpWith.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\CSharpConditional.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\CSharpScope.cs" />
@@ -699,7 +701,7 @@
     <Compile Include="TargetLanguages\CSharp\Nodes\Expression\CSharpAgentExpression.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\Expression\CSharpExpression.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\Feature\CSharpFeatureWithName.cs" />
-    <Compile Include="TargetLanguages\CSharp\Nodes\Feature\CSharpOverload.cs" />
+    <Compile Include="TargetLanguages\CSharp\Nodes\CSharpOverload.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\Instruction\CSharpThrowInstruction.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\Instruction\CSharpReleaseInstruction.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\Instruction\CSharpRaiseEventInstruction.cs" />
