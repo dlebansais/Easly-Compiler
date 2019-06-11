@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -58,19 +59,20 @@
             Command = CSharpQualifiedName.Create(context, (IQualifiedName)source.Command, parentFeature, null, false);
             FeatureCall = new CSharpFeatureCall(context, source.FeatureCall.Item);
 
-            ICompiledTypeWithFeature FinalType = Source.CommandFinalType.Item.ResolvedBaseType.Item;
-            IList<IClassType> ConformingClassTypeList = FinalType.ConformingClassTypeList;
+            ICompiledTypeWithFeature ResolvedBaseType = Source.CommandFinalType.Item.ResolvedBaseType.Item;
+            ICSharpTypeWithFeature FinalType = CSharpType.Create(context, ResolvedBaseType) as ICSharpTypeWithFeature;
+            Debug.Assert(FinalType != null);
+
+            IList<ICSharpClassType> ConformingClassTypeList = FinalType.ConformingClassTypeList;
 
             bool InheritFromDotNetEvent = false;
             bool IsNumberGuid = false;
-            foreach (IClassType Item in ConformingClassTypeList)
+            foreach (ICSharpClassType Item in ConformingClassTypeList)
             {
-                IClass BaseClass = Item.BaseClass;
-
-                ICSharpClass CallClass = context.GetClass(BaseClass);
+                ICSharpClass CallClass = Item.Class;
                 InheritFromDotNetEvent |= CallClass.InheritFromDotNetEvent;
 
-                IsNumberGuid = BaseClass.ClassGuid == LanguageClasses.Number.Guid;
+                IsNumberGuid = CallClass.Source.ClassGuid == LanguageClasses.Number.Guid;
             }
 
             SkipLastInPath = InheritFromDotNetEvent;

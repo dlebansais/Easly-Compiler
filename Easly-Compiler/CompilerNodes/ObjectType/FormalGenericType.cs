@@ -153,23 +153,6 @@
         public ICompiledType TypeAsDestinationOrSource { get { return this; } }
 
         /// <summary>
-        /// The list of class types this type conforms to.
-        /// </summary>
-        public IList<IClassType> ConformingClassTypeList
-        {
-            get
-            {
-                IList<IClassType> Result = new List<IClassType>();
-
-                foreach (IConstraint Constraint in FormalGeneric.ConstraintList)
-                    if (Constraint.ResolvedTypeWithRename.IsAssigned && Constraint.ResolvedTypeWithRename.Item is IClassType AsClassType)
-                        Result.Add(AsClassType);
-
-                return Result;
-            }
-        }
-
-        /// <summary>
         /// Gets the type table for this type.
         /// </summary>
         public ISealableDictionary<ITypeName, ICompiledType> GetTypeTable()

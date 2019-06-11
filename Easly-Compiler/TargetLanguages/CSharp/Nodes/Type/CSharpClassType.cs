@@ -8,7 +8,7 @@
     /// <summary>
     /// A C# class type.
     /// </summary>
-    public interface ICSharpClassType : ICSharpType
+    public interface ICSharpClassType : ICSharpTypeWithFeature
     {
         /// <summary>
         /// The Easly type from which the C# type is created.
@@ -62,6 +62,8 @@
 
                 TypeArgumentList.Add(TypeArgument);
             }
+
+            ConformingClassTypeList.Add(this);
         }
         #endregion
 
@@ -85,6 +87,11 @@
         /// True if the type can be used in the interface 'I' text format.
         /// </summary>
         public override bool HasInterfaceText { get { return Class.Source.Cloneable != BaseNode.CloneableStatus.Single && Class.ValidSourceName != "Microsoft .NET"; } }
+
+        /// <summary>
+        /// The list of class types this type conforms to.
+        /// </summary>
+        public IList<ICSharpClassType> ConformingClassTypeList { get; } = new List<ICSharpClassType>();
         #endregion
 
         #region Client Interface

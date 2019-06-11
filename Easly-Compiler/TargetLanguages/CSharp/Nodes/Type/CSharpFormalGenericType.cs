@@ -1,12 +1,13 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
     /// A C# formal generic type.
     /// </summary>
-    public interface ICSharpFormalGenericType : ICSharpType
+    public interface ICSharpFormalGenericType : ICSharpTypeWithFeature
     {
         /// <summary>
         /// The Easly type from which the C# type is created.
@@ -62,6 +63,23 @@
         /// True if the type can be used in the interface 'I' text format.
         /// </summary>
         public override bool HasInterfaceText { get { return false; } }
+
+        /// <summary>
+        /// The list of class types this type conforms to.
+        /// </summary>
+        public IList<ICSharpClassType> ConformingClassTypeList
+        {
+            get
+            {
+                IList<ICSharpClassType> Result = new List<ICSharpClassType>();
+
+                foreach (ICSharpConstraint Constraint in Generic.ConstraintList)
+                    if (Constraint.Type is ICSharpClassType AsClassType)
+                        Result.Add(AsClassType);
+
+                return Result;
+            }
+        }
         #endregion
 
         #region Client Interface

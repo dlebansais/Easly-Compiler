@@ -90,13 +90,14 @@
         /// <param name="context">The creation context.</param>
         public void Init(ICSharpContext context)
         {
-            Type = CSharpFormalGenericType.Create(context, Source.ResolvedGenericType.Item);
-
             foreach (IConstraint Constraint in Source.ConstraintList)
             {
                 ICSharpConstraint NewConstraint = CSharpConstraint.Create(context, Constraint);
                 ConstraintList.Add(NewConstraint);
             }
+
+            // Create the type after constraints have been listed.
+            Type = CSharpFormalGenericType.Create(context, Source.ResolvedGenericType.Item);
         }
         #endregion
     }

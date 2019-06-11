@@ -1,17 +1,15 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
-    using CompilerNode;
-    using Easly;
 
     /// <summary>
     /// Interface for types that have accessible features (class type and generic type with constraints).
     /// </summary>
-    public interface ICompiledTypeWithFeature : ICompiledType
+    public interface ICSharpTypeWithFeature : ICSharpType
     {
         /// <summary>
-        /// Gets the type table for this type.
+        /// The list of class types this type conforms to.
         /// </summary>
-        ISealableDictionary<ITypeName, ICompiledType> GetTypeTable();
+        IList<ICSharpClassType> ConformingClassTypeList { get; }
     }
 }

@@ -122,7 +122,6 @@
             SourceType = sourceType;
             BaseClass = baseClass;
             TypeArgumentTable = typeArgumentTable;
-            ConformingClassTypeList.Add(this);
         }
 
         /// <summary>
@@ -275,11 +274,6 @@
         /// The type to use instead of this type for a source or destination type, for the purpose of path searching.
         /// </summary>
         public ICompiledType TypeAsDestinationOrSource { get { return this; } }
-
-        /// <summary>
-        /// The list of class types this type conforms to.
-        /// </summary>
-        public IList<IClassType> ConformingClassTypeList { get; private set; } = new List<IClassType>();
 
         /// <summary>
         /// Gets the type table for this type.
