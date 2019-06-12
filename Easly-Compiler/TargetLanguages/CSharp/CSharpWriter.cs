@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Text;
@@ -8,7 +9,7 @@
     /// <summary>
     /// An interface to write to a C# file.
     /// </summary>
-    public interface ICSharpWriter : IDisposable
+    public interface ICSharpWriter : ICSharpUsingCollection, IDisposable
     {
         /// <summary>
         /// Current indentation level.
@@ -18,7 +19,7 @@
         /// <summary>
         /// Writes an empty line.
         /// </summary>
-        void WriteLine();
+        void WriteEmptyLine();
 
         /// <summary>
         /// Writes a line using the current indentation.
@@ -41,6 +42,11 @@
         /// Decreased the current indentation level by 1.
         /// </summary>
         void DecreaseIndent();
+
+        /// <summary>
+        /// Commits all accumulated lines.
+        /// </summary>
+        void CommitLines();
     }
 
     /// <summary>
@@ -53,13 +59,21 @@
         /// Initializes a new instance of the <see cref="CSharpWriter"/> class.
         /// </summary>
         /// <param name="stream">The stream to write to.</param>
-        public CSharpWriter(Stream stream)
+        /// <param name="defaultNamespace">The default namespace.</param>
+        public CSharpWriter(Stream stream, string defaultNamespace)
             : base(stream, Encoding.Unicode)
         {
+            DefaultNamespace = defaultNamespace;
+            AutoFlush = false;
         }
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the default namespace.
+        /// </summary>
+        public string DefaultNamespace { get; }
+
         /// <summary>
         /// Current indentation level.
         /// </summary>
@@ -68,15 +82,25 @@
 
         #region Client Interface
         /// <summary>
+        /// Writes an empty line.
+        /// </summary>
+        public void WriteEmptyLine()
+        {
+            LineList.Add(string.Empty);
+        }
+
+        /// <summary>
         /// Writes a line using the current indentation.
         /// </summary>
         /// <param name="line">The line to write.</param>
         public void WriteIndentedLine(string line)
         {
-            for (int i = 0; i < IndentLevel; i++)
-                Write("    ");
+            string Indentation = string.Empty;
 
-            WriteLine(line);
+            for (int i = 0; i < IndentLevel; i++)
+                Indentation += "    ";
+
+            LineList.Add(Indentation + line);
         }
 
         /// <summary>
@@ -109,6 +133,68 @@
             Debug.Assert(IndentLevel > 0);
 
             IndentLevel--;
+        }
+
+        /// <summary>
+        /// Adds a using directive to write separately.
+        /// </summary>
+        public void AddUsing(string usingDirective)
+        {
+            UsingList.Add(usingDirective);
+        }
+
+        /// <summary>
+        /// Commits all accumulated lines.
+        /// </summary>
+        public void CommitLines()
+        {
+            foreach (string UsingDirective in UsingList)
+                WriteLine($"    using {UsingDirective};");
+
+            if (UsingList.Count > 0)
+                WriteLine(string.Empty);
+
+            foreach (string Line in LineList)
+                WriteLine(Line);
+
+            if (UsingList.Count > 0 || LineList.Count > 0)
+            {
+                UsingList.Clear();
+                LineList.Clear();
+                Flush();
+            }
+        }
+
+        private IList<string> UsingList { get; } = new List<string>();
+        private IList<string> LineList { get; } = new List<string>();
+        #endregion
+
+        #region Implementation of IDisposable
+        /// <summary></summary>
+        protected override void Dispose(bool isDisposing)
+        {
+            if (isDisposing)
+                DisposeNow();
+        }
+
+        /// <summary></summary>
+        protected virtual void DisposeNow()
+        {
+            CommitLines();
+        }
+
+        /// <summary></summary>
+        public override void Close()
+        {
+            CommitLines();
+            base.Close();
+        }
+
+        /// <summary></summary>
+        public override void Flush()
+        {
+            CommitLines();
+            base.Flush();
         }
         #endregion
     }

@@ -41,8 +41,7 @@
         /// Writes down the C# feature.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        void WriteCSharp(ICSharpWriter writer, string outputNamespace);
+        void WriteCSharp(ICSharpWriter writer);
     }
 
     /// <summary>
@@ -134,23 +133,22 @@
         /// Writes down the C# feature.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public void WriteCSharp(ICSharpWriter writer, string outputNamespace)
+        public void WriteCSharp(ICSharpWriter writer)
         {
             string NameString = CSharpNames.ToCSharpIdentifier(Name);
-            string TypeString = Type.Type2CSharpString(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+            string TypeString = Type.Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
             string DefaultValueText = string.Empty;
 
             if (DefaultValue != null)
             {
-                DefaultValueText = DefaultValue.CSharpText(outputNamespace);
+                DefaultValueText = DefaultValue.CSharpText(writer);
                 if (DefaultValue.IsComplex)
                     DefaultValueText = $"({DefaultValueText})";
             }
 
             if (DefaultValueText.Length == 0)
             {
-                if (Type.GetSingletonString(outputNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None, out string SingletonString))
+                if (Type.GetSingletonString(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None, out string SingletonString))
                     DefaultValueText = SingletonString;
             }
 
@@ -164,15 +162,14 @@
         /// Writes down the C# feature.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
         /// <param name="featureTextType">The write mode.</param>
         /// <param name="exportStatus">The feature export status.</param>
         /// <param name="isLocal">True if the feature is local to the class.</param>
         /// <param name="isFirstFeature">True if the feature is the first in a list.</param>
         /// <param name="isMultiline">True if there is a separating line above.</param>
-        public override void WriteCSharp(ICSharpWriter writer, string outputNamespace, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
+        public override void WriteCSharp(ICSharpWriter writer, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
         {
-            WriteCSharp(writer, outputNamespace);
+            WriteCSharp(writer);
         }
         #endregion
     }

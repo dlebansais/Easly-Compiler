@@ -95,10 +95,9 @@
         /// Writes down the C# instruction.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
+        public override void WriteCSharp(ICSharpWriter writer)
         {
-            string SourceString = SourceExpression.CSharpText(outputNamespace, new List<ICSharpQualifiedName>());
+            string SourceString = SourceExpression.CSharpText(writer, new List<ICSharpQualifiedName>());
 
             writer.WriteIndentedLine($"switch ({SourceString})");
             writer.WriteIndentedLine("{");
@@ -110,19 +109,19 @@
                 if (!WithInserted)
                     WithInserted = true;
                 else
-                    writer.WriteLine();
+                    writer.WriteEmptyLine();
 
-                Item.WriteCSharp(writer, outputNamespace);
+                Item.WriteCSharp(writer);
             }
 
             if (WithInserted)
-                writer.WriteLine();
+                writer.WriteEmptyLine();
 
             writer.WriteIndentedLine("default:");
 
             if (ElseInstructions != null)
             {
-                ElseInstructions.WriteCSharp(writer, outputNamespace, CSharpCurlyBracketsInsertions.Indifferent, false);
+                ElseInstructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Indifferent, false);
                 writer.WriteIndentedLine("break;");
             }
             else

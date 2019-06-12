@@ -109,14 +109,13 @@
         /// Writes down the C# instruction.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
+        public override void WriteCSharp(ICSharpWriter writer)
         {
-            string OverListString = OverList.CSharpText(outputNamespace);
+            string OverListString = OverList.CSharpText(writer);
 
             ICSharpScopeAttributeFeature Indexer = IndexerList[0];
             string IndexerNameString = Indexer.Name;
-            string TypeString = Indexer.Type.Type2CSharpString(outputNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+            string TypeString = Indexer.Type.Type2CSharpString(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
 
             //TODO: support multiple indexers and IterationType
 
@@ -129,9 +128,9 @@
 
                 writer.WriteIndentedLine("{");
 
-                LoopInstructions.WriteCSharp(writer, outputNamespace, CSharpCurlyBracketsInsertions.AlreadyInserted, false);
+                LoopInstructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.AlreadyInserted, false);
 
-                writer.WriteLine();
+                writer.WriteEmptyLine();
                 writer.IncreaseIndent();
                 writer.WriteIndentedLine($"if ({ExitEntityNameString})");
                 writer.IncreaseIndent();
@@ -144,7 +143,7 @@
             {
                 writer.WriteIndentedLine($"foreach ({TypeString} {IndexerNameString} in {OverListString})");
 
-                LoopInstructions.WriteCSharp(writer, outputNamespace, CSharpCurlyBracketsInsertions.Indifferent, false);
+                LoopInstructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Indifferent, false);
             }
 
             //TODO: InvariantBlocks

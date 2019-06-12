@@ -23,8 +23,7 @@
         /// Writes down the C# assertion.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        void WriteCSharp(ICSharpWriter writer, string outputNamespace);
+        void WriteCSharp(ICSharpWriter writer);
     }
 
     /// <summary>
@@ -75,10 +74,9 @@
         /// Writes down the C# assertion.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public virtual void WriteCSharp(ICSharpWriter writer, string outputNamespace)
+        public virtual void WriteCSharp(ICSharpWriter writer)
         {
-            string AssertionString = BooleanExpression.CSharpText(outputNamespace);
+            string AssertionString = BooleanExpression.CSharpText(writer);
             string TagString = string.IsNullOrEmpty(Tag) ? string.Empty : $" // {Tag}?";
 
             writer.WriteIndentedLine($"Debug.Assert({AssertionString});{TagString}");
@@ -99,7 +97,7 @@
             if (writeEmptyContract || requireList.Count > 0 || ensureList.Count > 0)
             {
                 if (!isFirstFeature)
-                    writer.WriteLine();
+                    writer.WriteEmptyLine();
 
                 isMultiline = true;
 

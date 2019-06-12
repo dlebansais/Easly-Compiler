@@ -27,15 +27,13 @@
         /// Writes down the C# continuation instructions.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        void WriteCSharpInstructions(ICSharpWriter writer, string outputNamespace);
+        void WriteCSharpInstructions(ICSharpWriter writer);
 
         /// <summary>
         /// Writes down the C# continuation cleanup instructions.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        void WriteCSharpCleanupInstructions(ICSharpWriter writer, string outputNamespace);
+        void WriteCSharpCleanupInstructions(ICSharpWriter writer);
     }
 
     /// <summary>
@@ -98,18 +96,16 @@
         /// Writes down the C# continuation instructions.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public virtual void WriteCSharpInstructions(ICSharpWriter writer, string outputNamespace)
+        public virtual void WriteCSharpInstructions(ICSharpWriter writer)
         {
-            Instructions.WriteCSharp(writer, outputNamespace, CSharpCurlyBracketsInsertions.Indifferent, false);
+            Instructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Indifferent, false);
         }
 
         /// <summary>
         /// Writes down the C# continuation cleanup instructions.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public virtual void WriteCSharpCleanupInstructions(ICSharpWriter writer, string outputNamespace)
+        public virtual void WriteCSharpCleanupInstructions(ICSharpWriter writer)
         {
             if (CleanupList.Count > 1)
             {
@@ -118,7 +114,7 @@
             }
 
             foreach (ICSharpInstruction Item in CleanupList)
-                Item.WriteCSharp(writer, outputNamespace);
+                Item.WriteCSharp(writer);
 
             if (CleanupList.Count > 1)
             {

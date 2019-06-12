@@ -90,29 +90,29 @@
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
-        public override string CSharpText(string cSharpNamespace)
+        /// <param name="usingCollection">The collection of using directives.</param>
+        public override string CSharpText(ICSharpUsingCollection usingCollection)
         {
-            return CSharpText(cSharpNamespace, new List<ICSharpQualifiedName>());
+            return CSharpText(usingCollection, new List<ICSharpQualifiedName>());
         }
 
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="destinationList">The list of destinations.</param>
-        public override string CSharpText(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
+        public override string CSharpText(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList)
         {
             if (IsEventExpression)
-                return CSharpTextEvent(cSharpNamespace, destinationList);
+                return CSharpTextEvent(usingCollection, destinationList);
             else
-                return CSharpTextBoolean(cSharpNamespace, destinationList);
+                return CSharpTextBoolean(usingCollection, destinationList);
         }
 
-        private string CSharpTextEvent(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
+        private string CSharpTextEvent(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList)
         {
-            string LeftText = LeftExpression.CSharpText(cSharpNamespace);
-            string RightText = RightExpression.CSharpText(cSharpNamespace);
+            string LeftText = LeftExpression.CSharpText(usingCollection);
+            string RightText = RightExpression.CSharpText(usingCollection);
 
             string WaitName = null;
 
@@ -132,10 +132,10 @@
             return $"Event.{WaitName}(new Event[] {{ {LeftText}, {RightText} }})";
         }
 
-        private string CSharpTextBoolean(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
+        private string CSharpTextBoolean(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList)
         {
-            string LeftText = NestedExpressionText(LeftExpression, cSharpNamespace);
-            string RightText = NestedExpressionText(RightExpression, cSharpNamespace);
+            string LeftText = NestedExpressionText(usingCollection, LeftExpression);
+            string RightText = NestedExpressionText(usingCollection, RightExpression);
 
             string OperatorName = null;
 
@@ -155,9 +155,9 @@
             return $"{LeftText} {OperatorName} {RightText}";
         }
 
-        private string NestedExpressionText(ICSharpExpression expression, string cSharpNamespace)
+        private string NestedExpressionText(ICSharpUsingCollection usingCollection, ICSharpExpression expression)
         {
-            string Result = expression.CSharpText(cSharpNamespace);
+            string Result = expression.CSharpText(usingCollection);
 
             if (expression.IsComplex)
                 Result = $"({Result})";

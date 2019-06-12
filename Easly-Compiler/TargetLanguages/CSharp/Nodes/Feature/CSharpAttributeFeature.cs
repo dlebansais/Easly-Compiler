@@ -111,21 +111,20 @@
         /// Writes down the C# feature.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
         /// <param name="featureTextType">The write mode.</param>
         /// <param name="exportStatus">The feature export status.</param>
         /// <param name="isLocal">True if the feature is local to the class.</param>
         /// <param name="isFirstFeature">True if the feature is the first in a list.</param>
         /// <param name="isMultiline">True if there is a separating line above.</param>
-        public override void WriteCSharp(ICSharpWriter writer, string outputNamespace, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
+        public override void WriteCSharp(ICSharpWriter writer, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
         {
             isMultiline = false;
 
             if (featureTextType == CSharpFeatureTextTypes.Implementation)
-                WriteCSharpImplementation(writer, outputNamespace, exportStatus, ref isFirstFeature, ref isMultiline);
+                WriteCSharpImplementation(writer, exportStatus, ref isFirstFeature, ref isMultiline);
         }
 
-        private void WriteCSharpImplementation(ICSharpWriter writer, string outputNamespace, CSharpExports exportStatus, ref bool isFirstFeature, ref bool isMultiline)
+        private void WriteCSharpImplementation(ICSharpWriter writer, CSharpExports exportStatus, ref bool isFirstFeature, ref bool isMultiline)
         {
             bool IsEvent = false;
 
@@ -140,13 +139,13 @@
 
             CSharpAssertion.WriteContract(writer, new List<ICSharpAssertion>(), EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
 
-            string TypeString = Type.Type2CSharpString(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+            string TypeString = Type.Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
             string AttributeString = CSharpNames.ToCSharpIdentifier(Name);
             string ExportString = CSharpNames.ComposedExportStatus(false, false, true, exportStatus);
 
             if (IsEvent)
                 writer.WriteIndentedLine($"{ExportString} event {TypeString} {AttributeString};");
-            else if (Type.GetSingletonString(outputNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None, out string SingletonString))
+            else if (Type.GetSingletonString(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None, out string SingletonString))
                 writer.WriteIndentedLine($"{ExportString} {TypeString} {AttributeString} {{ get {{ return {SingletonString}; }} }}");
             else
                 writer.WriteIndentedLine($"{ExportString} {TypeString} {AttributeString} {{ get; private set; }}");

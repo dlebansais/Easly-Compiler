@@ -83,12 +83,11 @@
         /// Writes down the C# instruction.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
+        public override void WriteCSharp(ICSharpWriter writer)
         {
             if (DestinationList.Count > 1)
             {
-                string AssignementString = SourceExpression.CSharpText(outputNamespace, DestinationList);
+                string AssignementString = SourceExpression.CSharpText(writer, DestinationList);
 
                 writer.WriteIndentedLine($"{AssignementString};");
             }
@@ -97,8 +96,8 @@
                 Debug.Assert(DestinationList.Count == 1);
 
                 ICSharpQualifiedName Destination = DestinationList[0];
-                string DestinationText = Destination.DecoratedCSharpText(outputNamespace, 0);
-                string SourceText = SourceExpression.CSharpText(outputNamespace);
+                string DestinationText = Destination.DecoratedCSharpText(writer, 0);
+                string SourceText = SourceExpression.CSharpText(writer);
 
                 writer.WriteIndentedLine($"{DestinationText} = {SourceText};");
             }

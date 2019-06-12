@@ -88,12 +88,11 @@
         /// Writes down the C# instruction.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
+        public override void WriteCSharp(ICSharpWriter writer)
         {
-            string DestinationString = Destination.CSharpText(outputNamespace, 0);
-            string SourceString = SourceExpression.CSharpText(outputNamespace);
-            string ArgumentListText = CSharpArgument.CSharpArgumentList(outputNamespace, FeatureCall, new List<ICSharpQualifiedName>());
+            string DestinationString = Destination.CSharpText(writer, 0);
+            string SourceString = SourceExpression.CSharpText(writer);
+            string ArgumentListText = CSharpArgument.CSharpArgumentList(writer, FeatureCall, new List<ICSharpQualifiedName>());
 
             writer.WriteIndentedLine($"{DestinationString}[{ArgumentListText}] = {SourceString};");
         }

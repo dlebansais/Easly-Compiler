@@ -167,24 +167,24 @@
         /// Writes down the class source code.
         /// </summary>
         /// <param name="folder">The output root folder.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        void Write(string folder, string outputNamespace);
+        /// <param name="defaultNamespace">Namespace for the output code.</param>
+        void Write(string folder, string defaultNamespace);
 
         /// <summary>
         /// Gets the full name of a class.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="cSharpTypeFormat">The type format to use.</param>
         /// <param name="cSharpNamespaceFormat">The namespace format to use.</param>
-        string FullClassName2CSharpClassName(string cSharpNamespace, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat);
+        string FullClassName2CSharpClassName(ICSharpUsingCollection usingCollection, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat);
 
         /// <summary>
         /// Gets the name of a class.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="cSharpTypeFormat">The type format to use.</param>
         /// <param name="cSharpNamespaceFormat">The namespace format to use.</param>
-        string BasicClassName2CSharpClassName(string cSharpNamespace, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat);
+        string BasicClassName2CSharpClassName(ICSharpUsingCollection usingCollection, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat);
     }
 
     /// <summary>
@@ -622,8 +622,8 @@
         /// Writes down the class source code.
         /// </summary>
         /// <param name="rootFolder">The output root folder.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public void Write(string rootFolder, string outputNamespace)
+        /// <param name="defaultNamespace">Namespace for the output code.</param>
+        public void Write(string rootFolder, string defaultNamespace)
         {
             try
             {
@@ -637,9 +637,9 @@
 
                 using (FileStream Stream = new FileStream(FilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
                 {
-                    using (ICSharpWriter Writer = new CSharpWriter(Stream))
+                    using (CSharpWriter Writer = new CSharpWriter(Stream, defaultNamespace))
                     {
-                        Write(Writer, outputNamespace);
+                        Write(Writer);
                     }
                 }
             }
@@ -1120,21 +1120,21 @@
         #endregion
 
         #region Implementation
-        private void Write(ICSharpWriter writer, string outputNamespace)
+        private void Write(ICSharpWriter writer)
         {
             if (Source.IsEnumeration)
-                WriteEnum(writer, outputNamespace);
+                WriteEnum(writer);
             else
-                WriteClass(writer, outputNamespace);
+                WriteClass(writer);
         }
 
-        private void WriteEnum(ICSharpWriter writer, string outputNamespace)
+        private void WriteEnum(ICSharpWriter writer)
         {
-            writer.WriteIndentedLine($"namespace {outputNamespace}");
+            writer.WriteIndentedLine($"namespace {writer.DefaultNamespace}");
             writer.WriteIndentedLine("{");
             writer.IncreaseIndent();
 
-            string ClassName = FullClassName2CSharpClassName(outputNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+            string ClassName = FullClassName2CSharpClassName(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
 
             writer.WriteIndentedLine($"public enum {ClassName}");
             writer.WriteIndentedLine("{");
@@ -1150,7 +1150,7 @@
                 if (Item.ExplicitValue != null)
                 {
                     ICSharpExpression ExplicitValue = Item.ExplicitValue;
-                    Line += " " + "=" + " " + ExplicitValue.CSharpText(outputNamespace);
+                    Line += " " + "=" + " " + ExplicitValue.CSharpText(writer);
                 }
 
                 if (i + 1 < DiscreteList.Count)
@@ -1166,26 +1166,30 @@
             writer.WriteIndentedLine("}");
         }
 
-        private void WriteClass(ICSharpWriter writer, string outputNamespace)
+        private void WriteClass(ICSharpWriter writer)
         {
-            writer.WriteIndentedLine("namespace " + outputNamespace);
+            writer.WriteIndentedLine($"namespace {writer.DefaultNamespace}");
             writer.WriteIndentedLine("{");
+
+            // Next commit will write using directives.
+            writer.CommitLines();
+
             writer.IncreaseIndent();
 
             if (IsParameterizedSingleton)
-                WriteParameterizedSingletonClass(writer, outputNamespace);
+                WriteParameterizedSingletonClass(writer);
             else
-                WriteClassInterface(writer, outputNamespace);
+                WriteClassInterface(writer);
 
-            WriteClassImplementation(writer, outputNamespace);
+            WriteClassImplementation(writer);
 
             writer.DecreaseIndent();
             writer.WriteIndentedLine("}");
         }
 
-        private void WriteParameterizedSingletonClass(ICSharpWriter writer, string outputNamespace)
+        private void WriteParameterizedSingletonClass(ICSharpWriter writer)
         {
-            string ClassName = BasicClassName2CSharpClassName(outputNamespace, CSharpTypeFormats.AsSingleton, CSharpNamespaceFormats.None);
+            string ClassName = BasicClassName2CSharpClassName(writer, CSharpTypeFormats.AsSingleton, CSharpNamespaceFormats.None);
 
             writer.WriteIndentedLine($"class {ClassName}");
             writer.WriteIndentedLine("{");
@@ -1197,17 +1201,17 @@
             writer.DecreaseIndent();
             writer.WriteIndentedLine("}");
 
-            writer.WriteLine();
+            writer.WriteEmptyLine();
             writer.WriteIndentedLine("public static Hashtable<string, object> SingletonSet;");
             writer.DecreaseIndent();
             writer.WriteIndentedLine("}");
 
-            writer.WriteLine();
+            writer.WriteEmptyLine();
         }
 
-        private void WriteClassInterface(ICSharpWriter writer, string outputNamespace)
+        private void WriteClassInterface(ICSharpWriter writer)
         {
-            string InterfaceName = FullClassName2CSharpClassName(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+            string InterfaceName = FullClassName2CSharpClassName(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
 
             IList<ICSharpClass> InterfaceList = new List<ICSharpClass>();
             if (BaseClass != null)
@@ -1234,7 +1238,7 @@
                     if (OtherInterfaceNames.Length > 0)
                         OtherInterfaceNames += ", ";
 
-                    OtherInterfaceNames += OtherInterface.FullClassName2CSharpClassName(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+                    OtherInterfaceNames += OtherInterface.FullClassName2CSharpClassName(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
                 }
 
                 InterfaceDeclarationLine += $" : {OtherInterfaceNames}";
@@ -1243,7 +1247,7 @@
             writer.WriteIndentedLine(InterfaceDeclarationLine);
 
             foreach (ICSharpGeneric Generic in GenericList)
-                WriteGenericWhereClause(writer, outputNamespace, Generic);
+                WriteGenericWhereClause(writer, Generic);
 
             writer.WriteIndentedLine("{");
             writer.IncreaseIndent();
@@ -1260,12 +1264,12 @@
 
                 bool IsMultiline = false;
                 bool IsFirstFeature = true;
-                Feature.WriteCSharp(writer, outputNamespace, CSharpFeatureTextTypes.Interface, CSharpExports.None, IsLocal, ref IsFirstFeature, ref IsMultiline);
+                Feature.WriteCSharp(writer, CSharpFeatureTextTypes.Interface, CSharpExports.None, IsLocal, ref IsFirstFeature, ref IsMultiline);
             }
 
             writer.DecreaseIndent();
             writer.WriteIndentedLine("}");
-            writer.WriteLine();
+            writer.WriteEmptyLine();
         }
 
         private bool IsDirectFeature(ICSharpFeature feature)
@@ -1276,15 +1280,15 @@
                 return false;
         }
 
-        private void WriteGenericWhereClause(ICSharpWriter writer, string outputNamespace, ICSharpGeneric generic)
+        private void WriteGenericWhereClause(ICSharpWriter writer, ICSharpGeneric generic)
         {
             string GenericName = CSharpNames.ToCSharpIdentifier(generic.Name);
             string InterfaceGenericName = $"I{GenericName}";
 
             string CopyConstraint = CopyConstraintAsString(generic);
 
-            string ParentConstraint = ParentConstraintAsString(generic, outputNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
-            string InterfaceParentConstraint = ParentConstraintAsString(generic, outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+            string ParentConstraint = ParentConstraintAsString(writer, generic, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+            string InterfaceParentConstraint = ParentConstraintAsString(writer, generic, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
 
             string Constraints = string.Empty;
             string InterfaceConstraints = string.Empty;
@@ -1321,7 +1325,7 @@
             return string.Empty;
         }
 
-        private string ParentConstraintAsString(ICSharpGeneric generic, string outputNamespace, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat)
+        private string ParentConstraintAsString(ICSharpUsingCollection usingCollection, ICSharpGeneric generic, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat)
         {
             string Result = string.Empty;
 
@@ -1334,20 +1338,20 @@
                     if (Result.Length > 0)
                         Result += ", ";
 
-                    Result += Constraint.Type.Type2CSharpString(outputNamespace, cSharpTypeFormat, cSharpNamespaceFormat);
+                    Result += Constraint.Type.Type2CSharpString(usingCollection, cSharpTypeFormat, cSharpNamespaceFormat);
                 }
             }
 
             return Result;
         }
 
-        private void WriteClassImplementation(ICSharpWriter writer, string outputNamespace)
+        private void WriteClassImplementation(ICSharpWriter writer)
         {
             writer.WriteDocumentation(Source);
 
-            string InterfaceName = FullClassName2CSharpClassName(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
-            string ClassName = FullClassName2CSharpClassName(outputNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
-            string SingletonName = BasicClassName2CSharpClassName(outputNamespace, CSharpTypeFormats.AsSingleton, CSharpNamespaceFormats.None);
+            string InterfaceName = FullClassName2CSharpClassName(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+            string ClassName = FullClassName2CSharpClassName(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+            string SingletonName = BasicClassName2CSharpClassName(writer, CSharpTypeFormats.AsSingleton, CSharpNamespaceFormats.None);
 
             bool IsAbstract = Source.IsAbstract;
 
@@ -1370,7 +1374,7 @@
 
             if (BaseClass != null)
             {
-                string ParentClassName = BaseClass.FullClassName2CSharpClassName(outputNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+                string ParentClassName = BaseClass.FullClassName2CSharpClassName(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
                 InheritanceLineList.Add(ParentClassName);
             }
 
@@ -1395,7 +1399,7 @@
             writer.WriteIndentedLine(InterfaceDeclarationLine);
 
             foreach (ICSharpGeneric Generic in GenericList)
-                WriteGenericWhereClause(writer, outputNamespace, Generic);
+                WriteGenericWhereClause(writer, Generic);
 
             string InitRegion = "Init";
             string PropertiesRegion = "Properties";
@@ -1487,7 +1491,7 @@
                     if (IsFirstRegion)
                         IsFirstRegion = false;
                     else
-                        writer.WriteLine();
+                        writer.WriteEmptyLine();
 
                     writer.WriteIndentedLine("#region" + " " + BelongingRegion);
 
@@ -1496,15 +1500,15 @@
 
                     if ((BelongingRegion == InitRegion && ConstructorOverride != null) && Region.Count == 0)
                     {
-                        string NameString = BasicClassName2CSharpClassName(outputNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+                        string NameString = BasicClassName2CSharpClassName(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
 
                         foreach (ICSharpCommandOverload Item in ConstructorOverride.OverloadList)
                         {
                             string ParameterEntityList, ParameterNameList;
-                            CSharpArgument.BuildParameterList(Item.ParameterList, outputNamespace, out ParameterEntityList, out ParameterNameList);
+                            CSharpArgument.BuildParameterList(writer, Item.ParameterList, out ParameterEntityList, out ParameterNameList);
 
                             if (IsMultiline)
-                                writer.WriteLine();
+                                writer.WriteEmptyLine();
 
                             writer.WriteIndentedLine(CSharpNames.ComposedExportStatus(false, false, true, CSharpExports.Public) + $" {NameString}({ParameterEntityList})");
                             writer.IncreaseIndent();
@@ -1553,7 +1557,7 @@
                                 Feature.MarkPrecursorAsCoexisting(Entry.Key);
                         }
 
-                        Feature.WriteCSharp(writer, outputNamespace, CSharpFeatureTextTypes.Implementation, ExportStatus, IsLocal, ref IsFirstFeature, ref IsMultiline);
+                        Feature.WriteCSharp(writer, CSharpFeatureTextTypes.Implementation, ExportStatus, IsLocal, ref IsFirstFeature, ref IsMultiline);
                         WrittenFeatures++;
 
                         if (!string.IsNullOrEmpty(Feature.CoexistingPrecursorName) && Instance.PrecursorList.Count > 0)
@@ -1566,7 +1570,7 @@
                             CSharpExports PrecursorExportStatus = CSharpExports.Private;
 
                             ICSharpFeature PrecursorFeature = null;
-                            PrecursorFeature.WriteCSharp(writer, outputNamespace, CSharpFeatureTextTypes.Implementation, PrecursorExportStatus, false, ref IsFirstFeature, ref IsMultiline);
+                            PrecursorFeature.WriteCSharp(writer, CSharpFeatureTextTypes.Implementation, PrecursorExportStatus, false, ref IsFirstFeature, ref IsMultiline);
                             WrittenFeatures++;
                         }
                     }
@@ -1577,7 +1581,7 @@
                     if (IsParameterizedSingleton)
                     {
                         if (WrittenFeatures > 0)
-                            writer.WriteLine();
+                            writer.WriteEmptyLine();
                         else
                             writer.WriteIndentedLine("#region" + " " + BelongingRegion);
 
@@ -1590,7 +1594,7 @@
                         writer.WriteIndentedLine("string" + " " + "Key" + " " + "=" + " " + "\"\"" + ";");
                         foreach (ICSharpGeneric Generic in GenericList)
                             writer.WriteIndentedLine("Key" + " " + "+=" + " " + "\"" + "*" + "\"" + " " + "+" + " " + "typeof" + "(" + Generic.Name + ")" + "." + "FullName" + ";");
-                        writer.WriteLine();
+                        writer.WriteEmptyLine();
                         writer.WriteIndentedLine("if" + " " + "(" + "!" + SingletonName + "." + "SingletonSet" + "." + "ContainsKey" + "(" + "Key" + ")" + ")");
                         writer.WriteIndentedLine("{");
                         writer.IncreaseIndent();
@@ -1598,7 +1602,7 @@
                         writer.WriteIndentedLine(SingletonName + "." + "SingletonSet" + "." + "Add" + "(" + "Key" + ", " + "NewEntity" + ")" + ";");
                         writer.DecreaseIndent();
                         writer.WriteIndentedLine("}");
-                        writer.WriteLine();
+                        writer.WriteEmptyLine();
                         writer.WriteIndentedLine("return" + " " + "(" + ClassName + ")" + SingletonName + "." + "SingletonSet" + "[" + "Key" + "]" + ";");
                         writer.DecreaseIndent();
                         writer.WriteIndentedLine("}");
@@ -1612,7 +1616,7 @@
                     else if (IsUnparameterizedSingleton)
                     {
                         if (WrittenFeatures > 0)
-                            writer.WriteLine();
+                            writer.WriteEmptyLine();
                         else
                             writer.WriteIndentedLine("#region" + " " + BelongingRegion);
 
@@ -1622,7 +1626,7 @@
                         writer.WriteIndentedLine("_Singleton" + " " + "=" + " " + "new" + " " + "OnceReference" + "<" + ClassName + ">" + "(" + ")" + ";");
                         writer.DecreaseIndent();
                         writer.WriteIndentedLine("}");
-                        writer.WriteLine();
+                        writer.WriteEmptyLine();
 
                         writer.WriteIndentedLine("public" + " " + "static" + " " + ClassName + " " + "Singleton");
                         writer.WriteIndentedLine("{");
@@ -1634,7 +1638,7 @@
                         writer.IncreaseIndent();
                         writer.WriteIndentedLine("_Singleton" + "." + "Item" + " " + "=" + " " + "new" + " " + ClassName + "(" + ")" + ";");
                         writer.DecreaseIndent();
-                        writer.WriteLine();
+                        writer.WriteEmptyLine();
                         writer.WriteIndentedLine("return" + " " + "_Singleton" + "." + "Item" + ";");
                         writer.DecreaseIndent();
                         writer.WriteIndentedLine("}");
@@ -1654,7 +1658,7 @@
             if (Type.Source.IsUsedInCloneOf)
             {
                 if (IsMultiline)
-                    writer.WriteLine();
+                    writer.WriteEmptyLine();
 
                 WriteClonableImplementation(writer, out IsMultiline);
             }
@@ -1682,21 +1686,21 @@
         /// <summary>
         /// Gets the full name of a class.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="cSharpTypeFormat">The type format to use.</param>
         /// <param name="cSharpNamespaceFormat">The namespace format to use.</param>
-        public string FullClassName2CSharpClassName(string cSharpNamespace, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat)
+        public string FullClassName2CSharpClassName(ICSharpUsingCollection usingCollection, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat)
         {
-            return BasicClassName2CSharpClassName(cSharpNamespace, cSharpTypeFormat, cSharpNamespaceFormat) + Generics2CSharpName(cSharpNamespace);
+            return BasicClassName2CSharpClassName(usingCollection, cSharpTypeFormat, cSharpNamespaceFormat) + Generics2CSharpName(usingCollection);
         }
 
         /// <summary>
         /// Gets the name of a class.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="cSharpTypeFormat">The type format to use.</param>
         /// <param name="cSharpNamespaceFormat">The namespace format to use.</param>
-        public string BasicClassName2CSharpClassName(string cSharpNamespace, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat)
+        public string BasicClassName2CSharpClassName(ICSharpUsingCollection usingCollection, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat)
         {
             string ClassNamespace;
             string ClassOrInterfaceName;
@@ -1734,7 +1738,7 @@
 
             Debug.Assert(IsHandled);
 
-            if ((ClassNamespace.Length > 0 && ClassNamespace != cSharpNamespace) || cSharpNamespaceFormat.HasFlag(CSharpNamespaceFormats.FullNamespace))
+            if ((ClassNamespace.Length > 0 && ClassNamespace != usingCollection.DefaultNamespace) || cSharpNamespaceFormat.HasFlag(CSharpNamespaceFormats.FullNamespace))
                 if (cSharpNamespaceFormat.HasFlag(CSharpNamespaceFormats.OneWord))
                     return ClassNamespace + ClassOrInterfaceName;
                 else
@@ -1766,8 +1770,8 @@
         /// <summary>
         /// Gets the string corresponding to the enumeration of C# generic parameters.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
-        private string Generics2CSharpName(string cSharpNamespace)
+        /// <param name="usingCollection">The collection of using directives.</param>
+        private string Generics2CSharpName(ICSharpUsingCollection usingCollection)
         {
             string GenericNames = string.Empty;
 
@@ -1777,9 +1781,9 @@
                     GenericNames += ", ";
 
                 ICSharpFormalGenericType GenericType = Generic.Type;
-                GenericNames += GenericType.Type2CSharpString(cSharpNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+                GenericNames += GenericType.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
                 GenericNames += ", ";
-                GenericNames += GenericType.Type2CSharpString(cSharpNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+                GenericNames += GenericType.Type2CSharpString(usingCollection, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
             }
 
             if (GenericNames.Length > 0)

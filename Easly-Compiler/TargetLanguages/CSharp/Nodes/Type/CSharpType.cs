@@ -37,19 +37,19 @@
         /// <summary>
         /// Get the name of a type.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="cSharpTypeFormat">The type format.</param>
         /// <param name="cSharpNamespaceFormat">The namespace format.</param>
-        string Type2CSharpString(string cSharpNamespace, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat);
+        string Type2CSharpString(ICSharpUsingCollection usingCollection, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat);
 
         /// <summary>
         /// Gets the singleton text corresponding to this type, if any.
         /// </summary>
-        /// <param name="outputNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="cSharpTypeFormat">The type format.</param>
         /// <param name="cSharpNamespaceFormat">The namespace format.</param>
         /// <param name="text">The singleton text upon return, if successful.</param>
-        bool GetSingletonString(string outputNamespace, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat, out string text);
+        bool GetSingletonString(ICSharpUsingCollection usingCollection, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat, out string text);
     }
 
     /// <summary>
@@ -204,10 +204,10 @@
         /// <summary>
         /// Get the name of a type.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="cSharpTypeFormat">The type format.</param>
         /// <param name="cSharpNamespaceFormat">The namespace format.</param>
-        public abstract string Type2CSharpString(string cSharpNamespace, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat);
+        public abstract string Type2CSharpString(ICSharpUsingCollection usingCollection, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat);
 
         /// <summary>
         /// Sets the <see cref="IsUsedInCode"/> property.
@@ -220,11 +220,11 @@
         /// <summary>
         /// Gets the singleton text corresponding to this type, if any.
         /// </summary>
-        /// <param name="outputNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="cSharpTypeFormat">The type format.</param>
         /// <param name="cSharpNamespaceFormat">The namespace format.</param>
         /// <param name="text">The singleton text upon return, if successful.</param>
-        public virtual bool GetSingletonString(string outputNamespace, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat, out string text)
+        public virtual bool GetSingletonString(ICSharpUsingCollection usingCollection, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat, out string text)
         {
             text = null;
             return false;
@@ -235,11 +235,11 @@
         /// <summary>
         /// Gets the string corresponding to the enumeration of C# generic arguments.
         /// </summary>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="typeArgumentList">The list of arguments.</param>
-        /// <param name="cSharpNamespace">The current namespace.</param>
         /// <param name="isWithInterface">If true, include the interface type.</param>
         /// <param name="isWithImplementation">If true, include the implementation type.</param>
-        protected string TypeArguments2CSharpName(IList<ICSharpType> typeArgumentList, string cSharpNamespace, bool isWithInterface, bool isWithImplementation)
+        protected string TypeArguments2CSharpName(ICSharpUsingCollection usingCollection, IList<ICSharpType> typeArgumentList, bool isWithInterface, bool isWithImplementation)
         {
             Debug.Assert(isWithInterface || isWithImplementation);
 
@@ -251,14 +251,14 @@
                     GenericNames += ", ";
 
                 if (isWithInterface)
-                    GenericNames += TypeArgument.Type2CSharpString(cSharpNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+                    GenericNames += TypeArgument.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
 
                 if (isWithImplementation)
                 {
                     if (isWithInterface)
                         GenericNames += "," + " ";
 
-                    GenericNames += TypeArgument.Type2CSharpString(cSharpNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+                    GenericNames += TypeArgument.Type2CSharpString(usingCollection, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
                 }
             }
 

@@ -26,9 +26,8 @@
         /// Writes down the C# conditional instructions.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
         /// <param name="isElseIf">True if the conditional is not the first.</param>
-        void WriteCSharp(ICSharpWriter writer, string outputNamespace, bool isElseIf);
+        void WriteCSharp(ICSharpWriter writer, bool isElseIf);
     }
 
     /// <summary>
@@ -86,11 +85,10 @@
         /// Writes down the C# conditional instructions.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
         /// <param name="isElseIf">True if the conditional is not the first.</param>
-        public virtual void WriteCSharp(ICSharpWriter writer, string outputNamespace, bool isElseIf)
+        public virtual void WriteCSharp(ICSharpWriter writer, bool isElseIf)
         {
-            string ExpressionString = BooleanExpression.CSharpText(outputNamespace);
+            string ExpressionString = BooleanExpression.CSharpText(writer);
 
             string Condition;
             if (isElseIf)
@@ -101,7 +99,7 @@
             Condition += $" ({ExpressionString})";
             writer.WriteIndentedLine(Condition);
 
-            Instructions.WriteCSharp(writer, outputNamespace, CSharpCurlyBracketsInsertions.Indifferent, false);
+            Instructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Indifferent, false);
         }
         #endregion
     }

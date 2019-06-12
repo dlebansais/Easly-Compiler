@@ -111,10 +111,9 @@
         /// Writes down the C# instruction.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
+        public override void WriteCSharp(ICSharpWriter writer)
         {
-            string AttachedSourceString = SourceExpression.CSharpText(outputNamespace);
+            string AttachedSourceString = SourceExpression.CSharpText(writer);
 
             string NameString = EntityNameList[0];
 
@@ -122,7 +121,7 @@
             foreach (ICSharpAttachment Attachment in AttachmentList)
             {
                 if (IsElseIf)
-                    writer.WriteLine();
+                    writer.WriteEmptyLine();
 
                 ICSharpType FirstType = Attachment.AttachTypeList[0];
 
@@ -139,7 +138,7 @@
             writer.WriteIndentedLine("else");
 
             if (ElseInstructions != null)
-                ElseInstructions.WriteCSharp(writer, outputNamespace, CSharpCurlyBracketsInsertions.Indifferent, false);
+                ElseInstructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Indifferent, false);
             else
             {
                 writer.IncreaseIndent();

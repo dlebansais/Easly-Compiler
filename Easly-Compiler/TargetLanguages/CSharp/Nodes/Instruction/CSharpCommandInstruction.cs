@@ -112,14 +112,13 @@
         /// Writes down the C# instruction.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
+        public override void WriteCSharp(ICSharpWriter writer)
         {
             string CommandText;
 
             if (IsCallingNumberFeature)
             {
-                CommandText = Command.CSharpText(outputNamespace, 0);
+                CommandText = Command.CSharpText(writer, 0);
                 IList<IIdentifier> ValidPath = ((IQualifiedName)Source.Command).ValidPath.Item;
                 IIdentifier FinalFeatureIdentifier = ValidPath[ValidPath.Count - 1];
 
@@ -138,8 +137,8 @@
                 }
             }
 
-            CommandText = Command.CSharpText(outputNamespace, SkipLastInPath ? 1 : 0);
-            string ArgumentListText = CSharpArgument.CSharpArgumentList(outputNamespace, FeatureCall, new List<ICSharpQualifiedName>());
+            CommandText = Command.CSharpText(writer, SkipLastInPath ? 1 : 0);
+            string ArgumentListText = CSharpArgument.CSharpArgumentList(writer, FeatureCall, new List<ICSharpQualifiedName>());
 
             writer.WriteIndentedLine($"{CommandText}({ArgumentListText});");
         }

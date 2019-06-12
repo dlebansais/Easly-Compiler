@@ -68,20 +68,20 @@
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
-        public override string CSharpText(string cSharpNamespace)
+        /// <param name="usingCollection">The collection of using directives.</param>
+        public override string CSharpText(ICSharpUsingCollection usingCollection)
         {
-            return CSharpText(cSharpNamespace, new List<ICSharpQualifiedName>());
+            return CSharpText(usingCollection, new List<ICSharpQualifiedName>());
         }
 
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="destinationList">The list of destinations.</param>
-        public override string CSharpText(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
+        public override string CSharpText(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList)
         {
-            return SourceExpression.CSharpText(cSharpNamespace, destinationList);
+            return SourceExpression.CSharpText(usingCollection, destinationList);
         }
         #endregion
     }

@@ -56,10 +56,10 @@
         /// <summary>
         /// Get the name of a type.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="cSharpTypeFormat">The type format.</param>
         /// <param name="cSharpNamespaceFormat">The namespace format.</param>
-        public override string Type2CSharpString(string cSharpNamespace, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat)
+        public override string Type2CSharpString(ICSharpUsingCollection usingCollection, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat)
         {
             SetUsedInCode();
 

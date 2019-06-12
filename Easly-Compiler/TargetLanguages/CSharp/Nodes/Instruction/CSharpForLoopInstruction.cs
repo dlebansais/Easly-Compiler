@@ -143,8 +143,7 @@
         /// Writes down the C# instruction.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
+        public override void WriteCSharp(ICSharpWriter writer)
         {
             bool UseCurlyBrackets = false;
 
@@ -168,7 +167,7 @@
             }
 
             foreach (ICSharpScopeAttributeFeature Item in EntityDeclarationList)
-                Item.WriteCSharp(writer, outputNamespace);
+                Item.WriteCSharp(writer);
 
             if (Source.Variant.IsAssigned)
                 writer.WriteIndentedLine("double LoopVariant = double.NaN;");
@@ -184,29 +183,29 @@
             }*/
 
             if (EntityDeclarationList.Count > 0/* || AttachmentVariableTable.Count > 0*/)
-                writer.WriteLine();
+                writer.WriteEmptyLine();
 
             foreach (ICSharpInstruction Item in InitInstructionList)
-                Item.WriteCSharp(writer, outputNamespace);
+                Item.WriteCSharp(writer);
 
-            string WhileString = WhileCondition.CSharpText(outputNamespace);
+            string WhileString = WhileCondition.CSharpText(writer);
 
             writer.WriteIndentedLine($"while ({WhileString})");
             writer.WriteIndentedLine("{");
             writer.IncreaseIndent();
 
             foreach (ICSharpInstruction Item in LoopInstructionList)
-                Item.WriteCSharp(writer, outputNamespace);
+                Item.WriteCSharp(writer);
 
             if (LoopInstructionList.Count > 0 && IterationInstructionList.Count > 0)
-                writer.WriteLine();
+                writer.WriteEmptyLine();
 
             foreach (ICSharpInstruction Item in IterationInstructionList)
-                Item.WriteCSharp(writer, outputNamespace);
+                Item.WriteCSharp(writer);
 
             if (VariantExpression != null)
             {
-                string ExpressionText = VariantExpression.CSharpText(outputNamespace);
+                string ExpressionText = VariantExpression.CSharpText(writer);
 
                 writer.WriteIndentedLine($"double NewVariantResult = {ExpressionText};");
                 writer.WriteIndentedLine("if (NewVariantResult >= LoopVariant)// Takes advantage of the fact that 'x >= NaN' is always false");

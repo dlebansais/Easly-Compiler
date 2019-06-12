@@ -22,15 +22,15 @@
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
-        string CSharpText(string cSharpNamespace);
+        /// <param name="usingCollection">The collection of using directives.</param>
+        string CSharpText(ICSharpUsingCollection usingCollection);
 
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="destinationList">List of destinations.</param>
-        string CSharpText(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList);
+        string CSharpText(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList);
     }
 
     /// <summary>
@@ -173,15 +173,15 @@
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
-        public abstract string CSharpText(string cSharpNamespace);
+        /// <param name="usingCollection">The collection of using directives.</param>
+        public abstract string CSharpText(ICSharpUsingCollection usingCollection);
 
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="destinationList">List of destinations.</param>
-        public abstract string CSharpText(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList);
+        public abstract string CSharpText(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList);
         #endregion
     }
 }

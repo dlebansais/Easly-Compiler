@@ -17,8 +17,7 @@
         /// Writes down the C# attachment.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        void WriteCSharp(ICSharpWriter writer, string outputNamespace);
+        void WriteCSharp(ICSharpWriter writer);
     }
 
     /// <summary>
@@ -65,8 +64,7 @@
         /// Writes down the C# attachment.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public virtual void WriteCSharp(ICSharpWriter writer, string outputNamespace)
+        public virtual void WriteCSharp(ICSharpWriter writer)
         {
             //TODO
         }

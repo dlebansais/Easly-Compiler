@@ -65,10 +65,9 @@
         /// Writes down the C# instruction.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
+        public override void WriteCSharp(ICSharpWriter writer)
         {
-            string ExpressionText = BooleanExpression.CSharpText(outputNamespace);
+            string ExpressionText = BooleanExpression.CSharpText(writer);
 
             writer.WriteIndentedLine("Debug.Assert({ExpressionText});");
         }

@@ -89,24 +89,24 @@
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
-        public override string CSharpText(string cSharpNamespace)
+        /// <param name="usingCollection">The collection of using directives.</param>
+        public override string CSharpText(ICSharpUsingCollection usingCollection)
         {
-            return CSharpText(cSharpNamespace, new List<ICSharpQualifiedName>());
+            return CSharpText(usingCollection, new List<ICSharpQualifiedName>());
         }
 
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="destinationList">The list of destinations.</param>
-        public override string CSharpText(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
+        public override string CSharpText(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList)
         {
             // TODO clone of multiple result
 
             ICSharpType ClonedType = TypeList[0];
-            string SourceTypeText = ClonedType.Type2CSharpString(cSharpNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
-            string SourceText = SourceExpression.CSharpText(cSharpNamespace);
+            string SourceTypeText = ClonedType.Type2CSharpString(usingCollection, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+            string SourceText = SourceExpression.CSharpText(usingCollection);
 
             return $"({SourceTypeText})({SourceText}).Clone()";
         }

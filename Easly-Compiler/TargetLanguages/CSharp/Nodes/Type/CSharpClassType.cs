@@ -98,10 +98,10 @@
         /// <summary>
         /// Get the name of a type.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="cSharpTypeFormat">The type format.</param>
         /// <param name="cSharpNamespaceFormat">The namespace format.</param>
-        public override string Type2CSharpString(string cSharpNamespace, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat)
+        public override string Type2CSharpString(ICSharpUsingCollection usingCollection, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat)
         {
             SetUsedInCode();
 
@@ -117,11 +117,11 @@
             if (BaseClassGuid == LanguageClasses.BitFieldEnumeration.Guid)
                 Result = CSharpNames.ToCSharpIdentifier(Class.ValidClassName);
             else if (BaseClassGuid == LanguageClasses.DetachableReference.Guid)
-                Result = "DetachableReference" + TypeArguments2CSharpName(TypeArgumentList, cSharpNamespace, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
+                Result = "DetachableReference" + TypeArguments2CSharpName(usingCollection, TypeArgumentList, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
             else if (BaseClassGuid == LanguageClasses.Hashtable.Guid)
-                Result = "Hashtable" + TypeArguments2CSharpName(TypeArgumentList, cSharpNamespace, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
+                Result = "Hashtable" + TypeArguments2CSharpName(usingCollection, TypeArgumentList, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
             else if (BaseClassGuid == LanguageClasses.KeyValuePair.Guid)
-                Result = "KeyValuePair" + TypeArguments2CSharpName(TypeArgumentList, cSharpNamespace, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
+                Result = "KeyValuePair" + TypeArguments2CSharpName(usingCollection, TypeArgumentList, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
             else if (BaseClassGuid == LanguageClasses.List.Guid)
             {
                 string ClassName;
@@ -131,20 +131,20 @@
                 else
                     ClassName = "List";
 
-                Result = ClassName + TypeArguments2CSharpName(TypeArgumentList, cSharpNamespace, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
+                Result = ClassName + TypeArguments2CSharpName(usingCollection, TypeArgumentList, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
             }
             else if (BaseClassGuid == LanguageClasses.OnceReference.Guid)
-                Result = "OnceReference" + TypeArguments2CSharpName(TypeArgumentList, cSharpNamespace, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
+                Result = "OnceReference" + TypeArguments2CSharpName(usingCollection, TypeArgumentList, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
             else if (BaseClassGuid == LanguageClasses.OptionalReference.Guid)
-                Result = "OptionalReference" + TypeArguments2CSharpName(TypeArgumentList, cSharpNamespace, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
+                Result = "OptionalReference" + TypeArguments2CSharpName(usingCollection, TypeArgumentList, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
             else if (BaseClassGuid == LanguageClasses.OverLoopSource.Guid)
-                Result = "Enumerable" + TypeArguments2CSharpName(TypeArgumentList, cSharpNamespace, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
+                Result = "Enumerable" + TypeArguments2CSharpName(usingCollection, TypeArgumentList, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
             else if (BaseClassGuid == LanguageClasses.SealableHashtable.Guid)
-                Result = "Hashtable" + TypeArguments2CSharpName(TypeArgumentList, cSharpNamespace, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
+                Result = "Hashtable" + TypeArguments2CSharpName(usingCollection, TypeArgumentList, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
             else if (BaseClassGuid == LanguageClasses.SpecializedTypeEntity.Guid)
-                Result = "SpecializedTypeEntity" + TypeArguments2CSharpName(TypeArgumentList, cSharpNamespace, false, true);
+                Result = "SpecializedTypeEntity" + TypeArguments2CSharpName(usingCollection, TypeArgumentList, false, true);
             else if (BaseClassGuid == LanguageClasses.StableReference.Guid)
-                Result = "StableReference" + TypeArguments2CSharpName(TypeArgumentList, cSharpNamespace, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
+                Result = "StableReference" + TypeArguments2CSharpName(usingCollection, TypeArgumentList, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
             else if (LanguageClasses.GuidToName.ContainsKey(BaseClassGuid))
                 Result = LanguageClasses.GuidToName[BaseClassGuid];
             else
@@ -153,9 +153,9 @@
 
                 if (Class.Source.IsEnumeration)
                     cSharpTypeFormat = CSharpTypeFormats.Normal;
-                ClassName = Class.BasicClassName2CSharpClassName(cSharpNamespace, cSharpTypeFormat, cSharpNamespaceFormat);
+                ClassName = Class.BasicClassName2CSharpClassName(usingCollection, cSharpTypeFormat, cSharpNamespaceFormat);
 
-                Result = ClassName + TypeArguments2CSharpName(TypeArgumentList, cSharpNamespace, true, true);
+                Result = ClassName + TypeArguments2CSharpName(usingCollection, TypeArgumentList, true, true);
             }
 
             return Result;
@@ -164,18 +164,18 @@
         /// <summary>
         /// Gets the singleton text corresponding to this type, if any.
         /// </summary>
-        /// <param name="outputNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="cSharpTypeFormat">The type format.</param>
         /// <param name="cSharpNamespaceFormat">The namespace format.</param>
         /// <param name="text">The singleton text upon return, if successful.</param>
-        public override bool GetSingletonString(string outputNamespace, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat, out string text)
+        public override bool GetSingletonString(ICSharpUsingCollection usingCollection, CSharpTypeFormats cSharpTypeFormat, CSharpNamespaceFormats cSharpNamespaceFormat, out string text)
         {
             text = null;
 
             if (Class.Source.Cloneable != BaseNode.CloneableStatus.Single)
                 return false;
 
-            string ClassTypeText = Type2CSharpString(outputNamespace, cSharpTypeFormat, cSharpNamespaceFormat);
+            string ClassTypeText = Type2CSharpString(usingCollection, cSharpTypeFormat, cSharpNamespaceFormat);
 
             text = $"{ClassTypeText}.Singleton";
             return true;

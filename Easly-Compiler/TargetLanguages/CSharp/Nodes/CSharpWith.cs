@@ -29,8 +29,7 @@
         /// Writes down the C# conditional instructions.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        void WriteCSharp(ICSharpWriter writer, string outputNamespace);
+        void WriteCSharp(ICSharpWriter writer);
     }
 
     /// <summary>
@@ -90,8 +89,7 @@
         /// Writes down the C# conditional instructions.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public virtual void WriteCSharp(ICSharpWriter writer, string outputNamespace)
+        public virtual void WriteCSharp(ICSharpWriter writer)
         {
             foreach (ILanguageConstant Constant in ConstantList)
             {
@@ -123,7 +121,7 @@
                 Debug.Assert(IsHandled);
             }
 
-            Instructions.WriteCSharp(writer, outputNamespace, CSharpCurlyBracketsInsertions.Indifferent, true);
+            Instructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Indifferent, true);
         }
         #endregion
 

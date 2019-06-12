@@ -157,25 +157,24 @@
         /// Writes down the C# feature.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
         /// <param name="featureTextType">The write mode.</param>
         /// <param name="exportStatus">The feature export status.</param>
         /// <param name="isLocal">True if the feature is local to the class.</param>
         /// <param name="isFirstFeature">True if the feature is the first in a list.</param>
         /// <param name="isMultiline">True if there is a separating line above.</param>
-        public override void WriteCSharp(ICSharpWriter writer, string outputNamespace, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
+        public override void WriteCSharp(ICSharpWriter writer, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
         {
             bool IsHandled = false;
 
             switch (featureTextType)
             {
                 case CSharpFeatureTextTypes.Implementation:
-                    WriteCSharpImplementation(writer, outputNamespace, exportStatus, isLocal, ref isFirstFeature, ref isMultiline);
+                    WriteCSharpImplementation(writer, exportStatus, isLocal, ref isFirstFeature, ref isMultiline);
                     IsHandled = true;
                     break;
 
                 case CSharpFeatureTextTypes.Interface:
-                    WriteCSharpInterface(writer, outputNamespace, exportStatus, isLocal, ref isFirstFeature, ref isMultiline);
+                    WriteCSharpInterface(writer, exportStatus, isLocal, ref isFirstFeature, ref isMultiline);
                     IsHandled = true;
                     break;
             }
@@ -183,12 +182,12 @@
             Debug.Assert(IsHandled);
         }
 
-        private void WriteCSharpImplementation(ICSharpWriter writer, string outputNamespace, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
+        private void WriteCSharpImplementation(ICSharpWriter writer, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
         {
             writer.WriteDocumentation(Source);
 
-            string ResultType = EntityType.Type2CSharpString(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
-            CSharpArgument.BuildParameterList(IndexParameterList, outputNamespace, out string ParameterEntityList, out string ParameterNameList);
+            string ResultType = EntityType.Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+            CSharpArgument.BuildParameterList(writer, IndexParameterList, out string ParameterEntityList, out string ParameterNameList);
 
             string Accessors;
             if (!IsForcedReadWrite && SetterBody == null)
@@ -293,7 +292,7 @@
 
                             CSharpAssertion.WriteContract(writer, AsEffectiveGetterBody.RequireList, AsEffectiveGetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
                             writer.WriteIndentedLine("get");
-                            AsEffectiveGetterBody.WriteCSharp(writer, outputNamespace, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasResult, ResultType, false, new List<string>());
+                            AsEffectiveGetterBody.WriteCSharp(writer, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasResult, ResultType, false, new List<string>());
                         }
                     }
                     else if (IsForcedReadWrite)
@@ -307,7 +306,7 @@
 
                             CSharpAssertion.WriteContract(writer, AsEffectiveSetterBody.RequireList, AsEffectiveSetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
                             writer.WriteIndentedLine("set");
-                            AsEffectiveSetterBody.WriteCSharp(writer, outputNamespace, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasValue, string.Empty, false, new List<string>());
+                            AsEffectiveSetterBody.WriteCSharp(writer, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasValue, string.Empty, false, new List<string>());
                         }
                     }
                     else if (IsForcedReadWrite)
@@ -321,12 +320,12 @@
             }
         }
 
-        private void WriteCSharpInterface(ICSharpWriter writer, string outputNamespace, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
+        private void WriteCSharpInterface(ICSharpWriter writer, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
         {
             isMultiline = false;
 
-            string ResultType = EntityType.Type2CSharpString(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
-            CSharpArgument.BuildParameterList(IndexParameterList, outputNamespace, out string ParameterEntityList, out string ParameterNameList);
+            string ResultType = EntityType.Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+            CSharpArgument.BuildParameterList(writer, IndexParameterList, out string ParameterEntityList, out string ParameterNameList);
 
             string Accessors = "{ get; }";
 

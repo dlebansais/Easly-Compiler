@@ -105,31 +105,30 @@
         /// Writes down the C# feature.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
         /// <param name="featureTextType">The write mode.</param>
         /// <param name="exportStatus">The feature export status.</param>
         /// <param name="isLocal">True if the feature is local to the class.</param>
         /// <param name="isFirstFeature">True if the feature is the first in a list.</param>
         /// <param name="isMultiline">True if there is a separating line above.</param>
-        public override void WriteCSharp(ICSharpWriter writer, string outputNamespace, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
+        public override void WriteCSharp(ICSharpWriter writer, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
         {
             if (isMultiline)
-                writer.WriteLine();
+                writer.WriteEmptyLine();
 
             isFirstFeature = false;
             isMultiline = false;
 
             if (featureTextType == CSharpFeatureTextTypes.Implementation)
-                WriteCSharpImplementation(writer, outputNamespace, exportStatus, isLocal, ref isFirstFeature, ref isMultiline);
+                WriteCSharpImplementation(writer, exportStatus, isLocal, ref isFirstFeature, ref isMultiline);
         }
 
-        private void WriteCSharpImplementation(ICSharpWriter writer, string outputNamespace, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
+        private void WriteCSharpImplementation(ICSharpWriter writer, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
         {
             writer.WriteDocumentation(Source);
 
-            string TypeString = Type.Type2CSharpString(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+            string TypeString = Type.Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
             string AttributeString = CSharpNames.ToCSharpIdentifier(Name);
-            string ValueString = ConstantExpression.CSharpText(outputNamespace);
+            string ValueString = ConstantExpression.CSharpText(writer);
             string ExportStatusText = CSharpNames.ComposedExportStatus(false, false, true, exportStatus);
 
             writer.WriteIndentedLine($"{ExportStatusText} const {TypeString} {AttributeString} = {ValueString};");

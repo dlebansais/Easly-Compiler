@@ -105,18 +105,18 @@
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
-        public override string CSharpText(string cSharpNamespace)
+        /// <param name="usingCollection">The collection of using directives.</param>
+        public override string CSharpText(ICSharpUsingCollection usingCollection)
         {
-            return CSharpText(cSharpNamespace, new List<ICSharpQualifiedName>());
+            return CSharpText(usingCollection, new List<ICSharpQualifiedName>());
         }
 
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="destinationList">The list of destinations.</param>
-        public override string CSharpText(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
+        public override string CSharpText(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList)
         {
             string Result = null;
 
@@ -125,15 +125,15 @@
                 switch (Delegated)
                 {
                     case ICSharpProcedureFeature AsProcedureFeature:
-                        Result = CSharpTextProcedure(AsProcedureFeature, cSharpNamespace, destinationList);
+                        Result = CSharpTextProcedure(usingCollection, AsProcedureFeature, destinationList);
                         break;
 
                     case ICSharpFunctionFeature AsFunctionFeature:
-                        Result = CSharpTextFunction(AsFunctionFeature, cSharpNamespace, destinationList);
+                        Result = CSharpTextFunction(usingCollection, AsFunctionFeature, destinationList);
                         break;
 
                     case ICSharpPropertyFeature AsPropertyFeature:
-                        Result = CSharpTextProperty(AsPropertyFeature, cSharpNamespace, destinationList);
+                        Result = CSharpTextProperty(usingCollection, AsPropertyFeature, destinationList);
                         break;
                 }
             }
@@ -150,7 +150,7 @@
             return Result;
         }
 
-        private string CSharpTextProcedure(ICSharpProcedureFeature feature, string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
+        private string CSharpTextProcedure(ICSharpUsingCollection usingCollection, ICSharpProcedureFeature feature, IList<ICSharpQualifiedName> destinationList)
         {
             string Result;
 
@@ -160,13 +160,13 @@
             ICSharpCommandOverload Overload = feature.OverloadList[0] as ICSharpCommandOverload;
             Debug.Assert(Overload != null);
 
-            string BaseTypeText = BaseType.Type2CSharpString(cSharpNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.OneWord);
+            string BaseTypeText = BaseType.Type2CSharpString(usingCollection, CSharpTypeFormats.Normal, CSharpNamespaceFormats.OneWord);
             string AgentParameters;
             string ParameterNameListText;
 
             if (Overload.ParameterList.Count > 0)
             {
-                CSharpArgument.BuildParameterList(Overload.ParameterList, cSharpNamespace, out string ParameterListText, out ParameterNameListText);
+                CSharpArgument.BuildParameterList(usingCollection, Overload.ParameterList, out string ParameterListText, out ParameterNameListText);
                 AgentParameters = $"({BaseTypeText} agentBase, {ParameterListText})";
             }
             else
@@ -180,7 +180,7 @@
             return Result;
         }
 
-        private string CSharpTextFunction(ICSharpFunctionFeature feature, string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
+        private string CSharpTextFunction(ICSharpUsingCollection usingCollection, ICSharpFunctionFeature feature, IList<ICSharpQualifiedName> destinationList)
         {
             string Result;
 
@@ -190,13 +190,13 @@
             ICSharpQueryOverload Overload = feature.OverloadList[0] as ICSharpQueryOverload;
             Debug.Assert(Overload != null);
 
-            string BaseTypeText = BaseType.Type2CSharpString(cSharpNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.OneWord);
+            string BaseTypeText = BaseType.Type2CSharpString(usingCollection, CSharpTypeFormats.Normal, CSharpNamespaceFormats.OneWord);
             string AgentParameters;
             string ParameterNameListText;
 
             if (Overload.ParameterList.Count > 0)
             {
-                CSharpArgument.BuildParameterList(Overload.ParameterList, cSharpNamespace, out string ParameterListText, out ParameterNameListText);
+                CSharpArgument.BuildParameterList(usingCollection, Overload.ParameterList, out string ParameterListText, out ParameterNameListText);
                 AgentParameters = $"({BaseTypeText} agentBase, {ParameterListText})";
             }
             else
@@ -210,13 +210,13 @@
             return Result;
         }
 
-        private string CSharpTextProperty(ICSharpPropertyFeature feature, string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
+        private string CSharpTextProperty(ICSharpUsingCollection usingCollection, ICSharpPropertyFeature feature, IList<ICSharpQualifiedName> destinationList)
         {
             string Result;
 
             // TODO handle several overloads.
 
-            string BaseTypeText = BaseType.Type2CSharpString(cSharpNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.OneWord);
+            string BaseTypeText = BaseType.Type2CSharpString(usingCollection, CSharpTypeFormats.Normal, CSharpNamespaceFormats.OneWord);
 
             Result = $"({BaseTypeText} agentBase) => {{ agentBase.{Delegated.Name}; }}";
 

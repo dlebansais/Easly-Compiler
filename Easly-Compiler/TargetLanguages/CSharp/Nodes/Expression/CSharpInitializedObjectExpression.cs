@@ -84,18 +84,18 @@
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
-        public override string CSharpText(string cSharpNamespace)
+        /// <param name="usingCollection">The collection of using directives.</param>
+        public override string CSharpText(ICSharpUsingCollection usingCollection)
         {
-            return CSharpText(cSharpNamespace, new List<ICSharpQualifiedName>());
+            return CSharpText(usingCollection, new List<ICSharpQualifiedName>());
         }
 
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="destinationList">The list of destinations.</param>
-        public override string CSharpText(string cSharpNamespace, IList<ICSharpQualifiedName> destinationList)
+        public override string CSharpText(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList)
         {
             string ClassNameText = CSharpNames.ToCSharpIdentifier(Class.ValidClassName);
 
@@ -106,7 +106,7 @@
                     AssignmentText += ", ";
 
                 ICSharpExpression SourceExpression = Assignment.SourceExpression;
-                string ExpressionText = NestedExpressionText(SourceExpression, cSharpNamespace);
+                string ExpressionText = NestedExpressionText(usingCollection, SourceExpression);
 
                 //TODO: handle more than one parameter name
                 string AssignedField = Assignment.ParameterNameList[0];
@@ -118,9 +118,9 @@
             return $"new {ClassNameText}() {{ {AssignmentText} }}";
         }
 
-        private string NestedExpressionText(ICSharpExpression expression, string cSharpNamespace)
+        private string NestedExpressionText(ICSharpUsingCollection usingCollection, ICSharpExpression expression)
         {
-            string Result = expression.CSharpText(cSharpNamespace);
+            string Result = expression.CSharpText(usingCollection);
 
             if (expression.IsComplex)
                 Result = $"({Result})";

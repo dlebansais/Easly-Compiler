@@ -95,11 +95,10 @@
         /// Writes down the C# instruction.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
+        public override void WriteCSharp(ICSharpWriter writer)
         {
             // TODO scope of locals
-            string ContinueConditionString = ContinueCondition.CSharpText(outputNamespace);
+            string ContinueConditionString = ContinueCondition.CSharpText(writer);
 
             for (int i = 0; i < ContinuationList.Count; i++)
             {
@@ -107,13 +106,13 @@
 
                 if (i > 0)
                 {
-                    writer.WriteLine();
+                    writer.WriteEmptyLine();
                     writer.WriteIndentedLine($"if ({ContinueConditionString})");
                     writer.WriteIndentedLine("{");
                     writer.IncreaseIndent();
                 }
 
-                Item.WriteCSharpInstructions(writer, outputNamespace);
+                Item.WriteCSharpInstructions(writer);
             }
 
             for (int i = 0; i < ContinuationList.Count; i++)
@@ -125,7 +124,7 @@
                     writer.DecreaseIndent();
                     writer.WriteIndentedLine("}");
                     writer.WriteIndentedLine("else");
-                    Item.WriteCSharpCleanupInstructions(writer, outputNamespace);
+                    Item.WriteCSharpCleanupInstructions(writer);
                 }
             }
 
@@ -133,7 +132,7 @@
             {
                 writer.WriteIndentedLine("if" + " " + "(" + "!" + "(" + ContinueConditionString + ")" + ")");
 
-                ElseInstructions.WriteCSharp(writer, outputNamespace, CSharpCurlyBracketsInsertions.Indifferent, false);
+                ElseInstructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Indifferent, false);
             }
         }
         #endregion

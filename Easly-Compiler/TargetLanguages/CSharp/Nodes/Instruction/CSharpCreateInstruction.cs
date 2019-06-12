@@ -100,11 +100,10 @@
         /// Writes down the C# instruction.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
+        public override void WriteCSharp(ICSharpWriter writer)
         {
             string EntityString = CSharpNames.ToCSharpIdentifier(CreatedObjectName);
-            string EntityTypeString = EntityType.Type2CSharpString(outputNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+            string EntityTypeString = EntityType.Type2CSharpString(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
 
             bool IsAnchoredToCreationType = false;
 
@@ -113,7 +112,7 @@
                     IsAnchoredToCreationType = true;
 
             string CreationRoutineString = CSharpNames.ToCSharpIdentifier(CreationRoutineName);
-            string ArgumentListText = CSharpArgument.CSharpArgumentList(outputNamespace, FeatureCall, new List<ICSharpQualifiedName>());
+            string ArgumentListText = CSharpArgument.CSharpArgumentList(writer, FeatureCall, new List<ICSharpQualifiedName>());
 
             CSharpConstructorTypes ClassConstructorType = CSharpConstructorTypes.OneConstructor;
 

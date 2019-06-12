@@ -22,8 +22,7 @@
         /// Writes down the C# instruction.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        void WriteCSharp(ICSharpWriter writer, string outputNamespace);
+        void WriteCSharp(ICSharpWriter writer);
     }
 
     /// <summary>
@@ -154,8 +153,7 @@
         /// Writes down the C# instruction.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public abstract void WriteCSharp(ICSharpWriter writer, string outputNamespace);
+        public abstract void WriteCSharp(ICSharpWriter writer);
         #endregion
     }
 }

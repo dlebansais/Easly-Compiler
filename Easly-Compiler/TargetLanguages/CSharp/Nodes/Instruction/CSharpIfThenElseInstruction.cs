@@ -83,24 +83,23 @@
         /// Writes down the C# instruction.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
+        public override void WriteCSharp(ICSharpWriter writer)
         {
             bool IsElseIf = false;
 
             foreach (ICSharpConditional Item in ConditionalList)
             {
                 if (IsElseIf)
-                    writer.WriteLine();
+                    writer.WriteEmptyLine();
 
-                Item.WriteCSharp(writer, outputNamespace, IsElseIf);
+                Item.WriteCSharp(writer, IsElseIf);
                 IsElseIf = true;
             }
 
             if (ElseInstructions != null)
             {
                 writer.WriteIndentedLine("else");
-                ElseInstructions.WriteCSharp(writer, outputNamespace, CSharpCurlyBracketsInsertions.Indifferent, false);
+                ElseInstructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Indifferent, false);
             }
         }
         #endregion

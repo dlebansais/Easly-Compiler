@@ -104,7 +104,6 @@
         /// Writes down the C# overload of a feature.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
         /// <param name="featureTextType">The write mode.</param>
         /// <param name="isOverride">True if the feature is an override.</param>
         /// <param name="nameString">The composed feature name.</param>
@@ -112,7 +111,7 @@
         /// <param name="isConstructor">True if the feature is a constructor.</param>
         /// <param name="isFirstFeature">True if the feature is the first in a list.</param>
         /// <param name="isMultiline">True if there is a separating line above.</param>
-        public void WriteCSharp(ICSharpWriter writer, string outputNamespace, CSharpFeatureTextTypes featureTextType, bool isOverride, string nameString, CSharpExports exportStatus, bool isConstructor, ref bool isFirstFeature, ref bool isMultiline)
+        public void WriteCSharp(ICSharpWriter writer, CSharpFeatureTextTypes featureTextType, bool isOverride, string nameString, CSharpExports exportStatus, bool isConstructor, ref bool isFirstFeature, ref bool isMultiline)
         {
             IList<ICSharpParameter> SelectedParameterList = ParameterList;
             IList<ICSharpParameter> SelectedResultList = ResultList;
@@ -123,7 +122,7 @@
                 SelectedResultList = Precursor.ResultList;
             }
 
-            CSharpArgument.BuildParameterList(SelectedParameterList, SelectedResultList, featureTextType, outputNamespace, out string ArgumentEntityList, out string ArgumentNameList, out string ResultType);
+            CSharpArgument.BuildParameterList(writer, SelectedParameterList, SelectedResultList, featureTextType, out string ArgumentEntityList, out string ArgumentNameList, out string ResultType);
             string ExportStatusText;
 
             if (featureTextType == CSharpFeatureTextTypes.Implementation)
@@ -151,7 +150,7 @@
                         {
                             Flags |= CSharpBodyFlags.HasResult;
                             ICSharpParameter Result = ResultList[0];
-                            ResultString = Result.Feature.Type.Type2CSharpString(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+                            ResultString = Result.Feature.Type.Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
                         }
                         else
                         {
@@ -195,14 +194,14 @@
                         ExportStatusText = CSharpNames.ComposedExportStatus(isOverride, false, false, exportStatus);
                         writer.WriteIndentedLine($"{ExportStatusText} {ResultType} {nameString}({ArgumentEntityList})");
 
-                        AsEffectiveBody.WriteCSharp(writer, outputNamespace, Flags, ResultString, false, InitialisationStringList);
+                        AsEffectiveBody.WriteCSharp(writer, Flags, ResultString, false, InitialisationStringList);
                         isMultiline = true;
                         IsHandled = true;
                         break;
 
                     case ICSharpPrecursorBody AsPrecursorBody:
                         if (isMultiline)
-                            writer.WriteLine();
+                            writer.WriteEmptyLine();
 
                         ExportStatusText = CSharpNames.ComposedExportStatus(true, false, false, exportStatus);
                         writer.WriteIndentedLine($"{ExportStatusText} {ResultType} {nameString}({ArgumentEntityList})");

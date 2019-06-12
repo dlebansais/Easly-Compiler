@@ -32,16 +32,16 @@
         /// <summary>
         /// Gets the source code corresponding to the qualified name.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="skippedAtEnd">Number of identifiers to skip at the end.</param>
-        string CSharpText(string cSharpNamespace, int skippedAtEnd);
+        string CSharpText(ICSharpUsingCollection usingCollection, int skippedAtEnd);
 
         /// <summary>
         /// Gets the source code corresponding to the qualified name.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="skippedAtEnd">Number of identifiers to skip at the end.</param>
-        string DecoratedCSharpText(string cSharpNamespace, int skippedAtEnd);
+        string DecoratedCSharpText(ICSharpUsingCollection usingCollection, int skippedAtEnd);
     }
 
     /// <summary>
@@ -120,9 +120,9 @@
         /// <summary>
         /// Gets the source code corresponding to the qualified name.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="skippedAtEnd">Number of identifiers to skip at the end.</param>
-        public string CSharpText(string cSharpNamespace, int skippedAtEnd)
+        public string CSharpText(ICSharpUsingCollection usingCollection, int skippedAtEnd)
         {
             string Result;
             int i = 0;
@@ -148,7 +148,7 @@
                 if (ItemClass != null)
                     if (ItemClass.IsUnparameterizedSingleton && ItemClass.ValidSourceName != "Microsoft .NET")
                     {
-                        string TypeText = ItemClass.Type.Type2CSharpString(cSharpNamespace, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+                        string TypeText = ItemClass.Type.Type2CSharpString(usingCollection, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
                         ItemText = $"{TypeText}.Singleton";
                     }
 
@@ -161,13 +161,13 @@
         /// <summary>
         /// Gets the source code corresponding to the qualified name.
         /// </summary>
-        /// <param name="cSharpNamespace">The current namespace.</param>
+        /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="skippedAtEnd">Number of identifiers to skip at the end.</param>
-        public string DecoratedCSharpText(string cSharpNamespace, int skippedAtEnd)
+        public string DecoratedCSharpText(ICSharpUsingCollection usingCollection, int skippedAtEnd)
         {
             string Result = null;
 
-            string QueryText = CSharpText(cSharpNamespace, skippedAtEnd);
+            string QueryText = CSharpText(usingCollection, skippedAtEnd);
 
             if (Discrete != null)
                 Result = QueryText;

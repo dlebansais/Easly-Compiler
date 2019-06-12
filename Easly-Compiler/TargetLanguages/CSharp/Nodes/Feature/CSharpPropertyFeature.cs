@@ -273,25 +273,24 @@
         /// Writes down the C# feature.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
         /// <param name="featureTextType">The write mode.</param>
         /// <param name="exportStatus">The feature export status.</param>
         /// <param name="isLocal">True if the feature is local to the class.</param>
         /// <param name="isFirstFeature">True if the feature is the first in a list.</param>
         /// <param name="isMultiline">True if there is a separating line above.</param>
-        public override void WriteCSharp(ICSharpWriter writer, string outputNamespace, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
+        public override void WriteCSharp(ICSharpWriter writer, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
         {
             bool IsHandled = false;
 
             switch (featureTextType)
             {
                 case CSharpFeatureTextTypes.Implementation:
-                    WriteCSharpImplementation(writer, outputNamespace, featureTextType, exportStatus, isLocal, ref isFirstFeature, ref isMultiline);
+                    WriteCSharpImplementation(writer, featureTextType, exportStatus, isLocal, ref isFirstFeature, ref isMultiline);
                     IsHandled = true;
                     break;
 
                 case CSharpFeatureTextTypes.Interface:
-                    WriteCSharpInterface(writer, outputNamespace, featureTextType, exportStatus, isLocal, ref isFirstFeature, ref isMultiline);
+                    WriteCSharpInterface(writer, featureTextType, exportStatus, isLocal, ref isFirstFeature, ref isMultiline);
                     IsHandled = true;
                     break;
             }
@@ -299,34 +298,34 @@
             Debug.Assert(IsHandled);
         }
 
-        private void WriteCSharpImplementation(ICSharpWriter writer, string outputNamespace, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
+        private void WriteCSharpImplementation(ICSharpWriter writer, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
         {
             writer.WriteDocumentation(Source);
 
-            string ResultType = EntityType.Type2CSharpString(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+            string ResultType = EntityType.Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
             string PropertyName = CSharpNames.ToCSharpIdentifier(Name);
             bool IsHandled = false;
 
             if (IsForcedReadWrite)
             {
-                WriteCSharpForcedReadWriteProperty(writer, outputNamespace, IsOverride, exportStatus, PropertyName, ResultType, ref isFirstFeature, ref isMultiline);
+                WriteCSharpForcedReadWriteProperty(writer, IsOverride, exportStatus, PropertyName, ResultType, ref isFirstFeature, ref isMultiline);
                 IsHandled = true;
             }
             else
                 switch (Source.PropertyKind)
                 {
                     case BaseNode.UtilityType.ReadOnly:
-                        WriteCSharpReadOnlyProperty(writer, outputNamespace, IsOverride, exportStatus, PropertyName, ResultType, ref isFirstFeature, ref isMultiline);
+                        WriteCSharpReadOnlyProperty(writer, IsOverride, exportStatus, PropertyName, ResultType, ref isFirstFeature, ref isMultiline);
                         IsHandled = true;
                         break;
 
                     case BaseNode.UtilityType.WriteOnly:
-                        WriteCSharpWriteOnlyProperty(writer, outputNamespace, IsOverride, exportStatus, PropertyName, ResultType, ref isFirstFeature, ref isMultiline);
+                        WriteCSharpWriteOnlyProperty(writer, IsOverride, exportStatus, PropertyName, ResultType, ref isFirstFeature, ref isMultiline);
                         IsHandled = true;
                         break;
 
                     case BaseNode.UtilityType.ReadWrite:
-                        WriteCSharpReadWriteProperty(writer, outputNamespace, IsOverride, exportStatus, PropertyName, ResultType, ref isFirstFeature, ref isMultiline);
+                        WriteCSharpReadWriteProperty(writer, IsOverride, exportStatus, PropertyName, ResultType, ref isFirstFeature, ref isMultiline);
                         IsHandled = true;
                         break;
                 }
@@ -341,9 +340,9 @@
             }
         }
 
-        private void WriteCSharpInterface(ICSharpWriter writer, string outputNamespace, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
+        private void WriteCSharpInterface(ICSharpWriter writer, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
         {
-            string ResultType = EntityType.Type2CSharpString(outputNamespace, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+            string ResultType = EntityType.Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
             string PropertyName = CSharpNames.ToCSharpIdentifier(Name);
             string Accessors = null;
 
@@ -372,7 +371,7 @@
             isMultiline = false;
         }
 
-        private void WriteCSharpReadOnlyProperty(ICSharpWriter writer, string outputNamespace, bool isOverride, CSharpExports exportStatus, string propertyName, string resultType, ref bool isFirstFeature, ref bool isMultiline)
+        private void WriteCSharpReadOnlyProperty(ICSharpWriter writer, bool isOverride, CSharpExports exportStatus, string propertyName, string resultType, ref bool isFirstFeature, ref bool isMultiline)
         {
             bool IsDeferred = false;
             bool IsPrecursor = false;
@@ -403,7 +402,7 @@
                 else
                 {
                     if (isMultiline)
-                        writer.WriteLine();
+                        writer.WriteEmptyLine();
 
                     string ExportStatusText = CSharpNames.ComposedExportStatus(IsOverride, false, false, exportStatus);
                     writer.WriteIndentedLine($"{ExportStatusText} {resultType} {propertyName}");
@@ -429,7 +428,7 @@
                         CSharpAssertion.WriteContract(writer, EffectiveGetterBody.RequireList, EffectiveGetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
 
                         writer.WriteIndentedLine("get");
-                        EffectiveGetterBody.WriteCSharp(writer, outputNamespace, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasResult, resultType, false, new List<string>());
+                        EffectiveGetterBody.WriteCSharp(writer, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasResult, resultType, false, new List<string>());
 
                         writer.WriteIndentedLine($"protected set {{ _{propertyName} = value; }}");
                         writer.DecreaseIndent();
@@ -443,7 +442,7 @@
             else
             {
                 if (isMultiline)
-                    writer.WriteLine();
+                    writer.WriteEmptyLine();
 
                 string ExportStatusText = CSharpNames.ComposedExportStatus(IsOverride, false, false, exportStatus);
                 writer.WriteIndentedLine($"{ExportStatusText} {resultType} {propertyName} {{ get; protected set; }}");
@@ -451,7 +450,7 @@
             }
         }
 
-        private void WriteCSharpWriteOnlyProperty(ICSharpWriter writer, string outputNamespace, bool isOverride, CSharpExports exportStatus, string propertyName, string resultType, ref bool isFirstFeature, ref bool isMultiline)
+        private void WriteCSharpWriteOnlyProperty(ICSharpWriter writer, bool isOverride, CSharpExports exportStatus, string propertyName, string resultType, ref bool isFirstFeature, ref bool isMultiline)
         {
             bool IsDeferred = false;
             bool IsPrecursor = false;
@@ -484,7 +483,7 @@
                 else
                 {
                     if (isMultiline)
-                        writer.WriteLine();
+                        writer.WriteEmptyLine();
 
                     string ExportStatusText = CSharpNames.ComposedExportStatus(IsOverride, false, false, exportStatus);
                     writer.WriteIndentedLine($"{ExportStatusText} {resultType} {propertyName}");
@@ -511,7 +510,7 @@
                         CSharpAssertion.WriteContract(writer, EffectiveSetterBody.RequireList, EffectiveSetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
 
                         writer.WriteIndentedLine("set");
-                        EffectiveSetterBody.WriteCSharp(writer, outputNamespace, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasValue, string.Empty, false, new List<string>());
+                        EffectiveSetterBody.WriteCSharp(writer, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasValue, string.Empty, false, new List<string>());
 
                         writer.DecreaseIndent();
                         writer.WriteIndentedLine("}");
@@ -524,7 +523,7 @@
             else
             {
                 if (isMultiline)
-                    writer.WriteLine();
+                    writer.WriteEmptyLine();
 
                 string ExportStatusText = CSharpNames.ComposedExportStatus(IsOverride, false, false, exportStatus);
                 writer.WriteIndentedLine($"{ExportStatusText} {resultType} {propertyName} {{ protected get; set; }}");
@@ -533,7 +532,7 @@
             }
         }
 
-        private void WriteCSharpReadWriteProperty(ICSharpWriter writer, string outputNamespace, bool isOverride, CSharpExports exportStatus, string propertyName, string resultType, ref bool isFirstFeature, ref bool isMultiline)
+        private void WriteCSharpReadWriteProperty(ICSharpWriter writer, bool isOverride, CSharpExports exportStatus, string propertyName, string resultType, ref bool isFirstFeature, ref bool isMultiline)
         {
             bool IsDeferred = false;
             bool IsPrecursor = false;
@@ -590,7 +589,7 @@
                 else
                 {
                     if (isMultiline)
-                        writer.WriteLine();
+                        writer.WriteEmptyLine();
 
                     string ExportStatusText = CSharpNames.ComposedExportStatus(IsOverride, false, false, exportStatus);
                     writer.WriteIndentedLine($"{ExportStatusText} {resultType} {propertyName}");
@@ -613,7 +612,7 @@
                             CSharpAssertion.WriteContract(writer, EffectiveGetterBody.RequireList, EffectiveGetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
 
                             writer.WriteIndentedLine("get");
-                            EffectiveGetterBody.WriteCSharp(writer, outputNamespace, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasResult, resultType, false, new List<string>());
+                            EffectiveGetterBody.WriteCSharp(writer, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasResult, resultType, false, new List<string>());
                         }
                         else
                             writer.WriteIndentedLine($"get {{ return _{propertyName}; }}");
@@ -627,7 +626,7 @@
                             CSharpAssertion.WriteContract(writer, EffectiveSetterBody.RequireList, EffectiveSetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
 
                             writer.WriteIndentedLine("set");
-                            EffectiveSetterBody.WriteCSharp(writer, outputNamespace, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasValue, string.Empty, false, new List<string>());
+                            EffectiveSetterBody.WriteCSharp(writer, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasValue, string.Empty, false, new List<string>());
                         }
                         else
                             writer.WriteIndentedLine($"set {{ _{propertyName} = value; }}");
@@ -642,7 +641,7 @@
             else
             {
                 if (isMultiline)
-                    writer.WriteLine();
+                    writer.WriteEmptyLine();
 
                 string ExportStatusText = CSharpNames.ComposedExportStatus(IsOverride, false, false, exportStatus);
                 writer.WriteIndentedLine($"{ExportStatusText} {resultType} {propertyName} {{ get; set; }}");
@@ -651,7 +650,7 @@
             }
         }
 
-        private void WriteCSharpForcedReadWriteProperty(ICSharpWriter writer, string outputNamespace, bool isOverride, CSharpExports exportStatus, string propertyName, string resultType, ref bool isFirstFeature, ref bool isMultiline)
+        private void WriteCSharpForcedReadWriteProperty(ICSharpWriter writer, bool isOverride, CSharpExports exportStatus, string propertyName, string resultType, ref bool isFirstFeature, ref bool isMultiline)
         {
             bool IsDeferred = false;
             bool IsPrecursor = false;
@@ -708,7 +707,7 @@
                 else
                 {
                     if (isMultiline)
-                        writer.WriteLine();
+                        writer.WriteEmptyLine();
 
                     string ExportStatusText = CSharpNames.ComposedExportStatus(IsOverride, false, false, exportStatus);
                     writer.WriteIndentedLine($"{ExportStatusText} {resultType} {propertyName}");
@@ -738,7 +737,7 @@
                             CSharpAssertion.WriteContract(writer, EffectiveGetterBody.RequireList, EffectiveGetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
 
                             writer.WriteIndentedLine("get");
-                            EffectiveGetterBody.WriteCSharp(writer, outputNamespace, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasResult, resultType, false, new List<string>());
+                            EffectiveGetterBody.WriteCSharp(writer, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasResult, resultType, false, new List<string>());
                         }
                         else
                             writer.WriteIndentedLine($"get {{ throw new InvalidOperationException(); }}");
@@ -752,7 +751,7 @@
                             CSharpAssertion.WriteContract(writer, EffectiveSetterBody.RequireList, EffectiveSetterBody.EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
 
                             writer.WriteIndentedLine("set");
-                            EffectiveSetterBody.WriteCSharp(writer, outputNamespace, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasValue, string.Empty, false, new List<string>());
+                            EffectiveSetterBody.WriteCSharp(writer, CSharpBodyFlags.MandatoryCurlyBrackets | CSharpBodyFlags.HasValue, string.Empty, false, new List<string>());
                         }
                         else
                             writer.WriteIndentedLine($"set {{ throw new InvalidOperationException(); }}");
@@ -767,7 +766,7 @@
             else
             {
                 if (isMultiline)
-                    writer.WriteLine();
+                    writer.WriteEmptyLine();
 
                 string ExportStatusText = CSharpNames.ComposedExportStatus(IsOverride, false, false, exportStatus);
                 writer.WriteIndentedLine($"{ExportStatusText} {resultType} {propertyName}");

@@ -65,11 +65,10 @@
         /// Writes down the C# instruction.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
-        public override void WriteCSharp(ICSharpWriter writer, string outputNamespace)
+        public override void WriteCSharp(ICSharpWriter writer)
         {
             string DestinationString = Source.Destination.ToString();
-            string SourceString = SourceExpression.CSharpText(outputNamespace);
+            string SourceString = SourceExpression.CSharpText(writer);
 
             writer.WriteIndentedLine($"{DestinationString} = {SourceString};");
         }

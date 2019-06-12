@@ -27,12 +27,11 @@
         /// Writes down the body source code.
         /// </summary>
         /// <param name="writer">The stream on which to write down.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
         /// <param name="flags">Some flags.</param>
         /// <param name="resultType">Type of the result, if any.</param>
         /// <param name="skipFirstInstruction">Skip the first instruction.</param>
         /// <param name="initialisationStringList">List of initializations.</param>
-        void WriteCSharp(ICSharpWriter writer, string outputNamespace, CSharpBodyFlags flags, string resultType, bool skipFirstInstruction, IList<string> initialisationStringList);
+        void WriteCSharp(ICSharpWriter writer, CSharpBodyFlags flags, string resultType, bool skipFirstInstruction, IList<string> initialisationStringList);
     }
 
     /// <summary>
@@ -99,21 +98,20 @@
         /// Writes down the body source code.
         /// </summary>
         /// <param name="writer">The stream on which to write down.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
         /// <param name="flags">Some flags.</param>
         /// <param name="resultType">Type of the result, if any.</param>
         /// <param name="skipFirstInstruction">Skip the first instruction.</param>
         /// <param name="initialisationStringList">List of initializations.</param>
-        public virtual void WriteCSharp(ICSharpWriter writer, string outputNamespace, CSharpBodyFlags flags, string resultType, bool skipFirstInstruction, IList<string> initialisationStringList)
+        public virtual void WriteCSharp(ICSharpWriter writer, CSharpBodyFlags flags, string resultType, bool skipFirstInstruction, IList<string> initialisationStringList)
         {
             writer.WriteIndentedLine("{");
             writer.IncreaseIndent();
 
             foreach (ICSharpAssertion Assertion in RequireList)
-                Assertion.WriteCSharp(writer, outputNamespace);
+                Assertion.WriteCSharp(writer);
 
             if (RequireList.Count > 0)
-                writer.WriteLine();
+                writer.WriteEmptyLine();
 
             /*TODO
             List<AttachmentAlias> AttachmentVariableTable = new List<AttachmentAlias>();
@@ -125,7 +123,7 @@
                 writer.WriteIndentedLine($"{resultType} Result;");
 
             foreach (ICSharpScopeAttributeFeature Item in EntityDeclarationList)
-                Item.WriteCSharp(writer, outputNamespace);
+                Item.WriteCSharp(writer);
 
             /*TODO
             foreach (AttachmentAlias AliasItem in AttachmentVariableTable)
@@ -139,13 +137,13 @@
             */
 
             if (flags.HasFlag(CSharpBodyFlags.HasResult) || EntityDeclarationList.Count > 0/* || AttachmentVariableTable.Count > 0*/)
-                writer.WriteLine();
+                writer.WriteEmptyLine();
 
             foreach (string s in initialisationStringList)
                 writer.WriteIndentedLine(s);
 
             if (initialisationStringList.Count > 0)
-                writer.WriteLine();
+                writer.WriteEmptyLine();
 
             for (int i = 0; i < BodyInstructionList.Count; i++)
             {
@@ -153,18 +151,18 @@
                     continue;
 
                 ICSharpInstruction Item = BodyInstructionList[i];
-                Item.WriteCSharp(writer, outputNamespace);
+                Item.WriteCSharp(writer);
             }
 
             if (EnsureList.Count > 0)
             {
-                writer.WriteLine();
+                writer.WriteEmptyLine();
 
                 foreach (ICSharpAssertion Assertion in EnsureList)
-                    Assertion.WriteCSharp(writer, outputNamespace);
+                    Assertion.WriteCSharp(writer);
 
                 if (flags.HasFlag(CSharpBodyFlags.HasResult))
-                    writer.WriteLine();
+                    writer.WriteEmptyLine();
             }
 
             // TODO: ExceptionHandlerList

@@ -649,6 +649,7 @@
     <Compile Include="TargetLanguages\CSharp\CSharpContext.cs" />
     <Compile Include="TargetLanguages\CSharp\CSharpFeatureTextTypes.cs" />
     <Compile Include="TargetLanguages\CSharp\CSharpTypeWithFeature.cs" />
+    <Compile Include="TargetLanguages\CSharp\CSharpUsingCollection.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\Argument\CSharpAssignmentArgument.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\Argument\CSharpPositionalArgument.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\Argument\CSharpArgument.cs" />

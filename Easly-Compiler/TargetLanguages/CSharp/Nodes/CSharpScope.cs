@@ -27,10 +27,9 @@
         /// Writes down the C# scope.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
         /// <param name="curlyBracketsInsertion">The mode to use to write the C# scope..</param>
         /// <param name="endWithBreak">Add a break instruction at the end.</param>
-        void WriteCSharp(ICSharpWriter writer, string outputNamespace, CSharpCurlyBracketsInsertions curlyBracketsInsertion, bool endWithBreak);
+        void WriteCSharp(ICSharpWriter writer, CSharpCurlyBracketsInsertions curlyBracketsInsertion, bool endWithBreak);
     }
 
     /// <summary>
@@ -97,10 +96,9 @@
         /// Writes down the C# scope.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        /// <param name="outputNamespace">Namespace for the output code.</param>
         /// <param name="curlyBracketsInsertion">The mode to use to write the C# scope..</param>
         /// <param name="endWithBreak">Add a break instruction at the end.</param>
-        public virtual void WriteCSharp(ICSharpWriter writer, string outputNamespace, CSharpCurlyBracketsInsertions curlyBracketsInsertion, bool endWithBreak)
+        public virtual void WriteCSharp(ICSharpWriter writer, CSharpCurlyBracketsInsertions curlyBracketsInsertion, bool endWithBreak)
         {
             bool UseCurlyBrackets = false;
 
@@ -124,7 +122,7 @@
             writer.IncreaseIndent();
 
             foreach (ICSharpScopeAttributeFeature Item in EntityDeclarationList)
-                Item.WriteCSharp(writer, outputNamespace);
+                Item.WriteCSharp(writer);
 
             /*
             foreach (AttachmentAlias AliasItem in AttachmentVariableTable)
@@ -138,10 +136,10 @@
             */
 
             if (EntityDeclarationList.Count > 0/* || AttachmentVariableTable.Count > 0*/)
-                writer.WriteLine();
+                writer.WriteEmptyLine();
 
             foreach (ICSharpInstruction Item in InstructionList)
-                Item.WriteCSharp(writer, outputNamespace);
+                Item.WriteCSharp(writer);
 
             if (endWithBreak)
                 writer.WriteIndentedLine("break;");
