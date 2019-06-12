@@ -59,6 +59,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -749,6 +751,8 @@
   <ItemGroup>
     <None Include="packages.config" />
     <EmbeddedResource Include="Resources\language.easly" />
+    <EmbeddedResource Include="Resources\Language.zip" />
+    <EmbeddedResource Include="Resources\PolySerializer.zip" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.2\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />

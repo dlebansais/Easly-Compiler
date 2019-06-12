@@ -4,6 +4,9 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.IO.Compression;
+    using System.Reflection;
+    using System.Text;
     using CompilerNode;
     using Easly;
 
@@ -618,27 +621,21 @@
         /// <summary>
         /// Writes down the class source code.
         /// </summary>
-        /// <param name="folder">The output root folder.</param>
+        /// <param name="rootFolder">The output root folder.</param>
         /// <param name="outputNamespace">Namespace for the output code.</param>
-        public void Write(string folder, string outputNamespace)
+        public void Write(string rootFolder, string outputNamespace)
         {
-            string OutputFolder;
-            if (Source.FromIdentifier.IsAssigned)
-            {
-                IIdentifier FromIdentifier = (IIdentifier)Source.FromIdentifier.Item;
-                OutputFolder = Path.Combine(folder, FromIdentifier.ValidText.Item);
-            }
-            else
-                OutputFolder = folder;
-
             try
             {
+                string SourceName = Source.FromIdentifier.IsAssigned ? ((IIdentifier)Source.FromIdentifier.Item).ValidText.Item : null;
+                string ClassFileName = $"{ValidClassName}.cs";
+                LocateOrCreatePath(rootFolder, SourceName, ClassFileName, out string FilePath);
+
+                string OutputFolder = Path.GetDirectoryName(FilePath);
                 if (!Directory.Exists(OutputFolder))
                     Directory.CreateDirectory(OutputFolder);
 
-                string FileName = Path.Combine(OutputFolder, $"{ValidClassName}.cs");
-
-                using (FileStream Stream = new FileStream(FileName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
+                using (FileStream Stream = new FileStream(FilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
                 {
                     using (ICSharpWriter Writer = new CSharpWriter(Stream))
                     {
@@ -650,6 +647,474 @@
             {
                 Debug.WriteLine(e.Message);
                 Debug.WriteLine(e.StackTrace);
+            }
+        }
+
+        private void LocateOrCreatePath(string rootFolder, string sourceName, string classFileName, out string filePath)
+        {
+            LocateOrCreateSolution(rootFolder, out string SolutionFullPath);
+            LocateOrCreateProject(SolutionFullPath, out string ProjectFullPath);
+
+            List<string> LineList = new List<string>();
+
+            using (FileStream fs = new FileStream(ProjectFullPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                using (StreamReader sr = new StreamReader(fs, Encoding.ASCII))
+                {
+                    for (;;)
+                    {
+                        string Line = sr.ReadLine();
+                        if (Line == null)
+                            break;
+
+                        LineList.Add(Line);
+                    }
+                }
+            }
+
+            string FilePath = (sourceName != null) ? Path.Combine(sourceName, classFileName) : classFileName;
+            const string Pattern = "<Compile Include=";
+
+            foreach (string Line in LineList)
+                if (Line.Contains("\"" + FilePath + "\"") && Line.Contains(Pattern))
+                {
+                    filePath = Path.Combine(Path.GetDirectoryName(ProjectFullPath), FilePath);
+                    return;
+                }
+
+            foreach (string Line in LineList)
+            {
+                if (Line.Contains("\\" + FilePath) && Line.Contains(Pattern))
+                {
+                    FilePath = Line.Substring(Line.IndexOf(Pattern) + Pattern.Length);
+                    while (FilePath[0] == '"')
+                        FilePath = FilePath.Substring(1);
+
+                    int FileEndIndex = FilePath.IndexOf('"');
+                    if (FileEndIndex > 0)
+                        FilePath = FilePath.Substring(0, FileEndIndex);
+
+                    filePath = Path.Combine(Path.GetDirectoryName(ProjectFullPath), FilePath);
+                    return;
+                }
+            }
+
+            if (!IsSharedName)
+                foreach (string Line in LineList)
+                {
+                    if ((Line.Contains("\\" + classFileName) || Line.Contains("\"" + classFileName)) && Line.Contains(Pattern))
+                    {
+                        FilePath = Line.Substring(Line.IndexOf(Pattern) + Pattern.Length);
+                        while (FilePath[0] == '"')
+                            FilePath = FilePath.Substring(1);
+
+                        int FileEndIndex = FilePath.IndexOf('"');
+                        if (FileEndIndex > 0)
+                            FilePath = FilePath.Substring(0, FileEndIndex);
+
+                        filePath = Path.Combine(Path.GetDirectoryName(ProjectFullPath), FilePath);
+                        return;
+                    }
+                }
+
+            filePath = Path.Combine(Path.GetDirectoryName(ProjectFullPath), FilePath);
+            string FolderPath = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(FolderPath))
+                Directory.CreateDirectory(FolderPath);
+
+            int StartIncludeIndex = -1;
+            for (int i = 0; i < LineList.Count; i++)
+            {
+                string Line = LineList[i];
+                if (Line.Contains(Pattern))
+                    StartIncludeIndex = i;
+            }
+
+            LineList.Insert(StartIncludeIndex + 1, "    <Compile Include=\"" + FilePath + "\" />");
+
+            using (FileStream fs = new FileStream(ProjectFullPath, FileMode.Create, FileAccess.Write, FileShare.Read))
+            {
+                using (StreamWriter sw = new StreamWriter(fs, Encoding.ASCII))
+                {
+                    foreach (string Line in LineList)
+                        sw.WriteLine(Line);
+                }
+            }
+        }
+
+        private static void LocateOrCreateSolution(string rootFolder, out string solutionFullPath)
+        {
+            string[] Solutions = Directory.GetFiles(rootFolder, "*.sln");
+            if (Solutions.Length > 0)
+                solutionFullPath = Solutions[0];
+            else
+                CreateSolution(rootFolder, out solutionFullPath);
+        }
+
+        private static void LocateOrCreateProject(string solutionFullPath, out string projectFullPath)
+        {
+            List<string> LineList = new List<string>();
+
+            using (FileStream fs = new FileStream(solutionFullPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                using (StreamReader sr = new StreamReader(fs, Encoding.ASCII))
+                {
+                    for (; ; )
+                    {
+                        string Line = sr.ReadLine();
+                        if (Line == null)
+                            break;
+
+                        LineList.Add(Line);
+                    }
+                }
+            }
+
+            List<string> ProjectPathList = new List<string>();
+
+            foreach (string Line in LineList)
+            {
+                const string Pattern = "Project(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\") = ";
+                if (Line.StartsWith(Pattern))
+                {
+                    string[] LineComponents = Line.Split(',');
+                    if (LineComponents.Length > 1)
+                    {
+                        string ProjectPath = LineComponents[1];
+                        if (ProjectPath.Contains(".csproj"))
+                        {
+                            while (ProjectPath[0] == ' ' || ProjectPath[0] == '"')
+                                ProjectPath = ProjectPath.Substring(1);
+
+                            while (ProjectPath[ProjectPath.Length - 1] == ' ' || ProjectPath[ProjectPath.Length - 1] == '"')
+                                ProjectPath = ProjectPath.Substring(0, ProjectPath.Length - 1);
+
+                            ProjectPathList.Add(ProjectPath);
+                        }
+                    }
+                }
+            }
+
+            foreach (string ProjectPath in ProjectPathList)
+            {
+                string FullPath = Path.Combine(Path.GetDirectoryName(solutionFullPath), ProjectPath);
+                if (ProjectIncludesEasly(FullPath))
+                {
+                    projectFullPath = FullPath;
+                    return;
+                }
+            }
+
+            Guid ProjectGuid;
+            CreateProject(Path.GetDirectoryName(solutionFullPath), out projectFullPath, out ProjectGuid);
+
+            string ProjectName = Path.GetFileNameWithoutExtension(projectFullPath);
+            string ProjectFile = Path.GetFileName(projectFullPath);
+
+            int StartGlobalIndex = -1;
+            int SolutionConfigurationIndex = -1;
+            int ProjectConfigurationIndex = -1;
+            for (int i = 0; i < LineList.Count; i++)
+            {
+                string Line = LineList[i];
+                if (Line == "Global")
+                    StartGlobalIndex = i;
+                else if (Line.Trim() == "GlobalSection(SolutionConfigurationPlatforms)")
+                    SolutionConfigurationIndex = i;
+                else if (Line.Trim() == "GlobalSection(ProjectConfigurationPlatforms)")
+                    ProjectConfigurationIndex = i;
+            }
+
+            if (StartGlobalIndex == -1)
+            {
+                LineList.Add("Global");
+                StartGlobalIndex = LineList.Count;
+                LineList.Add("	GlobalSection(SolutionProperties) = preSolution");
+                LineList.Add("		HideSolutionNode = FALSE");
+                LineList.Add("	EndGlobalSection");
+                LineList.Add("EndGlobal");
+            }
+
+            if (SolutionConfigurationIndex == -1)
+            {
+                LineList.Insert(StartGlobalIndex + 1, "	EndGlobalSection");
+                LineList.Insert(StartGlobalIndex + 1, "		Release|x64 = Release|x64");
+                LineList.Insert(StartGlobalIndex + 1, "		Debug|x64 = Debug|x64");
+                LineList.Insert(StartGlobalIndex + 1, "	GlobalSection(SolutionConfigurationPlatforms) = preSolution");
+                if (ProjectConfigurationIndex == -1)
+                {
+                    ProjectConfigurationIndex = StartGlobalIndex + 5;
+                    LineList.Insert(ProjectConfigurationIndex, "	EndGlobalSection");
+                    LineList.Insert(ProjectConfigurationIndex, "	GlobalSection(ProjectConfigurationPlatforms) = postSolution");
+                }
+            }
+
+            if (ProjectConfigurationIndex == -1)
+            {
+                LineList.Insert(StartGlobalIndex + 1, "	GlobalSection(ProjectConfigurationPlatforms) = postSolution");
+                LineList.Insert(StartGlobalIndex + 1, "	EndGlobalSection");
+                ProjectConfigurationIndex = StartGlobalIndex + 2;
+            }
+
+            LineList.Insert(ProjectConfigurationIndex + 1, string.Empty + ProjectGuid + ".Release|x64.Build.0 = Release|x64");
+            LineList.Insert(ProjectConfigurationIndex + 1, string.Empty + ProjectGuid + ".Release|x64.ActiveCfg = Release|x64");
+            LineList.Insert(ProjectConfigurationIndex + 1, string.Empty + ProjectGuid + ".Debug|x64.Build.0 = Debug|x64");
+            LineList.Insert(ProjectConfigurationIndex + 1, string.Empty + ProjectGuid + ".Debug|x64.ActiveCfg = Debug|x64");
+
+            LineList.Insert(StartGlobalIndex, "EndProject");
+            LineList.Insert(StartGlobalIndex, "Project(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\") = \"" + ProjectName + "\", \"" + ProjectFile + "\", \"" + ProjectGuid + "\"");
+
+            using (FileStream fs = new FileStream(solutionFullPath, FileMode.Create, FileAccess.Write, FileShare.Read))
+            {
+                using (StreamWriter sw = new StreamWriter(fs, Encoding.ASCII))
+                {
+                    foreach (string Line in LineList)
+                        sw.WriteLine(Line);
+                }
+            }
+        }
+
+        private static void CreateSolution(string rootFolder, out string solutionFullPath)
+        {
+            solutionFullPath = Path.Combine(rootFolder, "CSharpProject.sln");
+
+            string ProjectFullPath;
+            Guid ProjectGuid;
+            CreateProject(rootFolder, out ProjectFullPath, out ProjectGuid);
+
+            string ProjectName = Path.GetFileNameWithoutExtension(ProjectFullPath);
+            string ProjectFile = Path.GetFileName(ProjectFullPath);
+
+            using (FileStream fs = new FileStream(solutionFullPath, FileMode.Create, FileAccess.Write))
+            {
+                using (StreamWriter sw = new StreamWriter(fs, Encoding.ASCII))
+                {
+                    sw.WriteLine();
+                    sw.WriteLine("Microsoft Visual Studio Solution File, Format Version 12.00");
+                    sw.WriteLine("# Visual Studio 15");
+                    sw.WriteLine("VisualStudioVersion = 15.0.28010.2041");
+                    sw.WriteLine("MinimumVisualStudioVersion = 10.0.40219.1");
+                    sw.WriteLine("Project(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\") = \"" + ProjectName + "\", \"" + ProjectFile + "\", \"" + ProjectGuid + "\"");
+                    sw.WriteLine("EndProject");
+                    sw.WriteLine("Global");
+                    sw.WriteLine("	GlobalSection(SolutionConfigurationPlatforms) = preSolution");
+                    sw.WriteLine("		Debug|x64 = Debug|x64");
+                    sw.WriteLine("		Release|x64 = Release|x64");
+                    sw.WriteLine("	EndGlobalSection");
+                    sw.WriteLine("	GlobalSection(ProjectConfigurationPlatforms) = postSolution");
+                    sw.WriteLine("		" + ProjectGuid + ".Debug|x64.ActiveCfg = Debug|x64");
+                    sw.WriteLine("		" + ProjectGuid + ".Debug|x64.Build.0 = Debug|x64");
+                    sw.WriteLine("		" + ProjectGuid + ".Release|x64.ActiveCfg = Release|x64");
+                    sw.WriteLine("		" + ProjectGuid + ".Release|x64.Build.0 = Release|x64");
+                    sw.WriteLine("	EndGlobalSection");
+                    sw.WriteLine("	GlobalSection(SolutionProperties) = preSolution");
+                    sw.WriteLine("		HideSolutionNode = FALSE");
+                    sw.WriteLine("	EndGlobalSection");
+                    sw.WriteLine("EndGlobal");
+                }
+            }
+        }
+
+        private static bool ProjectIncludesEasly(string projectFullPath)
+        {
+            using (FileStream fs = new FileStream(projectFullPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                using (StreamReader sr = new StreamReader(fs, Encoding.ASCII))
+                {
+                    for (; ; )
+                    {
+                        string Line = sr.ReadLine();
+                        if (Line == null)
+                            break;
+
+                        if (Line.Contains("<Compile Include=\"Language\\DetachableReference.cs\" />"))
+                            return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static void CreateProject(string rootFolder, out string projectFullPath, out Guid projectGuid)
+        {
+            projectFullPath = Path.Combine(rootFolder, "CSharpProject.csproj");
+            projectGuid = Guid.NewGuid();
+
+            string ProjectName = Path.GetFileNameWithoutExtension(projectFullPath);
+            string ProjectFile = Path.GetFileName(projectFullPath);
+
+            using (FileStream fs = new FileStream(projectFullPath, FileMode.Create, FileAccess.Write))
+            {
+                using (StreamWriter sw = new StreamWriter(fs, Encoding.ASCII))
+                {
+                    sw.WriteLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+                    sw.WriteLine("<Project ToolsVersion=\"15.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">");
+                    sw.WriteLine("  <Import Project=\"$(MSBuildExtensionsPath)\\$(MSBuildToolsVersion)\\Microsoft.Common.props\" Condition=\"Exists('$(MSBuildExtensionsPath)\\$(MSBuildToolsVersion)\\Microsoft.Common.props')\" />");
+                    sw.WriteLine("  <PropertyGroup>");
+                    sw.WriteLine("    <Configuration Condition=\" '$(Configuration)' == '' \">Debug</Configuration>");
+                    sw.WriteLine("    <Platform Condition=\" '$(Platform)' == '' \">x64</Platform>");
+                    sw.WriteLine("    <projectGuid>" + projectGuid + "</projectGuid>");
+                    sw.WriteLine("    <OutputType>Library</OutputType>");
+                    sw.WriteLine("    <AppDesignerFolder>Properties</AppDesignerFolder>");
+                    sw.WriteLine("    <RootNamespace>" + ProjectName + "</RootNamespace>");
+                    sw.WriteLine("    <AssemblyName>" + ProjectName + "</AssemblyName>");
+                    sw.WriteLine("    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>");
+                    sw.WriteLine("    <FileAlignment>512</FileAlignment>");
+                    sw.WriteLine("  </PropertyGroup>");
+                    sw.WriteLine("  <PropertyGroup Condition=\" '$(Configuration)|$(Platform)' == 'Debug|x64' \">");
+                    sw.WriteLine("    <DebugSymbols>true</DebugSymbols>");
+                    sw.WriteLine("    <DebugType>full</DebugType>");
+                    sw.WriteLine("    <Optimize>false</Optimize>");
+                    sw.WriteLine("    <OutputPath>bin\\Debug\\</OutputPath>");
+                    sw.WriteLine("    <DefineConstants>DEBUG;TRACE</DefineConstants>");
+                    sw.WriteLine("    <ErrorReport>prompt</ErrorReport>");
+                    sw.WriteLine("    <WarningLevel>4</WarningLevel>");
+                    sw.WriteLine("  </PropertyGroup>");
+                    sw.WriteLine("  <PropertyGroup Condition=\" '$(Configuration)|$(Platform)' == 'Release|x64' \">");
+                    sw.WriteLine("    <DebugType>pdbonly</DebugType>");
+                    sw.WriteLine("    <Optimize>true</Optimize>");
+                    sw.WriteLine("    <OutputPath>bin\\Release\\</OutputPath>");
+                    sw.WriteLine("    <DefineConstants>TRACE</DefineConstants>");
+                    sw.WriteLine("    <ErrorReport>prompt</ErrorReport>");
+                    sw.WriteLine("    <WarningLevel>4</WarningLevel>");
+                    sw.WriteLine("  </PropertyGroup>");
+                    sw.WriteLine("  <ItemGroup>");
+                    sw.WriteLine("    <Reference Include=\"PolySerializer-Attributes\">");
+                    sw.WriteLine("      <HintPath>.\\PolySerializer\\$(Platform)\\$(Configuration)\\PolySerializer-Attributes.dll</HintPath>");
+                    sw.WriteLine("    </Reference>");
+                    sw.WriteLine("    <Reference Include=\"PresentationCore\" />");
+                    sw.WriteLine("    <Reference Include=\"PresentationFramework\" />");
+                    sw.WriteLine("    <Reference Include=\"System\" />");
+                    sw.WriteLine("    <Reference Include=\"System.Core\" />");
+                    sw.WriteLine("    <Reference Include=\"System.Xaml\" />");
+                    sw.WriteLine("    <Reference Include=\"System.Xml.Linq\" />");
+                    sw.WriteLine("    <Reference Include=\"System.Data.DataSetExtensions\" />");
+                    sw.WriteLine("    <Reference Include=\"Microsoft.CSharp\" />");
+                    sw.WriteLine("    <Reference Include=\"System.Data\" />");
+                    sw.WriteLine("    <Reference Include=\"System.Xml\" />");
+                    sw.WriteLine("    <Reference Include=\"WindowsBase\" />");
+                    sw.WriteLine("  </ItemGroup>");
+                    sw.WriteLine("  <ItemGroup>");
+                    sw.WriteLine("    <Compile Include=\"Language\\DetachableReference.cs\" />");
+                    sw.WriteLine("    <Compile Include=\"Language\\OnceReference.cs\" />");
+                    sw.WriteLine("    <Compile Include=\"Language\\OptionalReference.cs\" />");
+                    sw.WriteLine("    <Compile Include=\"Language\\StableReference.cs\" />");
+                    sw.WriteLine("    <Compile Include=\"Language\\SealableDictionary.cs\" />");
+                    sw.WriteLine("    <Compile Include=\"Language\\SealableList.cs\" />");
+                    sw.WriteLine("    <Compile Include=\"Language\\Entity\\Entity.cs\" />");
+                    sw.WriteLine("    <Compile Include=\"Language\\Entity\\SpecializedTypeEntity.cs\" />");
+                    sw.WriteLine("    <Compile Include=\"Language\\Entity\\TypeEntity.cs\" />");
+                    sw.WriteLine("    <Compile Include=\"Language\\Entity\\FeatureEntity\\FeatureEntity.cs\" />");
+                    sw.WriteLine("    <Compile Include=\"Language\\Entity\\FeatureEntity\\FunctionEntity.cs\" />");
+                    sw.WriteLine("    <Compile Include=\"Language\\Entity\\FeatureEntity\\IndexerEntity.cs\" />");
+                    sw.WriteLine("    <Compile Include=\"Language\\Entity\\FeatureEntity\\NamedFeatureEntity.cs\" />");
+                    sw.WriteLine("    <Compile Include=\"Language\\Entity\\FeatureEntity\\ProcedureEntity.cs\" />");
+                    sw.WriteLine("    <Compile Include=\"Language\\Entity\\FeatureEntity\\PropertyEntity.cs\" />");
+                    sw.WriteLine("    <Compile Include=\"Properties\\AssemblyInfo.cs\" />");
+                    sw.WriteLine("  </ItemGroup>");
+                    sw.WriteLine("  <Import Project=\"$(MSBuildToolsPath)\\Microsoft.CSharp.targets\" />");
+                    sw.WriteLine("  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. ");
+                    sw.WriteLine("       Other similar extension points exist, see Microsoft.Common.targets.");
+                    sw.WriteLine("  <Target Name=\"BeforeBuild\">");
+                    sw.WriteLine("  </Target>");
+                    sw.WriteLine("  <Target Name=\"AfterBuild\">");
+                    sw.WriteLine("  </Target>");
+                    sw.WriteLine("  -->");
+                    sw.WriteLine("</Project>");
+                }
+            }
+
+            string PropertiesFolder = Path.Combine(rootFolder, "Properties");
+            if (!Directory.Exists(PropertiesFolder))
+                Directory.CreateDirectory(PropertiesFolder);
+
+            using (FileStream fs = new FileStream(Path.Combine(PropertiesFolder, "AssemblyInfo.cs"), FileMode.Create, FileAccess.Write))
+            {
+                using (StreamWriter sw = new StreamWriter(fs, Encoding.ASCII))
+                {
+                    sw.WriteLine("using System.Reflection;");
+                    sw.WriteLine("using System.Runtime.CompilerServices;");
+                    sw.WriteLine("using System.Runtime.InteropServices;");
+                    sw.WriteLine();
+                    sw.WriteLine("// General Information about an assembly is controlled through the following");
+                    sw.WriteLine("// set of attributes. Change these attribute values to modify the information");
+                    sw.WriteLine("// associated with an assembly.");
+                    sw.WriteLine("[assembly: AssemblyTitle(\"CSharpProject\")]");
+                    sw.WriteLine("[assembly: AssemblyDescription(\"\")]");
+                    sw.WriteLine("[assembly: AssemblyConfiguration(\"\")]");
+                    sw.WriteLine("[assembly: AssemblyCompany(\"\")]");
+                    sw.WriteLine("[assembly: AssemblyProduct(\"\")]");
+                    sw.WriteLine("[assembly: AssemblyCopyright(\"\")]");
+                    sw.WriteLine("[assembly: AssemblyTrademark(\"\")]");
+                    sw.WriteLine("[assembly: AssemblyCulture(\"\")]");
+                    sw.WriteLine();
+                    sw.WriteLine("// Setting ComVisible to false makes the types in this assembly not visible");
+                    sw.WriteLine("// to COM components.  If you need to access a type in this assembly from");
+                    sw.WriteLine("// COM, set the ComVisible attribute to true on that type.");
+                    sw.WriteLine("[assembly: ComVisible(false)]");
+                    sw.WriteLine();
+                    sw.WriteLine("// Version information for an assembly consists of the following four values:");
+                    sw.WriteLine("//");
+                    sw.WriteLine("//      Major Version");
+                    sw.WriteLine("//      Minor Version");
+                    sw.WriteLine("//      Build Number");
+                    sw.WriteLine("//      Revision");
+                    sw.WriteLine("//");
+                    sw.WriteLine("// You can specify all the values or you can default the Build and Revision Numbers");
+                    sw.WriteLine("// by using the '*' as shown below:");
+                    sw.WriteLine("// [assembly: AssemblyVersion(\"1.0.*\")]");
+                    sw.WriteLine("[assembly: AssemblyVersion(\"1.0.0.0\")]");
+                    sw.WriteLine("[assembly: AssemblyFileVersion(\"1.0.0.0\")]");
+                }
+            }
+
+            if (!Directory.Exists(Path.Combine(rootFolder, "Language")))
+            {
+                Assembly CurrentAssembly = Assembly.GetExecutingAssembly();
+                string[] ManifestResourceNames = CurrentAssembly.GetManifestResourceNames();
+
+                string ManifestResourceName = null;
+                foreach (string s in ManifestResourceNames)
+                    if (s.EndsWith("Language.zip"))
+                    {
+                        ManifestResourceName = s;
+                        break;
+                    }
+
+                Debug.Assert(ManifestResourceName != null);
+
+                using (Stream fs = CurrentAssembly.GetManifestResourceStream(ManifestResourceName))
+                {
+                    using (ZipArchive Archive = new ZipArchive(fs, ZipArchiveMode.Read))
+                    {
+                        Archive.ExtractToDirectory(rootFolder);
+                    }
+                }
+            }
+
+            if (!Directory.Exists(Path.Combine(rootFolder, "PolySerializer")))
+            {
+                Assembly CurrentAssembly = Assembly.GetExecutingAssembly();
+                string[] ManifestResourceNames = CurrentAssembly.GetManifestResourceNames();
+
+                string ManifestResourceName = null;
+                foreach (string s in ManifestResourceNames)
+                    if (s.EndsWith("PolySerializer.zip"))
+                    {
+                        ManifestResourceName = s;
+                        break;
+                    }
+
+                Debug.Assert(ManifestResourceName != null);
+
+                using (Stream fs = CurrentAssembly.GetManifestResourceStream(ManifestResourceName))
+                {
+                    using (ZipArchive Archive = new ZipArchive(fs, ZipArchiveMode.Read))
+                    {
+                        Archive.ExtractToDirectory(rootFolder);
+                    }
+                }
             }
         }
         #endregion
