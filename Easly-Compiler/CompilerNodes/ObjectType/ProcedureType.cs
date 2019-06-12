@@ -471,27 +471,7 @@ namespace CompilerNode
         /// <summary>
         /// Gets a string representation of the expression.
         /// </summary>
-        public string TypeToString
-        {
-            get
-            {
-                string Result = null;
-
-                switch (BaseType)
-                {
-                    case IObjectType AsObjectType:
-                        Result = $"procedure {{{AsObjectType.TypeToString}}}";
-                        break;
-
-                    case IClassType AsClassType:
-                        Result = $"procedure {{{AsClassType.BaseClass.EntityName.Text}}}";
-                        break;
-                }
-
-                Debug.Assert(Result != null);
-                return Result;
-            }
-        }
+        public string TypeToString { get { return $"procedure {{{((IObjectType)BaseType).TypeToString}}}"; } }
 
         /// <summary></summary>
         public override string ToString()

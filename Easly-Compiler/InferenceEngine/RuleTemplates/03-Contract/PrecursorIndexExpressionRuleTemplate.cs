@@ -71,13 +71,11 @@
             IFeatureInstance SelectedPrecursor = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureInstance, IFeatureCall>)data).Item5;
             IFeatureCall FeatureCall = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureInstance, IFeatureCall>)data).Item6;
 
+            Debug.Assert(ConstantSourceList.Count > 0);
+
             node.ResolvedResult.Item = ResolvedResult;
             node.ConstantSourceList.AddRange(ConstantSourceList);
             node.ConstantSourceList.Seal();
-
-            if (node.ConstantSourceList.Count == 0)
-                node.ExpressionConstant.Item = ExpressionConstant;
-
             node.ResolvedPrecursor.Item = SelectedPrecursor;
         }
         #endregion

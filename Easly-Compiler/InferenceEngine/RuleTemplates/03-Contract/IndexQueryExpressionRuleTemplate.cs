@@ -69,12 +69,11 @@
             ILanguageConstant ExpressionConstant = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureCall>)data).Item4;
             IFeatureCall FeatureCall = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureCall>)data).Item5;
 
+            Debug.Assert(ConstantSourceList.Count > 0);
+
             node.ResolvedResult.Item = ResolvedResult;
             node.ConstantSourceList.AddRange(ConstantSourceList);
             node.ConstantSourceList.Seal();
-
-            if (ConstantSourceList.Count == 0)
-                node.ExpressionConstant.Item = ExpressionConstant;
         }
         #endregion
     }

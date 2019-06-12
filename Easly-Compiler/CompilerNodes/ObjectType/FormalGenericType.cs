@@ -168,6 +168,9 @@
         /// <param name="resolvedType">The proposed type instance.</param>
         public void InstanciateType(ICompiledTypeWithFeature instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType)
         {
+            ISealableDictionary<ITypeName, ICompiledType> TypeTable = GetTypeTable();
+            Debug.Assert(TypeTable.Count == 0);
+
             if (instancingClassType is IClassType AsClassType)
             {
                 ISealableDictionary<string, ICompiledType> TypeArgumentTable = AsClassType.TypeArgumentTable;
