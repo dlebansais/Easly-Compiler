@@ -15,6 +15,11 @@
         /// Replicated list from <see cref="BaseNode.AssignmentInstruction.DestinationBlocks"/>.
         /// </summary>
         IList<IQualifiedName> DestinationList { get; }
+
+        /// <summary>
+        /// Table of resolved final features.
+        /// </summary>
+        ISealableDictionary<IQualifiedName, ICompiledFeature> FinalFeatureTable { get; }
     }
 
     /// <summary>
@@ -125,6 +130,7 @@
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
                 ResolvedException = new OnceReference<IResultException>();
+                FinalFeatureTable = new SealableDictionary<IQualifiedName, ICompiledFeature>();
                 IsHandled = true;
             }
 
@@ -159,6 +165,9 @@
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
                 IsResolved = ResolvedException.IsAssigned;
+
+                Debug.Assert(FinalFeatureTable.IsSealed || !IsResolved);
+
                 IsHandled = true;
             }
 
@@ -194,6 +203,13 @@
         /// All reachable entities.
         /// </summary>
         public ISealableDictionary<string, IScopeAttributeFeature> FullScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
+        #endregion
+
+        #region Compiler
+        /// <summary>
+        /// Table of resolved final features.
+        /// </summary>
+        public ISealableDictionary<IQualifiedName, ICompiledFeature> FinalFeatureTable { get; private set; } = new SealableDictionary<IQualifiedName, ICompiledFeature>();
         #endregion
 
         #region Debugging

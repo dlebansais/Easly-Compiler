@@ -55,7 +55,18 @@
 
             foreach (IQualifiedName Destination in source.DestinationList)
             {
-                ICSharpQualifiedName NewDestination = CSharpQualifiedName.Create(context, Destination, parentFeature, null, false);
+                ICompiledFeature SourceFeature = source.FinalFeatureTable[Destination];
+
+                ICSharpFeature FinalFeature;
+
+                if (SourceFeature is IScopeAttributeFeature AsScopeAttributeFeature)
+                {
+                    FinalFeature = CSharpScopeAttributeFeature.Create(null, AsScopeAttributeFeature);
+                }
+                else
+                    FinalFeature = context.GetFeature(SourceFeature);
+
+                ICSharpQualifiedName NewDestination = CSharpQualifiedName.Create(context, Destination, FinalFeature, null, false);
                 DestinationList.Add(NewDestination);
             }
         }

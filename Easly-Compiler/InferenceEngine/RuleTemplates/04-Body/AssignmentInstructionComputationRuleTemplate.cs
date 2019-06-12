@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
@@ -63,6 +64,7 @@
             {
                 IClass EmbeddingClass = node.EmbeddingClass;
                 IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;
+                ISealableDictionary<IQualifiedName, ICompiledFeature> FinalFeatureTable = new SealableDictionary<IQualifiedName, ICompiledFeature>();
 
                 for (int i = 0; i < node.DestinationList.Count; i++)
                 {
@@ -88,10 +90,12 @@
                         else
                             ObjectType.FillResultPath(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, Destination.ValidResultTypePath.Item);
                     }
+
+                    FinalFeatureTable.Add(Destination, FinalFeature);
                 }
 
                 if (Success)
-                    data = SourceExpression.ResolvedException.Item;
+                    data = new Tuple<IResultException, ISealableDictionary<IQualifiedName, ICompiledFeature>>(SourceExpression.ResolvedException.Item, FinalFeatureTable);
             }
 
             return Success;
@@ -104,9 +108,12 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IAssignmentInstruction node, object data)
         {
-            IResultException ResolvedException = (IResultException)data;
+            IResultException ResolvedException = ((Tuple<IResultException, ISealableDictionary<IQualifiedName, ICompiledFeature>>)data).Item1;
+            ISealableDictionary<IQualifiedName, ICompiledFeature> FinalFeatureTable = ((Tuple<IResultException, ISealableDictionary<IQualifiedName, ICompiledFeature>>)data).Item2;
 
             node.ResolvedException.Item = ResolvedException;
+            node.FinalFeatureTable.Merge(FinalFeatureTable);
+            node.FinalFeatureTable.Seal();
         }
         #endregion
     }
