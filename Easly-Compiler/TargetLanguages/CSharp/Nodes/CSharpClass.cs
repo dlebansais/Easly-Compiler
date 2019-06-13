@@ -970,6 +970,7 @@
                     sw.WriteLine("    <DefineConstants>DEBUG;TRACE</DefineConstants>");
                     sw.WriteLine("    <ErrorReport>prompt</ErrorReport>");
                     sw.WriteLine("    <WarningLevel>4</WarningLevel>");
+                    sw.WriteLine("    <LangVersion>7.2</LangVersion>");
                     sw.WriteLine("  </PropertyGroup>");
                     sw.WriteLine("  <PropertyGroup Condition=\" '$(Configuration)|$(Platform)' == 'Release|x64' \">");
                     sw.WriteLine("    <DebugType>pdbonly</DebugType>");
@@ -978,6 +979,7 @@
                     sw.WriteLine("    <DefineConstants>TRACE</DefineConstants>");
                     sw.WriteLine("    <ErrorReport>prompt</ErrorReport>");
                     sw.WriteLine("    <WarningLevel>4</WarningLevel>");
+                    sw.WriteLine("    <LangVersion>7.2</LangVersion>");
                     sw.WriteLine("  </PropertyGroup>");
                     sw.WriteLine("  <ItemGroup>");
                     sw.WriteLine("    <Reference Include=\"PolySerializer-Attributes\">");

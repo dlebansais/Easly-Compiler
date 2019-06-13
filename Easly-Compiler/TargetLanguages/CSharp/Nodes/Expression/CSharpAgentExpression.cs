@@ -20,6 +20,11 @@
         ICSharpTypeWithFeature BaseType { get; }
 
         /// <summary>
+        /// The effective base type if different than <see cref="BaseType"/>. Can be null.
+        /// </summary>
+        ICSharpTypeWithFeature EffectiveBaseType { get; }
+
+        /// <summary>
         /// The feature referenced.
         /// </summary>
         ICSharpFeatureWithName Delegated { get; }
@@ -53,8 +58,12 @@
 
             if (source.BaseType.IsAssigned)
             {
-                BaseType = CSharpType.Create(context, ((IObjectType)source.BaseType.Item).ResolvedType.Item) as ICSharpTypeWithFeature;
+                IObjectType SourceBaseType = (IObjectType)source.BaseType.Item;
+                ICompiledType ResolvedBaseType = SourceBaseType.ResolvedType.Item;
+                BaseType = CSharpType.Create(context, ResolvedBaseType) as ICSharpTypeWithFeature;
                 Debug.Assert(BaseType != null);
+
+                EffectiveBaseType = BaseType;
 
                 foreach (ICSharpClassType ClassType in BaseType.ConformingClassTypeList)
                 {
@@ -66,6 +75,9 @@
 
                             ICompiledFeature Feature = Entry.Value.Feature;
                             Delegated = context.GetFeature(Feature) as ICSharpFeatureWithName;
+
+                            if (ResolvedBaseType is IFormalGenericType)
+                                EffectiveBaseType = ClassType;
                         }
                     }
                 }
@@ -94,6 +106,11 @@
         /// The base type. Can be null.
         /// </summary>
         public ICSharpTypeWithFeature BaseType { get; }
+
+        /// <summary>
+        /// The effective base type if different than <see cref="BaseType"/>. Can be null.
+        /// </summary>
+        public ICSharpTypeWithFeature EffectiveBaseType { get; }
 
         /// <summary>
         /// The feature referenced.
@@ -137,13 +154,15 @@
                         break;
                 }
             }
-            else if (Delegated is ICSharpPropertyFeature AsPropertyFeature)
-            {
-                string EmbeddingClassName = Delegated.Owner.ValidClassName;
-                Result = $"({EmbeddingClassName} agentBase) => {{ agentBase.{Delegated.Name}; }}";
-            }
             else
-                Result = CSharpNames.ToCSharpIdentifier(Delegated.Name);
+            {
+                string EmbeddingClassName = CSharpNames.ToCSharpIdentifier(Delegated.Owner.ValidClassName);
+
+                if (Delegated is ICSharpPropertyFeature AsPropertyFeature)
+                    Result = $"(I{EmbeddingClassName} agentBase) => {{ agentBase.{CSharpNames.ToCSharpIdentifier(Delegated.Name)}; }}";
+                else
+                    Result = $"(I{EmbeddingClassName} agentBase) => {{ agentBase.{CSharpNames.ToCSharpIdentifier(Delegated.Name)}(); }}";
+            }
 
             Debug.Assert(Result != null);
 
@@ -160,7 +179,7 @@
             ICSharpCommandOverload Overload = feature.OverloadList[0] as ICSharpCommandOverload;
             Debug.Assert(Overload != null);
 
-            string BaseTypeText = BaseType.Type2CSharpString(usingCollection, CSharpTypeFormats.Normal, CSharpNamespaceFormats.OneWord);
+            string BaseTypeText = EffectiveBaseType.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.OneWord);
             string AgentParameters;
             string ParameterNameListText;
 
@@ -175,7 +194,7 @@
                 ParameterNameListText = string.Empty;
             }
 
-            Result = $"{AgentParameters} => {{ agentBase.{Delegated.Name}({ParameterNameListText}); }}";
+            Result = $"{AgentParameters} => {{ agentBase.{CSharpNames.ToCSharpIdentifier(Delegated.Name)}({ParameterNameListText}); }}";
 
             return Result;
         }
@@ -190,7 +209,7 @@
             ICSharpQueryOverload Overload = feature.OverloadList[0] as ICSharpQueryOverload;
             Debug.Assert(Overload != null);
 
-            string BaseTypeText = BaseType.Type2CSharpString(usingCollection, CSharpTypeFormats.Normal, CSharpNamespaceFormats.OneWord);
+            string BaseTypeText = EffectiveBaseType.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.OneWord);
             string AgentParameters;
             string ParameterNameListText;
 
@@ -205,7 +224,7 @@
                 ParameterNameListText = string.Empty;
             }
 
-            Result = $"{AgentParameters} => {{ return agentBase.{Delegated.Name}({ParameterNameListText}); }}";
+            Result = $"{AgentParameters} => {{ return agentBase.{CSharpNames.ToCSharpIdentifier(Delegated.Name)}({ParameterNameListText}); }}";
 
             return Result;
         }
@@ -216,9 +235,9 @@
 
             // TODO handle several overloads.
 
-            string BaseTypeText = BaseType.Type2CSharpString(usingCollection, CSharpTypeFormats.Normal, CSharpNamespaceFormats.OneWord);
+            string BaseTypeText = EffectiveBaseType.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.OneWord);
 
-            Result = $"({BaseTypeText} agentBase) => {{ agentBase.{Delegated.Name}; }}";
+            Result = $"({BaseTypeText} agentBase) => {{ agentBase.{CSharpNames.ToCSharpIdentifier(Delegated.Name)}; }}";
 
             return Result;
         }

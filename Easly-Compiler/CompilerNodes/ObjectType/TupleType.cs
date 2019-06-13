@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler ITupleType.
     /// </summary>
-    public interface ITupleType : BaseNode.ITupleType, IObjectType, INodeWithReplicatedBlocks, ICompiledType, IPathParticipatingType
+    public interface ITupleType : BaseNode.ITupleType, IObjectType, INodeWithReplicatedBlocks, ICompiledTypeWithFeature, IPathParticipatingType
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.TupleType.EntityDeclarationBlocks"/>.
@@ -210,7 +210,7 @@ namespace CompilerNode
         public OnceReference<ICompiledType> ResolvedType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
 
-        #region Implementation of ICompiledType
+        #region Implementation of ICompiledTypeWithFeature
         /// <summary>
         /// Discretes available in this type.
         /// </summary>
@@ -287,6 +287,14 @@ namespace CompilerNode
         public ICompiledType TypeAsDestinationOrSource { get { return this; } }
 
         /// <summary>
+        /// Gets the type table for this type.
+        /// </summary>
+        public ISealableDictionary<ITypeName, ICompiledType> GetTypeTable()
+        {
+            return TypeTable;
+        }
+
+        /// <summary>
         /// Creates an instance of a class type, or reuse an existing instance.
         /// </summary>
         /// <param name="instancingClassType">The class type to instanciate.</param>
@@ -319,6 +327,8 @@ namespace CompilerNode
                 ResolveType(TypeTable, EntityDeclarationList, Sharing, out resolvedTypeName, out resolvedType);
             }
         }
+
+        private ISealableDictionary<ITypeName, ICompiledType> TypeTable { get; } = new SealableDictionary<ITypeName, ICompiledType>();
         #endregion
 
         #region Locate type
@@ -390,7 +400,22 @@ namespace CompilerNode
         /// <param name="resolvedType">The type upon return.</param>
         public static void BuildType(IList<IEntityDeclaration> entityDeclarationList, BaseNode.SharingType sharing, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
-            ITupleType ResolvedTupleType = new TupleType(entityDeclarationList, sharing, new SealableDictionary<IFeatureName, IFeatureInstance>());
+            ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable = new SealableDictionary<IFeatureName, IFeatureInstance>();
+            foreach (IEntityDeclaration Item in entityDeclarationList)
+            {
+                Debug.Assert(Item.ValidEntity.IsAssigned);
+                IScopeAttributeFeature ValidEntity = Item.ValidEntity.Item;
+
+                Debug.Assert(ValidEntity.ValidFeatureName.IsAssigned);
+                IFeatureName FeatureName = ValidEntity.ValidFeatureName.Item;
+
+                IClass EmbeddingClass = Item.EmbeddingClass;
+                IFeatureInstance FeatureInstance = new FeatureInstance(EmbeddingClass, ValidEntity);
+
+                FeatureTable.Add(FeatureName, FeatureInstance);
+            }
+
+            ITupleType ResolvedTupleType = new TupleType(entityDeclarationList, sharing, FeatureTable);
 
             resolvedTypeName = new TypeName(ResolvedTupleType.TypeFriendlyName);
             resolvedType = ResolvedTupleType;

@@ -146,7 +146,7 @@
             else if (BaseClassGuid == LanguageClasses.StableReference.Guid)
                 Result = "StableReference" + TypeArguments2CSharpName(usingCollection, TypeArgumentList, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
             else if (LanguageClasses.GuidToName.ContainsKey(BaseClassGuid))
-                Result = LanguageClasses.GuidToName[BaseClassGuid];
+                Result = CSharpLanguageClasses.GuidToName[BaseClassGuid];
             else
             {
                 string ClassName;

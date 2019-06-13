@@ -25,6 +25,16 @@
         ICSharpFeatureCall FeatureCall { get; }
 
         /// <summary>
+        /// The feature at the end of the path.
+        /// </summary>
+        ICSharpFeature FinalFeature { get; }
+
+        /// <summary>
+        /// The type of the end of the path.
+        /// </summary>
+        ICSharpTypeWithFeature FinalType { get; }
+
+        /// <summary>
         /// True if the call should skip the last identifier in the path.
         /// </summary>
         bool SkipLastInPath { get; }
@@ -59,8 +69,14 @@
             Command = CSharpQualifiedName.Create(context, (IQualifiedName)source.Command, parentFeature, null, false);
             FeatureCall = new CSharpFeatureCall(context, source.FeatureCall.Item);
 
+            ICompiledFeature SourceFeature = source.SelectedFeature.Item;
+            if (SourceFeature is IScopeAttributeFeature AsScopeAttributeFeature)
+                FinalFeature = CSharpScopeAttributeFeature.Create(null, AsScopeAttributeFeature);
+            else
+                FinalFeature = context.GetFeature(SourceFeature);
+
             ICompiledTypeWithFeature ResolvedBaseType = Source.CommandFinalType.Item.ResolvedBaseType.Item;
-            ICSharpTypeWithFeature FinalType = CSharpType.Create(context, ResolvedBaseType) as ICSharpTypeWithFeature;
+            FinalType = CSharpType.Create(context, ResolvedBaseType) as ICSharpTypeWithFeature;
             Debug.Assert(FinalType != null);
 
             IList<ICSharpClassType> ConformingClassTypeList = FinalType.ConformingClassTypeList;
@@ -95,6 +111,16 @@
         /// The feature call.
         /// </summary>
         public ICSharpFeatureCall FeatureCall { get; }
+
+        /// <summary>
+        /// The feature at the end of the path.
+        /// </summary>
+        public ICSharpFeature FinalFeature { get; }
+
+        /// <summary>
+        /// The type of the end of the path.
+        /// </summary>
+        public ICSharpTypeWithFeature FinalType { get; }
 
         /// <summary>
         /// True if the call should skip the last identifier in the path.
@@ -137,10 +163,34 @@
                 }
             }
 
-            CommandText = Command.CSharpText(writer, SkipLastInPath ? 1 : 0);
-            string ArgumentListText = CSharpArgument.CSharpArgumentList(writer, FeatureCall, new List<ICSharpQualifiedName>());
+            bool IsAgent = !(FinalFeature is ICSharpProcedureFeature);
 
-            writer.WriteIndentedLine($"{CommandText}({ArgumentListText});");
+            if (IsAgent)
+            {
+                IIdentifier AgentIdentifier = (IIdentifier)Source.Command.Path[Source.Command.Path.Count - 1];
+                string AgentIdentifierText = CSharpNames.ToCSharpIdentifier(AgentIdentifier.ValidText.Item);
+
+                if (Source.Command.Path.Count > 1)
+                    CommandText = Command.CSharpText(writer, 1);
+                else
+                    CommandText = "this";
+
+                if (FeatureCall.ArgumentList.Count > 0)
+                {
+                    string ArgumentListText = CSharpArgument.CSharpArgumentList(writer, FeatureCall, new List<ICSharpQualifiedName>());
+
+                    writer.WriteIndentedLine($"{AgentIdentifierText}({CommandText}, {ArgumentListText});");
+                }
+                else
+                    writer.WriteIndentedLine($"{AgentIdentifierText}({CommandText});");
+            }
+            else
+            {
+                CommandText = Command.CSharpText(writer, SkipLastInPath ? 1 : 0);
+                string ArgumentListText = CSharpArgument.CSharpArgumentList(writer, FeatureCall, new List<ICSharpQualifiedName>());
+
+                writer.WriteIndentedLine($"{CommandText}({ArgumentListText});");
+            }
         }
         #endregion
     }

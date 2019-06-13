@@ -60,9 +60,7 @@
                 ICSharpFeature FinalFeature;
 
                 if (SourceFeature is IScopeAttributeFeature AsScopeAttributeFeature)
-                {
                     FinalFeature = CSharpScopeAttributeFeature.Create(null, AsScopeAttributeFeature);
-                }
                 else
                     FinalFeature = context.GetFeature(SourceFeature);
 
@@ -107,6 +105,8 @@
                 Debug.Assert(DestinationList.Count == 1);
 
                 ICSharpQualifiedName Destination = DestinationList[0];
+                ICSharpFeature Feature = Destination.Feature;
+
                 string DestinationText = Destination.DecoratedCSharpText(writer, 0);
                 string SourceText = SourceExpression.CSharpText(writer);
 

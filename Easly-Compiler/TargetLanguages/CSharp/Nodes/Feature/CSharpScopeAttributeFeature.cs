@@ -152,8 +152,10 @@
                     DefaultValueText = SingletonString;
             }
 
-            if (DefaultValueText.Length > 0)
-                DefaultValueText = $" = {DefaultValueText}";
+            if (DefaultValueText.Length == 0)
+                DefaultValueText = "default";
+
+            DefaultValueText = $" = {DefaultValueText}";
 
             writer.WriteIndentedLine($"{TypeString} {NameString}{DefaultValueText};");
         }

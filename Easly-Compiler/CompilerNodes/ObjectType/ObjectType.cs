@@ -1456,14 +1456,14 @@
             IIdentifier ValidIdentifier = validPath[index];
             string ValidText = ValidIdentifier.ValidText.Item;
 
-            if (localScope.ContainsKey(ValidText))
+            if (index == 0 && localScope.ContainsKey(ValidText))
                 return GetQualifiedPathFinalTypeFromLocal(baseClass, baseType, localScope, validPath, index, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
             else if (FeatureName.TableContain(FeatureTable, ValidText, out IFeatureName Key, out IFeatureInstance Instance))
                 return GetQualifiedPathFinalTypeAsFeature(baseClass, baseType, localScope, validPath, index, errorList, Instance, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
             else if (index == 0 && index + 1 < validPath.Count && baseClass.ImportedClassTable.ContainsKey(ValidText) && baseClass.ImportedClassTable[ValidText].Item.Cloneable == BaseNode.CloneableStatus.Single)
-                return GetQualifiedPathFinalTypeFromSingle(baseClass, validPath, index, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
+                return GetQualifiedPathFinalTypeFromSingle(baseClass, localScope, validPath, index, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
             else if (index + 1 == validPath.Count)
-                return GetQualifiedPathFinalTypeAsDiscrete(baseType, ValidIdentifier, errorList, out finalDiscrete, out finalTypeName, out finalType);
+                return GetQualifiedPathFinalTypeAsDiscreteOrAgent(baseType, localScope, ValidIdentifier, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
             else
             {
                 errorList.AddError(new ErrorUnknownIdentifier(ValidIdentifier, ValidText));
@@ -1484,8 +1484,7 @@
                 ICompiledType ResolvedFeatureType = localScope[ValidText].ResolvedFeatureType.Item;
                 ResolvedFeatureType.InstanciateType(baseClass.ResolvedClassType.Item, ref ResolvedFeatureTypeName, ref ResolvedFeatureType);
 
-                ISealableDictionary<string, IScopeAttributeFeature> NewScope = ScopeFromType(ResolvedFeatureType);
-                return GetQualifiedPathFinalType(baseClass, ResolvedFeatureType, NewScope, validPath, index + 1, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
+                return GetQualifiedPathFinalType(baseClass, ResolvedFeatureType, localScope, validPath, index + 1, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
             }
             else
             {
@@ -1513,10 +1512,7 @@
             ResolvedFeatureType.InstanciateType((ICompiledTypeWithFeature)baseType, ref ResolvedFeatureTypeName, ref ResolvedFeatureType);
 
             if (index + 1 < validPath.Count)
-            {
-                ISealableDictionary<string, IScopeAttributeFeature> NewScope = ScopeFromType(ResolvedFeatureType);
-                return GetQualifiedPathFinalType(baseClass, ResolvedFeatureType, NewScope, validPath, index + 1, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
-            }
+                return GetQualifiedPathFinalType(baseClass, ResolvedFeatureType, localScope, validPath, index + 1, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
             else
             {
                 finalFeature = SourceFeature;
@@ -1528,7 +1524,7 @@
             }
         }
 
-        private static bool GetQualifiedPathFinalTypeFromSingle(IClass baseClass, IList<IIdentifier> validPath, int index, IErrorList errorList, out ICompiledFeature finalFeature, out IDiscrete finalDiscrete, out ITypeName finalTypeName, out ICompiledType finalType, out bool inheritBySideAttribute)
+        private static bool GetQualifiedPathFinalTypeFromSingle(IClass baseClass, ISealableDictionary<string, IScopeAttributeFeature> localScope, IList<IIdentifier> validPath, int index, IErrorList errorList, out ICompiledFeature finalFeature, out IDiscrete finalDiscrete, out ITypeName finalTypeName, out ICompiledType finalType, out bool inheritBySideAttribute)
         {
             IIdentifier ValidIdentifier = validPath[index];
             string ValidText = ValidIdentifier.ValidText.Item;
@@ -1538,15 +1534,16 @@
             ICompiledType ResolvedFeatureType = Imported.ResolvedClassType.Item;
             ResolvedFeatureType.InstanciateType(baseClass.ResolvedClassType.Item, ref ResolvedFeatureTypeName, ref ResolvedFeatureType);
 
-            ISealableDictionary<string, IScopeAttributeFeature> NewScope = ScopeFromType(ResolvedFeatureType);
-            return GetQualifiedPathFinalType(baseClass, ResolvedFeatureType, NewScope, validPath, index + 1, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
+            return GetQualifiedPathFinalType(baseClass, ResolvedFeatureType, localScope, validPath, index + 1, errorList, out finalFeature, out finalDiscrete, out finalTypeName, out finalType, out inheritBySideAttribute);
         }
 
-        private static bool GetQualifiedPathFinalTypeAsDiscrete(ICompiledType baseType, IIdentifier validIdentifier, IErrorList errorList, out IDiscrete finalDiscrete, out ITypeName finalTypeName, out ICompiledType finalType)
+        private static bool GetQualifiedPathFinalTypeAsDiscreteOrAgent(ICompiledType baseType, ISealableDictionary<string, IScopeAttributeFeature> localScope, IIdentifier validIdentifier, IErrorList errorList, out ICompiledFeature finalFeature, out IDiscrete finalDiscrete, out ITypeName finalTypeName, out ICompiledType finalType, out bool inheritBySideAttribute)
         {
+            finalFeature = null;
             finalDiscrete = null;
             finalTypeName = null;
             finalType = null;
+            inheritBySideAttribute = false;
 
             string ValidText = validIdentifier.ValidText.Item;
 
@@ -1563,6 +1560,25 @@
                 {
                     errorList.AddError(new ErrorNumberTypeMissing(validIdentifier));
                     return false;
+                }
+            }
+            else if (localScope.ContainsKey(ValidText))
+            {
+                ICompiledType LocalType = localScope[ValidText].ResolvedFeatureType.Item;
+                switch (LocalType)
+                {
+                    case IProcedureType AsProcedureType:
+                    case IFunctionType AsFunctionType:
+                    case IPropertyType AsPropertyType:
+                        finalFeature = localScope[ValidText];
+                        finalTypeName = finalFeature.ResolvedFeatureTypeName.Item;
+                        finalType = finalFeature.ResolvedFeatureType.Item;
+                        inheritBySideAttribute = false;
+                        return true;
+
+                    default:
+                        errorList.AddError(new ErrorUnknownIdentifier(validIdentifier, ValidText));
+                        return false;
                 }
             }
             else

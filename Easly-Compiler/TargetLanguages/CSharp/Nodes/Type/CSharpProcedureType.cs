@@ -15,6 +15,11 @@
         new IProcedureType Source { get; }
 
         /// <summary>
+        /// The base type.
+        /// </summary>
+        ICSharpTypeWithFeature BaseType { get; }
+
+        /// <summary>
         /// The list of overloads.
         /// </summary>
         IList<ICSharpCommandOverloadType> OverloadTypeList { get; }
@@ -45,6 +50,9 @@
             : base(context, source)
         {
             Debug.Assert(source.OverloadList.Count > 0);
+
+            BaseType = Create(context, source.ResolvedBaseType.Item) as ICSharpTypeWithFeature;
+            Debug.Assert(BaseType != null);
 
             foreach (ICommandOverloadType OverloadType in source.OverloadList)
             {
@@ -92,6 +100,11 @@
         public new IProcedureType Source { get { return (IProcedureType)base.Source; } }
 
         /// <summary>
+        /// The base type.
+        /// </summary>
+        public ICSharpTypeWithFeature BaseType { get; }
+
+        /// <summary>
         /// The list of overloads.
         /// </summary>
         public IList<ICSharpCommandOverloadType> OverloadTypeList { get; } = new List<ICSharpCommandOverloadType>();
@@ -127,13 +140,18 @@
             {
                 ICSharpCommandOverloadType OverloadType = OverloadTypeList[0];
 
-                if (OverloadType.ParameterList.Count > 0)
+                string ActionArgumentText = BaseType.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+
+                foreach (ICSharpParameter Parameter in OverloadType.ParameterList)
                 {
-                    CSharpArgument.BuildParameterList(usingCollection, OverloadType.ParameterList, out string ParameterListText, out string ParameterNameListText);
-                    Result = $"Action<{ParameterListText}>";
+                    ICSharpType ParameterType = Parameter.Feature.Type;
+                    CSharpTypeFormats ParameterFormat = ParameterType.HasInterfaceText ? CSharpTypeFormats.AsInterface : CSharpTypeFormats.Normal;
+                    string ParameterText = ParameterType.Type2CSharpString(usingCollection, ParameterFormat, CSharpNamespaceFormats.None);
+
+                    ActionArgumentText += $", {ParameterText}";
                 }
-                else
-                    Result = "Action";
+
+                Result = $"Action<{ActionArgumentText}>";
 
                 usingCollection.AddUsing(nameof(System));
             }

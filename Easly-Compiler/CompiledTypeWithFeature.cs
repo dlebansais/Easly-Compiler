@@ -1,7 +1,5 @@
 ﻿namespace EaslyCompiler
 {
-    using System.Collections.Generic;
-    using CompilerNode;
     using Easly;
 
     /// <summary>
