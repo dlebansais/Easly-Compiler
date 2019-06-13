@@ -148,6 +148,13 @@
         /// </summary>
         public void CommitLines()
         {
+            int i = 0;
+            while (i < UsingList.Count)
+                if (i + 1 < UsingList.Count && UsingList[i] == UsingList[i + 1])
+                    UsingList.RemoveAt(i + 1);
+                else
+                    i++;
+
             foreach (string UsingDirective in UsingList)
                 WriteLine($"    using {UsingDirective};");
 

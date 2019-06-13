@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
 
@@ -12,6 +13,16 @@
         /// The Easly type from which the C# type is created.
         /// </summary>
         new IFunctionType Source { get; }
+
+        /// <summary>
+        /// The base type.
+        /// </summary>
+        ICSharpTypeWithFeature BaseType { get; }
+
+        /// <summary>
+        /// The list of overloads.
+        /// </summary>
+        IList<ICSharpQueryOverloadType> OverloadTypeList { get; }
     }
 
     /// <summary>
@@ -38,6 +49,18 @@
         protected CSharpFunctionType(ICSharpContext context, IFunctionType source)
             : base(context, source)
         {
+            Debug.Assert(source.OverloadList.Count > 0);
+
+            ICSharpClass Owner = source.EmbeddingClass != null ? context.GetClass(source.EmbeddingClass) : null;
+
+            BaseType = Create(context, source.ResolvedBaseType.Item) as ICSharpTypeWithFeature;
+            Debug.Assert(BaseType != null);
+
+            foreach (IQueryOverloadType OverloadType in source.OverloadList)
+            {
+                ICSharpQueryOverloadType NewOverloadType = CSharpQueryOverloadType.Create(context, OverloadType, Owner);
+                OverloadTypeList.Add(NewOverloadType);
+            }
         }
 
         /// <summary>
@@ -60,6 +83,18 @@
         protected CSharpFunctionType(ICSharpContext context, IFunctionType source, ICSharpTypedef originatingTypedef)
             : base(context, source, originatingTypedef)
         {
+            Debug.Assert(source.OverloadList.Count > 0);
+
+            ICSharpClass Owner = context.GetClass(source.EmbeddingClass);
+
+            BaseType = Create(context, source.ResolvedBaseType.Item) as ICSharpTypeWithFeature;
+            Debug.Assert(BaseType != null);
+
+            foreach (IQueryOverloadType OverloadType in source.OverloadList)
+            {
+                ICSharpQueryOverloadType NewOverloadType = CSharpQueryOverloadType.Create(context, OverloadType, Owner);
+                OverloadTypeList.Add(NewOverloadType);
+            }
         }
         #endregion
 
@@ -68,6 +103,16 @@
         /// The Easly type from which the C# type is created.
         /// </summary>
         public new IFunctionType Source { get { return (IFunctionType)base.Source; } }
+
+        /// <summary>
+        /// The base type.
+        /// </summary>
+        public ICSharpTypeWithFeature BaseType { get; }
+
+        /// <summary>
+        /// The list of overloads.
+        /// </summary>
+        public IList<ICSharpQueryOverloadType> OverloadTypeList { get; } = new List<ICSharpQueryOverloadType>();
 
         /// <summary>
         /// True if the type can be used in the interface 'I' text format.
@@ -96,7 +141,54 @@
                 Result = QueryOverloadType2CSharpString(DelegateName, Source.OverloadList[0]);
             }
             else
-                Result = "<Not supported>";
+            {
+                ICSharpQueryOverloadType OverloadType = OverloadTypeList[0];
+
+                string ActionArgumentText = BaseType.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+
+                foreach (ICSharpParameter Parameter in OverloadType.ParameterList)
+                {
+                    ICSharpType ParameterType = Parameter.Feature.Type;
+                    CSharpTypeFormats ParameterFormat = ParameterType.HasInterfaceText ? CSharpTypeFormats.AsInterface : CSharpTypeFormats.Normal;
+                    string ParameterText = ParameterType.Type2CSharpString(usingCollection, ParameterFormat, CSharpNamespaceFormats.None);
+
+                    ActionArgumentText += $", {ParameterText}";
+                }
+
+                Debug.Assert(OverloadType.ResultList.Count >= 1);
+
+                if (OverloadType.ResultList.Count == 1)
+                {
+                    ICSharpParameter Parameter = OverloadType.ResultList[0];
+                    ICSharpType ResultType = Parameter.Feature.Type;
+                    CSharpTypeFormats ResultFormat = ResultType.HasInterfaceText ? CSharpTypeFormats.AsInterface : CSharpTypeFormats.Normal;
+                    string ResultText = ResultType.Type2CSharpString(usingCollection, ResultFormat, CSharpNamespaceFormats.None);
+
+                    ActionArgumentText += $", {ResultText}";
+                }
+                else
+                {
+                    string FuncResultText = string.Empty;
+
+                    foreach (ICSharpParameter Parameter in OverloadType.ResultList)
+                    {
+                        if (FuncResultText.Length > 0)
+                            FuncResultText += ", ";
+
+                        ICSharpType ResultType = Parameter.Feature.Type;
+                        CSharpTypeFormats ResultFormat = ResultType.HasInterfaceText ? CSharpTypeFormats.AsInterface : CSharpTypeFormats.Normal;
+                        string ResultText = ResultType.Type2CSharpString(usingCollection, ResultFormat, CSharpNamespaceFormats.None);
+
+                        FuncResultText += $", {ResultText}";
+                    }
+
+                    ActionArgumentText += $", Tuple<{FuncResultText}>";
+                }
+
+                Result = $"Func<{ActionArgumentText}>";
+
+                usingCollection.AddUsing(nameof(System));
+            }
 
             return Result;
         }

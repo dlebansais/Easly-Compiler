@@ -136,13 +136,13 @@
             else*/
                 Result = string.Empty;
 
-            for (; i + skippedAtEnd < Source.ValidPath.Item.Count && i + skippedAtEnd < ClassPath.Count; i++)
+            for (; i + skippedAtEnd < Source.ValidPath.Item.Count; i++)
             {
                 if (Result.Length > 0)
                     Result += ".";
 
                 IIdentifier Item = Source.ValidPath.Item[i];
-                ICSharpClass ItemClass = ClassPath[i];
+                ICSharpClass ItemClass = i < ClassPath.Count ? ClassPath[i] : null;
                 string ItemText = CSharpNames.ToCSharpIdentifier(Item.ValidText.Item);
 
                 if (ItemClass != null)

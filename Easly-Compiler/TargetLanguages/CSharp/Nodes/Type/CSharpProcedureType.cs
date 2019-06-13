@@ -51,12 +51,14 @@
         {
             Debug.Assert(source.OverloadList.Count > 0);
 
+            ICSharpClass Owner = source.EmbeddingClass != null ? context.GetClass(source.EmbeddingClass) : null;
+
             BaseType = Create(context, source.ResolvedBaseType.Item) as ICSharpTypeWithFeature;
             Debug.Assert(BaseType != null);
 
             foreach (ICommandOverloadType OverloadType in source.OverloadList)
             {
-                ICSharpCommandOverloadType NewOverloadType = CSharpCommandOverloadType.Create(context, OverloadType, null);
+                ICSharpCommandOverloadType NewOverloadType = CSharpCommandOverloadType.Create(context, OverloadType, Owner);
                 OverloadTypeList.Add(NewOverloadType);
             }
         }
@@ -81,9 +83,12 @@
         protected CSharpProcedureType(ICSharpContext context, IProcedureType source, ICSharpTypedef originatingTypedef)
             : base(context, source, originatingTypedef)
         {
+            Debug.Assert(source.OverloadList.Count > 0);
+
             ICSharpClass Owner = context.GetClass(source.EmbeddingClass);
 
-            Debug.Assert(source.OverloadList.Count > 0);
+            BaseType = Create(context, source.ResolvedBaseType.Item) as ICSharpTypeWithFeature;
+            Debug.Assert(BaseType != null);
 
             foreach (ICommandOverloadType OverloadType in source.OverloadList)
             {

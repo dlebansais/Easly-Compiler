@@ -120,7 +120,7 @@
             */
 
             if (flags.HasFlag(CSharpBodyFlags.HasResult))
-                writer.WriteIndentedLine($"{resultType} Result;");
+                writer.WriteIndentedLine($"{resultType} Result = default;");
 
             foreach (ICSharpScopeAttributeFeature Item in EntityDeclarationList)
                 Item.WriteCSharp(writer);

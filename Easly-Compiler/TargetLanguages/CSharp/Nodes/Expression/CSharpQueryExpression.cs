@@ -143,10 +143,33 @@
             string ArgumentListText = CSharpArgument.CSharpArgumentList(usingCollection, FeatureCall, destinationList);
             string QueryText = Query.CSharpText(usingCollection, 0);
 
-            if (ArgumentListText.Length > 0)
-                return $"{QueryText}({ArgumentListText})";
+            bool IsAgent = !(Feature is ICSharpFunctionFeature);
+
+            if (IsAgent)
+            {
+                IIdentifier AgentIdentifier = (IIdentifier)Source.Query.Path[Source.Query.Path.Count - 1];
+                string AgentIdentifierText = CSharpNames.ToCSharpIdentifier(AgentIdentifier.ValidText.Item);
+
+                if (Source.Query.Path.Count > 1)
+                    QueryText = Query.CSharpText(usingCollection, 1);
+                else
+                    QueryText = "this";
+
+                if (FeatureCall.ArgumentList.Count > 0)
+                    return $"{AgentIdentifierText}({QueryText}, {ArgumentListText})";
+                else
+                    return $"{AgentIdentifierText}({QueryText})";
+            }
             else
-                return QueryText;
+            {
+                if (ArgumentListText.Length > 0)
+                    return $"{QueryText}({ArgumentListText})";
+                else if (Feature is ICSharpFunctionFeature)
+                    return $"{QueryText}()";
+                else
+                    return QueryText;
+            }
+
             /*
             else
             {

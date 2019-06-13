@@ -137,31 +137,19 @@
         {
             string Result = null;
 
-            if (BaseType != null)
+            switch (Delegated)
             {
-                switch (Delegated)
-                {
-                    case ICSharpProcedureFeature AsProcedureFeature:
-                        Result = CSharpTextProcedure(usingCollection, AsProcedureFeature, destinationList);
-                        break;
+                case ICSharpProcedureFeature AsProcedureFeature:
+                    Result = CSharpTextProcedure(usingCollection, AsProcedureFeature, destinationList);
+                    break;
 
-                    case ICSharpFunctionFeature AsFunctionFeature:
-                        Result = CSharpTextFunction(usingCollection, AsFunctionFeature, destinationList);
-                        break;
+                case ICSharpFunctionFeature AsFunctionFeature:
+                    Result = CSharpTextFunction(usingCollection, AsFunctionFeature, destinationList);
+                    break;
 
-                    case ICSharpPropertyFeature AsPropertyFeature:
-                        Result = CSharpTextProperty(usingCollection, AsPropertyFeature, destinationList);
-                        break;
-                }
-            }
-            else
-            {
-                string EmbeddingClassName = CSharpNames.ToCSharpIdentifier(Delegated.Owner.ValidClassName);
-
-                if (Delegated is ICSharpPropertyFeature AsPropertyFeature)
-                    Result = $"(I{EmbeddingClassName} agentBase) => {{ agentBase.{CSharpNames.ToCSharpIdentifier(Delegated.Name)}; }}";
-                else
-                    Result = $"(I{EmbeddingClassName} agentBase) => {{ agentBase.{CSharpNames.ToCSharpIdentifier(Delegated.Name)}(); }}";
+                case ICSharpPropertyFeature AsPropertyFeature:
+                    Result = CSharpTextProperty(usingCollection, AsPropertyFeature, destinationList);
+                    break;
             }
 
             Debug.Assert(Result != null);
@@ -179,7 +167,13 @@
             ICSharpCommandOverload Overload = feature.OverloadList[0] as ICSharpCommandOverload;
             Debug.Assert(Overload != null);
 
-            string BaseTypeText = EffectiveBaseType.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.OneWord);
+            string BaseTypeText;
+
+            if (BaseType != null)
+                BaseTypeText = EffectiveBaseType.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.OneWord);
+            else
+                BaseTypeText = $"I{CSharpNames.ToCSharpIdentifier(Delegated.Owner.ValidClassName)}";
+
             string AgentParameters;
             string ParameterNameListText;
 
@@ -209,7 +203,13 @@
             ICSharpQueryOverload Overload = feature.OverloadList[0] as ICSharpQueryOverload;
             Debug.Assert(Overload != null);
 
-            string BaseTypeText = EffectiveBaseType.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.OneWord);
+            string BaseTypeText;
+
+            if (BaseType != null)
+                BaseTypeText = EffectiveBaseType.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.OneWord);
+            else
+                BaseTypeText = $"I{CSharpNames.ToCSharpIdentifier(Delegated.Owner.ValidClassName)}";
+
             string AgentParameters;
             string ParameterNameListText;
 
@@ -235,7 +235,12 @@
 
             // TODO handle several overloads.
 
-            string BaseTypeText = EffectiveBaseType.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.OneWord);
+            string BaseTypeText;
+
+            if (BaseType != null)
+                BaseTypeText = EffectiveBaseType.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.OneWord);
+            else
+                BaseTypeText = $"I{CSharpNames.ToCSharpIdentifier(Delegated.Owner.ValidClassName)}";
 
             Result = $"({BaseTypeText} agentBase) => {{ agentBase.{CSharpNames.ToCSharpIdentifier(Delegated.Name)}; }}";
 
