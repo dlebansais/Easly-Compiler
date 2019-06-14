@@ -114,7 +114,8 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 ResolvedFeatureTypeName = new OnceReference<ITypeName>();
-                ResolvedFeatureType = new OnceReference<ICompiledType>();
+                ResolvedFeatureType2 = new OnceReference<ICompiledType>();
+                TypeAsDestinationOrSource = new OnceReference<ICompiledType>();
                 ValidFeatureName = new OnceReference<IFeatureName>();
                 ResolvedFeature = new OnceReference<ICompiledFeature>();
                 IsHandled = true;
@@ -145,7 +146,9 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                Debug.Assert(ResolvedFeatureTypeName.IsAssigned == ResolvedFeatureType.IsAssigned);
+                Debug.Assert(ResolvedFeatureTypeName.IsAssigned == ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(ResolvedFeatureTypeName.IsAssigned == TypeAsDestinationOrSource.IsAssigned);
+
                 IsResolved = ResolvedFeature.IsAssigned;
                 IsHandled = true;
             }
@@ -191,7 +194,12 @@ namespace CompilerNode
         /// <summary>
         /// Associated type.
         /// </summary>
-        public OnceReference<ICompiledType> ResolvedFeatureType { get; private set; } = new OnceReference<ICompiledType>();
+        public OnceReference<ICompiledType> ResolvedFeatureType2 { get; private set; } = new OnceReference<ICompiledType>();
+
+        /// <summary>
+        /// The type to use instead of this associated type for a source or destination, for the purpose of path searching, assignment and query.
+        /// </summary>
+        public OnceReference<ICompiledType> TypeAsDestinationOrSource { get; private set; } = new OnceReference<ICompiledType>();
 
         /// <summary>
         /// Guid of the language type corresponding to the entity object for an instance of this class.

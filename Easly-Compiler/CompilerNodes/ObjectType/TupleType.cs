@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler ITupleType.
     /// </summary>
-    public interface ITupleType : BaseNode.ITupleType, IObjectType, INodeWithReplicatedBlocks, ICompiledTypeWithFeature, IPathParticipatingType
+    public interface ITupleType : BaseNode.ITupleType, IObjectType, INodeWithReplicatedBlocks, ICompiledTypeWithFeature
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.TupleType.EntityDeclarationBlocks"/>.
@@ -309,13 +309,13 @@ namespace CompilerNode
             {
                 Debug.Assert(Field.ValidEntity.IsAssigned);
                 Debug.Assert(Field.ValidEntity.Item.ResolvedFeatureTypeName.IsAssigned);
-                Debug.Assert(Field.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                Debug.Assert(Field.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
 
                 ITypeName InstancedFieldTypeName = Field.ValidEntity.Item.ResolvedFeatureTypeName.Item;
-                ICompiledType InstancedFieldType = Field.ValidEntity.Item.ResolvedFeatureType.Item;
+                ICompiledType InstancedFieldType = Field.ValidEntity.Item.ResolvedFeatureType2.Item;
 
                 InstancedFieldType.InstanciateType(instancingClassType, ref InstancedFieldTypeName, ref InstancedFieldType);
-                IsNewInstance |= InstancedFieldType != Field.ValidEntity.Item.ResolvedFeatureType.Item;
+                IsNewInstance |= InstancedFieldType != Field.ValidEntity.Item.ResolvedFeatureType2.Item;
 
                 IEntityDeclaration InstancedField = new EntityDeclaration(Field, InstancedFieldTypeName, InstancedFieldType);
                 InstancedFieldList.Add(InstancedField);
@@ -371,11 +371,11 @@ namespace CompilerNode
                         for (int i = 0; i < entityDeclarationList.Count; i++)
                         {
                             Debug.Assert(entityDeclarationList[i].ValidEntity.IsAssigned);
-                            Debug.Assert(entityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                            Debug.Assert(entityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
                             Debug.Assert(AsTupleType.EntityDeclarationList[i].ValidEntity.IsAssigned);
-                            Debug.Assert(AsTupleType.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                            Debug.Assert(AsTupleType.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
 
-                            AllFieldsEqual &= entityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.Item == AsTupleType.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.Item;
+                            AllFieldsEqual &= entityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType2.Item == AsTupleType.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType2.Item;
                         }
 
                         if (AllFieldsEqual)
@@ -440,10 +440,10 @@ namespace CompilerNode
             for (int i = 0; i < type1.EntityDeclarationList.Count && i < type2.EntityDeclarationList.Count; i++)
             {
                 Debug.Assert(type1.EntityDeclarationList[i].ValidEntity.IsAssigned);
-                Debug.Assert(type1.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                Debug.Assert(type1.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
                 Debug.Assert(type2.EntityDeclarationList[i].ValidEntity.IsAssigned);
-                Debug.Assert(type2.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
-                IsIdentical &= ObjectType.TypesHaveIdenticalSignature(type1.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.Item, type2.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.Item);
+                Debug.Assert(type2.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                IsIdentical &= ObjectType.TypesHaveIdenticalSignature(type1.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType2.Item, type2.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType2.Item);
             }
 
             return IsIdentical;

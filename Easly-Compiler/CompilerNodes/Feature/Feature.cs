@@ -82,12 +82,12 @@
             for (int i = 0; i < SameIndexList.Count && Success; i++)
             {
                 IParameter Parameter1 = SameIndexList[i];
-                ICompiledType ParameterType1 = Parameter1.ResolvedParameter.ResolvedFeatureType.Item;
+                ICompiledType ParameterType1 = Parameter1.ResolvedParameter.ResolvedFeatureType2.Item;
 
                 for (int j = i + 1; j < SameIndexList.Count && Success; j++)
                 {
                     IParameter Parameter2 = SameIndexList[j];
-                    ICompiledType ParameterType2 = Parameter2.ResolvedParameter.ResolvedFeatureType.Item;
+                    ICompiledType ParameterType2 = Parameter2.ResolvedParameter.ResolvedFeatureType2.Item;
 
                     Success &= DisjoinedParameterCheck(Parameter1, Parameter2, errorList);
                     Success &= DisjoinedParameterCheck(Parameter2, Parameter1, errorList);
@@ -133,12 +133,12 @@
             for (int i = 0; i < SameIndexList.Count && Success; i++)
             {
                 IParameter Parameter1 = SameIndexList[i];
-                ICompiledType ParameterType1 = Parameter1.ResolvedParameter.ResolvedFeatureType.Item;
+                ICompiledType ParameterType1 = Parameter1.ResolvedParameter.ResolvedFeatureType2.Item;
 
                 for (int j = i + 1; j < SameIndexList.Count && Success; j++)
                 {
                     IParameter Parameter2 = SameIndexList[j];
-                    ICompiledType ParameterType2 = Parameter2.ResolvedParameter.ResolvedFeatureType.Item;
+                    ICompiledType ParameterType2 = Parameter2.ResolvedParameter.ResolvedFeatureType2.Item;
 
                     Success &= DisjoinedParameterCheck(Parameter1, Parameter2, errorList);
                     Success &= DisjoinedParameterCheck(Parameter2, Parameter1, errorList);
@@ -150,8 +150,8 @@
 
         private static bool DisjoinedParameterCheck(IParameter derivedParameter, IParameter baseParameter, IErrorList errorList)
         {
-            ICompiledType DerivedType = derivedParameter.ResolvedParameter.ResolvedFeatureType.Item;
-            ICompiledType BaseType = baseParameter.ResolvedParameter.ResolvedFeatureType.Item;
+            ICompiledType DerivedType = derivedParameter.ResolvedParameter.ResolvedFeatureType2.Item;
+            ICompiledType BaseType = baseParameter.ResolvedParameter.ResolvedFeatureType2.Item;
             bool Success = true;
 
             if (ObjectType.TypeConformToBase(DerivedType, BaseType, isConversionAllowed: false))
@@ -205,13 +205,13 @@
 
             IParameter SelectedParameter = SameIndexList[0];
             ITypeName SelectedParameterTypeName = SelectedParameter.ResolvedParameter.ResolvedFeatureTypeName.Item;
-            ICompiledType SelectedParameterType = SelectedParameter.ResolvedParameter.ResolvedFeatureType.Item;
+            ICompiledType SelectedParameterType = SelectedParameter.ResolvedParameter.ResolvedFeatureType2.Item;
 
             for (int i = 1; i < SameIndexList.Count; i++)
             {
                 IParameter CurrentParameter = SameIndexList[i];
                 ITypeName CurrentParameterTypeName = CurrentParameter.ResolvedParameter.ResolvedFeatureTypeName.Item;
-                ICompiledType CurrentParameterType = CurrentParameter.ResolvedParameter.ResolvedFeatureType.Item;
+                ICompiledType CurrentParameterType = CurrentParameter.ResolvedParameter.ResolvedFeatureType2.Item;
 
                 if (ObjectType.TypeConformToBase(SelectedParameterType, CurrentParameterType, isConversionAllowed: false))
                 {
@@ -248,7 +248,7 @@
             for (int i = 0; i < SameIndexList.Count; i++)
             {
                 IParameter CurrentParameter = SameIndexList[i];
-                ICompiledType CurrentParameterType = CurrentParameter.ResolvedParameter.ResolvedFeatureType.Item;
+                ICompiledType CurrentParameterType = CurrentParameter.ResolvedParameter.ResolvedFeatureType2.Item;
 
                 if (!ObjectType.TypeConformToBase(CurrentParameterType, baseType, isConversionAllowed: false))
                 {

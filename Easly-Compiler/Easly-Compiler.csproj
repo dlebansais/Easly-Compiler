@@ -147,7 +147,6 @@
     <Compile Include="ResultException.cs" />
     <Compile Include="FeatureCall.cs" />
     <Compile Include="ResultType.cs" />
-    <Compile Include="PathParticipatingType.cs" />
     <Compile Include="Compiler.cs" />
     <Compile Include="CompilerNodes\Argument\Argument.cs" />
     <Compile Include="CompilerNodes\Argument\AssignmentArgument.cs" />

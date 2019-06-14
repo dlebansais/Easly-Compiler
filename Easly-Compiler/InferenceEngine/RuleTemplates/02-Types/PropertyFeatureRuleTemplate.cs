@@ -31,7 +31,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IPropertyFeature, ITypeName>(nameof(IPropertyFeature.ResolvedFeatureTypeName)),
-                new OnceReferenceDestinationTemplate<IPropertyFeature, ICompiledType>(nameof(IPropertyFeature.ResolvedFeatureType)),
+                new OnceReferenceDestinationTemplate<IPropertyFeature, ICompiledType>(nameof(IPropertyFeature.ResolvedFeatureType2)),
                 new OnceReferenceDestinationTemplate<IPropertyFeature, ICompiledFeature>(nameof(IPropertyFeature.ResolvedFeature)),
                 new UnsealedTableDestinationTemplate<IPropertyFeature, string, IScopeAttributeFeature>(nameof(IPropertyFeature.LocalScope)),
                 new UnsealedTableDestinationTemplate<IPropertyFeature, string, IScopeAttributeFeature>(nameof(IPropertyFeature.LocalGetScope)),
@@ -164,7 +164,8 @@
             node.ResolvedEntityTypeName.Item = EntityTypeName;
             node.ResolvedEntityType.Item = EntityType;
             node.ResolvedFeatureTypeName.Item = ResolvedPropertyTypeName;
-            node.ResolvedFeatureType.Item = ResolvedPropertyType;
+            node.ResolvedFeatureType2.Item = ResolvedPropertyType;
+            node.TypeAsDestinationOrSource.Item = EntityType;
 
             if (node.GetterBody.IsAssigned)
                 EmbeddingClass.BodyList.Add((IBody)node.GetterBody.Item);

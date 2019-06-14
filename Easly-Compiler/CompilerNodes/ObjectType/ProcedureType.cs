@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IProcedureType.
     /// </summary>
-    public interface IProcedureType : BaseNode.IProcedureType, IObjectType, INodeWithReplicatedBlocks, ICompiledType, IPathParticipatingType
+    public interface IProcedureType : BaseNode.IProcedureType, IObjectType, INodeWithReplicatedBlocks, ICompiledType
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.ProcedureType.OverloadBlocks"/>.
@@ -397,7 +397,7 @@ namespace CompilerNode
 
                 for (int i = 0; i < overload.ParameterList.Count && i < Item.ParameterList.Count; i++)
                 {
-                    IsMatching &= overload.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item == Item.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item;
+                    IsMatching &= overload.ParameterList[i].ValidEntity.Item.ResolvedFeatureType2.Item == Item.ParameterList[i].ValidEntity.Item.ResolvedFeatureType2.Item;
 
                     if (IsMatching)
                     {

@@ -310,7 +310,7 @@
 
             if (InstanceList.Count > 1)
             {
-                ICompiledType FeatureType = InstanceList[0].Instance.Feature.ResolvedFeatureType.Item;
+                ICompiledType FeatureType = InstanceList[0].Instance.Feature.ResolvedFeatureType2.Item;
 
                 for (int i = 1; i < InstanceList.Count && Result; i++)
                 {
@@ -318,7 +318,7 @@
 
                     Result &= importedInstance.IsKept == ThisInstance.Instance.IsKept;
                     Result &= importedInstance.IsDiscontinued == ThisInstance.Instance.IsDiscontinued;
-                    Result &= ObjectType.TypesHaveIdenticalSignature(FeatureType, ThisInstance.Instance.Feature.ResolvedFeatureType.Item);
+                    Result &= ObjectType.TypesHaveIdenticalSignature(FeatureType, ThisInstance.Instance.Feature.ResolvedFeatureType2.Item);
 
                     if (!Result)
                     {
@@ -341,9 +341,9 @@
             importedInstance.IsDiscontinued = importedInstance.EffectiveInstance.Item.Instance.IsDiscontinued;
 
             // If the effective instance is a redefine.
-            if (importedInstance.EffectiveInstance.Item.Ancestor == localClassType && importedInstance.EffectiveInstance.Item.Instance.Feature.ResolvedFeatureType.IsAssigned)
+            if (importedInstance.EffectiveInstance.Item.Ancestor == localClassType && importedInstance.EffectiveInstance.Item.Instance.Feature.ResolvedFeatureType2.IsAssigned)
             {
-                ICompiledType DescendantFeatureType = importedInstance.EffectiveInstance.Item.Instance.Feature.ResolvedFeatureType.Item;
+                ICompiledType DescendantFeatureType = importedInstance.EffectiveInstance.Item.Instance.Feature.ResolvedFeatureType2.Item;
 
                 IList<InstanceNameInfo> InstanceList = importedInstance.PrecursorInstanceList;
                 foreach (InstanceNameInfo Item in InstanceList)
@@ -351,7 +351,7 @@
                     if (Item == importedInstance.EffectiveInstance.Item)
                         continue;
 
-                    ICompiledType AncestorFeatureType = Item.Instance.Feature.ResolvedFeatureType.Item;
+                    ICompiledType AncestorFeatureType = Item.Instance.Feature.ResolvedFeatureType2.Item;
 
                     if (!ObjectType.TypeConformToBase(DescendantFeatureType, AncestorFeatureType, errorList, (ISource)importedInstance.EffectiveInstance.Item.Instance.Feature, isConversionAllowed: false))
                     {

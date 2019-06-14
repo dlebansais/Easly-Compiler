@@ -22,7 +22,7 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceTableSourceTemplate<IKeywordAssignmentInstruction, string, IScopeAttributeFeature, ITypeName>(nameof(IScopeHolder.FullScope), nameof(IScopeAttributeFeature.ResolvedFeatureTypeName), TemplateNodeStart<IKeywordAssignmentInstruction>.Default),
-                new OnceReferenceTableSourceTemplate<IKeywordAssignmentInstruction, string, IScopeAttributeFeature, ICompiledType>(nameof(IScopeHolder.FullScope), nameof(IScopeAttributeFeature.ResolvedFeatureType), TemplateNodeStart<IKeywordAssignmentInstruction>.Default),
+                new OnceReferenceTableSourceTemplate<IKeywordAssignmentInstruction, string, IScopeAttributeFeature, ICompiledType>(nameof(IScopeHolder.FullScope), nameof(IScopeAttributeFeature.TypeAsDestinationOrSource), TemplateNodeStart<IKeywordAssignmentInstruction>.Default),
                 new SealedTableSourceTemplate<IKeywordAssignmentInstruction, string, IScopeAttributeFeature>(nameof(IScopeHolder.LocalScope), TemplateScopeStart<IKeywordAssignmentInstruction>.Default),
                 new OnceReferenceSourceTemplate<IKeywordAssignmentInstruction, IResultException>(nameof(IKeywordAssignmentInstruction.Source) + Dot + nameof(IExpression.ResolvedException)),
             };
@@ -74,7 +74,7 @@
                     {
                         IParameter SingleResult = AsQueryOverload.ResultTable[0];
                         if (SingleResult.Name == nameof(BaseNode.Keyword.Result))
-                            DestinationType = SingleResult.ResolvedParameter.ResolvedFeatureType.Item;
+                            DestinationType = SingleResult.ResolvedParameter.TypeAsDestinationOrSource.Item;
                     }
                 }
 

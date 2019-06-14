@@ -297,7 +297,7 @@ namespace CompilerNode
                 if (Item.Name == nameof(BaseNode.Keyword.Result))
                 {
                     resultTypeName = Item.ResolvedParameter.ResolvedFeatureTypeName.Item;
-                    resultType = Item.ResolvedParameter.ResolvedFeatureType.Item;
+                    resultType = Item.ResolvedParameter.TypeAsDestinationOrSource.Item;
                     Success = true;
                     break;
                 }

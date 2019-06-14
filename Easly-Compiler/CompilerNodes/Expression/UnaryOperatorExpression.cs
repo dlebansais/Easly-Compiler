@@ -252,7 +252,7 @@ namespace CompilerNode
                 }
 
                 ICompiledFeature OperatorFeature = Value.Feature;
-                ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
+                ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType2.Item;
 
                 if (OperatorFeature is IFunctionFeature AsFunctionFeature && OperatorType is IFunctionType AsFunctionType)
                 {

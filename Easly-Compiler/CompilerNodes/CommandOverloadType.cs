@@ -249,7 +249,7 @@
             foreach (IEntityDeclaration Parameter in instancedOverload.ParameterList)
             {
                 ITypeName InstancedParameterTypeName = Parameter.ValidEntity.Item.ResolvedFeatureTypeName.Item;
-                ICompiledType InstancedParameterType = Parameter.ValidEntity.Item.ResolvedFeatureType.Item;
+                ICompiledType InstancedParameterType = Parameter.ValidEntity.Item.ResolvedFeatureType2.Item;
                 InstancedParameterType.InstanciateType(instancingClassType, ref InstancedParameterTypeName, ref InstancedParameterType);
 
                 IEntityDeclaration InstancedParameter = new EntityDeclaration(Parameter, InstancedParameterTypeName, InstancedParameterType);
@@ -269,7 +269,7 @@
 
                 InstancedParameterList.Add(InstancedParameter);
 
-                if (InstancedParameterType != Parameter.ValidEntity.Item.ResolvedFeatureType.Item)
+                if (InstancedParameterType != Parameter.ValidEntity.Item.ResolvedFeatureType2.Item)
                     IsNewInstance = true;
             }
 
@@ -302,12 +302,12 @@
             for (int i = 0; i < overload1.ParameterList.Count && i < overload2.ParameterList.Count; i++)
             {
                 Debug.Assert(overload1.ParameterList[i].ValidEntity.IsAssigned);
-                Debug.Assert(overload1.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                Debug.Assert(overload1.ParameterList[i].ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
                 Debug.Assert(overload2.ParameterList[i].ValidEntity.IsAssigned);
-                Debug.Assert(overload2.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                Debug.Assert(overload2.ParameterList[i].ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
 
-                ICompiledType Type1 = overload1.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item;
-                ICompiledType Type2 = overload2.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item;
+                ICompiledType Type1 = overload1.ParameterList[i].ValidEntity.Item.ResolvedFeatureType2.Item;
+                ICompiledType Type2 = overload2.ParameterList[i].ValidEntity.Item.ResolvedFeatureType2.Item;
 
                 IsIdentical &= ObjectType.TypesHaveIdenticalSignature(Type1, Type2);
             }

@@ -8,7 +8,7 @@
     /// <summary>
     /// Compiler-only IClassType.
     /// </summary>
-    public interface IClassType : BaseNode.IShareableType, ICompiledTypeWithFeature, IPathParticipatingType
+    public interface IClassType : BaseNode.IShareableType, ICompiledTypeWithFeature
     {
         /// <summary>
         /// The source from which this type is issued.

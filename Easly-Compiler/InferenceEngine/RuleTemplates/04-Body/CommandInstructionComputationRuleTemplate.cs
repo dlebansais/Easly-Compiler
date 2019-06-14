@@ -24,7 +24,7 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceTableSourceTemplate<ICommandInstruction, string, IScopeAttributeFeature, ITypeName>(nameof(IScopeHolder.FullScope), nameof(IScopeAttributeFeature.ResolvedFeatureTypeName), TemplateNodeStart<ICommandInstruction>.Default),
-                new OnceReferenceTableSourceTemplate<ICommandInstruction, string, IScopeAttributeFeature, ICompiledType>(nameof(IScopeHolder.FullScope), nameof(IScopeAttributeFeature.ResolvedFeatureType), TemplateNodeStart<ICommandInstruction>.Default),
+                new OnceReferenceTableSourceTemplate<ICommandInstruction, string, IScopeAttributeFeature, ICompiledType>(nameof(IScopeHolder.FullScope), nameof(IScopeAttributeFeature.ResolvedFeatureType2), TemplateNodeStart<ICommandInstruction>.Default),
                 new SealedTableSourceTemplate<ICommandInstruction, string, IScopeAttributeFeature>(nameof(IScopeHolder.LocalScope), TemplateScopeStart<ICommandInstruction>.Default),
                 new OnceReferenceCollectionSourceTemplate<ICommandInstruction, IArgument, IResultException>(nameof(ICommandInstruction.ArgumentList), nameof(IArgument.ResolvedException)),
             };

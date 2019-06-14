@@ -9,7 +9,7 @@
     /// <summary>
     /// Compiler IPropertyType.
     /// </summary>
-    public interface IPropertyType : BaseNode.IPropertyType, IObjectType, INodeWithReplicatedBlocks, ICompiledType, IPathParticipatingType
+    public interface IPropertyType : BaseNode.IPropertyType, IObjectType, INodeWithReplicatedBlocks, ICompiledType
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.PropertyType.GetEnsureBlocks"/>.

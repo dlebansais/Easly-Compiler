@@ -329,7 +329,7 @@ namespace CompilerNode
             IList<IArgument> ArgumentList = node.ArgumentList;
             ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
             ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
-            ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
+            ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType2.Item;
             IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
             bool IsHandled = false;
             bool Success = false;
@@ -373,7 +373,7 @@ namespace CompilerNode
             IList<IArgument> ArgumentList = node.ArgumentList;
             ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
             ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
-            ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
+            ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType2.Item;
             IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
 
             foreach (IQueryOverloadType Overload in callType.OverloadList)
@@ -401,7 +401,7 @@ namespace CompilerNode
             IList<IArgument> ArgumentList = node.ArgumentList;
             ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
             ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
-            ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
+            ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType2.Item;
             IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
 
             if (ArgumentList.Count > 0)
@@ -430,8 +430,6 @@ namespace CompilerNode
 
             IList<IArgument> ArgumentList = node.ArgumentList;
             ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
-            ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
-            ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
             IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
 
             IPropertyFeature Property = (IPropertyFeature)OperatorFeature;

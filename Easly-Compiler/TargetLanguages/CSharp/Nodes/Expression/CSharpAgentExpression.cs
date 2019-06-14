@@ -139,6 +139,10 @@
 
             switch (Delegated)
             {
+                case ICSharpConstantFeature AsConstantFeature:
+                    Result = CSharpTextConstant(usingCollection, AsConstantFeature, destinationList);
+                    break;
+
                 case ICSharpProcedureFeature AsProcedureFeature:
                     Result = CSharpTextProcedure(usingCollection, AsProcedureFeature, destinationList);
                     break;
@@ -153,6 +157,22 @@
             }
 
             Debug.Assert(Result != null);
+
+            return Result;
+        }
+
+        private string CSharpTextConstant(ICSharpUsingCollection usingCollection, ICSharpConstantFeature feature, IList<ICSharpQualifiedName> destinationList)
+        {
+            string Result;
+
+            string BaseTypeText;
+
+            if (BaseType != null)
+                BaseTypeText = EffectiveBaseType.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.OneWord);
+            else
+                BaseTypeText = $"I{CSharpNames.ToCSharpIdentifier(Delegated.Owner.ValidClassName)}";
+
+            Result = $"({BaseTypeText} agentBase) => {{ agentBase.{CSharpNames.ToCSharpIdentifier(Delegated.Name)}; }}";
 
             return Result;
         }
@@ -232,8 +252,6 @@
         private string CSharpTextProperty(ICSharpUsingCollection usingCollection, ICSharpPropertyFeature feature, IList<ICSharpQualifiedName> destinationList)
         {
             string Result;
-
-            // TODO handle several overloads.
 
             string BaseTypeText;
 

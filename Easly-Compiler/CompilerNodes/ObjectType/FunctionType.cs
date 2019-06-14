@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IFunctionType.
     /// </summary>
-    public interface IFunctionType : BaseNode.IFunctionType, IObjectType, INodeWithReplicatedBlocks, ICompiledType, IPathParticipatingType
+    public interface IFunctionType : BaseNode.IFunctionType, IObjectType, INodeWithReplicatedBlocks, ICompiledType
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.FunctionType.OverloadBlocks"/>.
@@ -439,7 +439,7 @@ namespace CompilerNode
                 IScopeAttributeFeature OverloadAttribute1 = overload1.ParameterList[i].ValidEntity.Item;
                 IScopeAttributeFeature OverloadAttribute2 = overload2.ParameterList[i].ValidEntity.Item;
 
-                IsMatching &= OverloadAttribute1.ResolvedFeatureType.Item == OverloadAttribute2.ResolvedFeatureType.Item;
+                IsMatching &= OverloadAttribute1.ResolvedFeatureType2.Item == OverloadAttribute2.ResolvedFeatureType2.Item;
             }
 
             return IsMatching;
@@ -456,7 +456,7 @@ namespace CompilerNode
                 IScopeAttributeFeature OverloadAttribute1 = overload1.ResultList[i].ValidEntity.Item;
                 IScopeAttributeFeature OverloadAttribute2 = overload2.ResultList[i].ValidEntity.Item;
 
-                IsMatching &= OverloadAttribute1.ResolvedFeatureType.Item == OverloadAttribute2.ResolvedFeatureType.Item;
+                IsMatching &= OverloadAttribute1.ResolvedFeatureType2.Item == OverloadAttribute2.ResolvedFeatureType2.Item;
             }
 
             return IsMatching;
@@ -479,7 +479,7 @@ namespace CompilerNode
                 foreach (IEntityDeclaration Entity in Item.ResultList)
                 {
                     ITypeName EntityTypeName = Entity.ValidEntity.Item.ResolvedFeatureTypeName.Item;
-                    ICompiledType EntityType = Entity.ValidEntity.Item.ResolvedFeatureType.Item;
+                    ICompiledType EntityType = Entity.ValidEntity.Item.ResolvedFeatureType2.Item;
                     string EntityName = Entity.ValidEntity.Item.ValidFeatureName.Item.Name;
 
                     IExpressionType ResultExpressionType = new ExpressionType(EntityTypeName, EntityType, EntityName);

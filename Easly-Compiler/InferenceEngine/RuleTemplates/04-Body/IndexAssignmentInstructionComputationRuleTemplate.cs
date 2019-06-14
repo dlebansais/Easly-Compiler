@@ -24,7 +24,7 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceTableSourceTemplate<IIndexAssignmentInstruction, string, IScopeAttributeFeature, ITypeName>(nameof(IScopeHolder.FullScope), nameof(IScopeAttributeFeature.ResolvedFeatureTypeName), TemplateNodeStart<IIndexAssignmentInstruction>.Default),
-                new OnceReferenceTableSourceTemplate<IIndexAssignmentInstruction, string, IScopeAttributeFeature, ICompiledType>(nameof(IScopeHolder.FullScope), nameof(IScopeAttributeFeature.ResolvedFeatureType), TemplateNodeStart<IIndexAssignmentInstruction>.Default),
+                new OnceReferenceTableSourceTemplate<IIndexAssignmentInstruction, string, IScopeAttributeFeature, ICompiledType>(nameof(IScopeHolder.FullScope), nameof(IScopeAttributeFeature.TypeAsDestinationOrSource), TemplateNodeStart<IIndexAssignmentInstruction>.Default),
                 new SealedTableSourceTemplate<IIndexAssignmentInstruction, string, IScopeAttributeFeature>(nameof(IScopeHolder.LocalScope), TemplateScopeStart<IIndexAssignmentInstruction>.Default),
                 new OnceReferenceCollectionSourceTemplate<IIndexAssignmentInstruction, IArgument, IResultException>(nameof(IIndexAssignmentInstruction.ArgumentList), nameof(IArgument.ResolvedException)),
             };
@@ -76,7 +76,7 @@
 
                 IFeatureInstance IndexerInstance = IndexedFeatureTable[FeatureName.IndexerFeatureName];
                 IIndexerFeature Indexer = (IndexerFeature)IndexerInstance.Feature;
-                IIndexerType AsIndexerType = (IndexerType)Indexer.ResolvedFeatureType.Item;
+                IIndexerType AsIndexerType = (IndexerType)Indexer.TypeAsDestinationOrSource.Item;
 
                 bool IsReadOnlyIndexer = Indexer.GetterBody.IsAssigned && !Indexer.SetterBody.IsAssigned;
                 bool IsReadOnlyIndexerType = AsIndexerType.IndexerKind == BaseNode.UtilityType.ReadOnly;

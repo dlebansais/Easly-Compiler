@@ -75,7 +75,7 @@
                     if (IndexerFeature.IndexParameterList.Count == 1)
                     {
                         IEntityDeclaration IndexParameterDeclaration = IndexerFeature.IndexParameterList[0];
-                        if (IndexParameterDeclaration.ValidEntity.Item.ResolvedFeatureType.Item == NumberType)
+                        if (IndexParameterDeclaration.ValidEntity.Item.TypeAsDestinationOrSource.Item == NumberType)
                             IsConformantToNumericIndexer = true;
                     }
                 }

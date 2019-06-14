@@ -30,7 +30,7 @@
                 new OnceReferenceDestinationTemplate<IConstantFeature, ITypeName>(nameof(IConstantFeature.ResolvedEntityTypeName)),
                 new OnceReferenceDestinationTemplate<IConstantFeature, ICompiledType>(nameof(IConstantFeature.ResolvedEntityType)),
                 new OnceReferenceDestinationTemplate<IConstantFeature, ITypeName>(nameof(IConstantFeature.ResolvedFeatureTypeName)),
-                new OnceReferenceDestinationTemplate<IConstantFeature, ICompiledType>(nameof(IConstantFeature.ResolvedFeatureType)),
+                new OnceReferenceDestinationTemplate<IConstantFeature, ICompiledType>(nameof(IConstantFeature.ResolvedFeatureType2)),
                 new OnceReferenceDestinationTemplate<IConstantFeature, ICompiledFeature>(nameof(IConstantFeature.ResolvedFeature)),
             };
         }
@@ -85,7 +85,8 @@
             node.ResolvedEntityTypeName.Item = TypeToResolve.ResolvedTypeName.Item;
             node.ResolvedEntityType.Item = TypeToResolve.ResolvedType.Item;
             node.ResolvedFeatureTypeName.Item = NewEntity.ResolvedFeatureTypeName.Item;
-            node.ResolvedFeatureType.Item = NewEntity.ResolvedFeatureType.Item;
+            node.ResolvedFeatureType2.Item = NewEntity.ResolvedFeatureType2.Item;
+            node.TypeAsDestinationOrSource.Item = NewEntity.TypeAsDestinationOrSource.Item;
 
             node.ResolvedFeature.Item = node;
 

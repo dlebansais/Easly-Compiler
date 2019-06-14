@@ -172,8 +172,8 @@
 
             if (IsLocal)
             {
-                IsReady = Entity.ValidEntity.IsAssigned && Entity.ValidEntity.Item.ResolvedFeatureType.IsAssigned;
-                ItemType = IsReady ? Entity.ValidEntity.Item.ResolvedFeatureType.Item : null;
+                IsReady = Entity.ValidEntity.IsAssigned && Entity.ValidEntity.Item.TypeAsDestinationOrSource.IsAssigned;
+                ItemType = IsReady ? Entity.ValidEntity.Item.TypeAsDestinationOrSource.Item : null;
             }
             else
             {
@@ -282,10 +282,10 @@
 
             if (IsLocal)
             {
-                if (Entity.ValidEntity.IsAssigned && Entity.ValidEntity.Item.ResolvedFeatureType.IsAssigned)
+                if (Entity.ValidEntity.IsAssigned && Entity.ValidEntity.Item.TypeAsDestinationOrSource.IsAssigned)
                 {
                     resolvedPathTypeName = Entity.ValidEntity.Item.ResolvedFeatureTypeName.Item;
-                    resolvedPathType = Entity.ValidEntity.Item.ResolvedFeatureType.Item;
+                    resolvedPathType = Entity.ValidEntity.Item.TypeAsDestinationOrSource.Item;
                     Result = true;
                 }
             }

@@ -8,7 +8,7 @@
     /// <summary>
     /// Compiler-only IFormalGenericType.
     /// </summary>
-    public interface IFormalGenericType : ICompiledTypeWithFeature, IPathParticipatingType
+    public interface IFormalGenericType : ICompiledTypeWithFeature
     {
         /// <summary>
         /// The generic from which this instance is issued.

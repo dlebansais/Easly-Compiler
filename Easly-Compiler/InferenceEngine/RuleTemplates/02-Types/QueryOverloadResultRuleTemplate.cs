@@ -92,8 +92,8 @@
 
             foreach (IParameter Parameter in ResultTable)
             {
-                Debug.Assert(Parameter.ResolvedParameter.ResolvedFeatureType.IsAssigned);
-                node.ConformantResultTable.Add(Parameter.ResolvedParameter.ResolvedFeatureType.Item);
+                Debug.Assert(Parameter.ResolvedParameter.ResolvedFeatureType2.IsAssigned);
+                node.ConformantResultTable.Add(Parameter.ResolvedParameter.ResolvedFeatureType2.Item);
             }
 
             Debug.Assert(ResultTable.Count > 0);
@@ -103,12 +103,12 @@
             foreach (IParameter Item in ResultTable)
             {
                 Debug.Assert(Item.ResolvedParameter.ResolvedFeatureTypeName.IsAssigned);
-                Debug.Assert(Item.ResolvedParameter.ResolvedFeatureType.IsAssigned);
+                Debug.Assert(Item.ResolvedParameter.TypeAsDestinationOrSource.IsAssigned);
 
                 if (BestResultType == null || Item.Name == nameof(BaseNode.Keyword.Result))
                 {
                     BestResultTypeName = Item.ResolvedParameter.ResolvedFeatureTypeName.Item;
-                    BestResultType = Item.ResolvedParameter.ResolvedFeatureType.Item;
+                    BestResultType = Item.ResolvedParameter.TypeAsDestinationOrSource.Item;
                 }
             }
 
@@ -124,8 +124,8 @@
 
             foreach (IParameter Parameter in ResultTable)
             {
-                Debug.Assert(Parameter.ResolvedParameter.ResolvedFeatureType.IsAssigned);
-                AssociatedType.ConformantResultTable.Add(Parameter.ResolvedParameter.ResolvedFeatureType.Item);
+                Debug.Assert(Parameter.ResolvedParameter.TypeAsDestinationOrSource.IsAssigned);
+                AssociatedType.ConformantResultTable.Add(Parameter.ResolvedParameter.TypeAsDestinationOrSource.Item);
             }
 
             node.ResolvedAssociatedType.Item = AssociatedType;

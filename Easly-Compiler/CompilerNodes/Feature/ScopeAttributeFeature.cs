@@ -131,13 +131,14 @@ namespace CompilerNode
             ValidFeatureName = new OnceReference<IFeatureName>();
             ValidFeatureName.Item = new FeatureName(EntityName.Text);
 
-            ResolvedFeatureTypeName = new OnceReference<ITypeName>();
             if (attributeTypeName != null)
                 ResolvedFeatureTypeName.Item = attributeTypeName;
 
-            ResolvedFeatureType = new OnceReference<ICompiledType>();
             if (attributeType != null)
-                ResolvedFeatureType.Item = attributeType;
+            {
+                ResolvedFeatureType2.Item = attributeType;
+                TypeAsDestinationOrSource.Item = attributeType;
+            }
 
             if (initialDefaultValue != null)
             {
@@ -162,7 +163,7 @@ namespace CompilerNode
         {
             bool IsAssigned = false;
 
-            if (ResolvedFeatureType.IsAssigned && ResolvedFeatureType.Item is IClassType AsClassType)
+            if (ResolvedFeatureType2.IsAssigned && ResolvedFeatureType2.Item is IClassType AsClassType)
             {
                 IClass BaseClass = AsClassType.BaseClass;
                 Debug.Assert(BaseClass.ClassGroup.IsAssigned);
@@ -216,18 +217,21 @@ namespace CompilerNode
         /// <param name="attributeType">The associated type.</param>
         public void FixFeatureType(ITypeName attributeTypeName, ICompiledType attributeType)
         {
-            if (ResolvedFeatureTypeName.IsAssigned || ResolvedFeatureType.IsAssigned)
+            if (ResolvedFeatureTypeName.IsAssigned || ResolvedFeatureType2.IsAssigned)
             {
                 Debug.Assert(ResolvedFeatureTypeName.IsAssigned);
-                Debug.Assert(ResolvedFeatureType.IsAssigned);
+                Debug.Assert(ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(TypeAsDestinationOrSource.IsAssigned);
 
                 Debug.Assert(ResolvedFeatureTypeName.Item == attributeTypeName);
-                Debug.Assert(ResolvedFeatureType.Item == attributeType);
+                Debug.Assert(ResolvedFeatureType2.Item == attributeType);
+                Debug.Assert(TypeAsDestinationOrSource.Item == attributeType);
             }
             else
             {
                 ResolvedFeatureTypeName.Item = attributeTypeName;
-                ResolvedFeatureType.Item = attributeType;
+                ResolvedFeatureType2.Item = attributeType;
+                TypeAsDestinationOrSource.Item = attributeType;
             }
         }
         #endregion
@@ -251,12 +255,17 @@ namespace CompilerNode
         /// <summary>
         /// Name of the associated type.
         /// </summary>
-        public OnceReference<ITypeName> ResolvedFeatureTypeName { get; private set; } = new OnceReference<ITypeName>();
+        public OnceReference<ITypeName> ResolvedFeatureTypeName { get; } = new OnceReference<ITypeName>();
 
         /// <summary>
         /// Associated type.
         /// </summary>
-        public OnceReference<ICompiledType> ResolvedFeatureType { get; private set; } = new OnceReference<ICompiledType>();
+        public OnceReference<ICompiledType> ResolvedFeatureType2 { get; } = new OnceReference<ICompiledType>();
+
+        /// <summary>
+        /// The type to use instead of this associated type for a source or destination, for the purpose of path searching, assignment and query.
+        /// </summary>
+        public OnceReference<ICompiledType> TypeAsDestinationOrSource { get; } = new OnceReference<ICompiledType>();
 
         /// <summary>
         /// Guid of the language type corresponding to the entity object for an instance of this class.
