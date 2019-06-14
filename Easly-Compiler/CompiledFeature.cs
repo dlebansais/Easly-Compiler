@@ -31,7 +31,7 @@
         /// <summary>
         /// Associated type.
         /// </summary>
-        OnceReference<ICompiledType> ResolvedFeatureType2 { get; }
+        OnceReference<ICompiledType> ResolvedFeatureType { get; }
 
         /// <summary>
         /// The type to use instead of this associated type for a source or destination, for the purpose of path searching, assignment and query.

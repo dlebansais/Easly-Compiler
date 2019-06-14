@@ -46,7 +46,7 @@
         {
             foreach (IScopeAttributeFeature Entity in source.ResolvedLocalEntitiesList)
             {
-                ICSharpType NewType = CSharpType.Create(context, Entity.ResolvedFeatureType2.Item);
+                ICSharpType NewType = CSharpType.Create(context, Entity.ResolvedFeatureType.Item);
                 AttachTypeList.Add(NewType);
             }
         }

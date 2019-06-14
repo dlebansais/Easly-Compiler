@@ -168,7 +168,7 @@
                 if (Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, source, out ITypeName NumberTypeName, out ICompiledType NumberType))
                 {
                     IEntityDeclaration IndexParameterDeclaration = AsIndexer.IndexParameterList[0];
-                    ICompiledType IndexParameterType = IndexParameterDeclaration.ValidEntity.Item.ResolvedFeatureType2.Item;
+                    ICompiledType IndexParameterType = IndexParameterDeclaration.ValidEntity.Item.ResolvedFeatureType.Item;
 
                     if (IndexParameterType is IClassType AsClassIndexType)
                         if (AsClassIndexType == NumberType)

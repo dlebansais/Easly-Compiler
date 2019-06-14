@@ -73,9 +73,9 @@
                 if (SelectedOverloadType.ResultTable.Count == 1)
                 {
                     IParameter OverloadResult = SelectedOverloadType.ResultTable[0];
-                    Debug.Assert(OverloadResult.ResolvedParameter.ResolvedFeatureType2.IsAssigned);
+                    Debug.Assert(OverloadResult.ResolvedParameter.ResolvedFeatureType.IsAssigned);
 
-                    ICompiledType ResultType = OverloadResult.ResolvedParameter.ResolvedFeatureType2.Item;
+                    ICompiledType ResultType = OverloadResult.ResolvedParameter.ResolvedFeatureType.Item;
 
                     if (Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType) && ResultType == BooleanType)
                         ExpressionConstant = new BooleanLanguageConstant();

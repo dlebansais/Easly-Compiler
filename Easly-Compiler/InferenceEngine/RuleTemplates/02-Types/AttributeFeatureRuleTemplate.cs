@@ -30,7 +30,7 @@
                 new OnceReferenceDestinationTemplate<IAttributeFeature, ITypeName>(nameof(IAttributeFeature.ResolvedEntityTypeName)),
                 new OnceReferenceDestinationTemplate<IAttributeFeature, ICompiledType>(nameof(IAttributeFeature.ResolvedEntityType)),
                 new OnceReferenceDestinationTemplate<IAttributeFeature, ITypeName>(nameof(IAttributeFeature.ResolvedFeatureTypeName)),
-                new OnceReferenceDestinationTemplate<IAttributeFeature, ICompiledType>(nameof(IAttributeFeature.ResolvedFeatureType2)),
+                new OnceReferenceDestinationTemplate<IAttributeFeature, ICompiledType>(nameof(IAttributeFeature.ResolvedFeatureType)),
                 new OnceReferenceDestinationTemplate<IAttributeFeature, ICompiledFeature>(nameof(IAttributeFeature.ResolvedFeature)),
             };
         }
@@ -69,7 +69,7 @@
             node.ResolvedEntityTypeName.Item = TypeToResolve.ResolvedTypeName.Item;
             node.ResolvedEntityType.Item = TypeToResolve.ResolvedType.Item;
             node.ResolvedFeatureTypeName.Item = NewEntity.ResolvedFeatureTypeName.Item;
-            node.ResolvedFeatureType2.Item = NewEntity.ResolvedFeatureType2.Item;
+            node.ResolvedFeatureType.Item = NewEntity.ResolvedFeatureType.Item;
             node.TypeAsDestinationOrSource.Item = NewEntity.TypeAsDestinationOrSource.Item;
 
             node.ResolvedFeature.Item = node;

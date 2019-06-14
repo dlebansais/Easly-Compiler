@@ -154,9 +154,9 @@
                     Debug.Assert(ParameterTable.Count == 1);
 
                     IParameter OverloadParameter = ParameterTable[0];
-                    Debug.Assert(OverloadParameter.ResolvedParameter.ResolvedFeatureType2.IsAssigned);
+                    Debug.Assert(OverloadParameter.ResolvedParameter.ResolvedFeatureType.IsAssigned);
 
-                    ICompiledType OverloadParameterType = OverloadParameter.ResolvedParameter.ResolvedFeatureType2.Item;
+                    ICompiledType OverloadParameterType = OverloadParameter.ResolvedParameter.ResolvedFeatureType.Item;
                     Result.Add(OverloadParameterType);
                 }
             }
@@ -185,9 +185,9 @@
                     Debug.Assert(ResultTable.Count == 1);
 
                     IParameter OverloadResult = ResultTable[0];
-                    Debug.Assert(OverloadResult.ResolvedParameter.ResolvedFeatureType2.IsAssigned);
+                    Debug.Assert(OverloadResult.ResolvedParameter.ResolvedFeatureType.IsAssigned);
 
-                    ICompiledType OverloadResultType = OverloadResult.ResolvedParameter.ResolvedFeatureType2.Item;
+                    ICompiledType OverloadResultType = OverloadResult.ResolvedParameter.ResolvedFeatureType.Item;
                     Result.Add(OverloadResultType);
                 }
             }
@@ -549,11 +549,11 @@
                 IEntityDeclaration DerivedParameter = derivedType.ParameterList[i];
 
                 Debug.Assert(DerivedParameter.ValidEntity.IsAssigned);
-                Debug.Assert(DerivedParameter.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
                 Debug.Assert(BaseParameter.ValidEntity.IsAssigned);
-                Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(BaseParameter.ValidEntity.Item.ResolvedFeatureType2.Item, DerivedParameter.ValidEntity.Item.ResolvedFeatureType2.Item, errorList, sourceLocation, isConversionAllowed: false);
+                Result &= TypeConformToBase(BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             for (int i = 0; i < baseType.ResultList.Count && i < derivedType.ResultList.Count; i++)
@@ -562,11 +562,11 @@
                 IEntityDeclaration DerivedResult = derivedType.ResultList[i];
 
                 Debug.Assert(BaseResult.ValidEntity.IsAssigned);
-                Debug.Assert(BaseResult.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(BaseResult.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
                 Debug.Assert(DerivedResult.ValidEntity.IsAssigned);
-                Debug.Assert(DerivedResult.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(DerivedResult.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(DerivedResult.ValidEntity.Item.ResolvedFeatureType2.Item, BaseResult.ValidEntity.Item.ResolvedFeatureType2.Item, errorList, sourceLocation, isConversionAllowed: false);
+                Result &= TypeConformToBase(DerivedResult.ValidEntity.Item.ResolvedFeatureType.Item, BaseResult.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             Result &= ExceptionListConformToBase(derivedType.ExceptionIdentifierList, baseType.ExceptionIdentifierList, errorList, sourceLocation);
@@ -604,10 +604,10 @@
 
             IEntityDeclaration OverloadResult = SingleOverload.ResultList[0];
             Debug.Assert(OverloadResult.ValidEntity.IsAssigned);
-            Debug.Assert(OverloadResult.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+            Debug.Assert(OverloadResult.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
             Debug.Assert(derivedType.ResolvedEntityType.IsAssigned);
 
-            Result &= TypeConformToBase(OverloadResult.ValidEntity.Item.ResolvedFeatureType2.Item, derivedType.ResolvedEntityType.Item, errorList, sourceLocation, isConversionAllowed: false);
+            Result &= TypeConformToBase(OverloadResult.ValidEntity.Item.ResolvedFeatureType.Item, derivedType.ResolvedEntityType.Item, errorList, sourceLocation, isConversionAllowed: false);
             Result &= ExceptionListConformToBase(derivedType.GetExceptionIdentifierList, SingleOverload.ExceptionIdentifierList, errorList, sourceLocation);
 
             return Result;
@@ -647,19 +647,19 @@
                 IEntityDeclaration DerivedParameter = derivedType.IndexParameterList[i];
 
                 Debug.Assert(DerivedParameter.ValidEntity.IsAssigned);
-                Debug.Assert(DerivedParameter.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
                 Debug.Assert(BaseParameter.ValidEntity.IsAssigned);
-                Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType2.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType2.Item, errorList, sourceLocation, isConversionAllowed: false);
+                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             IEntityDeclaration OverloadResult = SingleOverload.ResultList[0];
             Debug.Assert(OverloadResult.ValidEntity.IsAssigned);
-            Debug.Assert(OverloadResult.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+            Debug.Assert(OverloadResult.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
             Debug.Assert(derivedType.ResolvedEntityType.IsAssigned);
 
-            Result &= TypeConformToBase(OverloadResult.ValidEntity.Item.ResolvedFeatureType2.Item, derivedType.ResolvedEntityType.Item, errorList, sourceLocation, isConversionAllowed: false);
+            Result &= TypeConformToBase(OverloadResult.ValidEntity.Item.ResolvedFeatureType.Item, derivedType.ResolvedEntityType.Item, errorList, sourceLocation, isConversionAllowed: false);
             Result &= ExceptionListConformToBase(derivedType.GetExceptionIdentifierList, SingleOverload.ExceptionIdentifierList, errorList, sourceLocation);
 
             return Result;
@@ -760,11 +760,11 @@
                 IEntityDeclaration DerivedParameter = derivedType.ParameterList[i];
 
                 Debug.Assert(DerivedParameter.ValidEntity.IsAssigned);
-                Debug.Assert(DerivedParameter.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
                 Debug.Assert(BaseParameter.ValidEntity.IsAssigned);
-                Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType2.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType2.Item, errorList, sourceLocation, isConversionAllowed: false);
+                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             Result &= ExceptionListConformToBase(derivedType.ExceptionIdentifierList, baseType.ExceptionIdentifierList, errorList, sourceLocation);
@@ -805,9 +805,9 @@
                 IEntityDeclaration OverloadValue = SingleOverload.ParameterList[0];
                 Debug.Assert(derivedType.ResolvedEntityType.IsAssigned);
                 Debug.Assert(OverloadValue.ValidEntity.IsAssigned);
-                Debug.Assert(OverloadValue.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(OverloadValue.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(derivedType.ResolvedEntityType.Item, OverloadValue.ValidEntity.Item.ResolvedFeatureType2.Item, errorList, sourceLocation, isConversionAllowed: false);
+                Result &= TypeConformToBase(derivedType.ResolvedEntityType.Item, OverloadValue.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
                 Result &= ExceptionListConformToBase(derivedType.SetExceptionIdentifierList, SingleOverload.ExceptionIdentifierList, errorList, sourceLocation);
             }
 
@@ -848,11 +848,11 @@
                 IEntityDeclaration DerivedParameter = derivedType.IndexParameterList[i];
 
                 Debug.Assert(BaseParameter.ValidEntity.IsAssigned);
-                Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
                 Debug.Assert(DerivedParameter.ValidEntity.IsAssigned);
-                Debug.Assert(DerivedParameter.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType2.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType2.Item, errorList, sourceLocation, isConversionAllowed: false);
+                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             if (SingleOverload.ParameterList.Count == derivedType.IndexParameterList.Count + 1)
@@ -861,9 +861,9 @@
 
                 IEntityDeclaration LastParameter = SingleOverload.ParameterList[derivedType.IndexParameterList.Count];
                 Debug.Assert(LastParameter.ValidEntity.IsAssigned);
-                Debug.Assert(LastParameter.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(LastParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(derivedType.ResolvedEntityType.Item, LastParameter.ValidEntity.Item.ResolvedFeatureType2.Item, errorList, sourceLocation, isConversionAllowed: false);
+                Result &= TypeConformToBase(derivedType.ResolvedEntityType.Item, LastParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             Result &= ExceptionListConformToBase(derivedType.SetExceptionIdentifierList, SingleOverload.ExceptionIdentifierList, errorList, sourceLocation);
@@ -969,9 +969,9 @@
 
                 Debug.Assert(baseType.ResolvedEntityType.IsAssigned);
                 Debug.Assert(OverloadResult.ValidEntity.IsAssigned);
-                Debug.Assert(OverloadResult.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(OverloadResult.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(baseType.ResolvedEntityType.Item, OverloadResult.ValidEntity.Item.ResolvedFeatureType2.Item, errorList, sourceLocation, isConversionAllowed: false);
+                Result &= TypeConformToBase(baseType.ResolvedEntityType.Item, OverloadResult.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             Result &= ExceptionListConformToBase(derivedOverload.ExceptionIdentifierList, baseType.GetExceptionIdentifierList, errorList, sourceLocation);
@@ -1033,9 +1033,9 @@
             {
                 IEntityDeclaration OverloadValue = derivedOverload.ParameterList[0];
                 Debug.Assert(OverloadValue.ValidEntity.IsAssigned);
-                Debug.Assert(OverloadValue.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(OverloadValue.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(OverloadValue.ValidEntity.Item.ResolvedFeatureType2.Item, baseType.ResolvedEntityType.Item, errorList, sourceLocation, isConversionAllowed: false);
+                Result &= TypeConformToBase(OverloadValue.ValidEntity.Item.ResolvedFeatureType.Item, baseType.ResolvedEntityType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             Result &= ExceptionListConformToBase(derivedOverload.ExceptionIdentifierList, baseType.SetExceptionIdentifierList, errorList, sourceLocation);
@@ -1161,20 +1161,20 @@
                 IEntityDeclaration DerivedParameter = derivedOverload.ParameterList[i];
 
                 Debug.Assert(DerivedParameter.ValidEntity.IsAssigned);
-                Debug.Assert(DerivedParameter.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
                 Debug.Assert(BaseParameter.ValidEntity.IsAssigned);
-                Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType2.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType2.Item, errorList, sourceLocation, isConversionAllowed: false);
+                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             IEntityDeclaration OverloadResult = derivedOverload.ResultList[0];
 
             Debug.Assert(baseType.ResolvedEntityType.IsAssigned);
             Debug.Assert(OverloadResult.ValidEntity.IsAssigned);
-            Debug.Assert(OverloadResult.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+            Debug.Assert(OverloadResult.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-            Result &= TypeConformToBase(baseType.ResolvedEntityType.Item, OverloadResult.ValidEntity.Item.ResolvedFeatureType2.Item, ErrorList.Ignored, ErrorList.NoLocation, isConversionAllowed: false);
+            Result &= TypeConformToBase(baseType.ResolvedEntityType.Item, OverloadResult.ValidEntity.Item.ResolvedFeatureType.Item, ErrorList.Ignored, ErrorList.NoLocation, isConversionAllowed: false);
             Result &= ExceptionListConformToBase(derivedOverload.ExceptionIdentifierList, baseType.GetExceptionIdentifierList, errorList, sourceLocation);
 
             return Result;
@@ -1220,11 +1220,11 @@
                 IEntityDeclaration DerivedParameter = derivedOverload.ParameterList[i];
 
                 Debug.Assert(DerivedParameter.ValidEntity.IsAssigned);
-                Debug.Assert(DerivedParameter.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
                 Debug.Assert(BaseParameter.ValidEntity.IsAssigned);
-                Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType2.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType2.Item, errorList, sourceLocation, isConversionAllowed: false);
+                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             if (derivedOverload.ParameterList.Count == baseType.IndexParameterList.Count + 1)
@@ -1232,10 +1232,10 @@
                 IEntityDeclaration OverloadValue = derivedOverload.ParameterList[baseType.IndexParameterList.Count];
 
                 Debug.Assert(OverloadValue.ValidEntity.IsAssigned);
-                Debug.Assert(OverloadValue.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(OverloadValue.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
                 Debug.Assert(baseType.ResolvedEntityType.IsAssigned);
 
-                Result &= TypeConformToBase(OverloadValue.ValidEntity.Item.ResolvedFeatureType2.Item, baseType.ResolvedEntityType.Item, ErrorList.Ignored, ErrorList.NoLocation, isConversionAllowed: false);
+                Result &= TypeConformToBase(OverloadValue.ValidEntity.Item.ResolvedFeatureType.Item, baseType.ResolvedEntityType.Item, ErrorList.Ignored, ErrorList.NoLocation, isConversionAllowed: false);
                 Result &= ExceptionListConformToBase(derivedOverload.ExceptionIdentifierList, baseType.SetExceptionIdentifierList, errorList, sourceLocation);
             }
 
@@ -1271,11 +1271,11 @@
                 IEntityDeclaration DerivedParameter = derivedType.IndexParameterList[i];
 
                 Debug.Assert(DerivedParameter.ValidEntity.IsAssigned);
-                Debug.Assert(DerivedParameter.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
                 Debug.Assert(BaseParameter.ValidEntity.IsAssigned);
-                Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType2.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType2.Item, errorList, sourceLocation, isConversionAllowed: false);
+                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedFeatureType.Item, BaseParameter.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             Debug.Assert(derivedType.ResolvedEntityType.IsAssigned);
@@ -1358,11 +1358,11 @@
                 IEntityDeclaration DerivedField = derivedType.EntityDeclarationList[i];
 
                 Debug.Assert(DerivedField.ValidEntity.IsAssigned);
-                Debug.Assert(DerivedField.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(DerivedField.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
                 Debug.Assert(BaseField.ValidEntity.IsAssigned);
-                Debug.Assert(BaseField.ValidEntity.Item.ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(BaseField.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
 
-                Result = TypeConformToBase(DerivedField.ValidEntity.Item.ResolvedFeatureType2.Item, BaseField.ValidEntity.Item.ResolvedFeatureType2.Item, errorList, sourceLocation, isConversionAllowed: false);
+                Result = TypeConformToBase(DerivedField.ValidEntity.Item.ResolvedFeatureType.Item, BaseField.ValidEntity.Item.ResolvedFeatureType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             return Result;

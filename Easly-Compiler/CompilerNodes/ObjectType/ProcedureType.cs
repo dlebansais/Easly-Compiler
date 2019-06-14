@@ -397,7 +397,7 @@ namespace CompilerNode
 
                 for (int i = 0; i < overload.ParameterList.Count && i < Item.ParameterList.Count; i++)
                 {
-                    IsMatching &= overload.ParameterList[i].ValidEntity.Item.ResolvedFeatureType2.Item == Item.ParameterList[i].ValidEntity.Item.ResolvedFeatureType2.Item;
+                    IsMatching &= overload.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item == Item.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item;
 
                     if (IsMatching)
                     {

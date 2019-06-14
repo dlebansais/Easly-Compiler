@@ -24,7 +24,7 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceTableSourceTemplate<ICreateInstruction, string, IScopeAttributeFeature, ITypeName>(nameof(IScopeHolder.FullScope), nameof(IScopeAttributeFeature.ResolvedFeatureTypeName), TemplateNodeStart<ICreateInstruction>.Default),
-                new OnceReferenceTableSourceTemplate<ICreateInstruction, string, IScopeAttributeFeature, ICompiledType>(nameof(IScopeHolder.FullScope), nameof(IScopeAttributeFeature.ResolvedFeatureType2), TemplateNodeStart<ICreateInstruction>.Default),
+                new OnceReferenceTableSourceTemplate<ICreateInstruction, string, IScopeAttributeFeature, ICompiledType>(nameof(IScopeHolder.FullScope), nameof(IScopeAttributeFeature.ResolvedFeatureType), TemplateNodeStart<ICreateInstruction>.Default),
                 new SealedTableSourceTemplate<ICreateInstruction, string, IScopeAttributeFeature>(nameof(IScopeHolder.LocalScope), TemplateScopeStart<ICreateInstruction>.Default),
                 new OnceReferenceCollectionSourceTemplate<ICreateInstruction, IArgument, IResultException>(nameof(ICreateInstruction.ArgumentList), nameof(IArgument.ResolvedException)),
             };
@@ -114,7 +114,7 @@
             {
                 IScopeAttributeFeature CreatedFeature = LocalScope[ValidText];
                 attributeTypeName = CreatedFeature.ResolvedFeatureTypeName.Item;
-                attributeType = CreatedFeature.ResolvedFeatureType2.Item;
+                attributeType = CreatedFeature.ResolvedFeatureType.Item;
                 Success = true;
             }
             else if (FeatureName.TableContain(EmbeddingClass.FeatureTable, ValidText, out IFeatureName Key, out IFeatureInstance Instance))
@@ -228,7 +228,7 @@
 
             IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
 
-            IProcedureType AsProcedureType = (IProcedureType)creationFeature.ResolvedFeatureType2.Item;
+            IProcedureType AsProcedureType = (IProcedureType)creationFeature.ResolvedFeatureType.Item;
             foreach (ICommandOverloadType Overload in AsProcedureType.OverloadList)
                 ParameterTableList.Add(Overload.ParameterTable);
 

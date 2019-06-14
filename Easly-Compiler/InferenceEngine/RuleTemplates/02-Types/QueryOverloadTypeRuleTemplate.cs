@@ -116,8 +116,8 @@
 
             foreach (IParameter Parameter in ResultTable)
             {
-                Debug.Assert(Parameter.ResolvedParameter.ResolvedFeatureType2.IsAssigned);
-                node.ConformantResultTable.Add(Parameter.ResolvedParameter.ResolvedFeatureType2.Item);
+                Debug.Assert(Parameter.ResolvedParameter.ResolvedFeatureType.IsAssigned);
+                node.ConformantResultTable.Add(Parameter.ResolvedParameter.ResolvedFeatureType.Item);
             }
         }
         #endregion

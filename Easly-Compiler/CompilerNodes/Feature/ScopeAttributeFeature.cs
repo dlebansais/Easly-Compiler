@@ -136,7 +136,7 @@ namespace CompilerNode
 
             if (attributeType != null)
             {
-                ResolvedFeatureType2.Item = attributeType;
+                ResolvedFeatureType.Item = attributeType;
                 TypeAsDestinationOrSource.Item = attributeType;
             }
 
@@ -163,7 +163,7 @@ namespace CompilerNode
         {
             bool IsAssigned = false;
 
-            if (ResolvedFeatureType2.IsAssigned && ResolvedFeatureType2.Item is IClassType AsClassType)
+            if (ResolvedFeatureType.IsAssigned && ResolvedFeatureType.Item is IClassType AsClassType)
             {
                 IClass BaseClass = AsClassType.BaseClass;
                 Debug.Assert(BaseClass.ClassGroup.IsAssigned);
@@ -217,20 +217,20 @@ namespace CompilerNode
         /// <param name="attributeType">The associated type.</param>
         public void FixFeatureType(ITypeName attributeTypeName, ICompiledType attributeType)
         {
-            if (ResolvedFeatureTypeName.IsAssigned || ResolvedFeatureType2.IsAssigned)
+            if (ResolvedFeatureTypeName.IsAssigned || ResolvedFeatureType.IsAssigned)
             {
                 Debug.Assert(ResolvedFeatureTypeName.IsAssigned);
-                Debug.Assert(ResolvedFeatureType2.IsAssigned);
+                Debug.Assert(ResolvedFeatureType.IsAssigned);
                 Debug.Assert(TypeAsDestinationOrSource.IsAssigned);
 
                 Debug.Assert(ResolvedFeatureTypeName.Item == attributeTypeName);
-                Debug.Assert(ResolvedFeatureType2.Item == attributeType);
+                Debug.Assert(ResolvedFeatureType.Item == attributeType);
                 Debug.Assert(TypeAsDestinationOrSource.Item == attributeType);
             }
             else
             {
                 ResolvedFeatureTypeName.Item = attributeTypeName;
-                ResolvedFeatureType2.Item = attributeType;
+                ResolvedFeatureType.Item = attributeType;
                 TypeAsDestinationOrSource.Item = attributeType;
             }
         }
@@ -260,7 +260,7 @@ namespace CompilerNode
         /// <summary>
         /// Associated type.
         /// </summary>
-        public OnceReference<ICompiledType> ResolvedFeatureType2 { get; } = new OnceReference<ICompiledType>();
+        public OnceReference<ICompiledType> ResolvedFeatureType { get; } = new OnceReference<ICompiledType>();
 
         /// <summary>
         /// The type to use instead of this associated type for a source or destination, for the purpose of path searching, assignment and query.

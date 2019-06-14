@@ -296,7 +296,7 @@ namespace CompilerNode
 
             IIndexerFeature OperatorFeature = selectedPrecursor.Feature as IIndexerFeature;
             Debug.Assert(OperatorFeature != null);
-            IIndexerType OperatorType = OperatorFeature.ResolvedFeatureType2.Item as IIndexerType;
+            IIndexerType OperatorType = OperatorFeature.ResolvedFeatureType.Item as IIndexerType;
             Debug.Assert(OperatorType != null);
 
             IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();

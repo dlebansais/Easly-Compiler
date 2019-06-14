@@ -73,7 +73,7 @@
             node.ConstantSourceList.Seal();
             node.ExpressionConstant.Item = ExpressionConstant;
             node.ResolvedAncestorTypeName.Item = ResolvedFeature.ResolvedFeatureTypeName.Item;
-            node.ResolvedAncestorType.Item = ResolvedFeature.ResolvedFeatureType2.Item;
+            node.ResolvedAncestorType.Item = ResolvedFeature.ResolvedFeatureType.Item;
             node.ResolvedFeature.Item = ResolvedFeature;
         }
         #endregion

@@ -284,7 +284,7 @@ namespace CompilerNode
             Debug.Assert(FeatureInstance.Feature != null);
             resolvedFeature = FeatureInstance.Feature;
 
-            resolvedResult = new ResultType(resolvedFeature.ResolvedFeatureTypeName.Item, resolvedFeature.ResolvedFeatureType2.Item, string.Empty);
+            resolvedResult = new ResultType(resolvedFeature.ResolvedFeatureTypeName.Item, resolvedFeature.ResolvedFeatureType.Item, string.Empty);
 
             resolvedException = new ResultException();
             expressionConstant = new AgentLanguageConstant(resolvedFeature);

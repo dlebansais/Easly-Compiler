@@ -30,7 +30,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IFunctionFeature, ITypeName>(nameof(IFunctionFeature.ResolvedFeatureTypeName)),
-                new OnceReferenceDestinationTemplate<IFunctionFeature, ICompiledType>(nameof(IFunctionFeature.ResolvedFeatureType2)),
+                new OnceReferenceDestinationTemplate<IFunctionFeature, ICompiledType>(nameof(IFunctionFeature.ResolvedFeatureType)),
                 new OnceReferenceDestinationTemplate<IFunctionFeature, ICompiledFeature>(nameof(IFunctionFeature.ResolvedFeature)),
             };
         }
@@ -112,7 +112,7 @@
             FunctionType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType.SourceType, BaseType, OverloadList, out ResolvedFunctionTypeName, out ResolvedFunctionType);
 
             node.ResolvedFeatureTypeName.Item = ResolvedFunctionTypeName;
-            node.ResolvedFeatureType2.Item = ResolvedFunctionType;
+            node.ResolvedFeatureType.Item = ResolvedFunctionType;
             node.TypeAsDestinationOrSource.Item = ResolvedFunctionType;
             node.ResolvedFeature.Item = node;
 

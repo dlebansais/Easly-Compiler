@@ -22,7 +22,7 @@
             SourceTemplateList = new List<ISourceTemplate>()
             {
                 new OnceReferenceSourceTemplate<IFunctionFeature, ITypeName>(nameof(IFunctionFeature.ResolvedFeatureTypeName)),
-                new OnceReferenceSourceTemplate<IFunctionFeature, ICompiledType>(nameof(IFunctionFeature.ResolvedFeatureType2)),
+                new OnceReferenceSourceTemplate<IFunctionFeature, ICompiledType>(nameof(IFunctionFeature.ResolvedFeatureType)),
                 new SealedListCollectionSourceTemplate<IFunctionFeature, IQueryOverload, ICompiledType>(nameof(IFunctionFeature.OverloadList), nameof(IQueryOverload.CompleteConformantResultTable)),
             };
 

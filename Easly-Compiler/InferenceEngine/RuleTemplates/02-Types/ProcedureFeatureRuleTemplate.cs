@@ -28,7 +28,7 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IProcedureFeature, ITypeName>(nameof(IProcedureFeature.ResolvedFeatureTypeName)),
-                new OnceReferenceDestinationTemplate<IProcedureFeature, ICompiledType>(nameof(IProcedureFeature.ResolvedFeatureType2)),
+                new OnceReferenceDestinationTemplate<IProcedureFeature, ICompiledType>(nameof(IProcedureFeature.ResolvedFeatureType)),
                 new OnceReferenceDestinationTemplate<IProcedureFeature, ICompiledFeature>(nameof(IProcedureFeature.ResolvedFeature)),
             };
         }
@@ -101,7 +101,7 @@
 
             ProcedureType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType.SourceType, BaseType, OverloadList, out ITypeName ResolvedProcedureTypeName, out ICompiledType ResolvedProcedureType);
             node.ResolvedFeatureTypeName.Item = ResolvedProcedureTypeName;
-            node.ResolvedFeatureType2.Item = ResolvedProcedureType;
+            node.ResolvedFeatureType.Item = ResolvedProcedureType;
             node.TypeAsDestinationOrSource.Item = ResolvedProcedureType;
 
             node.ResolvedFeature.Item = node;
