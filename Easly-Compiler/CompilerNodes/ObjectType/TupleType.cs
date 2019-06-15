@@ -308,14 +308,14 @@ namespace CompilerNode
             foreach (IEntityDeclaration Field in EntityDeclarationList)
             {
                 Debug.Assert(Field.ValidEntity.IsAssigned);
-                Debug.Assert(Field.ValidEntity.Item.ResolvedFeatureTypeName.IsAssigned);
-                Debug.Assert(Field.ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                Debug.Assert(Field.ValidEntity.Item.ResolvedEffectiveTypeName.IsAssigned);
+                Debug.Assert(Field.ValidEntity.Item.ResolvedEffectiveType.IsAssigned);
 
-                ITypeName InstancedFieldTypeName = Field.ValidEntity.Item.ResolvedFeatureTypeName.Item;
-                ICompiledType InstancedFieldType = Field.ValidEntity.Item.ResolvedFeatureType.Item;
+                ITypeName InstancedFieldTypeName = Field.ValidEntity.Item.ResolvedEffectiveTypeName.Item;
+                ICompiledType InstancedFieldType = Field.ValidEntity.Item.ResolvedEffectiveType.Item;
 
                 InstancedFieldType.InstanciateType(instancingClassType, ref InstancedFieldTypeName, ref InstancedFieldType);
-                IsNewInstance |= InstancedFieldType != Field.ValidEntity.Item.ResolvedFeatureType.Item;
+                IsNewInstance |= InstancedFieldType != Field.ValidEntity.Item.ResolvedEffectiveType.Item;
 
                 IEntityDeclaration InstancedField = new EntityDeclaration(Field, InstancedFieldTypeName, InstancedFieldType);
                 InstancedFieldList.Add(InstancedField);
@@ -371,11 +371,11 @@ namespace CompilerNode
                         for (int i = 0; i < entityDeclarationList.Count; i++)
                         {
                             Debug.Assert(entityDeclarationList[i].ValidEntity.IsAssigned);
-                            Debug.Assert(entityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                            Debug.Assert(entityDeclarationList[i].ValidEntity.Item.ResolvedEffectiveType.IsAssigned);
                             Debug.Assert(AsTupleType.EntityDeclarationList[i].ValidEntity.IsAssigned);
-                            Debug.Assert(AsTupleType.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                            Debug.Assert(AsTupleType.EntityDeclarationList[i].ValidEntity.Item.ResolvedEffectiveType.IsAssigned);
 
-                            AllFieldsEqual &= entityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.Item == AsTupleType.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.Item;
+                            AllFieldsEqual &= entityDeclarationList[i].ValidEntity.Item.ResolvedEffectiveType.Item == AsTupleType.EntityDeclarationList[i].ValidEntity.Item.ResolvedEffectiveType.Item;
                         }
 
                         if (AllFieldsEqual)
@@ -440,10 +440,10 @@ namespace CompilerNode
             for (int i = 0; i < type1.EntityDeclarationList.Count && i < type2.EntityDeclarationList.Count; i++)
             {
                 Debug.Assert(type1.EntityDeclarationList[i].ValidEntity.IsAssigned);
-                Debug.Assert(type1.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                Debug.Assert(type1.EntityDeclarationList[i].ValidEntity.Item.ResolvedEffectiveType.IsAssigned);
                 Debug.Assert(type2.EntityDeclarationList[i].ValidEntity.IsAssigned);
-                Debug.Assert(type2.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
-                IsIdentical &= ObjectType.TypesHaveIdenticalSignature(type1.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.Item, type2.EntityDeclarationList[i].ValidEntity.Item.ResolvedFeatureType.Item);
+                Debug.Assert(type2.EntityDeclarationList[i].ValidEntity.Item.ResolvedEffectiveType.IsAssigned);
+                IsIdentical &= ObjectType.TypesHaveIdenticalSignature(type1.EntityDeclarationList[i].ValidEntity.Item.ResolvedEffectiveType.Item, type2.EntityDeclarationList[i].ValidEntity.Item.ResolvedEffectiveType.Item);
             }
 
             return IsIdentical;

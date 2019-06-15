@@ -272,7 +272,7 @@ namespace CompilerNode
 
                 IFeatureInstance IndexerInstance = IndexedFeatureTable[FeatureName.IndexerFeatureName];
                 IIndexerFeature Indexer = (IndexerFeature)IndexerInstance.Feature;
-                IIndexerType AsIndexerType = (IndexerType)Indexer.ResolvedFeatureType.Item;
+                IIndexerType AsIndexerType = (IndexerType)Indexer.ResolvedAgentType.Item;
 
                 List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
                 if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, errorList))

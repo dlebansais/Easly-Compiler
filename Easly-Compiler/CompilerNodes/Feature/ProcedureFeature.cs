@@ -113,9 +113,10 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                ResolvedFeatureTypeName = new OnceReference<ITypeName>();
-                ResolvedFeatureType = new OnceReference<ICompiledType>();
-                TypeAsDestinationOrSource = new OnceReference<ICompiledType>();
+                ResolvedAgentTypeName = new OnceReference<ITypeName>();
+                ResolvedAgentType = new OnceReference<ICompiledType>();
+                ResolvedEffectiveTypeName = new OnceReference<ITypeName>();
+                ResolvedEffectiveType = new OnceReference<ICompiledType>();
                 ValidFeatureName = new OnceReference<IFeatureName>();
                 ResolvedFeature = new OnceReference<ICompiledFeature>();
                 IsHandled = true;
@@ -146,10 +147,14 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                Debug.Assert(ResolvedFeatureTypeName.IsAssigned == ResolvedFeatureType.IsAssigned);
-                Debug.Assert(ResolvedFeatureTypeName.IsAssigned == TypeAsDestinationOrSource.IsAssigned);
+                Debug.Assert(ResolvedAgentTypeName.IsAssigned == ResolvedAgentType.IsAssigned);
+                Debug.Assert(ResolvedEffectiveTypeName.IsAssigned == ResolvedEffectiveType.IsAssigned);
 
                 IsResolved = ResolvedFeature.IsAssigned;
+
+                Debug.Assert(ResolvedAgentType.IsAssigned || !IsResolved);
+                Debug.Assert(!ResolvedEffectiveType.IsAssigned);
+
                 IsHandled = true;
             }
 
@@ -187,20 +192,27 @@ namespace CompilerNode
         public bool HasPrecursorBody { get { return ((List<ICommandOverload>)OverloadList).Exists((ICommandOverload overload) => overload.HasPrecursorBody); } }
 
         /// <summary>
-        /// Name of the associated type.
+        /// Name of the agent type associated to the feature.
         /// </summary>
-        public OnceReference<ITypeName> ResolvedFeatureTypeName { get; private set; } = new OnceReference<ITypeName>();
+        public OnceReference<ITypeName> ResolvedAgentTypeName { get; private set; } = new OnceReference<ITypeName>();
 
         /// <summary>
-        /// Associated type.
+        /// The agent type associated to the feature.
         /// </summary>
-        public OnceReference<ICompiledType> ResolvedFeatureType { get; private set; } = new OnceReference<ICompiledType>();
+        public OnceReference<ICompiledType> ResolvedAgentType { get; private set; } = new OnceReference<ICompiledType>();
 
         /// <summary>
-        /// The type to use instead of this associated type for a source or destination, for the purpose of path searching, assignment and query.
+        /// The name of the type to use, as source or destination, for the purpose of path searching, assignment and query.
         /// </summary>
-        public OnceReference<ICompiledType> TypeAsDestinationOrSource { get; private set; } = new OnceReference<ICompiledType>();
+        public OnceReference<ITypeName> ResolvedEffectiveTypeName { get; private set; } = new OnceReference<ITypeName>();
 
+        /// <summary>
+        /// The type to use, as source or destination, for the purpose of path searching, assignment and query.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedEffectiveType { get; private set; } = new OnceReference<ICompiledType>();
+        #endregion
+
+        #region Implementation of IFeatureWithEntity
         /// <summary>
         /// Guid of the language type corresponding to the entity object for an instance of this class.
         /// </summary>

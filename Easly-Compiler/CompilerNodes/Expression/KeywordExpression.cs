@@ -296,8 +296,8 @@ namespace CompilerNode
             foreach (IParameter Item in innerQueryOverload.ResultTable)
                 if (Item.Name == nameof(BaseNode.Keyword.Result))
                 {
-                    resultTypeName = Item.ResolvedParameter.ResolvedFeatureTypeName.Item;
-                    resultType = Item.ResolvedParameter.TypeAsDestinationOrSource.Item;
+                    resultTypeName = Item.ResolvedParameter.ResolvedEffectiveTypeName.Item;
+                    resultType = Item.ResolvedParameter.ResolvedEffectiveType.Item;
                     Success = true;
                     break;
                 }

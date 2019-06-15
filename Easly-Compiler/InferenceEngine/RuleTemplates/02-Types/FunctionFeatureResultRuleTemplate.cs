@@ -21,15 +21,16 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceSourceTemplate<IFunctionFeature, ITypeName>(nameof(IFunctionFeature.ResolvedFeatureTypeName)),
-                new OnceReferenceSourceTemplate<IFunctionFeature, ICompiledType>(nameof(IFunctionFeature.ResolvedFeatureType)),
+                new OnceReferenceSourceTemplate<IFunctionFeature, ITypeName>(nameof(IFunctionFeature.ResolvedAgentTypeName)),
+                new OnceReferenceSourceTemplate<IFunctionFeature, ICompiledType>(nameof(IFunctionFeature.ResolvedAgentType)),
                 new SealedListCollectionSourceTemplate<IFunctionFeature, IQueryOverload, ICompiledType>(nameof(IFunctionFeature.OverloadList), nameof(IQueryOverload.CompleteConformantResultTable)),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IFunctionFeature, ITypeName>(nameof(IFunctionFeature.MostCommonTypeName)),
-                new OnceReferenceDestinationTemplate<IFunctionFeature, ICompiledType>(nameof(IFunctionFeature.MostCommonType)),
+                new OnceReferenceDestinationTemplate<IFunctionFeature, IExpressionType>(nameof(IFunctionFeature.MostCommonResult)),
+                new OnceReferenceDestinationTemplate<IFunctionFeature, ITypeName>(nameof(IFunctionFeature.ResolvedEffectiveTypeName)),
+                new OnceReferenceDestinationTemplate<IFunctionFeature, ICompiledType>(nameof(IFunctionFeature.ResolvedEffectiveType)),
             };
         }
         #endregion
@@ -50,17 +51,16 @@
             // This is ensured because the root node is valid.
             Debug.Assert(node.OverloadList.Count > 0);
 
-            IList<IQueryOverloadType> OverloadTypeList = new List<IQueryOverloadType>();
-            foreach (IQueryOverload Overload in node.OverloadList)
+            IFunctionType ResolvedFeatureType = node.ResolvedAgentType.Item as IFunctionType;
+            Debug.Assert(ResolvedFeatureType != null);
+
+            foreach (IQueryOverloadType OverloadType in ResolvedFeatureType.OverloadList)
             {
-                Debug.Assert(Overload.ResolvedAssociatedType.IsAssigned);
-                IQueryOverloadType OverloadType = Overload.ResolvedAssociatedType.Item;
-
-                Debug.Assert(Overload.ConformantResultTable.IsSealed);
                 Debug.Assert(OverloadType.ConformantResultTable.IsSealed);
-
-                OverloadTypeList.Add(OverloadType);
+                Debug.Assert(OverloadType.ResultTypeList.Count == OverloadType.ResultTable.Count);
             }
+
+            IList<IQueryOverloadType> OverloadTypeList = ResolvedFeatureType.OverloadList;
 
             IResultType CommonResults = Feature.CommonResultType(OverloadTypeList);
 
@@ -89,17 +89,12 @@
         {
             IResultType CommonResults = (IResultType)data;
 
-            ITypeName MostCommonTypeName = null;
-            ICompiledType MostCommonType = null;
-            foreach (IExpressionType Item in CommonResults)
-                if (MostCommonType == null || Item.Name == nameof(BaseNode.Keyword.Result))
-                {
-                    MostCommonTypeName = Item.ValueTypeName;
-                    MostCommonType = Item.ValueType;
-                }
+            int Index = CommonResults.ResultNameIndex >= 0 ? CommonResults.ResultNameIndex : 0;
+            IExpressionType MostCommonResult = CommonResults.At(Index);
 
-            node.MostCommonTypeName.Item = MostCommonTypeName;
-            node.MostCommonType.Item = MostCommonType;
+            node.MostCommonResult.Item = MostCommonResult;
+            node.ResolvedEffectiveTypeName.Item = MostCommonResult.ValueTypeName;
+            node.ResolvedEffectiveType.Item = MostCommonResult.ValueType;
         }
         #endregion
     }

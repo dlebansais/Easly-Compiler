@@ -239,10 +239,9 @@ namespace CompilerNode
                     Debug.Assert(Value.Feature != null);
 
                     ICompiledFeature OperatorFeature = Value.Feature;
-                    Debug.Assert(OperatorFeature.ResolvedFeatureType.IsAssigned);
-                    ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
+                    ICompiledType OperatorType = OperatorFeature.ResolvedAgentType.Item;
 
-                    if (OperatorType is FunctionType AsFunctionType && OperatorFeature is IFunctionFeature AsFunctionFeature)
+                    if (OperatorFeature is IFunctionFeature AsFunctionFeature && OperatorType is FunctionType AsFunctionType)
                     {
                         IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
                         foreach (IQueryOverloadType Overload in AsFunctionType.OverloadList)

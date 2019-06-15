@@ -123,7 +123,7 @@
         /// <param name="context">The initialization context.</param>
         public override void Init(ICSharpContext context)
         {
-            Type = CSharpType.Create(context, Source.TypeAsDestinationOrSource.Item);
+            Type = CSharpType.Create(context, Source.ResolvedEffectiveType.Item);
 
             if (Source.DefaultValue.IsAssigned)
                 DefaultValue = CSharpExpression.Create(context, Source.DefaultValue.Item);

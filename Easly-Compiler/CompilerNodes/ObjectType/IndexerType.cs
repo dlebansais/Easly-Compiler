@@ -411,7 +411,7 @@
                         ParameterDeclarationList += ", ";
 
                     IScopeAttributeFeature ParameterAttribute = ParameterItem.ValidEntity.Item;
-                    ParameterDeclarationList += ParameterAttribute.ValidFeatureName.Item.Name + " :" + ParameterAttribute.ResolvedFeatureTypeName.Item;
+                    ParameterDeclarationList += ParameterAttribute.ValidFeatureName.Item.Name + " :" + ParameterAttribute.ResolvedEffectiveTypeName.Item;
                 }
 
                 string Result = $"{BaseTypeName}.indexer: {EntityTypeName}({ParameterDeclarationList})";
@@ -484,8 +484,8 @@
             IList<IEntityDeclaration> InstancedIndexParameterList = new List<IEntityDeclaration>();
             foreach (IEntityDeclaration Parameter in IndexParameterList)
             {
-                ITypeName InstancedParameterTypeName = Parameter.ValidEntity.Item.ResolvedFeatureTypeName.Item;
-                ICompiledType InstancedParameterType = Parameter.ValidEntity.Item.ResolvedFeatureType.Item;
+                ITypeName InstancedParameterTypeName = Parameter.ValidEntity.Item.ResolvedEffectiveTypeName.Item;
+                ICompiledType InstancedParameterType = Parameter.ValidEntity.Item.ResolvedEffectiveType.Item;
                 InstancedParameterType.InstanciateType(instancingClassType, ref InstancedParameterTypeName, ref InstancedParameterType);
 
                 IEntityDeclaration InstancedParameter = new EntityDeclaration(Parameter, InstancedParameterTypeName, InstancedParameterType);
@@ -501,7 +501,7 @@
                 else
                     NewEntity = ScopeAttributeFeature.Create(Parameter, ParameterName.ValidText.Item, InstancedParameterTypeName, InstancedParameterType);
 
-                IsNewInstance |= InstancedParameterType != Parameter.ValidEntity.Item.ResolvedFeatureType.Item;
+                IsNewInstance |= InstancedParameterType != Parameter.ValidEntity.Item.ResolvedEffectiveType.Item;
 
                 InstancedParameter.ValidEntity.Item = NewEntity;
                 InstancedIndexParameterList.Add(InstancedParameter);
@@ -607,7 +607,7 @@
             IsSame &= indexerType.IndexParameterList.Count == indexParameterList.Count;
 
             for (int i = 0; i < indexerType.IndexParameterList.Count && i < indexParameterList.Count; i++)
-                IsSame &= indexParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item == indexerType.IndexParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item;
+                IsSame &= indexParameterList[i].ValidEntity.Item.ResolvedEffectiveType.Item == indexerType.IndexParameterList[i].ValidEntity.Item.ResolvedEffectiveType.Item;
 
             IsSame &= indexerType.ParameterEnd == parameterEnd;
 
@@ -680,10 +680,10 @@
             for (int i = 0; i < type1.IndexParameterList.Count && i < type2.IndexParameterList.Count; i++)
             {
                 Debug.Assert(type1.IndexParameterList[i].ValidEntity.IsAssigned);
-                Debug.Assert(type1.IndexParameterList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
+                Debug.Assert(type1.IndexParameterList[i].ValidEntity.Item.ResolvedEffectiveType.IsAssigned);
                 Debug.Assert(type2.IndexParameterList[i].ValidEntity.IsAssigned);
-                Debug.Assert(type2.IndexParameterList[i].ValidEntity.Item.ResolvedFeatureType.IsAssigned);
-                IsIdentical &= ObjectType.TypesHaveIdenticalSignature(type1.IndexParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item, type2.IndexParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item);
+                Debug.Assert(type2.IndexParameterList[i].ValidEntity.Item.ResolvedEffectiveType.IsAssigned);
+                IsIdentical &= ObjectType.TypesHaveIdenticalSignature(type1.IndexParameterList[i].ValidEntity.Item.ResolvedEffectiveType.Item, type2.IndexParameterList[i].ValidEntity.Item.ResolvedEffectiveType.Item);
             }
 
             IsIdentical &= Assertion.IsAssertionListEqual(type1.GetRequireList, type2.GetRequireList);

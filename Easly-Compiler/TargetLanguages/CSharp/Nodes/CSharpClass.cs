@@ -580,21 +580,20 @@
             {
                 ICompiledTypeWithFeature BaseType;
                 ITypeName ResolvedTypeName;
-                ICompiledType ResolvedType;
 
                 switch (Item.Value)
                 {
                     case IFunctionType AsFunctionType:
                         BaseType = AsFunctionType.ResolvedBaseType.Item;
 
-                        if (!FunctionType.TypeTableContaining(DelegateTable, BaseType, AsFunctionType.OverloadList, out ResolvedTypeName, out ResolvedType))
+                        if (!FunctionType.TypeTableContaining(DelegateTable, BaseType, AsFunctionType.OverloadList, out ResolvedTypeName, out IFunctionType ResolvedFunctionType))
                             DelegateTable.Add(Item.Key, Item.Value);
                         break;
 
                     case IProcedureType AsProcedureType:
                         BaseType = AsProcedureType.ResolvedBaseType.Item;
 
-                        if (!ProcedureType.TypeTableContaining(DelegateTable, BaseType, AsProcedureType.OverloadList, out ResolvedTypeName, out ResolvedType))
+                        if (!ProcedureType.TypeTableContaining(DelegateTable, BaseType, AsProcedureType.OverloadList, out ResolvedTypeName, out IProcedureType ResolvedProcedureType))
                             DelegateTable.Add(Item.Key, Item.Value);
                         break;
                 }

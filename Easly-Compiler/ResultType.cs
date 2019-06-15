@@ -9,6 +9,11 @@
     public interface IResultType : IReadOnlyCollection<IExpressionType>
     {
         /// <summary>
+        /// Index of the result type to select with a 'result of' expression. -1 if none.
+        /// </summary>
+        int ResultNameIndex { get; }
+
+        /// <summary>
         /// Gets the type at the given index.
         /// </summary>
         /// <param name="index">The index.</param>
@@ -42,6 +47,7 @@
         /// </summary>
         protected ResultType()
         {
+            ResultNameIndex = GetResultNameIndex();
         }
 
         /// <summary>
@@ -51,6 +57,7 @@
         public ResultType(IExpressionType item)
         {
             Add(item);
+            ResultNameIndex = GetResultNameIndex();
         }
 
         /// <summary>
@@ -60,6 +67,7 @@
         public ResultType(IList<IExpressionType> resultList)
         {
             AddRange(resultList);
+            ResultNameIndex = GetResultNameIndex();
         }
 
         /// <summary>
@@ -71,7 +79,32 @@
         public ResultType(ITypeName valueTypeName, ICompiledType valueType, string name)
         {
             Add(new ExpressionType(valueTypeName, valueType, name));
+            ResultNameIndex = GetResultNameIndex();
         }
+
+        private int GetResultNameIndex()
+        {
+            int Index = -1;
+
+            for (int i = 0; i < Count; i++)
+            {
+                IExpressionType Item = this[i];
+                if (Item.IsResultName)
+                {
+                    Debug.Assert(Index == -1);
+                    Index = i;
+                }
+            }
+
+            return Index;
+        }
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// Index of the result type to select with a 'result of' expression. -1 if none.
+        /// </summary>
+        public int ResultNameIndex { get; }
         #endregion
 
         #region Client Interface

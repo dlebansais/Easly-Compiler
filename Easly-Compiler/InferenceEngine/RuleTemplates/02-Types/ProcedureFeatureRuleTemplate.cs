@@ -27,8 +27,8 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IProcedureFeature, ITypeName>(nameof(IProcedureFeature.ResolvedFeatureTypeName)),
-                new OnceReferenceDestinationTemplate<IProcedureFeature, ICompiledType>(nameof(IProcedureFeature.ResolvedFeatureType)),
+                new OnceReferenceDestinationTemplate<IProcedureFeature, ITypeName>(nameof(IProcedureFeature.ResolvedAgentTypeName)),
+                new OnceReferenceDestinationTemplate<IProcedureFeature, ICompiledType>(nameof(IProcedureFeature.ResolvedAgentType)),
                 new OnceReferenceDestinationTemplate<IProcedureFeature, ICompiledFeature>(nameof(IProcedureFeature.ResolvedFeature)),
             };
         }
@@ -99,15 +99,16 @@
             foreach (ICommandOverload Item in node.OverloadList)
                 OverloadList.Add(Item.ResolvedAssociatedType.Item);
 
-            ProcedureType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType.SourceType, BaseType, OverloadList, out ITypeName ResolvedProcedureTypeName, out ICompiledType ResolvedProcedureType);
-            node.ResolvedFeatureTypeName.Item = ResolvedProcedureTypeName;
-            node.ResolvedFeatureType.Item = ResolvedProcedureType;
-            node.TypeAsDestinationOrSource.Item = ResolvedProcedureType;
+            ProcedureType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType.SourceType, BaseType, OverloadList, out ITypeName ResolvedProcedureTypeName, out IProcedureType ResolvedProcedureType);
+            node.ResolvedAgentTypeName.Item = ResolvedProcedureTypeName;
+            node.ResolvedAgentType.Item = ResolvedProcedureType;
 
             node.ResolvedFeature.Item = node;
 
 #if COVERAGE
             string TypeString = ResolvedProcedureType.ToString();
+            Debug.Assert(!node.ResolvedEffectiveTypeName.IsAssigned);
+            Debug.Assert(!node.ResolvedEffectiveType.IsAssigned);
 #endif
         }
         #endregion

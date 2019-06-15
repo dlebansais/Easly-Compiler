@@ -64,7 +64,7 @@
 
                 IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
                 ICompiledFeature OperatorFeature = SelectedPrecursor.Feature;
-                IIndexerType AsIndexerType = OperatorFeature.TypeAsDestinationOrSource.Item as IIndexerType;
+                IIndexerType AsIndexerType = OperatorFeature.ResolvedAgentType.Item as IIndexerType;
                 Debug.Assert(AsIndexerType != null);
 
                 ParameterTableList.Add(AsIndexerType.ParameterTable);

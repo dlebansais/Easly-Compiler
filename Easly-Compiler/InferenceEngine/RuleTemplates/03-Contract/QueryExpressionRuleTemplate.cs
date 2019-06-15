@@ -23,8 +23,8 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceTableSourceTemplate<IQueryExpression, string, IScopeAttributeFeature, ITypeName>(nameof(IScope.FullScope), nameof(IScopeAttributeFeature.ResolvedFeatureTypeName), TemplateScopeStart<IQueryExpression>.Default),
-                new OnceReferenceTableSourceTemplate<IQueryExpression, string, IScopeAttributeFeature, ICompiledType>(nameof(IScope.FullScope), nameof(IScopeAttributeFeature.ResolvedFeatureType), TemplateScopeStart<IQueryExpression>.Default),
+                new OnceReferenceTableSourceTemplate<IQueryExpression, string, IScopeAttributeFeature, ITypeName>(nameof(IScope.FullScope), nameof(IScopeAttributeFeature.ResolvedEffectiveTypeName), TemplateScopeStart<IQueryExpression>.Default),
+                new OnceReferenceTableSourceTemplate<IQueryExpression, string, IScopeAttributeFeature, ICompiledType>(nameof(IScope.FullScope), nameof(IScopeAttributeFeature.ResolvedEffectiveType), TemplateScopeStart<IQueryExpression>.Default),
                 new OnceReferenceSourceTemplate<IQueryExpression, IList<IExpressionType>>(nameof(IQueryExpression.Query) + Dot + nameof(IQualifiedName.ValidResultTypePath)),
                 new OnceReferenceCollectionSourceTemplate<IQueryExpression, IArgument, IResultType>(nameof(IQueryExpression.ArgumentList), nameof(IArgument.ResolvedResult)),
             };
@@ -49,6 +49,10 @@
         {
             data = null;
             bool Success = true;
+
+            if (node.EmbeddingClass != null && node.EmbeddingClass.EntityName.Text == "Coverage Result Of Expression")
+            {
+            }
 
             Success &= QueryExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IResultException ResolvedException, out ISealableList<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out ICompiledFeature ResolvedFinalFeature, out IDiscrete ResolvedFinalDiscrete, out ISealableList<IParameter> SelectedResultList, out IFeatureCall FeatureCall, out bool InheritBySideAttribute);
 

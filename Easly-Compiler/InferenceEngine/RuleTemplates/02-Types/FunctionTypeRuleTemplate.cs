@@ -77,7 +77,7 @@
             ICompiledTypeWithFeature ResolvedBaseType = BaseType.ResolvedType.Item as ICompiledTypeWithFeature;
             Debug.Assert(BaseType != null);
 
-            FunctionType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType, ResolvedBaseType, node.OverloadList, out ITypeName ResolvedTypeName, out ICompiledType ResolvedType);
+            FunctionType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType, ResolvedBaseType, node.OverloadList, out ITypeName ResolvedTypeName, out IFunctionType ResolvedType);
 
             node.ResolvedTypeName.Item = ResolvedTypeName;
             node.ResolvedType.Item = ResolvedType;

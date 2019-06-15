@@ -29,8 +29,8 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IFunctionFeature, ITypeName>(nameof(IFunctionFeature.ResolvedFeatureTypeName)),
-                new OnceReferenceDestinationTemplate<IFunctionFeature, ICompiledType>(nameof(IFunctionFeature.ResolvedFeatureType)),
+                new OnceReferenceDestinationTemplate<IFunctionFeature, ITypeName>(nameof(IFunctionFeature.ResolvedAgentTypeName)),
+                new OnceReferenceDestinationTemplate<IFunctionFeature, ICompiledType>(nameof(IFunctionFeature.ResolvedAgentType)),
                 new OnceReferenceDestinationTemplate<IFunctionFeature, ICompiledFeature>(nameof(IFunctionFeature.ResolvedFeature)),
             };
         }
@@ -108,12 +108,11 @@
             }
 
             ITypeName ResolvedFunctionTypeName;
-            ICompiledType ResolvedFunctionType;
+            IFunctionType ResolvedFunctionType;
             FunctionType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType.SourceType, BaseType, OverloadList, out ResolvedFunctionTypeName, out ResolvedFunctionType);
 
-            node.ResolvedFeatureTypeName.Item = ResolvedFunctionTypeName;
-            node.ResolvedFeatureType.Item = ResolvedFunctionType;
-            node.TypeAsDestinationOrSource.Item = ResolvedFunctionType;
+            node.ResolvedAgentTypeName.Item = ResolvedFunctionTypeName;
+            node.ResolvedAgentType.Item = ResolvedFunctionType;
             node.ResolvedFeature.Item = node;
 
 #if COVERAGE

@@ -23,8 +23,8 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceTableSourceTemplate<IEntityExpression, string, IScopeAttributeFeature, ITypeName>(nameof(IScope.FullScope), nameof(IScopeAttributeFeature.ResolvedFeatureTypeName), TemplateScopeStart<IEntityExpression>.Default),
-                new OnceReferenceTableSourceTemplate<IEntityExpression, string, IScopeAttributeFeature, ICompiledType>(nameof(IScope.FullScope), nameof(IScopeAttributeFeature.ResolvedFeatureType), TemplateScopeStart<IEntityExpression>.Default),
+                new OnceReferenceTableSourceTemplate<IEntityExpression, string, IScopeAttributeFeature, ITypeName>(nameof(IScope.FullScope), nameof(IScopeAttributeFeature.ResolvedEffectiveTypeName), TemplateScopeStart<IEntityExpression>.Default),
+                new OnceReferenceTableSourceTemplate<IEntityExpression, string, IScopeAttributeFeature, ICompiledType>(nameof(IScope.FullScope), nameof(IScopeAttributeFeature.ResolvedEffectiveType), TemplateScopeStart<IEntityExpression>.Default),
                 new OnceReferenceSourceTemplate<IEntityExpression, IList<IExpressionType>>(nameof(IEntityExpression.Query) + Dot + nameof(IQualifiedName.ValidResultTypePath)),
             };
 

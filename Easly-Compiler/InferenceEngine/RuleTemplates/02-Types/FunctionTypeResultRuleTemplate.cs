@@ -28,8 +28,7 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IFunctionType, ITypeName>(nameof(IFunctionType.MostCommonTypeName)),
-                new OnceReferenceDestinationTemplate<IFunctionType, ICompiledType>(nameof(IFunctionType.MostCommonType)),
+                new OnceReferenceDestinationTemplate<IFunctionType, IExpressionType>(nameof(IFunctionType.MostCommonResult)),
             };
         }
         #endregion
@@ -50,11 +49,15 @@
             // This is ensured because the root node is valid.
             Debug.Assert(node.OverloadList.Count > 0);
 
-            IResultType CommonResults = Feature.CommonResultType(node.OverloadList);
+            IFunctionType ResolvedType = node.ResolvedType.Item as IFunctionType;
+            Debug.Assert(node.OverloadList.Count == ResolvedType.OverloadList.Count);
+            IList<IQueryOverloadType> OverloadTypeList = ResolvedType.OverloadList;
+
+            IResultType CommonResults = Feature.CommonResultType(OverloadTypeList);
 
             IErrorList CheckErrorList = new ErrorList();
             for (int i = 0; i < CommonResults.Count; i++)
-                Success &= Feature.JoinedResultCheck(node.OverloadList, i, CommonResults.At(i).ValueType, node, CheckErrorList);
+                Success &= Feature.JoinedResultCheck(OverloadTypeList, i, CommonResults.At(i).ValueType, node, CheckErrorList);
 
             if (!Success)
             {
@@ -77,17 +80,10 @@
         {
             IResultType CommonResults = (IResultType)data;
 
-            ITypeName MostCommonTypeName = null;
-            ICompiledType MostCommonType = null;
-            foreach (IExpressionType Item in CommonResults)
-                if (MostCommonType == null || Item.Name == nameof(BaseNode.Keyword.Result))
-                {
-                    MostCommonTypeName = Item.ValueTypeName;
-                    MostCommonType = Item.ValueType;
-                }
+            int Index = CommonResults.ResultNameIndex >= 0 ? CommonResults.ResultNameIndex : 0;
+            IExpressionType MostCommonResult = CommonResults.At(Index);
 
-            node.MostCommonTypeName.Item = MostCommonTypeName;
-            node.MostCommonType.Item = MostCommonType;
+            node.MostCommonResult.Item = MostCommonResult;
         }
         #endregion
     }

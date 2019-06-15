@@ -18,14 +18,9 @@ namespace CompilerNode
         IList<IQueryOverload> OverloadList { get; }
 
         /// <summary>
-        /// The name of the resolved function type processing all overloads.
-        /// </summary>
-        OnceReference<ITypeName> MostCommonTypeName { get; }
-
-        /// <summary>
         /// The resolved function type processing all overloads.
         /// </summary>
-        OnceReference<ICompiledType> MostCommonType { get; }
+        OnceReference<IExpressionType> MostCommonResult { get; }
     }
 
     /// <summary>
@@ -123,13 +118,13 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                ResolvedFeatureTypeName = new OnceReference<ITypeName>();
-                ResolvedFeatureType = new OnceReference<ICompiledType>();
-                TypeAsDestinationOrSource = new OnceReference<ICompiledType>();
+                ResolvedAgentTypeName = new OnceReference<ITypeName>();
+                ResolvedAgentType = new OnceReference<ICompiledType>();
+                ResolvedEffectiveTypeName = new OnceReference<ITypeName>();
+                ResolvedEffectiveType = new OnceReference<ICompiledType>();
                 ValidFeatureName = new OnceReference<IFeatureName>();
                 ResolvedFeature = new OnceReference<ICompiledFeature>();
-                MostCommonTypeName = new OnceReference<ITypeName>();
-                MostCommonType = new OnceReference<ICompiledType>();
+                MostCommonResult = new OnceReference<IExpressionType>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
@@ -158,15 +153,14 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                Debug.Assert(MostCommonTypeName.IsAssigned == MostCommonType.IsAssigned);
-                Debug.Assert(ResolvedFeatureTypeName.IsAssigned == ResolvedFeatureType.IsAssigned);
-                Debug.Assert(ResolvedFeatureTypeName.IsAssigned == TypeAsDestinationOrSource.IsAssigned);
+                Debug.Assert(ResolvedAgentTypeName.IsAssigned == ResolvedAgentType.IsAssigned);
+                Debug.Assert(ResolvedEffectiveTypeName.IsAssigned == ResolvedEffectiveType.IsAssigned);
 
-                IsResolved = MostCommonType.IsAssigned;
+                IsResolved = MostCommonResult.IsAssigned;
 
                 Debug.Assert(ResolvedFeature.IsAssigned || !IsResolved);
-                Debug.Assert(ResolvedFeatureType.IsAssigned || !IsResolved);
-                Debug.Assert(TypeAsDestinationOrSource.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedAgentType.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedEffectiveType.IsAssigned || !IsResolved);
 
                 IsHandled = true;
             }
@@ -205,20 +199,27 @@ namespace CompilerNode
         public bool HasPrecursorBody { get { return ((List<IQueryOverload>)OverloadList).Exists((IQueryOverload overload) => overload.HasPrecursorBody); } }
 
         /// <summary>
-        /// Name of the associated type.
+        /// Name of the agent type associated to the feature.
         /// </summary>
-        public OnceReference<ITypeName> ResolvedFeatureTypeName { get; private set; } = new OnceReference<ITypeName>();
+        public OnceReference<ITypeName> ResolvedAgentTypeName { get; private set; } = new OnceReference<ITypeName>();
 
         /// <summary>
-        /// Associated type.
+        /// The agent type associated to the feature.
         /// </summary>
-        public OnceReference<ICompiledType> ResolvedFeatureType { get; private set; } = new OnceReference<ICompiledType>();
+        public OnceReference<ICompiledType> ResolvedAgentType { get; private set; } = new OnceReference<ICompiledType>();
 
         /// <summary>
-        /// The type to use instead of this associated type for a source or destination, for the purpose of path searching, assignment and query.
+        /// The name of the type to use, as source or destination, for the purpose of path searching, assignment and query.
         /// </summary>
-        public OnceReference<ICompiledType> TypeAsDestinationOrSource { get; private set; } = new OnceReference<ICompiledType>();
+        public OnceReference<ITypeName> ResolvedEffectiveTypeName { get; private set; } = new OnceReference<ITypeName>();
 
+        /// <summary>
+        /// The type to use, as source or destination, for the purpose of path searching, assignment and query.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedEffectiveType { get; private set; } = new OnceReference<ICompiledType>();
+        #endregion
+
+        #region Implementation of IFeatureWithEntity
         /// <summary>
         /// Guid of the language type corresponding to the entity object for an instance of this class.
         /// </summary>
@@ -247,14 +248,9 @@ namespace CompilerNode
 
         #region Compiler
         /// <summary>
-        /// The name of the resolved function type after processing all overloads.
-        /// </summary>
-        public OnceReference<ITypeName> MostCommonTypeName { get; private set; } = new OnceReference<ITypeName>();
-
-        /// <summary>
         /// The resolved function type processing all overloads.
         /// </summary>
-        public OnceReference<ICompiledType> MostCommonType { get; private set; } = new OnceReference<ICompiledType>();
+        public OnceReference<IExpressionType> MostCommonResult { get; private set; } = new OnceReference<IExpressionType>();
         #endregion
 
         #region Debugging

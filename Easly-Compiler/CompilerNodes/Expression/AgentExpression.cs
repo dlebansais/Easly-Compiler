@@ -13,12 +13,12 @@ namespace CompilerNode
         /// <summary>
         /// The resolved type name of the feature providing the expression result.
         /// </summary>
-        OnceReference<ITypeName> ResolvedAncestorTypeName { get; }
+        OnceReference<ITypeName> ResolvedAgentTypeName { get; }
 
         /// <summary>
         /// The resolved type of the feature providing the expression result.
         /// </summary>
-        OnceReference<ICompiledType> ResolvedAncestorType { get; }
+        OnceReference<ICompiledType> ResolvedAgentType { get; }
 
         /// <summary>
         /// The resolved feature providing the expression result.
@@ -94,8 +94,8 @@ namespace CompilerNode
                 ResolvedResult = new OnceReference<IResultType>();
                 ConstantSourceList = new SealableList<IExpression>();
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
-                ResolvedAncestorTypeName = new OnceReference<ITypeName>();
-                ResolvedAncestorType = new OnceReference<ICompiledType>();
+                ResolvedAgentTypeName = new OnceReference<ITypeName>();
+                ResolvedAgentType = new OnceReference<ICompiledType>();
                 ResolvedFeature = new OnceReference<ICompiledFeature>();
                 IsHandled = true;
             }
@@ -128,8 +128,8 @@ namespace CompilerNode
                 IsResolved = ExpressionConstant.IsAssigned;
 
                 Debug.Assert(ResolvedResult.IsAssigned || !IsResolved);
-                Debug.Assert(ResolvedAncestorTypeName.IsAssigned == ResolvedResult.IsAssigned);
-                Debug.Assert(ResolvedAncestorType.IsAssigned == ResolvedResult.IsAssigned);
+                Debug.Assert(ResolvedAgentTypeName.IsAssigned == ResolvedResult.IsAssigned);
+                Debug.Assert(ResolvedAgentType.IsAssigned == ResolvedResult.IsAssigned);
                 Debug.Assert(ResolvedFeature.IsAssigned == ResolvedResult.IsAssigned);
 
                 IsHandled = true;
@@ -171,12 +171,12 @@ namespace CompilerNode
         /// <summary>
         /// The resolved type name of the feature providing the expression result.
         /// </summary>
-        public OnceReference<ITypeName> ResolvedAncestorTypeName { get; private set; } = new OnceReference<ITypeName>();
+        public OnceReference<ITypeName> ResolvedAgentTypeName { get; private set; } = new OnceReference<ITypeName>();
 
         /// <summary>
         /// The resolved type of the feature providing the expression result.
         /// </summary>
-        public OnceReference<ICompiledType> ResolvedAncestorType { get; private set; } = new OnceReference<ICompiledType>();
+        public OnceReference<ICompiledType> ResolvedAgentType { get; private set; } = new OnceReference<ICompiledType>();
 
         /// <summary>
         /// The resolved feature providing the expression result.
@@ -284,7 +284,7 @@ namespace CompilerNode
             Debug.Assert(FeatureInstance.Feature != null);
             resolvedFeature = FeatureInstance.Feature;
 
-            resolvedResult = new ResultType(resolvedFeature.ResolvedFeatureTypeName.Item, resolvedFeature.ResolvedFeatureType.Item, string.Empty);
+            resolvedResult = new ResultType(resolvedFeature.ResolvedAgentTypeName.Item, resolvedFeature.ResolvedAgentType.Item, string.Empty);
 
             resolvedException = new ResultException();
             expressionConstant = new AgentLanguageConstant(resolvedFeature);

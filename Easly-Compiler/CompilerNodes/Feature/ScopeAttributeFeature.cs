@@ -132,12 +132,15 @@ namespace CompilerNode
             ValidFeatureName.Item = new FeatureName(EntityName.Text);
 
             if (attributeTypeName != null)
-                ResolvedFeatureTypeName.Item = attributeTypeName;
+            {
+                ResolvedAgentTypeName.Item = attributeTypeName;
+                ResolvedEffectiveTypeName.Item = attributeTypeName;
+            }
 
             if (attributeType != null)
             {
-                ResolvedFeatureType.Item = attributeType;
-                TypeAsDestinationOrSource.Item = attributeType;
+                ResolvedAgentType.Item = attributeType;
+                ResolvedEffectiveType.Item = attributeType;
             }
 
             if (initialDefaultValue != null)
@@ -163,7 +166,7 @@ namespace CompilerNode
         {
             bool IsAssigned = false;
 
-            if (ResolvedFeatureType.IsAssigned && ResolvedFeatureType.Item is IClassType AsClassType)
+            if (ResolvedEffectiveType.IsAssigned && ResolvedEffectiveType.Item is IClassType AsClassType)
             {
                 IClass BaseClass = AsClassType.BaseClass;
                 Debug.Assert(BaseClass.ClassGroup.IsAssigned);
@@ -217,21 +220,18 @@ namespace CompilerNode
         /// <param name="attributeType">The associated type.</param>
         public void FixFeatureType(ITypeName attributeTypeName, ICompiledType attributeType)
         {
-            if (ResolvedFeatureTypeName.IsAssigned || ResolvedFeatureType.IsAssigned)
+            if (ResolvedEffectiveTypeName.IsAssigned || ResolvedEffectiveType.IsAssigned)
             {
-                Debug.Assert(ResolvedFeatureTypeName.IsAssigned);
-                Debug.Assert(ResolvedFeatureType.IsAssigned);
-                Debug.Assert(TypeAsDestinationOrSource.IsAssigned);
+                Debug.Assert(ResolvedEffectiveTypeName.IsAssigned);
+                Debug.Assert(ResolvedEffectiveType.IsAssigned);
 
-                Debug.Assert(ResolvedFeatureTypeName.Item == attributeTypeName);
-                Debug.Assert(ResolvedFeatureType.Item == attributeType);
-                Debug.Assert(TypeAsDestinationOrSource.Item == attributeType);
+                Debug.Assert(ResolvedEffectiveTypeName.Item == attributeTypeName);
+                Debug.Assert(ResolvedEffectiveType.Item == attributeType);
             }
             else
             {
-                ResolvedFeatureTypeName.Item = attributeTypeName;
-                ResolvedFeatureType.Item = attributeType;
-                TypeAsDestinationOrSource.Item = attributeType;
+                ResolvedEffectiveTypeName.Item = attributeTypeName;
+                ResolvedEffectiveType.Item = attributeType;
             }
         }
         #endregion
@@ -253,20 +253,27 @@ namespace CompilerNode
         public bool HasPrecursorBody { get { return false; } }
 
         /// <summary>
-        /// Name of the associated type.
+        /// Name of the agent type associated to the feature.
         /// </summary>
-        public OnceReference<ITypeName> ResolvedFeatureTypeName { get; } = new OnceReference<ITypeName>();
+        public OnceReference<ITypeName> ResolvedAgentTypeName { get; private set; } = new OnceReference<ITypeName>();
 
         /// <summary>
-        /// Associated type.
+        /// The agent type associated to the feature.
         /// </summary>
-        public OnceReference<ICompiledType> ResolvedFeatureType { get; } = new OnceReference<ICompiledType>();
+        public OnceReference<ICompiledType> ResolvedAgentType { get; private set; } = new OnceReference<ICompiledType>();
 
         /// <summary>
-        /// The type to use instead of this associated type for a source or destination, for the purpose of path searching, assignment and query.
+        /// The name of the type to use, as source or destination, for the purpose of path searching, assignment and query.
         /// </summary>
-        public OnceReference<ICompiledType> TypeAsDestinationOrSource { get; } = new OnceReference<ICompiledType>();
+        public OnceReference<ITypeName> ResolvedEffectiveTypeName { get; private set; } = new OnceReference<ITypeName>();
 
+        /// <summary>
+        /// The type to use, as source or destination, for the purpose of path searching, assignment and query.
+        /// </summary>
+        public OnceReference<ICompiledType> ResolvedEffectiveType { get; private set; } = new OnceReference<ICompiledType>();
+        #endregion
+
+        #region Implementation of IFeatureWithEntity
         /// <summary>
         /// Guid of the language type corresponding to the entity object for an instance of this class.
         /// </summary>

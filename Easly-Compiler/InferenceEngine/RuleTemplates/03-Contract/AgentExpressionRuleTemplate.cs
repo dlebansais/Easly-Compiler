@@ -28,7 +28,8 @@
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
                 new OnceReferenceDestinationTemplate<IAgentExpression, IResultType>(nameof(IAgentExpression.ResolvedResult)),
-                new OnceReferenceDestinationTemplate<IAgentExpression, ICompiledType>(nameof(IAgentExpression.ResolvedAncestorType)),
+                new OnceReferenceDestinationTemplate<IAgentExpression, ITypeName>(nameof(IAgentExpression.ResolvedAgentTypeName)),
+                new OnceReferenceDestinationTemplate<IAgentExpression, ICompiledType>(nameof(IAgentExpression.ResolvedAgentType)),
                 new UnsealedListDestinationTemplate<IAgentExpression, IExpression>(nameof(IAgentExpression.ConstantSourceList)),
             };
         }
@@ -72,8 +73,8 @@
             node.ConstantSourceList.AddRange(ConstantSourceList);
             node.ConstantSourceList.Seal();
             node.ExpressionConstant.Item = ExpressionConstant;
-            node.ResolvedAncestorTypeName.Item = ResolvedFeature.ResolvedFeatureTypeName.Item;
-            node.ResolvedAncestorType.Item = ResolvedFeature.ResolvedFeatureType.Item;
+            node.ResolvedAgentTypeName.Item = ResolvedFeature.ResolvedAgentTypeName.Item;
+            node.ResolvedAgentType.Item = ResolvedFeature.ResolvedAgentType.Item;
             node.ResolvedFeature.Item = ResolvedFeature;
         }
         #endregion

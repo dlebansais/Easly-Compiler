@@ -319,7 +319,8 @@ namespace CompilerNode
             if (IsNewInstance)
             {
                 ISealableDictionary<ITypeName, ICompiledType> TypeTable = instancingClassType.GetTypeTable();
-                ResolveType(TypeTable, InstancedBaseTypeName, (IObjectType)BaseType, (ICompiledTypeWithFeature)InstancedBaseType, InstancedOverloadList, out resolvedTypeName, out resolvedType);
+                ResolveType(TypeTable, InstancedBaseTypeName, (IObjectType)BaseType, (ICompiledTypeWithFeature)InstancedBaseType, InstancedOverloadList, out resolvedTypeName, out IProcedureType ResolvedProcedureType);
+                resolvedType = ResolvedProcedureType;
             }
         }
         #endregion
@@ -335,7 +336,7 @@ namespace CompilerNode
         /// <param name="overloadList">The list of resolved overloads.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void ResolveType(ISealableDictionary<ITypeName, ICompiledType> typeTable, ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, IList<ICommandOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void ResolveType(ISealableDictionary<ITypeName, ICompiledType> typeTable, ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, IList<ICommandOverloadType> overloadList, out ITypeName resolvedTypeName, out IProcedureType resolvedType)
         {
             if (!TypeTableContaining(typeTable, resolvedBaseType, overloadList, out resolvedTypeName, out resolvedType))
             {
@@ -352,7 +353,7 @@ namespace CompilerNode
         /// <param name="overloadList">The list of resolved overloads.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static bool TypeTableContaining(ISealableDictionary<ITypeName, ICompiledType> typeTable, ICompiledTypeWithFeature baseType, IList<ICommandOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static bool TypeTableContaining(ISealableDictionary<ITypeName, ICompiledType> typeTable, ICompiledTypeWithFeature baseType, IList<ICommandOverloadType> overloadList, out ITypeName resolvedTypeName, out IProcedureType resolvedType)
         {
             resolvedTypeName = null;
             resolvedType = null;
@@ -397,7 +398,7 @@ namespace CompilerNode
 
                 for (int i = 0; i < overload.ParameterList.Count && i < Item.ParameterList.Count; i++)
                 {
-                    IsMatching &= overload.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item == Item.ParameterList[i].ValidEntity.Item.ResolvedFeatureType.Item;
+                    IsMatching &= overload.ParameterList[i].ValidEntity.Item.ResolvedEffectiveType.Item == Item.ParameterList[i].ValidEntity.Item.ResolvedEffectiveType.Item;
 
                     if (IsMatching)
                     {
@@ -431,7 +432,7 @@ namespace CompilerNode
         /// <param name="overloadList">The list of resolved overloads.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void BuildType(ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, IList<ICommandOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void BuildType(ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, IList<ICommandOverloadType> overloadList, out ITypeName resolvedTypeName, out IProcedureType resolvedType)
         {
             IProcedureType ResolvedProcedureType = new ProcedureType(baseTypeName, baseType, resolvedBaseType, overloadList);
 

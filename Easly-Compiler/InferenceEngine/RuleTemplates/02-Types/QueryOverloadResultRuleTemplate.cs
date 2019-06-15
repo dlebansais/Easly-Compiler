@@ -92,8 +92,8 @@
 
             foreach (IParameter Parameter in ResultTable)
             {
-                Debug.Assert(Parameter.ResolvedParameter.ResolvedFeatureType.IsAssigned);
-                node.ConformantResultTable.Add(Parameter.ResolvedParameter.ResolvedFeatureType.Item);
+                Debug.Assert(Parameter.ResolvedParameter.ResolvedEffectiveType.IsAssigned);
+                node.ConformantResultTable.Add(Parameter.ResolvedParameter.ResolvedEffectiveType.Item);
             }
 
             Debug.Assert(ResultTable.Count > 0);
@@ -102,13 +102,13 @@
             ICompiledType BestResultType = null;
             foreach (IParameter Item in ResultTable)
             {
-                Debug.Assert(Item.ResolvedParameter.ResolvedFeatureTypeName.IsAssigned);
-                Debug.Assert(Item.ResolvedParameter.TypeAsDestinationOrSource.IsAssigned);
+                Debug.Assert(Item.ResolvedParameter.ResolvedEffectiveTypeName.IsAssigned);
+                Debug.Assert(Item.ResolvedParameter.ResolvedEffectiveType.IsAssigned);
 
                 if (BestResultType == null || Item.Name == nameof(BaseNode.Keyword.Result))
                 {
-                    BestResultTypeName = Item.ResolvedParameter.ResolvedFeatureTypeName.Item;
-                    BestResultType = Item.ResolvedParameter.TypeAsDestinationOrSource.Item;
+                    BestResultTypeName = Item.ResolvedParameter.ResolvedEffectiveTypeName.Item;
+                    BestResultType = Item.ResolvedParameter.ResolvedEffectiveType.Item;
                 }
             }
 
@@ -124,8 +124,8 @@
 
             foreach (IParameter Parameter in ResultTable)
             {
-                Debug.Assert(Parameter.ResolvedParameter.TypeAsDestinationOrSource.IsAssigned);
-                AssociatedType.ConformantResultTable.Add(Parameter.ResolvedParameter.TypeAsDestinationOrSource.Item);
+                Debug.Assert(Parameter.ResolvedParameter.ResolvedEffectiveType.IsAssigned);
+                AssociatedType.ConformantResultTable.Add(Parameter.ResolvedParameter.ResolvedEffectiveType.Item);
             }
 
             node.ResolvedAssociatedType.Item = AssociatedType;

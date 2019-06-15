@@ -30,8 +30,10 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IPropertyFeature, ITypeName>(nameof(IPropertyFeature.ResolvedFeatureTypeName)),
-                new OnceReferenceDestinationTemplate<IPropertyFeature, ICompiledType>(nameof(IPropertyFeature.ResolvedFeatureType)),
+                new OnceReferenceDestinationTemplate<IPropertyFeature, ITypeName>(nameof(IPropertyFeature.ResolvedAgentTypeName)),
+                new OnceReferenceDestinationTemplate<IPropertyFeature, ICompiledType>(nameof(IPropertyFeature.ResolvedAgentType)),
+                new OnceReferenceDestinationTemplate<IPropertyFeature, ITypeName>(nameof(IPropertyFeature.ResolvedEffectiveTypeName)),
+                new OnceReferenceDestinationTemplate<IPropertyFeature, ICompiledType>(nameof(IPropertyFeature.ResolvedEffectiveType)),
                 new OnceReferenceDestinationTemplate<IPropertyFeature, ICompiledFeature>(nameof(IPropertyFeature.ResolvedFeature)),
                 new UnsealedTableDestinationTemplate<IPropertyFeature, string, IScopeAttributeFeature>(nameof(IPropertyFeature.LocalScope)),
                 new UnsealedTableDestinationTemplate<IPropertyFeature, string, IScopeAttributeFeature>(nameof(IPropertyFeature.LocalGetScope)),
@@ -163,9 +165,10 @@
 
             node.ResolvedEntityTypeName.Item = EntityTypeName;
             node.ResolvedEntityType.Item = EntityType;
-            node.ResolvedFeatureTypeName.Item = ResolvedPropertyTypeName;
-            node.ResolvedFeatureType.Item = ResolvedPropertyType;
-            node.TypeAsDestinationOrSource.Item = EntityType;
+            node.ResolvedAgentTypeName.Item = ResolvedPropertyTypeName;
+            node.ResolvedAgentType.Item = ResolvedPropertyType;
+            node.ResolvedEffectiveTypeName.Item = EntityTypeName;
+            node.ResolvedEffectiveType.Item = EntityType;
 
             if (node.GetterBody.IsAssigned)
                 EmbeddingClass.BodyList.Add((IBody)node.GetterBody.Item);

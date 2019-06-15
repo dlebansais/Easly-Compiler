@@ -27,14 +27,9 @@ namespace CompilerNode
         OnceReference<ICompiledTypeWithFeature> ResolvedBaseType { get; }
 
         /// <summary>
-        /// Resolved type name for the most common result of all overloads.
-        /// </summary>
-        OnceReference<ITypeName> MostCommonTypeName { get; }
-
-        /// <summary>
         /// Resolved type for the most common result of all overloads.
         /// </summary>
-        OnceReference<ICompiledType> MostCommonType { get; }
+        OnceReference<IExpressionType> MostCommonResult { get; }
     }
 
     /// <summary>
@@ -167,8 +162,7 @@ namespace CompilerNode
                 ResolvedBaseType = new OnceReference<ICompiledTypeWithFeature>();
                 ResolvedTypeName = new OnceReference<ITypeName>();
                 ResolvedType = new OnceReference<ICompiledType>();
-                MostCommonTypeName = new OnceReference<ITypeName>();
-                MostCommonType = new OnceReference<ICompiledType>();
+                MostCommonResult = new OnceReference<IExpressionType>();
                 DiscreteTable = new SealableDictionary<IFeatureName, IDiscrete>();
                 FeatureTable = new SealableDictionary<IFeatureName, IFeatureInstance>();
                 ExportTable = new SealableDictionary<IFeatureName, ISealableDictionary<string, IClass>>();
@@ -199,8 +193,9 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 Debug.Assert(ResolvedTypeName.IsAssigned == ResolvedType.IsAssigned);
-                Debug.Assert(MostCommonTypeName.IsAssigned == MostCommonType.IsAssigned);
-                IsResolved = MostCommonType.IsAssigned;
+
+                IsResolved = MostCommonResult.IsAssigned;
+
                 Debug.Assert(ResolvedType.IsAssigned || !IsResolved);
                 IsHandled = true;
             }
@@ -222,14 +217,9 @@ namespace CompilerNode
         public OnceReference<ICompiledTypeWithFeature> ResolvedBaseType { get; private set; } = new OnceReference<ICompiledTypeWithFeature>();
 
         /// <summary>
-        /// Resolved type name for the most common result of all overloads.
-        /// </summary>
-        public OnceReference<ITypeName> MostCommonTypeName { get; private set; } = new OnceReference<ITypeName>();
-
-        /// <summary>
         /// Resolved type for the most common result of all overloads.
         /// </summary>
-        public OnceReference<ICompiledType> MostCommonType { get; private set; } = new OnceReference<ICompiledType>();
+        public OnceReference<IExpressionType> MostCommonResult { get; private set; } = new OnceReference<IExpressionType>();
         #endregion
 
         #region Implementation of IObjectType
@@ -344,7 +334,8 @@ namespace CompilerNode
             if (IsNewInstance)
             {
                 ISealableDictionary<ITypeName, ICompiledType> TypeTable = instancingClassType.GetTypeTable();
-                ResolveType(TypeTable, InstancedBaseTypeName, (IObjectType)BaseType, (ICompiledTypeWithFeature)InstancedBaseType, InstancedOverloadList, out resolvedTypeName, out resolvedType);
+                ResolveType(TypeTable, InstancedBaseTypeName, (IObjectType)BaseType, (ICompiledTypeWithFeature)InstancedBaseType, InstancedOverloadList, out resolvedTypeName, out IFunctionType ResolvedFunctionType);
+                resolvedType = ResolvedFunctionType;
             }
         }
         #endregion
@@ -360,7 +351,7 @@ namespace CompilerNode
         /// <param name="overloadList">The list of resolved overloads.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void ResolveType(ISealableDictionary<ITypeName, ICompiledType> typeTable, ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, IList<IQueryOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void ResolveType(ISealableDictionary<ITypeName, ICompiledType> typeTable, ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, IList<IQueryOverloadType> overloadList, out ITypeName resolvedTypeName, out IFunctionType resolvedType)
         {
             if (!TypeTableContaining(typeTable, resolvedBaseType, overloadList, out resolvedTypeName, out resolvedType))
             {
@@ -377,7 +368,7 @@ namespace CompilerNode
         /// <param name="overloadList">The list of resolved overloads.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static bool TypeTableContaining(ISealableDictionary<ITypeName, ICompiledType> typeTable, ICompiledType baseType, IList<IQueryOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static bool TypeTableContaining(ISealableDictionary<ITypeName, ICompiledType> typeTable, ICompiledType baseType, IList<IQueryOverloadType> overloadList, out ITypeName resolvedTypeName, out IFunctionType resolvedType)
         {
             resolvedTypeName = null;
             resolvedType = null;
@@ -439,7 +430,7 @@ namespace CompilerNode
                 IScopeAttributeFeature OverloadAttribute1 = overload1.ParameterList[i].ValidEntity.Item;
                 IScopeAttributeFeature OverloadAttribute2 = overload2.ParameterList[i].ValidEntity.Item;
 
-                IsMatching &= OverloadAttribute1.ResolvedFeatureType.Item == OverloadAttribute2.ResolvedFeatureType.Item;
+                IsMatching &= OverloadAttribute1.ResolvedEffectiveType.Item == OverloadAttribute2.ResolvedEffectiveType.Item;
             }
 
             return IsMatching;
@@ -456,7 +447,7 @@ namespace CompilerNode
                 IScopeAttributeFeature OverloadAttribute1 = overload1.ResultList[i].ValidEntity.Item;
                 IScopeAttributeFeature OverloadAttribute2 = overload2.ResultList[i].ValidEntity.Item;
 
-                IsMatching &= OverloadAttribute1.ResolvedFeatureType.Item == OverloadAttribute2.ResolvedFeatureType.Item;
+                IsMatching &= OverloadAttribute1.ResolvedEffectiveType.Item == OverloadAttribute2.ResolvedEffectiveType.Item;
             }
 
             return IsMatching;
@@ -471,15 +462,15 @@ namespace CompilerNode
         /// <param name="overloadList">The list of resolved overloads.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void BuildType(ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, IList<IQueryOverloadType> overloadList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void BuildType(ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, IList<IQueryOverloadType> overloadList, out ITypeName resolvedTypeName, out IFunctionType resolvedType)
         {
             FunctionType ResolvedFunctionType = new FunctionType(baseTypeName, baseType, resolvedBaseType, overloadList);
 
             foreach (IQueryOverloadType Item in overloadList)
                 foreach (IEntityDeclaration Entity in Item.ResultList)
                 {
-                    ITypeName EntityTypeName = Entity.ValidEntity.Item.ResolvedFeatureTypeName.Item;
-                    ICompiledType EntityType = Entity.ValidEntity.Item.ResolvedFeatureType.Item;
+                    ITypeName EntityTypeName = Entity.ValidEntity.Item.ResolvedEffectiveTypeName.Item;
+                    ICompiledType EntityType = Entity.ValidEntity.Item.ResolvedEffectiveType.Item;
                     string EntityName = Entity.ValidEntity.Item.ValidFeatureName.Item.Name;
 
                     IExpressionType ResultExpressionType = new ExpressionType(EntityTypeName, EntityType, EntityName);

@@ -1,6 +1,7 @@
 ﻿namespace CompilerNode
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using Easly;
     using EaslyCompiler;
 
@@ -82,12 +83,12 @@
             for (int i = 0; i < SameIndexList.Count && Success; i++)
             {
                 IParameter Parameter1 = SameIndexList[i];
-                ICompiledType ParameterType1 = Parameter1.ResolvedParameter.ResolvedFeatureType.Item;
+                ICompiledType ParameterType1 = Parameter1.ResolvedParameter.ResolvedEffectiveType.Item;
 
                 for (int j = i + 1; j < SameIndexList.Count && Success; j++)
                 {
                     IParameter Parameter2 = SameIndexList[j];
-                    ICompiledType ParameterType2 = Parameter2.ResolvedParameter.ResolvedFeatureType.Item;
+                    ICompiledType ParameterType2 = Parameter2.ResolvedParameter.ResolvedEffectiveType.Item;
 
                     Success &= DisjoinedParameterCheck(Parameter1, Parameter2, errorList);
                     Success &= DisjoinedParameterCheck(Parameter2, Parameter1, errorList);
@@ -133,12 +134,12 @@
             for (int i = 0; i < SameIndexList.Count && Success; i++)
             {
                 IParameter Parameter1 = SameIndexList[i];
-                ICompiledType ParameterType1 = Parameter1.ResolvedParameter.ResolvedFeatureType.Item;
+                ICompiledType ParameterType1 = Parameter1.ResolvedParameter.ResolvedEffectiveType.Item;
 
                 for (int j = i + 1; j < SameIndexList.Count && Success; j++)
                 {
                     IParameter Parameter2 = SameIndexList[j];
-                    ICompiledType ParameterType2 = Parameter2.ResolvedParameter.ResolvedFeatureType.Item;
+                    ICompiledType ParameterType2 = Parameter2.ResolvedParameter.ResolvedEffectiveType.Item;
 
                     Success &= DisjoinedParameterCheck(Parameter1, Parameter2, errorList);
                     Success &= DisjoinedParameterCheck(Parameter2, Parameter1, errorList);
@@ -150,8 +151,8 @@
 
         private static bool DisjoinedParameterCheck(IParameter derivedParameter, IParameter baseParameter, IErrorList errorList)
         {
-            ICompiledType DerivedType = derivedParameter.ResolvedParameter.ResolvedFeatureType.Item;
-            ICompiledType BaseType = baseParameter.ResolvedParameter.ResolvedFeatureType.Item;
+            ICompiledType DerivedType = derivedParameter.ResolvedParameter.ResolvedEffectiveType.Item;
+            ICompiledType BaseType = baseParameter.ResolvedParameter.ResolvedEffectiveType.Item;
             bool Success = true;
 
             if (ObjectType.TypeConformToBase(DerivedType, BaseType, isConversionAllowed: false))
@@ -185,7 +186,10 @@
             for (int i = 0; i < MaxResult; i++)
             {
                 GetCommonResultType(overloadList, i, out ITypeName ResultTypeName, out ICompiledType ResultType);
-                IExpressionType NewExpressionType = new ExpressionType(ResultTypeName, ResultType, overloadList[MaxResultIndex].ResultTable[i].Name);
+
+                Debug.Assert(i < overloadList[MaxResultIndex].ResultTypeList.Count);
+
+                IExpressionType NewExpressionType = new ExpressionType(ResultTypeName, ResultType, overloadList[MaxResultIndex].ResultTypeList[i].Name);
                 ResultList.Add(NewExpressionType);
             }
 
@@ -204,14 +208,14 @@
             }
 
             IParameter SelectedParameter = SameIndexList[0];
-            ITypeName SelectedParameterTypeName = SelectedParameter.ResolvedParameter.ResolvedFeatureTypeName.Item;
-            ICompiledType SelectedParameterType = SelectedParameter.ResolvedParameter.ResolvedFeatureType.Item;
+            ITypeName SelectedParameterTypeName = SelectedParameter.ResolvedParameter.ResolvedEffectiveTypeName.Item;
+            ICompiledType SelectedParameterType = SelectedParameter.ResolvedParameter.ResolvedEffectiveType.Item;
 
             for (int i = 1; i < SameIndexList.Count; i++)
             {
                 IParameter CurrentParameter = SameIndexList[i];
-                ITypeName CurrentParameterTypeName = CurrentParameter.ResolvedParameter.ResolvedFeatureTypeName.Item;
-                ICompiledType CurrentParameterType = CurrentParameter.ResolvedParameter.ResolvedFeatureType.Item;
+                ITypeName CurrentParameterTypeName = CurrentParameter.ResolvedParameter.ResolvedEffectiveTypeName.Item;
+                ICompiledType CurrentParameterType = CurrentParameter.ResolvedParameter.ResolvedEffectiveType.Item;
 
                 if (ObjectType.TypeConformToBase(SelectedParameterType, CurrentParameterType, isConversionAllowed: false))
                 {
@@ -248,7 +252,7 @@
             for (int i = 0; i < SameIndexList.Count; i++)
             {
                 IParameter CurrentParameter = SameIndexList[i];
-                ICompiledType CurrentParameterType = CurrentParameter.ResolvedParameter.ResolvedFeatureType.Item;
+                ICompiledType CurrentParameterType = CurrentParameter.ResolvedParameter.ResolvedEffectiveType.Item;
 
                 if (!ObjectType.TypeConformToBase(CurrentParameterType, baseType, isConversionAllowed: false))
                 {

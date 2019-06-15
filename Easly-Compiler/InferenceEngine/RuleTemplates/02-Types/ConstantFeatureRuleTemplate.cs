@@ -29,8 +29,10 @@
             {
                 new OnceReferenceDestinationTemplate<IConstantFeature, ITypeName>(nameof(IConstantFeature.ResolvedEntityTypeName)),
                 new OnceReferenceDestinationTemplate<IConstantFeature, ICompiledType>(nameof(IConstantFeature.ResolvedEntityType)),
-                new OnceReferenceDestinationTemplate<IConstantFeature, ITypeName>(nameof(IConstantFeature.ResolvedFeatureTypeName)),
-                new OnceReferenceDestinationTemplate<IConstantFeature, ICompiledType>(nameof(IConstantFeature.ResolvedFeatureType)),
+                new OnceReferenceDestinationTemplate<IConstantFeature, ITypeName>(nameof(IConstantFeature.ResolvedAgentTypeName)),
+                new OnceReferenceDestinationTemplate<IConstantFeature, ICompiledType>(nameof(IConstantFeature.ResolvedAgentType)),
+                new OnceReferenceDestinationTemplate<IConstantFeature, ITypeName>(nameof(IConstantFeature.ResolvedEffectiveTypeName)),
+                new OnceReferenceDestinationTemplate<IConstantFeature, ICompiledType>(nameof(IConstantFeature.ResolvedEffectiveType)),
                 new OnceReferenceDestinationTemplate<IConstantFeature, ICompiledFeature>(nameof(IConstantFeature.ResolvedFeature)),
             };
         }
@@ -82,11 +84,19 @@
             IClass EmbeddingClass = node.EmbeddingClass;
             IScopeAttributeFeature NewEntity = (IScopeAttributeFeature)data;
 
-            node.ResolvedEntityTypeName.Item = TypeToResolve.ResolvedTypeName.Item;
-            node.ResolvedEntityType.Item = TypeToResolve.ResolvedType.Item;
-            node.ResolvedFeatureTypeName.Item = NewEntity.ResolvedFeatureTypeName.Item;
-            node.ResolvedFeatureType.Item = NewEntity.ResolvedFeatureType.Item;
-            node.TypeAsDestinationOrSource.Item = NewEntity.TypeAsDestinationOrSource.Item;
+            ITypeName BaseTypeName = EmbeddingClass.ResolvedClassTypeName.Item;
+            IClassType BaseType = EmbeddingClass.ResolvedClassType.Item;
+            ITypeName EntityTypeName = TypeToResolve.ResolvedTypeName.Item;
+            ICompiledType EntityType = TypeToResolve.ResolvedType.Item;
+
+            PropertyType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType, EntityTypeName, EntityType, BaseNode.UtilityType.ReadOnly, new List<IAssertion>(), new List<IIdentifier>(), new List<IAssertion>(), new List<IIdentifier>(), out ITypeName ResolvedAgentTypeName, out ICompiledType ResolvedAgentType);
+
+            node.ResolvedEntityTypeName.Item = EntityTypeName;
+            node.ResolvedEntityType.Item = EntityType;
+            node.ResolvedAgentTypeName.Item = ResolvedAgentTypeName;
+            node.ResolvedAgentType.Item = ResolvedAgentType;
+            node.ResolvedEffectiveTypeName.Item = EntityTypeName;
+            node.ResolvedEffectiveType.Item = EntityType;
 
             node.ResolvedFeature.Item = node;
 

@@ -20,8 +20,8 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
-                new OnceReferenceTableSourceTemplate<IReleaseInstruction, string, IScopeAttributeFeature, ITypeName>(nameof(IScopeHolder.FullScope), nameof(IScopeAttributeFeature.ResolvedFeatureTypeName), TemplateNodeStart<IReleaseInstruction>.Default),
-                new OnceReferenceTableSourceTemplate<IReleaseInstruction, string, IScopeAttributeFeature, ICompiledType>(nameof(IScopeHolder.FullScope), nameof(IScopeAttributeFeature.ResolvedFeatureType), TemplateNodeStart<IReleaseInstruction>.Default),
+                new OnceReferenceTableSourceTemplate<IReleaseInstruction, string, IScopeAttributeFeature, ITypeName>(nameof(IScopeHolder.FullScope), nameof(IScopeAttributeFeature.ResolvedEffectiveTypeName), TemplateNodeStart<IReleaseInstruction>.Default),
+                new OnceReferenceTableSourceTemplate<IReleaseInstruction, string, IScopeAttributeFeature, ICompiledType>(nameof(IScopeHolder.FullScope), nameof(IScopeAttributeFeature.ResolvedEffectiveType), TemplateNodeStart<IReleaseInstruction>.Default),
                 new SealedTableSourceTemplate<IReleaseInstruction, string, IScopeAttributeFeature>(nameof(IScopeHolder.LocalScope), TemplateScopeStart<IReleaseInstruction>.Default),
             };
 

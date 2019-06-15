@@ -24,18 +24,23 @@
         bool HasPrecursorBody { get; }
 
         /// <summary>
-        /// Name of the associated type.
+        /// Name of the agent type associated to the feature.
         /// </summary>
-        OnceReference<ITypeName> ResolvedFeatureTypeName { get; }
+        OnceReference<ITypeName> ResolvedAgentTypeName { get; }
 
         /// <summary>
-        /// Associated type.
+        /// The agent type associated to the feature.
         /// </summary>
-        OnceReference<ICompiledType> ResolvedFeatureType { get; }
+        OnceReference<ICompiledType> ResolvedAgentType { get; }
 
         /// <summary>
-        /// The type to use instead of this associated type for a source or destination, for the purpose of path searching, assignment and query.
+        /// The name of the type to use, as source or destination, for the purpose of path searching, assignment and query.
         /// </summary>
-        OnceReference<ICompiledType> TypeAsDestinationOrSource { get; }
+        OnceReference<ITypeName> ResolvedEffectiveTypeName { get; }
+
+        /// <summary>
+        /// The type to use, as source or destination, for the purpose of path searching, assignment and query.
+        /// </summary>
+        OnceReference<ICompiledType> ResolvedEffectiveType { get; }
     }
 }

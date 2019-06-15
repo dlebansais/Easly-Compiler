@@ -31,8 +31,10 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IIndexerFeature, ITypeName>(nameof(IIndexerFeature.ResolvedFeatureTypeName)),
-                new OnceReferenceDestinationTemplate<IIndexerFeature, ICompiledType>(nameof(IIndexerFeature.ResolvedFeatureType)),
+                new OnceReferenceDestinationTemplate<IIndexerFeature, ITypeName>(nameof(IIndexerFeature.ResolvedAgentTypeName)),
+                new OnceReferenceDestinationTemplate<IIndexerFeature, ICompiledType>(nameof(IIndexerFeature.ResolvedAgentType)),
+                new OnceReferenceDestinationTemplate<IIndexerFeature, ITypeName>(nameof(IIndexerFeature.ResolvedEffectiveTypeName)),
+                new OnceReferenceDestinationTemplate<IIndexerFeature, ICompiledType>(nameof(IIndexerFeature.ResolvedEffectiveType)),
                 new OnceReferenceDestinationTemplate<IIndexerFeature, ICompiledFeature>(nameof(IIndexerFeature.ResolvedFeature)),
                 new UnsealedTableDestinationTemplate<IIndexerFeature, string, IScopeAttributeFeature>(nameof(IIndexerFeature.LocalScope)),
                 new UnsealedTableDestinationTemplate<IIndexerFeature, string, IScopeAttributeFeature>(nameof(IIndexerFeature.LocalGetScope)),
@@ -223,11 +225,12 @@
 
             IndexerType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType, EntityTypeName, EntityType, IndexerKind, IndexParameterList, ParameterEnd, GetRequireList, GetEnsureList, GetExceptionIdentifierList, SetRequireList, SetEnsureList, SetExceptionIdentifierList, out ITypeName ResolvedIndexerTypeName, out ICompiledType ResolvedIndexerType);
 
-            node.ResolvedFeatureTypeName.Item = ResolvedIndexerTypeName;
-            node.ResolvedFeatureType.Item = ResolvedIndexerType;
-            node.TypeAsDestinationOrSource.Item = ResolvedIndexerType;
             node.ResolvedEntityTypeName.Item = EntityTypeName;
             node.ResolvedEntityType.Item = EntityType;
+            node.ResolvedAgentTypeName.Item = ResolvedIndexerTypeName;
+            node.ResolvedAgentType.Item = ResolvedIndexerType;
+            node.ResolvedEffectiveTypeName.Item = EntityTypeName;
+            node.ResolvedEffectiveType.Item = EntityType;
 
             foreach (KeyValuePair<string, IScopeAttributeFeature> Entry in CheckedScope)
                 node.ParameterTable.Add(new Parameter(Entry.Key, Entry.Value));

@@ -28,6 +28,16 @@
         IExpression Source { get; }
 
         /// <summary>
+        /// True if the associated name is 'Result'.
+        /// </summary>
+        bool IsResultName { get; }
+
+        /// <summary>
+        /// Index of this type in results of <see cref="Source"/>.
+        /// </summary>
+        int Index { get; }
+
+        /// <summary>
         /// Sets the origin expression of this type.
         /// </summary>
         /// <param name="source">The expression with this type.</param>
@@ -81,6 +91,11 @@
         /// The expression with this type.
         /// </summary>
         public IExpression Source { get; private set; }
+
+        /// <summary>
+        /// True if the associated name is 'Result'.
+        /// </summary>
+        public bool IsResultName { get { return Name == nameof(BaseNode.Keyword.Result); } }
 
         /// <summary>
         /// Index of this type in results of <see cref="Source"/>.

@@ -313,16 +313,16 @@ namespace CompilerNode
                 {
                     ICompiledType ArgumentType = arguments[j].ValueType;
                     IParameter OverloadParameter = OverloadParameterList[j];
-                    Debug.Assert(OverloadParameter.ResolvedParameter.TypeAsDestinationOrSource.IsAssigned);
+                    Debug.Assert(OverloadParameter.ResolvedParameter.ResolvedEffectiveType.IsAssigned);
 
                     ICompiledType ParameterType = null;
-                    switch (OverloadParameter.ResolvedParameter.TypeAsDestinationOrSource.Item)
+                    switch (OverloadParameter.ResolvedParameter.ResolvedEffectiveType.Item)
                     {
                         case IFunctionType AsFunctionType:
                         case IProcedureType AsProcedureType:
                         case IClassType AsClassType:
                         case IFormalGenericType AsFormalGenericType:
-                            ParameterType = OverloadParameter.ResolvedParameter.TypeAsDestinationOrSource.Item;
+                            ParameterType = OverloadParameter.ResolvedParameter.ResolvedEffectiveType.Item;
                             break;
                     }
 
@@ -397,7 +397,7 @@ namespace CompilerNode
                     IParameter OverloadParameter = MatchingParameter.Item;
                     UnassignedParameters.Remove(OverloadParameter);
 
-                    ICompiledType ParameterType = OverloadParameter.ResolvedParameter.TypeAsDestinationOrSource.Item;
+                    ICompiledType ParameterType = OverloadParameter.ResolvedParameter.ResolvedEffectiveType.Item;
                     IsMatching &= ObjectType.TypeConformToBase(ArgumentType, ParameterType, isConversionAllowed: true);
                 }
 

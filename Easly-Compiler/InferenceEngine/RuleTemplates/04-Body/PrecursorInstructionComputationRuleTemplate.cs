@@ -105,7 +105,7 @@
                 IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
 
                 ICompiledFeature OperatorFeature = SelectedPrecursor.Item.Feature;
-                ICompiledType OperatorType = OperatorFeature.TypeAsDestinationOrSource.Item;
+                ICompiledType OperatorType = OperatorFeature.ResolvedAgentType.Item;
                 IList<IIdentifier> PrecursorInstructionException = null;
                 ISealableList<IParameter> SelectedParameterList = null;
 

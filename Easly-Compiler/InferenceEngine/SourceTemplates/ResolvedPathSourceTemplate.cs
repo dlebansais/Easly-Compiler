@@ -172,8 +172,8 @@
 
             if (IsLocal)
             {
-                IsReady = Entity.ValidEntity.IsAssigned && Entity.ValidEntity.Item.TypeAsDestinationOrSource.IsAssigned;
-                ItemType = IsReady ? Entity.ValidEntity.Item.TypeAsDestinationOrSource.Item : null;
+                IsReady = Entity.ValidEntity.IsAssigned && Entity.ValidEntity.Item.ResolvedEffectiveType.IsAssigned;
+                ItemType = IsReady ? Entity.ValidEntity.Item.ResolvedEffectiveType.Item : null;
             }
             else
             {
@@ -224,8 +224,8 @@
                     return false;
 
                 case IFunctionFeature AsFunctionFeature:
-                    IsReady = AsFunctionFeature.MostCommonType.IsAssigned;
-                    itemType = IsReady ? AsFunctionFeature.MostCommonType.Item : null;
+                    IsReady = AsFunctionFeature.MostCommonResult.IsAssigned;
+                    itemType = IsReady ? AsFunctionFeature.MostCommonResult.Item.ValueType : null;
                     IsHandled = true;
                     break;
 
@@ -282,10 +282,10 @@
 
             if (IsLocal)
             {
-                if (Entity.ValidEntity.IsAssigned && Entity.ValidEntity.Item.TypeAsDestinationOrSource.IsAssigned)
+                if (Entity.ValidEntity.IsAssigned && Entity.ValidEntity.Item.ResolvedEffectiveType.IsAssigned)
                 {
-                    resolvedPathTypeName = Entity.ValidEntity.Item.ResolvedFeatureTypeName.Item;
-                    resolvedPathType = Entity.ValidEntity.Item.TypeAsDestinationOrSource.Item;
+                    resolvedPathTypeName = Entity.ValidEntity.Item.ResolvedEffectiveTypeName.Item;
+                    resolvedPathType = Entity.ValidEntity.Item.ResolvedEffectiveType.Item;
                     Result = true;
                 }
             }
@@ -393,10 +393,10 @@
             resolvedPathTypeName = null;
             resolvedPathType = null;
 
-            if (feature.MostCommonTypeName.IsAssigned && feature.MostCommonType.IsAssigned)
+            if (feature.MostCommonResult.IsAssigned)
             {
-                resolvedPathTypeName = feature.MostCommonTypeName.Item;
-                resolvedPathType = feature.MostCommonType.Item;
+                resolvedPathTypeName = feature.MostCommonResult.Item.ValueTypeName;
+                resolvedPathType = feature.MostCommonResult.Item.ValueType;
                 Result = true;
             }
 

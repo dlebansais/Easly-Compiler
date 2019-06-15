@@ -80,7 +80,8 @@
                     return false;
 
                 IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
-                ICompiledType FinalType = AsCreationFeature.ResolvedFeatureType.Item;
+                Debug.Assert(AsCreationFeature.ResolvedAgentType.IsAssigned);
+                ICompiledType FinalType = AsCreationFeature.ResolvedAgentType.Item;
                 IProcedureType AsProcedureType = FinalType as IProcedureType;
                 Debug.Assert(AsProcedureType != null);
 

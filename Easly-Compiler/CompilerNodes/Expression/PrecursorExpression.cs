@@ -328,32 +328,38 @@ namespace CompilerNode
 
             IList<IArgument> ArgumentList = node.ArgumentList;
             ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
-            ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
-            ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
             IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
             bool IsHandled = false;
             bool Success = false;
 
-            switch (OperatorType)
+            switch (OperatorFeature)
             {
-                case IFunctionType AsFunctionType:
-                    Success = ResolveCallFunction(node, selectedPrecursor, AsFunctionType, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out selectedParameterList, out resolvedArgumentList);
-                    IsHandled = true;
-                    break;
-
-                case IProcedureType AsProcedureType:
-                case IIndexerType AsIndexerType:
+                case IAttributeFeature AsAttributeFeature:
+                case ICreationFeature AsCreationFeature:
+                case IProcedureFeature AsProcedureFeature:
+                case IIndexerFeature AsIndexerFeature:
                     errorList.AddError(new ErrorInvalidExpression(node));
                     IsHandled = true;
                     break;
 
-                case IClassType AsClassType:
+                case IConstantFeature AsConstantFeature:
                     Success = ResolveCallClass(node, selectedPrecursor, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out selectedParameterList, out resolvedArgumentList);
                     IsHandled = true;
                     break;
 
-                case IPropertyType AsPropertyType:
-                    Success = ResolveCallProperty(node, selectedPrecursor, AsPropertyType, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out selectedParameterList, out resolvedArgumentList);
+                case IFunctionFeature AsFunctionFeature:
+                    IFunctionType FunctionType = AsFunctionFeature.ResolvedAgentType.Item as IFunctionType;
+                    Debug.Assert(FunctionType != null);
+
+                    Success = ResolveCallFunction(node, selectedPrecursor, FunctionType, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out selectedParameterList, out resolvedArgumentList);
+                    IsHandled = true;
+                    break;
+
+                case IPropertyFeature AsPropertyFeature:
+                    IPropertyType PropertyType = AsPropertyFeature.ResolvedAgentType.Item as IPropertyType;
+                    Debug.Assert(PropertyType != null);
+
+                    Success = ResolveCallProperty(node, selectedPrecursor, PropertyType, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out selectedParameterList, out resolvedArgumentList);
                     IsHandled = true;
                     break;
             }
@@ -372,8 +378,6 @@ namespace CompilerNode
 
             IList<IArgument> ArgumentList = node.ArgumentList;
             ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
-            ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
-            ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
             IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
 
             foreach (IQueryOverloadType Overload in callType.OverloadList)
@@ -400,8 +404,8 @@ namespace CompilerNode
 
             IList<IArgument> ArgumentList = node.ArgumentList;
             ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
-            ITypeName OperatorTypeName = OperatorFeature.ResolvedFeatureTypeName.Item;
-            ICompiledType OperatorType = OperatorFeature.ResolvedFeatureType.Item;
+            ITypeName OperatorTypeName = OperatorFeature.ResolvedEffectiveTypeName.Item;
+            ICompiledType OperatorType = OperatorFeature.ResolvedEffectiveType.Item;
             IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
 
             if (ArgumentList.Count > 0)
