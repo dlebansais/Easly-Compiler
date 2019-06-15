@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -47,6 +48,16 @@
             bool Success = true;
             data = null;
 
+            IObjectType BaseType = (IObjectType)node.BaseType;
+            Debug.Assert(BaseType.ResolvedType.IsAssigned);
+
+            ICompiledTypeWithFeature ResolvedBaseType = BaseType.ResolvedType.Item as ICompiledTypeWithFeature;
+            if (ResolvedBaseType == null)
+            {
+                AddSourceError(new ErrorClassTypeRequired(node));
+                Success = false;
+            }
+
             return Success;
         }
 
@@ -58,16 +69,17 @@
         public override void Apply(IPropertyType node, object data)
         {
             IClass EmbeddingClass = node.EmbeddingClass;
-            IObjectType BaseTypeItem = (IObjectType)node.BaseType;
-            IObjectType EntityTypeItem = (IObjectType)node.EntityType;
+            IObjectType BaseType = (IObjectType)node.BaseType;
+            IObjectType EntityType = (IObjectType)node.EntityType;
 
-            ITypeName BaseTypeName = BaseTypeItem.ResolvedTypeName.Item;
-            ICompiledType BaseType = BaseTypeItem.ResolvedType.Item;
+            ITypeName ResolvedBaseTypeName = BaseType.ResolvedTypeName.Item;
+            ICompiledTypeWithFeature ResolvedBaseType = BaseType.ResolvedType.Item as ICompiledTypeWithFeature;
+            Debug.Assert(ResolvedBaseType != null);
 
-            ITypeName EntityTypeName = EntityTypeItem.ResolvedTypeName.Item;
-            ICompiledType EntityType = EntityTypeItem.ResolvedType.Item;
+            ITypeName ResolvedEntityTypeName = EntityType.ResolvedTypeName.Item;
+            ICompiledType ResolvedEntityType = EntityType.ResolvedType.Item;
 
-            PropertyType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType, EntityTypeName, EntityType, node.PropertyKind, node.GetEnsureList, node.GetExceptionIdentifierList, node.SetRequireList, node.SetExceptionIdentifierList, out ITypeName ResolvedTypeName, out ICompiledType ResolvedType);
+            PropertyType.ResolveType(EmbeddingClass.TypeTable, ResolvedBaseTypeName, BaseType, ResolvedBaseType, ResolvedEntityTypeName, ResolvedEntityType, node.PropertyKind, node.GetEnsureList, node.GetExceptionIdentifierList, node.SetRequireList, node.SetExceptionIdentifierList, out ITypeName ResolvedTypeName, out ICompiledType ResolvedType);
 
             node.ResolvedTypeName.Item = ResolvedTypeName;
             node.ResolvedType.Item = ResolvedType;

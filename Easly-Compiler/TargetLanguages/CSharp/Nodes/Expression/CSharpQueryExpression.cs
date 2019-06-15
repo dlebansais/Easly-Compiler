@@ -143,7 +143,7 @@
             string ArgumentListText = CSharpArgument.CSharpArgumentList(usingCollection, FeatureCall, destinationList);
             string QueryText = Query.CSharpText(usingCollection, 0);
 
-            bool IsAgent = !(Feature is ICSharpFunctionFeature);
+            bool IsAgent = !(Feature is ICSharpFunctionFeature) && !(Feature is ICSharpPropertyFeature);
 
             if (IsAgent)
             {

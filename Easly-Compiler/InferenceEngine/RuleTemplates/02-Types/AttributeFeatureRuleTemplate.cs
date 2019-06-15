@@ -74,7 +74,7 @@
             ITypeName EntityTypeName = TypeToResolve.ResolvedTypeName.Item;
             ICompiledType EntityType = TypeToResolve.ResolvedType.Item;
 
-            PropertyType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType, EntityTypeName, EntityType, BaseNode.UtilityType.ReadOnly, new List<IAssertion>(), new List<IIdentifier>(), new List<IAssertion>(), new List<IIdentifier>(), out ITypeName ResolvedAgentTypeName, out ICompiledType ResolvedAgentType);
+            PropertyType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType.SourceType, BaseType, EntityTypeName, EntityType, BaseNode.UtilityType.ReadOnly, new List<IAssertion>(), new List<IIdentifier>(), new List<IAssertion>(), new List<IIdentifier>(), out ITypeName ResolvedAgentTypeName, out ICompiledType ResolvedAgentType);
 
             node.ResolvedEntityTypeName.Item = EntityTypeName;
             node.ResolvedEntityType.Item = EntityType;

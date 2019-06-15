@@ -156,7 +156,7 @@
                     SetExceptionIdentifierList.Add(Item);
             }
 
-            PropertyType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType, EntityTypeName, EntityType, node.PropertyKind, GetEnsureList, GetExceptionIdentifierList, SetRequireList, SetExceptionIdentifierList, out ITypeName ResolvedPropertyTypeName, out ICompiledType ResolvedPropertyType);
+            PropertyType.ResolveType(EmbeddingClass.TypeTable, BaseTypeName, BaseType.SourceType, BaseType, EntityTypeName, EntityType, node.PropertyKind, GetEnsureList, GetExceptionIdentifierList, SetRequireList, SetExceptionIdentifierList, out ITypeName ResolvedPropertyTypeName, out ICompiledType ResolvedPropertyType);
 
 #if COVERAGE
             Debug.Assert(!ResolvedPropertyType.IsReference);

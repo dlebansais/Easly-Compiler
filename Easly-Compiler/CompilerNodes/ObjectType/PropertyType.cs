@@ -39,7 +39,7 @@
         /// <summary>
         /// The type name of the resolved base type.
         /// </summary>
-        OnceReference<IClassType> ResolvedBaseType { get; }
+        OnceReference<ICompiledTypeWithFeature> ResolvedBaseType { get; }
 
         /// <summary>
         /// The type name of the resolved result type.
@@ -74,7 +74,8 @@
         /// Initializes a new instance of the <see cref="PropertyType"/> class.
         /// </summary>
         /// <param name="baseTypeName">The type name of the resolved base type.</param>
-        /// <param name="baseType">The type of the resolved base type.</param>
+        /// <param name="baseType">The base type.</param>
+        /// <param name="resolvedBaseType">The resolved base type.</param>
         /// <param name="entityTypeName">The type name of the resolved result type.</param>
         /// <param name="entityType">The type of the resolved result type.</param>
         /// <param name="propertyKind">The type of the property.</param>
@@ -82,7 +83,7 @@
         /// <param name="getExceptionIdentifierList">The list of known exceptions thrown for the getter.</param>
         /// <param name="setRequireList">The list of require assertions for the setter.</param>
         /// <param name="setExceptionIdentifierList">The list of known exceptions thrown for the setter.</param>
-        public PropertyType(ITypeName baseTypeName, IClassType baseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType propertyKind, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IIdentifier> setExceptionIdentifierList)
+        public PropertyType(ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType propertyKind, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IIdentifier> setExceptionIdentifierList)
             : this()
         {
             BaseType = baseType;
@@ -90,7 +91,7 @@
             PropertyKind = propertyKind;
 
             ResolvedBaseTypeName.Item = baseTypeName;
-            ResolvedBaseType.Item = baseType;
+            ResolvedBaseType.Item = resolvedBaseType;
             ResolvedEntityTypeName.Item = entityTypeName;
             ResolvedEntityType.Item = entityType;
             GetEnsureList = getEnsureList;
@@ -218,7 +219,7 @@
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 ResolvedBaseTypeName = new OnceReference<ITypeName>();
-                ResolvedBaseType = new OnceReference<IClassType>();
+                ResolvedBaseType = new OnceReference<ICompiledTypeWithFeature>();
                 ResolvedEntityTypeName = new OnceReference<ITypeName>();
                 ResolvedEntityType = new OnceReference<ICompiledType>();
                 ResolvedTypeName = new OnceReference<ITypeName>();
@@ -271,7 +272,7 @@
         /// <summary>
         /// The type name of the resolved base type.
         /// </summary>
-        public OnceReference<IClassType> ResolvedBaseType { get; private set; } = new OnceReference<IClassType>();
+        public OnceReference<ICompiledTypeWithFeature> ResolvedBaseType { get; private set; } = new OnceReference<ICompiledTypeWithFeature>();
 
         /// <summary>
         /// The type name of the resolved result type.
@@ -394,6 +395,8 @@
             ITypeName InstancedBaseTypeName = ResolvedBaseTypeName.Item;
             ICompiledType InstancedBaseType = ResolvedBaseType.Item;
             InstancedBaseType.InstanciateType(instancingClassType, ref InstancedBaseTypeName, ref InstancedBaseType);
+            Debug.Assert(InstancedBaseType is ICompiledTypeWithFeature);
+
             IsNewInstance |= InstancedBaseType != ResolvedBaseType.Item;
 
             ITypeName InstancedEntityTypeName = ResolvedEntityTypeName.Item;
@@ -404,7 +407,7 @@
             if (IsNewInstance)
             {
                 ISealableDictionary<ITypeName, ICompiledType> TypeTable = instancingClassType.GetTypeTable();
-                ResolveType(TypeTable, InstancedBaseTypeName, InstancedBaseType, InstancedEntityTypeName, InstancedEntityType, PropertyKind, GetEnsureList, GetExceptionIdentifierList, SetRequireList, SetExceptionIdentifierList, out resolvedTypeName, out resolvedType);
+                ResolveType(TypeTable, InstancedBaseTypeName, (IObjectType)BaseType, (ICompiledTypeWithFeature)InstancedBaseType, InstancedEntityTypeName, InstancedEntityType, PropertyKind, GetEnsureList, GetExceptionIdentifierList, SetRequireList, SetExceptionIdentifierList, out resolvedTypeName, out resolvedType);
             }
         }
         #endregion
@@ -414,8 +417,9 @@
         /// Locates, or creates, a resolved property type.
         /// </summary>
         /// <param name="typeTable">The table of existing types.</param>
-        /// <param name="baseTypeName">The type name of the resolved base type.</param>
-        /// <param name="baseType">The type of the resolved base type.</param>
+        /// <param name="baseTypeName">Name of the resolved base type.</param>
+        /// <param name="baseType">The base type.</param>
+        /// <param name="resolvedBaseType">The resolved base type.</param>
         /// <param name="entityTypeName">The type name of the resolved result type.</param>
         /// <param name="entityType">The type of the resolved result type.</param>
         /// <param name="propertyKind">The type of the property.</param>
@@ -425,11 +429,11 @@
         /// <param name="setExceptionIdentifierList">The list of known exceptions thrown for the setter.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void ResolveType(ISealableDictionary<ITypeName, ICompiledType> typeTable, ITypeName baseTypeName, ICompiledType baseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType propertyKind, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IIdentifier> setExceptionIdentifierList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void ResolveType(ISealableDictionary<ITypeName, ICompiledType> typeTable, ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType propertyKind, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IIdentifier> setExceptionIdentifierList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
-            if (!TypeTableContaining(typeTable, baseType, entityType, propertyKind, getEnsureList, getExceptionIdentifierList, setRequireList, setExceptionIdentifierList, out resolvedTypeName, out resolvedType))
+            if (!TypeTableContaining(typeTable, resolvedBaseType, entityType, propertyKind, getEnsureList, getExceptionIdentifierList, setRequireList, setExceptionIdentifierList, out resolvedTypeName, out resolvedType))
             {
-                BuildType(baseTypeName, baseType, entityTypeName, entityType, propertyKind, getEnsureList, getExceptionIdentifierList, setRequireList, setExceptionIdentifierList, out resolvedTypeName, out resolvedType);
+                BuildType(baseTypeName, baseType, resolvedBaseType, entityTypeName, entityType, propertyKind, getEnsureList, getExceptionIdentifierList, setRequireList, setExceptionIdentifierList, out resolvedTypeName, out resolvedType);
                 typeTable.Add(resolvedTypeName, resolvedType);
             }
         }
@@ -483,7 +487,8 @@
         /// Creates a function type with resolved arguments.
         /// </summary>
         /// <param name="baseTypeName">The type name of the resolved base type.</param>
-        /// <param name="baseType">The type of the resolved base type.</param>
+        /// <param name="baseType">The base type.</param>
+        /// <param name="resolvedBaseType">The resolved base type.</param>
         /// <param name="entityTypeName">The type name of the resolved result type.</param>
         /// <param name="entityType">The type of the resolved result type.</param>
         /// <param name="propertyKind">The type of the property.</param>
@@ -493,9 +498,9 @@
         /// <param name="setExceptionIdentifierList">The list of known exceptions thrown for the setter.</param>
         /// <param name="resolvedTypeName">The type name upon return.</param>
         /// <param name="resolvedType">The type upon return.</param>
-        public static void BuildType(ITypeName baseTypeName, ICompiledType baseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType propertyKind, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IIdentifier> setExceptionIdentifierList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
+        public static void BuildType(ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType propertyKind, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IIdentifier> setExceptionIdentifierList, out ITypeName resolvedTypeName, out ICompiledType resolvedType)
         {
-            IPropertyType ResolvedPropertyType = new PropertyType(baseTypeName, (IClassType)baseType, entityTypeName, entityType, propertyKind, getEnsureList, getExceptionIdentifierList, setRequireList, setExceptionIdentifierList);
+            IPropertyType ResolvedPropertyType = new PropertyType(baseTypeName, baseType, resolvedBaseType, entityTypeName, entityType, propertyKind, getEnsureList, getExceptionIdentifierList, setRequireList, setExceptionIdentifierList);
 
             resolvedTypeName = new TypeName(ResolvedPropertyType.TypeFriendlyName);
             resolvedType = ResolvedPropertyType;

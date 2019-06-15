@@ -236,38 +236,39 @@ namespace CompilerNode
             {
                 IObjectType BaseType = (IObjectType)node.BaseType.Item;
                 ICompiledType ResolvedBaseType = BaseType.ResolvedType.Item;
+                ISealableDictionary<IFeatureName, IFeatureInstance> FeatureTable = null;
 
-                if (ResolvedBaseType is IClassType AsClassType)
+                switch (ResolvedBaseType)
                 {
-                    if (!FeatureName.TableContain(AsClassType.FeatureTable, ValidText, out IFeatureName Key, out FeatureInstance))
-                    {
-                        errorList.AddError(new ErrorUnknownIdentifier(node, ValidText));
-                        return false;
-                    }
-                }
-                else if (ResolvedBaseType is IFormalGenericType AsFormalGenericType)
-                {
-                    FeatureInstance = null;
+                    case IClassType AsClassType:
+                        FeatureTable = AsClassType.FeatureTable;
+                        break;
 
-                    foreach (IConstraint Item in AsFormalGenericType.FormalGeneric.ConstraintList)
-                        if (Item.ResolvedTypeWithRename.Item is IClassType Parent)
-                        {
-                            if (!FeatureName.TableContain(Parent.FeatureTable, ValidText, out IFeatureName Key, out FeatureInstance))
+                    case IFormalGenericType AsFormalGenericType:
+                        foreach (IConstraint Item in AsFormalGenericType.FormalGeneric.ConstraintList)
+                            if (Item.ResolvedTypeWithRename.Item is IClassType Parent)
                             {
-                                errorList.AddError(new ErrorUnknownIdentifier(node, ValidText));
-                                return false;
-                            }
-                        }
+                                FeatureTable = Parent.FeatureTable;
 
-                    if (FeatureInstance == null)
-                    {
-                        errorList.AddError(new ErrorUnknownIdentifier(node, ValidText));
-                        return false;
-                    }
+                                if (FeatureName.TableContain(FeatureTable, ValidText, out IFeatureName ParentKey, out IFeatureInstance ParentFeatureInstance))
+                                    break;
+                            }
+                        break;
+
+                    case ITupleType AsTupleType:
+                        FeatureTable = AsTupleType.FeatureTable;
+                        break;
                 }
-                else
+
+                if (FeatureTable == null)
                 {
                     errorList.AddError(new ErrorClassTypeRequired(node));
+                    return false;
+                }
+
+                if (!FeatureName.TableContain(FeatureTable, ValidText, out IFeatureName Key, out FeatureInstance))
+                {
+                    errorList.AddError(new ErrorUnknownIdentifier(node, ValidText));
                     return false;
                 }
             }

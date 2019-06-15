@@ -280,7 +280,7 @@
             else
                 BaseTypeText = $"I{CSharpNames.ToCSharpIdentifier(Delegated.Owner.ValidClassName)}";
 
-            Result = $"({BaseTypeText} agentBase) => {{ agentBase.{CSharpNames.ToCSharpIdentifier(Delegated.Name)}; }}";
+            Result = $"({BaseTypeText} agentBase) => {{ return agentBase.{CSharpNames.ToCSharpIdentifier(Delegated.Name)}; }}";
 
             return Result;
         }

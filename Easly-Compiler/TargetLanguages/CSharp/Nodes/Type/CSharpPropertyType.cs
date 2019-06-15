@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -11,6 +12,16 @@
         /// The Easly type from which the C# type is created.
         /// </summary>
         new IPropertyType Source { get; }
+
+        /// <summary>
+        /// The base type.
+        /// </summary>
+        ICSharpTypeWithFeature BaseType { get; }
+
+        /// <summary>
+        /// The entity type.
+        /// </summary>
+        ICSharpType EntityType { get; }
     }
 
     /// <summary>
@@ -37,6 +48,10 @@
         protected CSharpPropertyType(ICSharpContext context, IPropertyType source)
             : base(context, source)
         {
+            BaseType = Create(context, source.ResolvedBaseType.Item) as ICSharpTypeWithFeature;
+            Debug.Assert(BaseType != null);
+
+            EntityType = Create(context, source.ResolvedEntityType.Item);
         }
         #endregion
 
@@ -45,6 +60,16 @@
         /// The Easly type from which the C# type is created.
         /// </summary>
         public new IPropertyType Source { get { return (IPropertyType)base.Source; } }
+
+        /// <summary>
+        /// The base type.
+        /// </summary>
+        public ICSharpTypeWithFeature BaseType { get; }
+
+        /// <summary>
+        /// The entity type.
+        /// </summary>
+        public ICSharpType EntityType { get; }
 
         /// <summary>
         /// True if the type can be used in the interface 'I' text format.
@@ -63,7 +88,32 @@
         {
             SetUsedInCode();
 
-            return "<Not Supported>";
+            string Result;
+
+            if (OriginatingTypedef != null)
+            {
+                // TODO
+                string DelegateName = CSharpNames.ToCSharpIdentifier(OriginatingTypedef.Name);
+
+                Result = PropertyType2CSharpString(DelegateName);
+            }
+            else
+            {
+                string BaseTypeText = BaseType.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+                string EntityTypeText = EntityType.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+
+                Result = $"Func<{BaseTypeText}, {EntityTypeText}>";
+
+                usingCollection.AddUsing(nameof(System));
+            }
+
+            return Result;
+        }
+
+        private string PropertyType2CSharpString(string delegateName)
+        {
+            // TODO
+            return delegateName;
         }
         #endregion
     }
