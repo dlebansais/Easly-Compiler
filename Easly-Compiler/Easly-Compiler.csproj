@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="CompiledBody.cs" />
     <Compile Include="CompilerNodes\Expression\ComparableExpression.cs" />
+    <Compile Include="CompilerNodes\Expression\KeywordEntityExpression.cs" />
     <Compile Include="CompilerNodes\Feature\FeatureWithPrecursor.cs" />
     <Compile Include="CompiledTypeWithFeature.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorInvalidConversionFeature.cs" />
@@ -88,7 +89,9 @@
     <Compile Include="InferenceEngine\RuleTemplateList.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllConversionsRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\IndexQueryExpressionConstantRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\KeywordEntityExpressionRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\PrecursorIndexExpressionConstantRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\04-Body\KeywordEntityExpressionComputationRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\04-Body\PrecursorBodyComputationRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\04-Body\ExternBodyComputationRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\04-Body\DeferredBodyComputationRuleTemplate.cs" />

@@ -10,7 +10,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IIndexerFeature.
     /// </summary>
-    public interface IIndexerFeature : BaseNode.IIndexerFeature, IFeature, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithPrecursor, IGetterSetterScopeHolder, INodeWithResult
+    public interface IIndexerFeature : BaseNode.IIndexerFeature, IFeature, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithPrecursor, IGetterSetterScopeHolder, INodeWithResult, IFeatureWithEntity
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.IndexerFeature.IndexParameterBlocks"/>.
@@ -306,6 +306,18 @@ namespace CompilerNode
         /// All reachable entities, setter only.
         /// </summary>
         public ISealableDictionary<string, IScopeAttributeFeature> FullSetScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
+        #endregion
+
+        #region Implementation of IFeatureWithEntity
+        /// <summary>
+        /// Guid of the language type corresponding to the entity object for an instance of this class.
+        /// </summary>
+        public Guid EntityGuid { get { return LanguageClasses.IndexerEntity.Guid; } }
+
+        /// <summary>
+        /// The source node associated to this instance.
+        /// </summary>
+        public ISource Location { get { return this; } }
         #endregion
 
         #region Compiler
