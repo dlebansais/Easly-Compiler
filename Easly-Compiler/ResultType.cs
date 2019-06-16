@@ -14,6 +14,11 @@
         int ResultNameIndex { get; }
 
         /// <summary>
+        /// The only result type, or the result type to select with a 'result of' expression if several. Can be null.
+        /// </summary>
+        IExpressionType Preferred { get; }
+
+        /// <summary>
         /// Gets the type at the given index.
         /// </summary>
         /// <param name="index">The index.</param>
@@ -105,6 +110,23 @@
         /// Index of the result type to select with a 'result of' expression. -1 if none.
         /// </summary>
         public int ResultNameIndex { get; }
+
+        /// <summary>
+        /// The only result type, or the result type to select with a 'result of' expression if several.
+        /// </summary>
+        public IExpressionType Preferred
+        {
+            get
+            {
+                if (Count == 1)
+                    return At(0);
+
+                if (ResultNameIndex >= 0)
+                    return At(ResultNameIndex);
+
+                return null;
+            }
+        }
         #endregion
 
         #region Client Interface

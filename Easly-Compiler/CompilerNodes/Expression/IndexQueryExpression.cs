@@ -244,22 +244,18 @@ namespace CompilerNode
             IList<IArgument> ArgumentList = node.ArgumentList;
             IClass EmbeddingClass = node.EmbeddingClass;
             IResultType ResolvedIndexerResult = IndexedExpression.ResolvedResult.Item;
+            IExpressionType PreferredIndexerResult = ResolvedIndexerResult.Preferred;
+            ICompiledType IndexedExpressionType;
 
-            OnceReference<ICompiledType> IndexedExpressionType = new OnceReference<ICompiledType>();
-            foreach (IExpressionType Item in ResolvedIndexerResult)
-                if (Item.Name == nameof(BaseNode.Keyword.Result) || ResolvedIndexerResult.Count == 1)
-                {
-                    IndexedExpressionType.Item = Item.ValueType;
-                    break;
-                }
-
-            if (!IndexedExpressionType.IsAssigned)
+            if (PreferredIndexerResult == null)
             {
                 errorList.AddError(new ErrorInvalidExpression(node));
                 return false;
             }
+            else
+                IndexedExpressionType = PreferredIndexerResult.ValueType;
 
-            if (IndexedExpressionType.Item is IClassType AsClassType)
+            if (IndexedExpressionType is IClassType AsClassType)
             {
                 IClass IndexedBaseClass = AsClassType.BaseClass;
                 ISealableDictionary<IFeatureName, IFeatureInstance> IndexedFeatureTable = IndexedBaseClass.FeatureTable;

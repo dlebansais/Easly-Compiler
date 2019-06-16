@@ -190,19 +190,16 @@ namespace CompilerNode
 
             IExpression Source = (IExpression)node.Source;
             IResultType ResolvedSourceResult = Source.ResolvedResult.Item;
+            int ResultNameIndex = ResolvedSourceResult.ResultNameIndex;
 
-            foreach (IExpressionType Item in ResolvedSourceResult)
-                if (Item.Name == nameof(BaseNode.Keyword.Result))
-                {
-                    Debug.Assert(resolvedResult == null);
-                    resolvedResult = new ResultType(Item);
-                }
-
-            if (resolvedResult == null)
+            if (ResultNameIndex < 0)
             {
                 errorList.AddError(new ErrorInvalidExpression(node));
                 return false;
             }
+
+            Debug.Assert(ResolvedSourceResult.Preferred != null);
+            resolvedResult = new ResultType(ResolvedSourceResult.Preferred);
 
             constantSourceList.Add(Source);
 
