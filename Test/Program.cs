@@ -38,7 +38,7 @@
         static ICompiler CreateCompiler()
         {
             Compiler c = new Compiler();
-            //c.InferenceRetries = 50;
+            c.InferenceRetries = 200;
 
             return c;
         }

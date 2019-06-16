@@ -232,6 +232,11 @@ namespace CompilerNode
         ISealableDictionary<ITypeName, ICompiledType> TypeTable { get; }
 
         /// <summary>
+        /// The class indexer, if any.
+        /// </summary>
+        OptionalReference<IIndexerFeature> ClassIndexer { get; }
+
+        /// <summary>
         /// List of single classes accumulated as inheritance clauses are processed.
         /// </summary>
         ISealableList<IClass> ClassGroupList { get; }
@@ -645,6 +650,7 @@ namespace CompilerNode
                 ResolvedClassType = new OnceReference<IClassType>();
                 GenericInstanceList = new List<IClassType>();
                 TypeTable = new SealableDictionary<ITypeName, ICompiledType>();
+                ClassIndexer = new OptionalReference<IIndexerFeature>();
                 ClassGroupList = new SealableList<IClass>();
                 ClassGroup = new OnceReference<SingleClassGroup>();
                 InheritanceTable = new SealableDictionary<ITypeName, ICompiledType>();
@@ -1095,6 +1101,11 @@ namespace CompilerNode
         /// Table of all types used in this class.
         /// </summary>
         public ISealableDictionary<ITypeName, ICompiledType> TypeTable { get; private set; } = new SealableDictionary<ITypeName, ICompiledType>();
+
+        /// <summary>
+        /// The class indexer, if any.
+        /// </summary>
+        public OptionalReference<IIndexerFeature> ClassIndexer { get; private set; } = new OptionalReference<IIndexerFeature>();
 
         /// <summary>
         /// List of single classes accumulated as inheritance clauses are processed.

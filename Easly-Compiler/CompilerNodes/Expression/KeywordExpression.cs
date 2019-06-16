@@ -204,6 +204,8 @@ namespace CompilerNode
                     break;
 
                 case BaseNode.Keyword.Current:
+                    Debug.Assert(EmbeddingClass.ResolvedClassTypeName.IsAssigned);
+                    Debug.Assert(EmbeddingClass.ResolvedClassType.IsAssigned);
                     resultTypeName = EmbeddingClass.ResolvedClassTypeName.Item;
                     resultType = EmbeddingClass.ResolvedClassType.Item;
                     Result = true;
@@ -226,6 +228,23 @@ namespace CompilerNode
                     else
                         Result = true;
 
+                    IsHandled = true;
+                    break;
+
+                case BaseNode.Keyword.Indexer:
+                    if (EmbeddingClass.ClassIndexer.IsAssigned)
+                    {
+                        IIndexerFeature IndexerFeature = EmbeddingClass.ClassIndexer.Item;
+
+                        Debug.Assert(IndexerFeature.ResolvedAgentTypeName.IsAssigned);
+                        Debug.Assert(IndexerFeature.ResolvedAgentType.IsAssigned);
+
+                        resultTypeName = IndexerFeature.ResolvedAgentTypeName.Item;
+                        resultType = IndexerFeature.ResolvedAgentType.Item;
+                        Result = true;
+                    }
+                    else
+                        errorList.AddError(new ErrorMissingIndexer(source));
                     IsHandled = true;
                     break;
             }
@@ -339,7 +358,7 @@ namespace CompilerNode
             IClass EmbeddingClass = node.EmbeddingClass;
             BaseNode.Keyword Value = node.Value;
 
-            if (!KeywordExpression.IsKeywordAvailable(Value, node, errorList, out ITypeName KeywordTypeName, out ICompiledType KeywordType))
+            if (!IsKeywordAvailable(Value, node, errorList, out ITypeName KeywordTypeName, out ICompiledType KeywordType))
                 return false;
 
             resolvedResult = new ResultType(KeywordTypeName, KeywordType, Value.ToString());
@@ -361,6 +380,7 @@ namespace CompilerNode
                 case BaseNode.Keyword.Result:
                 case BaseNode.Keyword.Retry:
                 case BaseNode.Keyword.Exception:
+                case BaseNode.Keyword.Indexer:
                     IsHandled = true;
                     break;
             }

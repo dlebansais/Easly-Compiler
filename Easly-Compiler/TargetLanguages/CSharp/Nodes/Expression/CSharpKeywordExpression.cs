@@ -102,6 +102,10 @@
                 case BaseNode.Keyword.Exception:
                     Result = "CaughtException";
                     break;
+
+                case BaseNode.Keyword.Indexer:
+                    Result = "Indexer";
+                    break;
             }
 
             Debug.Assert(Result != null);

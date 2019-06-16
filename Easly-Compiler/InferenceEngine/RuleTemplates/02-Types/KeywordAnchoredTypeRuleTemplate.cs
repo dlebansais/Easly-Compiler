@@ -27,6 +27,7 @@
                 new OnceReferenceResultSourceTemplate<IKeywordAnchoredType, ICompiledType>(nameof(INodeWithResult.ResolvedResultType)),
                 new OnceReferenceSourceTemplate<IKeywordAnchoredType, ITypeName>(nameof(IClass.ResolvedClassTypeName), TemplateClassStart<IKeywordAnchoredType>.Default),
                 new OnceReferenceSourceTemplate<IKeywordAnchoredType, IClassType>(nameof(IClass.ResolvedClassType), TemplateClassStart<IKeywordAnchoredType>.Default),
+                new ConditionallyAssignedReferenceSourceTemplate<IKeywordAnchoredType, IIndexerFeature, ICompiledType>(nameof(IClass.ClassIndexer), nameof(IIndexerFeature.ResolvedAgentType), TemplateClassStart<IKeywordAnchoredType>.Default),
             };
 
             DestinationTemplateList = new List<IDestinationTemplate>()

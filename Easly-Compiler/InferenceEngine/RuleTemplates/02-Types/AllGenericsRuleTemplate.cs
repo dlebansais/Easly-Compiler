@@ -77,6 +77,13 @@
             node.ResolvedAsCompiledType.Item = NewClassType;
             node.GenericTable.Merge(LocalGenericTable);
             node.GenericTable.Seal();
+
+            foreach (IFeature Item in node.FeatureList)
+                if (Item is IIndexerFeature AsIndexerFeature)
+                {
+                    node.ClassIndexer.Item = AsIndexerFeature;
+                    break;
+                }
         }
         #endregion
     }
