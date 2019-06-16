@@ -254,10 +254,6 @@ namespace CompilerNode
                                     break;
                             }
                         break;
-
-                    case ITupleType AsTupleType:
-                        FeatureTable = AsTupleType.FeatureTable;
-                        break;
                 }
 
                 if (FeatureTable == null)
