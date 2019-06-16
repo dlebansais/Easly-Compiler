@@ -59,7 +59,7 @@ namespace CompilerNode
         /// <param name="location">The location associated to this attribute.</param>
         /// <param name="attributeName">The attribute name.</param>
         private ScopeAttributeFeature(ISource location, string attributeName)
-            : this(location, attributeName, null, null, null)
+            : this(location, attributeName, null, null, null, null, null)
         {
         }
 
@@ -83,7 +83,7 @@ namespace CompilerNode
         /// <param name="attributeTypeName">Resolved type name of the attribute.</param>
         /// <param name="attributeType">Resolved type of the attribute.</param>
         public ScopeAttributeFeature(ISource location, string attributeName, ITypeName attributeTypeName, ICompiledType attributeType)
-            : this(location, attributeName, attributeTypeName, attributeType, null)
+            : this(location, attributeName, attributeTypeName, attributeType, attributeTypeName, attributeType, null)
         {
         }
 
@@ -108,7 +108,7 @@ namespace CompilerNode
                 errorList.AddError(new ErrorSingleTypeNotAllowed(location, attributeName));
             else
             {
-                feature = new ScopeAttributeFeature(location, attributeName, attributeTypeName, attributeType, initialDefaultValue);
+                feature = new ScopeAttributeFeature(location, attributeName, attributeTypeName, attributeType, attributeTypeName, attributeType, initialDefaultValue);
                 Result = true;
             }
 
@@ -120,10 +120,12 @@ namespace CompilerNode
         /// </summary>
         /// <param name="location">The location associated to this attribute.</param>
         /// <param name="attributeName">The attribute name.</param>
-        /// <param name="attributeTypeName">Resolved type name of the attribute.</param>
-        /// <param name="attributeType">Resolved type of the attribute.</param>
+        /// <param name="agentTypeName">Resolved agent type name of the attribute.</param>
+        /// <param name="agentType">Resolved agent type of the attribute.</param>
+        /// <param name="attributeTypeName">Resolved effective type name of the attribute.</param>
+        /// <param name="attributeType">Resolved effective type of the attribute.</param>
         /// <param name="initialDefaultValue">Default value, if any.</param>
-        public ScopeAttributeFeature(ISource location, string attributeName, ITypeName attributeTypeName, ICompiledType attributeType, IExpression initialDefaultValue)
+        public ScopeAttributeFeature(ISource location, string attributeName, ITypeName agentTypeName, ICompiledType agentType, ITypeName attributeTypeName, ICompiledType attributeType, IExpression initialDefaultValue)
         {
             Location = location;
 
@@ -133,13 +135,13 @@ namespace CompilerNode
 
             if (attributeTypeName != null)
             {
-                ResolvedAgentTypeName.Item = attributeTypeName;
+                ResolvedAgentTypeName.Item = agentTypeName;
                 ResolvedEffectiveTypeName.Item = attributeTypeName;
             }
 
             if (attributeType != null)
             {
-                ResolvedAgentType.Item = attributeType;
+                ResolvedAgentType.Item = agentType;
                 ResolvedEffectiveType.Item = attributeType;
             }
 
