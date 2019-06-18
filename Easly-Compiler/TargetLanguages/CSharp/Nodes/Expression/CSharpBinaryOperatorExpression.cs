@@ -59,6 +59,14 @@
 
             Operator = context.GetFeature(source.SelectedFeature.Item) as ICSharpFunctionFeature;
             Debug.Assert(Operator != null);
+
+            IResultType ResolvedLeftResult = LeftExpression.Source.ResolvedResult.Item;
+            Debug.Assert(ResolvedLeftResult.Count == 1);
+
+            ICompiledType OperatorBaseType = ResolvedLeftResult.At(0).ValueType;
+            if (OperatorBaseType is IClassType AsClassType)
+                if (AsClassType.BaseClass.ClassGuid == LanguageClasses.Number.Guid)
+                    IsCallingNumberFeature = true;
         }
         #endregion
 
@@ -87,6 +95,11 @@
         /// The operator.
         /// </summary>
         public ICSharpFunctionFeature Operator { get; }
+
+        /// <summary>
+        /// True if calling a feature of the Number class.
+        /// </summary>
+        public bool IsCallingNumberFeature { get; }
         #endregion
 
         #region Client Interface
@@ -109,6 +122,14 @@
             string LeftText = NestedExpressionText(usingCollection, LeftExpression);
             string RightText = NestedExpressionText(usingCollection, RightExpression);
             string OperatorText = Operator.Name;
+
+            if (IsCallingNumberFeature)
+            {
+                if (OperatorText == "≥")
+                    OperatorText = ">=";
+                else if (OperatorText == "≤")
+                    OperatorText = "<=";
+            }
 
             return $"{LeftText} {OperatorText} {RightText}";
         }

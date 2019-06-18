@@ -80,6 +80,8 @@
             string TagString = string.IsNullOrEmpty(Tag) ? string.Empty : $" // {Tag}?";
 
             writer.WriteIndentedLine($"Debug.Assert({AssertionString});{TagString}");
+
+            writer.AddUsing("System.Diagnostics");
         }
 
         /// <summary>

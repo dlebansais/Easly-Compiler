@@ -60,7 +60,7 @@
                 AddSourceError(new ErrorBooleanTypeMissing(node));
                 Success = false;
             }
-            else if (ResolvedResult.At(0).ValueType != BooleanType)
+            else if (!ObjectType.TypeConformToBase(ResolvedResult.At(0).ValueType, BooleanType, isConversionAllowed: true))
             {
                 AddSourceError(new ErrorInvalidExpression(BooleanExpression));
                 Success = false;
