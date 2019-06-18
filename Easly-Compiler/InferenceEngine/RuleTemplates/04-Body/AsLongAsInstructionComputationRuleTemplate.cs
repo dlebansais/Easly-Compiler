@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -50,21 +51,24 @@
             IResultType ResolvedResult = ContinueCondition.ResolvedResult.Item;
             IClass EmbeddingClass = node.EmbeddingClass;
 
-            if (ResolvedResult.Count > 1)
-            {
-                AddSourceError(new ErrorInvalidExpression(ContinueCondition));
-                Success = false;
-            }
-            else if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType))
+            if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType))
             {
                 AddSourceError(new ErrorBooleanTypeMissing(node));
                 Success = false;
             }
             else
             {
-                IExpressionType ContractType = ResolvedResult.At(0);
+                Debug.Assert(ResolvedResult.Count > 0);
 
-                if (ContractType.ValueType != BooleanType)
+                bool IsBoolean = true;
+
+                for (int i = 0; i < ResolvedResult.Count; i++)
+                {
+                    ICompiledType ContractType = ResolvedResult.At(i).ValueType;
+                    IsBoolean &= ObjectType.TypeConformToBase(ContractType, BooleanType, isConversionAllowed: true);
+                }
+
+                if (!IsBoolean)
                 {
                     AddSourceError(new ErrorInvalidExpression(ContinueCondition));
                     Success = false;

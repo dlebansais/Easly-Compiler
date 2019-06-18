@@ -143,7 +143,33 @@
             string ArgumentListText = CSharpArgument.CSharpArgumentList(usingCollection, FeatureCall, destinationList);
             string QueryText = Query.CSharpText(usingCollection, 0);
 
-            bool IsAgent = !(Feature is ICSharpFunctionFeature) && !(Feature is ICSharpPropertyFeature);
+            bool IsAgent;
+            switch (Feature)
+            {
+                case ICSharpFunctionFeature AsFunctionFeature:
+                case ICSharpPropertyFeature AsPropertyFeature:
+                    IsAgent = false;
+                    break;
+
+                case ICSharpScopeAttributeFeature AsScopeAttributeFeature:
+                    switch (AsScopeAttributeFeature.Type)
+                    {
+                        case ICSharpProcedureType AsProcedureType:
+                        case ICSharpFunctionType AsFunctionType:
+                        case ICSharpPropertyType AsPropertyType:
+                            IsAgent = true;
+                            break;
+
+                        default:
+                            IsAgent = false;
+                            break;
+                    }
+                    break;
+
+                default:
+                    IsAgent = true;
+                    break;
+            }
 
             if (IsAgent)
             {

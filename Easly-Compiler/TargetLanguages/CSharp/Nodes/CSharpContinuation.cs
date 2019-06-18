@@ -107,20 +107,8 @@
         /// <param name="writer">The stream on which to write.</param>
         public virtual void WriteCSharpCleanupInstructions(ICSharpWriter writer)
         {
-            if (CleanupList.Count > 1)
-            {
-                writer.WriteIndentedLine("{");
-                writer.IncreaseIndent();
-            }
-
             foreach (ICSharpInstruction Item in CleanupList)
                 Item.WriteCSharp(writer);
-
-            if (CleanupList.Count > 1)
-            {
-                writer.DecreaseIndent();
-                writer.WriteIndentedLine("}");
-            }
         }
         #endregion
     }

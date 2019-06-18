@@ -105,33 +105,50 @@
                 ICSharpContinuation Item = ContinuationList[i];
 
                 if (i > 0)
-                {
                     writer.WriteEmptyLine();
-                    writer.WriteIndentedLine($"if ({ContinueConditionString})");
-                    writer.WriteIndentedLine("{");
-                    writer.IncreaseIndent();
+
+                writer.WriteIndentedLine($"if ({ContinueConditionString})");
+                Item.WriteCSharpInstructions(writer);
+
+                int CleanupInstructionCount = 0;
+                for (int j = i; j > 0; j--)
+                {
+                    ICSharpContinuation PreviousItem = ContinuationList[j - 1];
+                    CleanupInstructionCount += PreviousItem.CleanupList.Count;
                 }
 
-                Item.WriteCSharpInstructions(writer);
-            }
-
-            for (int i = 0; i < ContinuationList.Count; i++)
-            {
-                ICSharpContinuation Item = ContinuationList[ContinuationList.Count - 1 - i];
-
-                if (i > 0)
+                if (CleanupInstructionCount > 0)
                 {
-                    writer.DecreaseIndent();
-                    writer.WriteIndentedLine("}");
                     writer.WriteIndentedLine("else");
-                    Item.WriteCSharpCleanupInstructions(writer);
+
+                    if (CleanupInstructionCount > 1)
+                        writer.WriteIndentedLine("{");
+
+                    writer.IncreaseIndent();
+
+                    for (int j = i; j > 0; j--)
+                    {
+                        if (j < i)
+                            writer.WriteEmptyLine();
+
+                        ICSharpContinuation PreviousItem = ContinuationList[j - 1];
+                        PreviousItem.WriteCSharpCleanupInstructions(writer);
+                    }
+
+                    writer.DecreaseIndent();
+
+                    if (CleanupInstructionCount > 1)
+                        writer.WriteIndentedLine("}");
                 }
             }
 
             if (ElseInstructions != null)
             {
-                writer.WriteIndentedLine("if" + " " + "(" + "!" + "(" + ContinueConditionString + ")" + ")");
+                writer.WriteEmptyLine();
 
+                string ComplexContinueConditionString = ContinueCondition.IsComplex ? $"({ContinueConditionString})" : ContinueConditionString;
+
+                writer.WriteIndentedLine($"if (!{ComplexContinueConditionString})");
                 ElseInstructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Indifferent, false);
             }
         }
