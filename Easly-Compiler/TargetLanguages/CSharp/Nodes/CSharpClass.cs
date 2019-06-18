@@ -46,6 +46,11 @@
         IList<ICSharpDiscrete> DiscreteList { get; }
 
         /// <summary>
+        /// The list of class invariants.
+        /// </summary>
+        IList<ICSharpAssertion> InvariantList { get; }
+
+        /// <summary>
         /// The corresponding type.
         /// </summary>
         ICSharpClassType Type { get; }
@@ -252,6 +257,11 @@
         public IList<ICSharpDiscrete> DiscreteList { get; } = new List<ICSharpDiscrete>();
 
         /// <summary>
+        /// The list of class invariants.
+        /// </summary>
+        public IList<ICSharpAssertion> InvariantList { get; } = new List<ICSharpAssertion>();
+
+        /// <summary>
         /// The corresponding type.
         /// </summary>
         public ICSharpClassType Type { get; private set; }
@@ -421,6 +431,12 @@
             {
                 ICSharpDiscrete NewDiscrete = CSharpDiscrete.Create(context, Item);
                 DiscreteList.Add(NewDiscrete);
+            }
+
+            foreach (IAssertion Item in Source.InvariantList)
+            {
+                ICSharpAssertion NewAssertion = CSharpAssertion.Create(context, Item);
+                InvariantList.Add(NewAssertion);
             }
         }
 
@@ -1182,6 +1198,7 @@
             else
                 WriteClassInterface(writer);
 
+            WriteClassContract(writer);
             WriteClassImplementation(writer);
 
             writer.DecreaseIndent();
@@ -1344,6 +1361,20 @@
             }
 
             return Result;
+        }
+
+        private void WriteClassContract(ICSharpWriter writer)
+        {
+            if (InvariantList.Count > 0)
+            {
+                writer.WriteIndentedLine("// Invariant:");
+
+                foreach (ICSharpAssertion Invariant in InvariantList)
+                {
+                    string Line = Invariant.BooleanExpression.Source.ExpressionToString;
+                    writer.WriteIndentedLine($"//   {Line}");
+                }
+            }
         }
 
         private void WriteClassImplementation(ICSharpWriter writer)
