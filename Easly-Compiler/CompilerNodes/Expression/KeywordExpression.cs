@@ -128,6 +128,11 @@ namespace CompilerNode
 
         #region Implementation of IExpression
         /// <summary>
+        /// True if the expression is complex (and requires to be surrounded with parenthesis).
+        /// </summary>
+        public bool IsComplex { get { return false; } }
+
+        /// <summary>
         /// Types of expression results.
         /// </summary>
         public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();

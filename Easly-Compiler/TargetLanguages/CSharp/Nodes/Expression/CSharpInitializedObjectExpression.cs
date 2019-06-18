@@ -65,11 +65,6 @@
         public new IInitializedObjectExpression Source { get { return (IInitializedObjectExpression)base.Source; } }
 
         /// <summary>
-        /// True if the expression is complex (and requires to be surrounded with parenthesis).
-        /// </summary>
-        public override bool IsComplex { get { return false; } }
-
-        /// <summary>
         /// Class of the initialized object.
         /// </summary>
         public ICSharpClass Class { get; }

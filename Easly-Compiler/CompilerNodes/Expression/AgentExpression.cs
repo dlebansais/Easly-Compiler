@@ -169,6 +169,11 @@ namespace CompilerNode
 
         #region Compiler
         /// <summary>
+        /// True if the expression is complex (and requires to be surrounded with parenthesis).
+        /// </summary>
+        public bool IsComplex { get { return false; } }
+
+        /// <summary>
         /// The resolved type name of the feature providing the expression result.
         /// </summary>
         public OnceReference<ITypeName> ResolvedAgentTypeName { get; private set; } = new OnceReference<ITypeName>();

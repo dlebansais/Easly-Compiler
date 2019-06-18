@@ -136,6 +136,11 @@
 
         #region Implementation of IExpression
         /// <summary>
+        /// True if the expression is complex (and requires to be surrounded with parenthesis).
+        /// </summary>
+        public bool IsComplex { get { return true; } }
+
+        /// <summary>
         /// Types of expression results.
         /// </summary>
         public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
@@ -237,7 +242,16 @@
         /// <summary>
         /// Gets a string representation of the expression.
         /// </summary>
-        public string ExpressionToString { get { return $"not {((IExpression)RightExpression).ExpressionToString}"; } }
+        public string ExpressionToString
+        {
+            get
+            {
+                IExpression Expression = (IExpression)RightExpression;
+                string RightExpressionString = Expression.IsComplex ? $"({Expression.ExpressionToString})" : Expression.ExpressionToString;
+
+                return $"not {RightExpressionString}";
+            }
+        }
 
         /// <summary></summary>
         public override string ToString()

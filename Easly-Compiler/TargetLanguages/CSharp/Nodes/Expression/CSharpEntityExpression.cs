@@ -91,11 +91,6 @@
         public new IEntityExpression Source { get { return (IEntityExpression)base.Source; } }
 
         /// <summary>
-        /// True if the expression is complex (and requires to be surrounded with parenthesis).
-        /// </summary>
-        public override bool IsComplex { get { return false; } }
-
-        /// <summary>
         /// The source feature for which an entity object is obtained. Can be null.
         /// </summary>
         public ICSharpFeature Feature { get; }

@@ -46,11 +46,6 @@
         /// The Easly expression from which the C# expression is created.
         /// </summary>
         public new IManifestCharacterExpression Source { get { return (IManifestCharacterExpression)base.Source; } }
-
-        /// <summary>
-        /// True if the expression is complex (and requires to be surrounded with parenthesis).
-        /// </summary>
-        public override bool IsComplex { get { return false; } }
         #endregion
 
         #region Client Interface

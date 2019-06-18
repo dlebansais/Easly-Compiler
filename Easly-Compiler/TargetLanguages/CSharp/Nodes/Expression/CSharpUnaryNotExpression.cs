@@ -59,11 +59,6 @@
         public new IUnaryNotExpression Source { get { return (IUnaryNotExpression)base.Source; } }
 
         /// <summary>
-        /// True if the expression is complex (and requires to be surrounded with parenthesis).
-        /// </summary>
-        public override bool IsComplex { get { return true; } }
-
-        /// <summary>
         /// The right expression.
         /// </summary>
         public ICSharpExpression RightExpression { get; }

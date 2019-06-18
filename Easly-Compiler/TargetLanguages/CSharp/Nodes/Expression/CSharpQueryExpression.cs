@@ -98,11 +98,6 @@
         public new IQueryExpression Source { get { return (IQueryExpression)base.Source; } }
 
         /// <summary>
-        /// True if the expression is complex (and requires to be surrounded with parenthesis).
-        /// </summary>
-        public override bool IsComplex { get { return false; } }
-
-        /// <summary>
         /// The feature call.
         /// </summary>
         public ICSharpFeatureCall FeatureCall { get; }

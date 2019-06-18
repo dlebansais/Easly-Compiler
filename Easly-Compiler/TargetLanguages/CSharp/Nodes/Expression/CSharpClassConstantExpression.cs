@@ -71,11 +71,6 @@
         public new IClassConstantExpression Source { get { return (IClassConstantExpression)base.Source; } }
 
         /// <summary>
-        /// True if the expression is complex (and requires to be surrounded with parenthesis).
-        /// </summary>
-        public override bool IsComplex { get { return false; } }
-
-        /// <summary>
         /// The constant feature.
         /// </summary>
         public ICSharpConstantFeature Feature { get; }

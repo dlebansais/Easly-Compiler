@@ -683,6 +683,7 @@
     <Compile Include="TargetLanguages\CSharp\Nodes\CSharpQualifiedName.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\CSharpTypedef.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\CSharpGeneric.cs" />
+    <Compile Include="TargetLanguages\CSharp\Nodes\Expression\CSharpKeywordEntityExpression.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\Expression\CSharpUnaryOperatorExpression.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\Expression\CSharpUnaryNotExpression.cs" />
     <Compile Include="TargetLanguages\CSharp\Nodes\Expression\CSharpResultOfExpression.cs" />

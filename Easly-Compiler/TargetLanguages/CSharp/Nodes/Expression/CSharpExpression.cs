@@ -90,6 +90,10 @@
                     Result = CSharpInitializedObjectExpression.Create(context, AsInitializedObjectExpression);
                     break;
 
+                case IKeywordEntityExpression AsKeywordEntityExpression:
+                    Result = CSharpKeywordEntityExpression.Create(context, AsKeywordEntityExpression);
+                    break;
+
                 case IKeywordExpression AsKeywordExpression:
                     Result = CSharpKeywordExpression.Create(context, AsKeywordExpression);
                     break;
@@ -166,7 +170,7 @@
         /// <summary>
         /// True if the expression is complex (and requires to be surrounded with parenthesis).
         /// </summary>
-        public abstract bool IsComplex { get; }
+        public virtual bool IsComplex { get { return Source.IsComplex; } }
         #endregion
 
         #region Client Interface

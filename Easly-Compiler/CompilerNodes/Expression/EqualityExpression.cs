@@ -127,6 +127,11 @@
 
         #region Implementation of IExpression
         /// <summary>
+        /// True if the expression is complex (and requires to be surrounded with parenthesis).
+        /// </summary>
+        public bool IsComplex { get { return true; } }
+
+        /// <summary>
         /// Types of expression results.
         /// </summary>
         public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
@@ -262,8 +267,17 @@
             get
             {
                 string ComparisonString = Comparison == BaseNode.ComparisonType.Equal ? "=" : "≠";
-                string EqualityString = Equality == BaseNode.EqualityType.Deep ? string.Empty : "/phys";
-                return $"({((IExpression)LeftExpression).ExpressionToString}) {ComparisonString}{EqualityString} ({((IExpression)RightExpression).ExpressionToString})";
+                string EqualityString = Equality == BaseNode.EqualityType.Physical ? string.Empty : "/deep";
+
+                IExpression Expression;
+
+                Expression = (IExpression)LeftExpression;
+                string LeftExpressionString = Expression.IsComplex ? $"({Expression.ExpressionToString})" : Expression.ExpressionToString;
+
+                Expression = (IExpression)RightExpression;
+                string RightExpressionString = Expression.IsComplex ? $"({Expression.ExpressionToString})" : Expression.ExpressionToString;
+
+                return $"{LeftExpressionString} {ComparisonString}{EqualityString} {RightExpressionString}";
             }
         }
 

@@ -61,11 +61,6 @@
         public new IEqualityExpression Source { get { return (IEqualityExpression)base.Source; } }
 
         /// <summary>
-        /// True if the expression is complex (and requires to be surrounded with parenthesis).
-        /// </summary>
-        public override bool IsComplex { get { return true; } }
-
-        /// <summary>
         /// The left expression.
         /// </summary>
         public ICSharpExpression LeftExpression { get; }

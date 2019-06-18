@@ -70,11 +70,6 @@
         public new ICloneOfExpression Source { get { return (ICloneOfExpression)base.Source; } }
 
         /// <summary>
-        /// True if the expression is complex (and requires to be surrounded with parenthesis).
-        /// </summary>
-        public override bool IsComplex { get { return true; } }
-
-        /// <summary>
         /// The source expression.
         /// </summary>
         public ICSharpExpression SourceExpression { get; }

@@ -63,11 +63,6 @@
         public new IPrecursorExpression Source { get { return (IPrecursorExpression)base.Source; } }
 
         /// <summary>
-        /// True if the expression is complex (and requires to be surrounded with parenthesis).
-        /// </summary>
-        public override bool IsComplex { get { return false; } }
-
-        /// <summary>
         /// The feature whose precursor is being called.
         /// </summary>
         public ICSharpFeatureWithName Feature { get; }

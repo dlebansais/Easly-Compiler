@@ -61,12 +61,14 @@
             Debug.Assert(Operator != null);
 
             IResultType ResolvedLeftResult = LeftExpression.Source.ResolvedResult.Item;
-            Debug.Assert(ResolvedLeftResult.Count == 1);
 
-            ICompiledType OperatorBaseType = ResolvedLeftResult.At(0).ValueType;
-            if (OperatorBaseType is IClassType AsClassType)
-                if (AsClassType.BaseClass.ClassGuid == LanguageClasses.Number.Guid)
-                    IsCallingNumberFeature = true;
+            for (int i = 0; i < ResolvedLeftResult.Count; i++)
+            {
+                ICompiledType OperatorBaseType = ResolvedLeftResult.At(i).ValueType;
+                if (OperatorBaseType is IClassType AsClassType)
+                    if (AsClassType.BaseClass.ClassGuid == LanguageClasses.Number.Guid)
+                        IsCallingNumberFeature = true;
+            }
         }
         #endregion
 
@@ -75,11 +77,6 @@
         /// The Easly expression from which the C# expression is created.
         /// </summary>
         public new IBinaryOperatorExpression Source { get { return (IBinaryOperatorExpression)base.Source; } }
-
-        /// <summary>
-        /// True if the expression is complex (and requires to be surrounded with parenthesis).
-        /// </summary>
-        public override bool IsComplex { get { return true; } }
 
         /// <summary>
         /// The left expression.

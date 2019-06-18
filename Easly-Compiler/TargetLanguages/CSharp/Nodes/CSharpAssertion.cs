@@ -113,16 +113,27 @@
                     {
                         case CSharpContractLocations.Getter:
                             writer.WriteIndentedLine("// Contract (getter):");
+                            WriteContract(writer, requireList);
                             IsHandled = true;
                             break;
 
                         case CSharpContractLocations.Setter:
                             writer.WriteIndentedLine("// Contract (setter):");
+                            WriteContract(writer, requireList);
                             IsHandled = true;
                             break;
 
                         case CSharpContractLocations.Other:
-                            writer.WriteIndentedLine("// Contract:");
+                            if (requireList.Count > 0)
+                            {
+                                writer.WriteIndentedLine("// Require:");
+                                WriteContract(writer, requireList);
+                            }
+                            if (ensureList.Count > 0)
+                            {
+                                writer.WriteIndentedLine("// Ensure:");
+                                WriteContract(writer, ensureList);
+                            }
                             IsHandled = true;
                             break;
                     }
@@ -132,6 +143,15 @@
             }
 
             isFirstFeature = false;
+        }
+
+        private static void WriteContract(ICSharpWriter writer, IList<ICSharpAssertion> assertionList)
+        {
+            foreach (ICSharpAssertion Assertion in assertionList)
+            {
+                string Line = Assertion.BooleanExpression.Source.ExpressionToString;
+                writer.WriteIndentedLine($"//   {Line}");
+            }
         }
         #endregion
     }

@@ -46,11 +46,6 @@
         /// The Easly expression from which the C# expression is created.
         /// </summary>
         public new IAssertionTagExpression Source { get { return (IAssertionTagExpression)base.Source; } }
-
-        /// <summary>
-        /// True if the expression is complex (and requires to be surrounded with parenthesis).
-        /// </summary>
-        public override bool IsComplex { get { return false; } }
         #endregion
 
         #region Client Interface

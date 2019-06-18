@@ -12,6 +12,11 @@ namespace CompilerNode
     public interface IExpression : BaseNode.IExpression, INode, ISource
     {
         /// <summary>
+        /// True if the expression is complex (and requires to be surrounded with parenthesis).
+        /// </summary>
+        bool IsComplex { get; }
+
+        /// <summary>
         /// Gets a string representation of the expression.
         /// </summary>
         string ExpressionToString { get; }

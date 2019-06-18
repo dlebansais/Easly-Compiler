@@ -197,6 +197,11 @@ namespace CompilerNode
 
         #region Implementation of IExpression
         /// <summary>
+        /// True if the expression is complex (and requires to be surrounded with parenthesis).
+        /// </summary>
+        public bool IsComplex { get { return false; } }
+
+        /// <summary>
         /// Types of expression results.
         /// </summary>
         public OnceReference<IResultType> ResolvedResult { get; private set; } = new OnceReference<IResultType>();
@@ -479,7 +484,16 @@ namespace CompilerNode
         /// <summary>
         /// Gets a string representation of the expression.
         /// </summary>
-        public string ExpressionToString { get { return $"{((IQualifiedName)Query).PathToString}({Argument.ArgumentListToString(ArgumentList)})"; } }
+        public string ExpressionToString
+        {
+            get
+            {
+                string QueryString = ((IQualifiedName)Query).PathToString;
+                string ArgumentString = ArgumentList.Count == 0 ? string.Empty : $"({Argument.ArgumentListToString(ArgumentList)})";
+
+                return $"{QueryString}{ArgumentString}";
+            }
+        }
 
         /// <summary></summary>
         public override string ToString()
