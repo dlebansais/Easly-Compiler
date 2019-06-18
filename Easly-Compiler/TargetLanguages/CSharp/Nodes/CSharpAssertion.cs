@@ -77,7 +77,7 @@
         public virtual void WriteCSharp(ICSharpWriter writer)
         {
             string AssertionString = BooleanExpression.CSharpText(writer);
-            string TagString = string.IsNullOrEmpty(Tag) ? string.Empty : $" // {Tag}?";
+            string TagString = string.IsNullOrEmpty(Tag) ? string.Empty : $" // {Tag}";
 
             writer.WriteIndentedLine($"Debug.Assert({AssertionString});{TagString}");
 
@@ -149,8 +149,9 @@
         {
             foreach (ICSharpAssertion Assertion in assertionList)
             {
+                string Tag = Assertion.Tag != null ? $"{Assertion.Tag}: " : string.Empty;
                 string Line = Assertion.BooleanExpression.Source.ExpressionToString;
-                writer.WriteIndentedLine($"//   {Line}");
+                writer.WriteIndentedLine($"//   {Tag}{Line}");
             }
         }
         #endregion

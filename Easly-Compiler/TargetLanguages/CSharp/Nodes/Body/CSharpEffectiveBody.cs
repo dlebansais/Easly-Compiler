@@ -167,8 +167,14 @@
 
             // TODO: ExceptionHandlerList
 
+            if (ParentFeature.Owner.InvariantList.Count > 0)
+            {
+                writer.WriteIndentedLine("CheckInvariant();");
+                writer.WriteEmptyLine();
+            }
+
             if (flags.HasFlag(CSharpBodyFlags.HasResult))
-                writer.WriteIndentedLine("return" + " " + "Result" + ";");
+                writer.WriteIndentedLine("return Result;");
 
             /*TODO
             foreach (AttachmentAlias AliasItem in AttachmentVariableTable)

@@ -107,10 +107,20 @@
                 ICSharpQualifiedName Destination = DestinationList[0];
                 ICSharpFeature Feature = Destination.Feature;
 
-                string DestinationText = Destination.DecoratedCSharpText(writer, 0);
-                string SourceText = SourceExpression.CSharpText(writer);
+                if (Destination.IsAttributeWithContract)
+                {
+                    string SetterText = Destination.CSharpSetter(writer);
+                    string SourceText = SourceExpression.CSharpText(writer);
 
-                writer.WriteIndentedLine($"{DestinationText} = {SourceText};");
+                    writer.WriteIndentedLine($"{SetterText}({SourceText});");
+                }
+                else
+                {
+                    string DestinationText = Destination.DecoratedCSharpText(writer, 0);
+                    string SourceText = SourceExpression.CSharpText(writer);
+
+                    writer.WriteIndentedLine($"{DestinationText} = {SourceText};");
+                }
             }
         }
         #endregion

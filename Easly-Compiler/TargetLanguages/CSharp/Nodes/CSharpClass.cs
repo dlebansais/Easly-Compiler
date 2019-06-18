@@ -91,6 +91,11 @@
         bool IsSharedName { get; }
 
         /// <summary>
+        /// True if the class implements the method to check the class invariant.
+        /// </summary>
+        bool HasCheckInvariantMethod { get; }
+
+        /// <summary>
         /// True if the class is a singleton with generic parameters.
         /// </summary>
         bool IsParameterizedSingleton { get; }
@@ -300,6 +305,11 @@
         /// True if the class shares its name with another from a different 'From' source.
         /// </summary>
         public bool IsSharedName { get; private set; }
+
+        /// <summary>
+        /// True if the class implements the method to check the class invariant.
+        /// </summary>
+        public bool HasCheckInvariantMethod { get { return InvariantList.Count > 0; } }
 
         /// <summary>
         /// True if the class is a singleton with generic parameters.
@@ -1198,7 +1208,9 @@
             else
                 WriteClassInterface(writer);
 
-            WriteClassContract(writer);
+            if (InvariantList.Count > 0)
+                WriteClassContract(writer);
+
             WriteClassImplementation(writer);
 
             writer.DecreaseIndent();
@@ -1365,15 +1377,13 @@
 
         private void WriteClassContract(ICSharpWriter writer)
         {
-            if (InvariantList.Count > 0)
-            {
-                writer.WriteIndentedLine("// Invariant:");
+            writer.WriteIndentedLine("// Invariant:");
 
-                foreach (ICSharpAssertion Invariant in InvariantList)
-                {
-                    string Line = Invariant.BooleanExpression.Source.ExpressionToString;
-                    writer.WriteIndentedLine($"//   {Line}");
-                }
+            foreach (ICSharpAssertion Invariant in InvariantList)
+            {
+                string Tag = Invariant.Tag != null ? $"{Invariant.Tag}: " : string.Empty;
+                string Line = Invariant.BooleanExpression.Source.ExpressionToString;
+                writer.WriteIndentedLine($"//   {Tag}{Line}");
             }
         }
 
@@ -1695,6 +1705,14 @@
                 WriteClonableImplementation(writer, out IsMultiline);
             }
 
+            if (InvariantList.Count > 0)
+            {
+                if (IsMultiline)
+                    writer.WriteEmptyLine();
+
+                WriteClassInvariant(writer, out IsMultiline);
+            }
+
             writer.DecreaseIndent();
             writer.WriteIndentedLine("}");
         }
@@ -1708,6 +1726,32 @@
             writer.WriteIndentedLine("{");
             writer.IncreaseIndent();
             writer.WriteIndentedLine("return Easly.DeepCopy(this);");
+            writer.DecreaseIndent();
+            writer.WriteIndentedLine("}");
+            writer.WriteIndentedLine("#endregion");
+        }
+
+        private void WriteClassInvariant(ICSharpWriter writer, out bool isMultiline)
+        {
+            isMultiline = true;
+
+            bool HasPrecursorInvariant = BaseClass != null && BaseClass.HasCheckInvariantMethod;
+            string ExportStatus = HasPrecursorInvariant ? "override" : "virtual";
+
+            writer.WriteIndentedLine("#region Invariant");
+            writer.WriteIndentedLine($"protected {ExportStatus} void CheckInvariant()");
+            writer.WriteIndentedLine("{");
+            writer.IncreaseIndent();
+
+            if (HasPrecursorInvariant)
+            {
+                writer.WriteIndentedLine("base.CheckInvariant();");
+                writer.WriteEmptyLine();
+            }
+
+            foreach (ICSharpAssertion Invariant in InvariantList)
+                Invariant.WriteCSharp(writer);
+
             writer.DecreaseIndent();
             writer.WriteIndentedLine("}");
             writer.WriteIndentedLine("#endregion");

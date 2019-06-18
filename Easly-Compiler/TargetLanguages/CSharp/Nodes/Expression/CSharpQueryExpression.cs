@@ -141,6 +141,8 @@
             bool IsAgent;
             switch (Feature)
             {
+                case ICSharpAttributeFeature AsAttributeFeature:
+                case ICSharpConstantFeature AsConstantFeature:
                 case ICSharpFunctionFeature AsFunctionFeature:
                 case ICSharpPropertyFeature AsPropertyFeature:
                     IsAgent = false;

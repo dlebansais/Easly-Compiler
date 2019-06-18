@@ -148,7 +148,24 @@
             else if (Type.GetSingletonString(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None, out string SingletonString))
                 writer.WriteIndentedLine($"{ExportString} {TypeString} {AttributeString} {{ get {{ return {SingletonString}; }} }}");
             else
+            {
                 writer.WriteIndentedLine($"{ExportString} {TypeString} {AttributeString} {{ get; private set; }}");
+
+                if (EnsureList.Count > 0)
+                {
+                    writer.WriteIndentedLine($"private void Set_{AttributeString}({TypeString} value)");
+                    writer.WriteIndentedLine("{");
+                    writer.IncreaseIndent();
+
+                    foreach (ICSharpAssertion Assertion in EnsureList)
+                        Assertion.WriteCSharp(writer);
+
+                    writer.WriteEmptyLine();
+                    writer.WriteIndentedLine($"{AttributeString} = value;");
+                    writer.DecreaseIndent();
+                    writer.WriteIndentedLine("}");
+                }
+            }
         }
         #endregion
     }

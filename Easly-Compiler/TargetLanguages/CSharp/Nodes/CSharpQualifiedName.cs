@@ -30,6 +30,11 @@
         IList<ICSharpClass> ClassPath { get; }
 
         /// <summary>
+        /// True if the final feature is an attribute with ensure clauses.
+        /// </summary>
+        bool IsAttributeWithContract { get; }
+
+        /// <summary>
         /// Gets the source code corresponding to the qualified name.
         /// </summary>
         /// <param name="usingCollection">The collection of using directives.</param>
@@ -42,6 +47,12 @@
         /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="skippedAtEnd">Number of identifiers to skip at the end.</param>
         string DecoratedCSharpText(ICSharpUsingCollection usingCollection, int skippedAtEnd);
+
+        /// <summary>
+        /// Gets the source code corresponding to the qualified name setter.
+        /// </summary>
+        /// <param name="usingCollection">The collection of using directives.</param>
+        string CSharpSetter(ICSharpUsingCollection usingCollection);
     }
 
     /// <summary>
@@ -79,6 +90,7 @@
             Feature = feature;
             Discrete = discrete;
             InheritBySideAttribute = inheritBySideAttribute;
+            IsAttributeWithContract = feature is ICSharpAttributeFeature AsAttributeFeature && AsAttributeFeature.Source.EnsureList.Count > 0;
 
             foreach (IExpressionType Item in source.ValidResultTypePath.Item)
             {
@@ -114,6 +126,11 @@
         /// The list of classes involved along the path.
         /// </summary>
         public IList<ICSharpClass> ClassPath { get; } = new List<ICSharpClass>();
+
+        /// <summary>
+        /// True if the final feature is an attribute with ensure clauses.
+        /// </summary>
+        public bool IsAttributeWithContract { get; }
         #endregion
 
         #region Client Interface
@@ -199,6 +216,29 @@
             Debug.Assert(Result != null);
 
             return Result;
+        }
+
+        /// <summary>
+        /// Gets the source code corresponding to the qualified name setter.
+        /// </summary>
+        /// <param name="usingCollection">The collection of using directives.</param>
+        public string CSharpSetter(ICSharpUsingCollection usingCollection)
+        {
+            string StartText;
+
+            if (Source.ValidPath.Item.Count > 1)
+            {
+                StartText = CSharpText(usingCollection, 1);
+                StartText += ".";
+            }
+            else
+                StartText = string.Empty;
+
+            IIdentifier Item = Source.ValidPath.Item[0];
+            string ItemText = CSharpNames.ToCSharpIdentifier(Item.ValidText.Item);
+            string SetterText = $"{StartText}Set_{ItemText}";
+
+            return SetterText;
         }
         #endregion
     }
