@@ -45,69 +45,74 @@
             bool Success = true;
 
             IClass EmbeddingClass = node.EmbeddingClass;
-            IAssertion InnerAssertion = node.EmbeddingAssertion;
-            if (InnerAssertion == null)
+
+            Debug.Assert(node.ResolvedAssertion.IsAssigned);
+            IAssertion InnerAssertion = node.ResolvedAssertion.Item;
+
+            IList<IAssertion> MatchingAssertionList = new List<IAssertion>();
+            IIdentifier TagIdentifier = (IIdentifier)node.TagIdentifier;
+            string ExpectedTag = TagIdentifier.ValidText.Item;
+            IFeature Feature = node.EmbeddingFeature;
+            IFeatureName FeatureName = Feature.ValidFeatureName.Item;
+
+            Debug.Assert(EmbeddingClass.FeatureTable.ContainsKey(FeatureName));
+            IFeatureInstance FeatureInstance = EmbeddingClass.FeatureTable[FeatureName];
+            if (FeatureInstance.OriginalPrecursor.IsAssigned)
+                FeatureInstance = FeatureInstance.OriginalPrecursor.Item.Precursor;
+
+            IList<IPrecursorInstance> PrecursorList = FeatureInstance.PrecursorList;
+
+            foreach (KeyValuePair<IClassType, IList<IBody>> Entry in EmbeddingClass.InheritedBodyTagListTable)
             {
-                AddSourceError(new ErrorInvalidExpressionContext(node));
+                IClass InheritedClass = Entry.Key.BaseClass;
+
+                foreach (IBody InheritedBody in Entry.Value)
+                {
+                    IFeature InheritedFeature = InheritedBody.EmbeddingFeature;
+                    IFeatureName InheritedFeatureName = InheritedFeature.ValidFeatureName.Item;
+
+                    Debug.Assert(InheritedClass.FeatureTable.ContainsKey(InheritedFeatureName));
+                    IFeatureInstance InheritedFeatureInstance = InheritedClass.FeatureTable[InheritedFeatureName];
+
+                    foreach (IPrecursorInstance PrecursorInstance in PrecursorList)
+                        if (PrecursorInstance.Precursor == InheritedFeatureInstance)
+                        {
+                            FindMatchingAssertions(InheritedBody.RequireList, InnerAssertion, ExpectedTag, MatchingAssertionList);
+                            FindMatchingAssertions(InheritedBody.EnsureList, InnerAssertion, ExpectedTag, MatchingAssertionList);
+                        }
+                }
+            }
+
+            if (InnerAssertion.EmbeddingBody != null)
+            {
+                IBody ResolvedBody = InnerAssertion.EmbeddingBody;
+                Debug.Assert(ResolvedBody.RequireList.Count > 0 || ResolvedBody.EnsureList.Count > 0);
+
+                FindMatchingAssertions(ResolvedBody.RequireList, InnerAssertion, ExpectedTag, MatchingAssertionList);
+                FindMatchingAssertions(ResolvedBody.EnsureList, InnerAssertion, ExpectedTag, MatchingAssertionList);
+            }
+            else
+            {
+                Debug.Assert(EmbeddingClass.InvariantList.Count > 0);
+                FindMatchingAssertions(EmbeddingClass.InvariantList, InnerAssertion, ExpectedTag, MatchingAssertionList);
+            }
+
+            if (MatchingAssertionList.Count == 0)
+            {
+                AddSourceError(new ErrorInvalidExpression(node));
+                Success = false;
+            }
+            else if (MatchingAssertionList.Count > 1)
+            {
+                AddSourceError(new ErrorInvalidExpression(node));
                 Success = false;
             }
             else
             {
-                IBody ResolvedBody = node.ResolvedBody.Item;
-                IList<IAssertion> MatchingAssertionList = new List<IAssertion>();
-                IIdentifier TagIdentifier = (IIdentifier)node.TagIdentifier;
-                string ExpectedTag = TagIdentifier.ValidText.Item;
-                IFeature Feature = node.EmbeddingFeature;
-                IFeatureName FeatureName = Feature.ValidFeatureName.Item;
+                Debug.Assert(MatchingAssertionList.Count == 1);
+                IAssertion MatchingAssertion = MatchingAssertionList[0];
 
-                Debug.Assert(EmbeddingClass.FeatureTable.ContainsKey(FeatureName));
-                IFeatureInstance FeatureInstance = EmbeddingClass.FeatureTable[FeatureName];
-                if (FeatureInstance.OriginalPrecursor.IsAssigned)
-                    FeatureInstance = FeatureInstance.OriginalPrecursor.Item.Precursor;
-
-                IList<IPrecursorInstance> PrecursorList = FeatureInstance.PrecursorList;
-
-                foreach (KeyValuePair<IClassType, IList<IBody>> Entry in EmbeddingClass.InheritedBodyTagListTable)
-                {
-                    IClass InheritedClass = Entry.Key.BaseClass;
-
-                    foreach (IBody InheritedBody in Entry.Value)
-                    {
-                        IFeature InheritedFeature = InheritedBody.EmbeddingFeature;
-                        IFeatureName InheritedFeatureName = InheritedFeature.ValidFeatureName.Item;
-
-                        Debug.Assert(InheritedClass.FeatureTable.ContainsKey(InheritedFeatureName));
-                        IFeatureInstance InheritedFeatureInstance = InheritedClass.FeatureTable[InheritedFeatureName];
-
-                        foreach (IPrecursorInstance PrecursorInstance in PrecursorList)
-                            if (PrecursorInstance.Precursor == InheritedFeatureInstance)
-                            {
-                                FindMatchingAssertions(InheritedBody.RequireList, InnerAssertion, ExpectedTag, MatchingAssertionList);
-                                FindMatchingAssertions(InheritedBody.EnsureList, InnerAssertion, ExpectedTag, MatchingAssertionList);
-                            }
-                    }
-                }
-
-                FindMatchingAssertions(ResolvedBody.RequireList, InnerAssertion, ExpectedTag, MatchingAssertionList);
-                FindMatchingAssertions(ResolvedBody.EnsureList, InnerAssertion, ExpectedTag, MatchingAssertionList);
-
-                if (MatchingAssertionList.Count == 0)
-                {
-                    AddSourceError(new ErrorInvalidExpression(node));
-                    Success = false;
-                }
-                else if (MatchingAssertionList.Count > 1)
-                {
-                    AddSourceError(new ErrorInvalidExpression(node));
-                    Success = false;
-                }
-                else
-                {
-                    Debug.Assert(MatchingAssertionList.Count == 1);
-                    IAssertion MatchingAssertion = MatchingAssertionList[0];
-
-                    data = MatchingAssertion.BooleanExpression;
-                }
+                data = MatchingAssertion.BooleanExpression;
             }
 
             return Success;

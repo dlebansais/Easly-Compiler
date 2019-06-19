@@ -11,9 +11,9 @@ namespace CompilerNode
     public interface IAssertionTagExpression : BaseNode.IAssertionTagExpression, IExpression, IComparableExpression
     {
         /// <summary>
-        /// The resolved embedding body.
+        /// The resolved embedding assertion.
         /// </summary>
-        OnceReference<IBody> ResolvedBody { get; }
+        OnceReference<IAssertion> ResolvedAssertion { get; }
 
         /// <summary>
         /// The resolved expression.
@@ -86,7 +86,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                ResolvedBody = new OnceReference<IBody>();
+                ResolvedAssertion = new OnceReference<IAssertion>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
@@ -123,7 +123,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
-                IsResolved = ResolvedBody.IsAssigned;
+                IsResolved = ResolvedAssertion.IsAssigned;
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
@@ -182,7 +182,7 @@ namespace CompilerNode
         /// <summary>
         /// The resolved embedding body.
         /// </summary>
-        public OnceReference<IBody> ResolvedBody { get; private set; } = new OnceReference<IBody>();
+        public OnceReference<IAssertion> ResolvedAssertion { get; private set; } = new OnceReference<IAssertion>();
 
         /// <summary>
         /// Compares two expressions.

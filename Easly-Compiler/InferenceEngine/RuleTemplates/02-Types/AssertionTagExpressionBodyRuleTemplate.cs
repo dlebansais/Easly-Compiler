@@ -24,7 +24,7 @@
 
             DestinationTemplateList = new List<IDestinationTemplate>()
             {
-                new OnceReferenceDestinationTemplate<IAssertionTagExpression, IBody>(nameof(IAssertionTagExpression.ResolvedBody)),
+                new OnceReferenceDestinationTemplate<IAssertionTagExpression, IAssertion>(nameof(IAssertionTagExpression.ResolvedAssertion)),
             };
         }
         #endregion
@@ -42,15 +42,18 @@
             bool Success = true;
             data = null;
 
-            IBody ResolvedBody = node.EmbeddingBody;
+            IAssertion ResolvedAssertion = node.EmbeddingAssertion;
 
-            if (ResolvedBody == null)
+            IBody EmbeddingBody = node.EmbeddingBody;
+            IClass EmbeddingClass = node.EmbeddingClass;
+
+            if (ResolvedAssertion == null || (EmbeddingBody == null && !EmbeddingClass.InvariantList.Contains(ResolvedAssertion)))
             {
                 AddSourceError(new ErrorInvalidExpressionContext(node));
                 Success = false;
             }
             else
-                data = ResolvedBody;
+                data = ResolvedAssertion;
 
             return Success;
         }
@@ -62,9 +65,9 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IAssertionTagExpression node, object data)
         {
-            IBody ResolvedBody = (IBody)data;
+            IAssertion ResolvedAssertion = (IAssertion)data;
 
-            node.ResolvedBody.Item = ResolvedBody;
+            node.ResolvedAssertion.Item = ResolvedAssertion;
         }
         #endregion
     }
