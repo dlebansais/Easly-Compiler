@@ -138,12 +138,15 @@ namespace CompilerNode
             {
                 InnerLoopScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 LocalScope = new SealableDictionary<string, IScopeAttributeFeature>();
+                AdditionalScope = new SealableDictionary<string, IScopeAttributeFeature>(); // Don't seal it yet, not until indexers are handled.
                 InnerScopes = new List<IScopeHolder>();
                 FullScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
+                if (!FullScope.IsSealed) FullScope.Seal();
+                AdditionalScope = AdditionalScope.CloneUnsealed();
                 ResolvedResult = new OnceReference<IResultType>();
                 ResolvedInitResult = new OnceReference<IResultType>();
                 IsHandled = true;
@@ -200,6 +203,11 @@ namespace CompilerNode
         /// Entities local to a scope.
         /// </summary>
         public ISealableDictionary<string, IScopeAttributeFeature> LocalScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
+
+        /// <summary>
+        /// Additional entities such as loop indexer.
+        /// </summary>
+        public ISealableDictionary<string, IScopeAttributeFeature> AdditionalScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
 
         /// <summary>
         /// List of scopes containing the current instance.

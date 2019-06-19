@@ -137,12 +137,15 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 LocalScope = new SealableDictionary<string, IScopeAttributeFeature>();
+                AdditionalScope = new SealableDictionary<string, IScopeAttributeFeature>();
+                AdditionalScope.Seal();
                 InnerScopes = new List<IScopeHolder>();
                 FullScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
+                if (!FullScope.IsSealed) FullScope.Seal();
                 ResolvedResult = new OnceReference<IResultType>();
                 IsHandled = true;
             }
@@ -196,6 +199,11 @@ namespace CompilerNode
         /// Entities local to a scope.
         /// </summary>
         public ISealableDictionary<string, IScopeAttributeFeature> LocalScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
+
+        /// <summary>
+        /// Additional entities such as loop indexer.
+        /// </summary>
+        public ISealableDictionary<string, IScopeAttributeFeature> AdditionalScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
 
         /// <summary>
         /// List of scopes containing the current instance.
@@ -265,6 +273,22 @@ namespace CompilerNode
                         IsHandled = true;
                         break;
                         */
+
+                    case IAssertion AsAssertion:
+                        if (AsAssertion.ParentSource is IScopeHolder)
+                        {
+                            // If the parent is also a scope holder, this will defer to the parent.
+                            Result = AsAssertion.FullScope;
+                            IsHandled = true;
+                        }
+                        else
+                        {
+                            // Otherwise, do the same as the default case.
+                            ChildSource = ParentSource;
+                            ParentSource = ChildSource.ParentSource;
+                            IsHandled = ParentSource != null;
+                        }
+                        break;
 
                     case IInstruction AsInstruction:
                         Result = AsInstruction.FullScope;

@@ -23,6 +23,7 @@
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
+                new SealedTableSourceTemplate<IQueryExpression, string, IScopeAttributeFeature>(nameof(IScope.FullScope), TemplateScopeStart<IQueryExpression>.Default),
                 new OnceReferenceTableSourceTemplate<IQueryExpression, string, IScopeAttributeFeature, ITypeName>(nameof(IScope.FullScope), nameof(IScopeAttributeFeature.ResolvedEffectiveTypeName), TemplateScopeStart<IQueryExpression>.Default),
                 new OnceReferenceTableSourceTemplate<IQueryExpression, string, IScopeAttributeFeature, ICompiledType>(nameof(IScope.FullScope), nameof(IScopeAttributeFeature.ResolvedEffectiveType), TemplateScopeStart<IQueryExpression>.Default),
                 new OnceReferenceSourceTemplate<IQueryExpression, IList<IExpressionType>>(nameof(IQueryExpression.Query) + Dot + nameof(IQualifiedName.ValidResultTypePath)),

@@ -210,6 +210,8 @@
             }
 
             node.ResolvedInitResult.Item = ResultType.Empty;
+
+            node.AdditionalScope.Seal();
         }
         #endregion
     }

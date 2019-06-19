@@ -665,12 +665,15 @@ namespace CompilerNode
                 NamespaceTable = new SealableDictionary<string, ISealableDictionary>();
                 LocalScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 LocalScope.Seal();
+                AdditionalScope = new SealableDictionary<string, IScopeAttributeFeature>();
+                AdditionalScope.Seal();
                 InnerScopes = new List<IScopeHolder>();
                 FullScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
+                if (!FullScope.IsSealed) FullScope.Seal();
                 ResolvedBodyTagList = new OnceReference<IList<IBody>>();
                 ResolvedNodeWithDefaultList = new OnceReference<IList<IExpression>>();
                 ResolvedNodeWithNumberConstantList = new OnceReference<IList<IExpression>>();
@@ -727,6 +730,11 @@ namespace CompilerNode
         /// Entities local to a scope.
         /// </summary>
         public ISealableDictionary<string, IScopeAttributeFeature> LocalScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
+
+        /// <summary>
+        /// Additional entities such as loop indexer.
+        /// </summary>
+        public ISealableDictionary<string, IScopeAttributeFeature> AdditionalScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
 
         /// <summary>
         /// List of scopes containing the current instance.

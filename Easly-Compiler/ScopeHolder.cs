@@ -16,6 +16,11 @@
         ISealableDictionary<string, IScopeAttributeFeature> LocalScope { get; }
 
         /// <summary>
+        /// Additional entities such as loop indexer.
+        /// </summary>
+        ISealableDictionary<string, IScopeAttributeFeature> AdditionalScope { get; }
+
+        /// <summary>
         /// List of scopes containing the current instance.
         /// </summary>
         IList<IScopeHolder> InnerScopes { get; }

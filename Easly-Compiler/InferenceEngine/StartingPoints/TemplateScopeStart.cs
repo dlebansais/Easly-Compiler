@@ -53,12 +53,20 @@
         public virtual ISource GetStart(TSource source)
         {
             ISource ScopeSource = source;
-            while (!(ScopeSource is IScopeHolder) && ScopeSource.ParentSource != null)
+            while (!IsScopeHolder(ScopeSource) && ScopeSource.ParentSource != null)
                 ScopeSource = ScopeSource.ParentSource;
 
             Debug.Assert(ScopeSource is IScopeHolder);
 
             return ScopeSource;
+        }
+
+        private bool IsScopeHolder(ISource source)
+        {
+            if (source is IAssertion AsAssertion)
+                return AsAssertion.ParentSource is IScopeHolder;
+            else
+                return source is IScopeHolder;
         }
         #endregion
 

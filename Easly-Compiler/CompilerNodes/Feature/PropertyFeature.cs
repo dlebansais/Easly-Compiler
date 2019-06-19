@@ -124,7 +124,7 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Contract)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers)
             {
                 IsHandled = true;
             }
@@ -141,12 +141,19 @@ namespace CompilerNode
                 LocalScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 LocalGetScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 LocalSetScope = new SealableDictionary<string, IScopeAttributeFeature>();
+                AdditionalScope = new SealableDictionary<string, IScopeAttributeFeature>();
+                AdditionalScope.Seal();
                 InnerScopes = new List<IScopeHolder>();
                 InnerGetScopes = new List<IScopeHolder>();
                 InnerSetScopes = new List<IScopeHolder>();
                 FullScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 FullGetScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 FullSetScope = new SealableDictionary<string, IScopeAttributeFeature>();
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Contract)
+            {
+                if (!FullScope.IsSealed) FullScope.Seal();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
@@ -285,6 +292,11 @@ namespace CompilerNode
         /// Entities local to a scope, setter only.
         /// </summary>
         public ISealableDictionary<string, IScopeAttributeFeature> LocalSetScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
+
+        /// <summary>
+        /// Additional entities such as loop indexer.
+        /// </summary>
+        public ISealableDictionary<string, IScopeAttributeFeature> AdditionalScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
 
         /// <summary>
         /// List of scopes containing the current instance.

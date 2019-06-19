@@ -8,7 +8,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IAssertion.
     /// </summary>
-    public interface IAssertion : BaseNode.IAssertion, INode, ISource
+    public interface IAssertion : BaseNode.IAssertion, INode, ISource, IScopeHolder
     {
         /// <summary>
         /// The resolved contract with the associated tag.
@@ -126,6 +126,46 @@ namespace CompilerNode
 
             Debug.Assert(IsHandled);
             return IsResolved;
+        }
+        #endregion
+
+        #region Implementation of IScopeHolder
+        /// <summary>
+        /// Entities local to a scope.
+        /// </summary>
+        public ISealableDictionary<string, IScopeAttributeFeature> LocalScope { get { return ((IScopeHolder)ParentSource).LocalScope; } }
+
+        /// <summary>
+        /// Additional entities such as loop indexer.
+        /// </summary>
+        public ISealableDictionary<string, IScopeAttributeFeature> AdditionalScope { get { return ((IScopeHolder)ParentSource).AdditionalScope; } }
+
+        /// <summary>
+        /// List of scopes containing the current instance.
+        /// </summary>
+        public IList<IScopeHolder> InnerScopes { get { return ((IScopeHolder)ParentSource).InnerScopes; } }
+
+        /// <summary>
+        /// All reachable entities.
+        /// </summary>
+        public ISealableDictionary<string, IScopeAttributeFeature> FullScope
+        {
+            // In the case of the full scope of an assertion, also include entities declared in the parent.
+            // Typically, indexers of a IOverLoopInstruction.
+            get
+            {
+                ISealableDictionary<string, IScopeAttributeFeature> Result = new SealableDictionary<string, IScopeAttributeFeature>();
+                ISealableDictionary<string, IScopeAttributeFeature> ParentFullScope = ((IScopeHolder)ParentSource).FullScope;
+                ISealableDictionary<string, IScopeAttributeFeature> ParentAdditionalScope = ((IScopeHolder)ParentSource).AdditionalScope;
+
+                Result.Merge(ParentFullScope);
+                Result.Merge(ParentAdditionalScope);
+
+                if (ParentFullScope.IsSealed && ParentAdditionalScope.IsSealed)
+                    Result.Seal();
+
+                return Result;
+            }
         }
         #endregion
 
