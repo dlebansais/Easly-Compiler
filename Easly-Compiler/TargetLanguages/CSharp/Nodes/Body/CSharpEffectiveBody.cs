@@ -125,16 +125,18 @@
                             }
 
                         Debug.Assert(ParentOverload != null);
+
                         ICSharpQueryOverload ParentPrecursorOverload = ParentOverload.Precursor;
-                        Debug.Assert(ParentPrecursorOverload != null);
+                        if (ParentPrecursorOverload != null)
+                        {
+                            ICSharpBody PrecursorBody = ParentPrecursorOverload.Body;
 
-                        ICSharpBody PrecursorBody = ParentPrecursorOverload.Body;
+                            if (RequireList.Count == 0 && PrecursorBody.RequireList.Count > 0)
+                                EffectiveRequireList = PrecursorBody.RequireList;
 
-                        if (RequireList.Count == 0 && PrecursorBody.RequireList.Count > 0)
-                            EffectiveRequireList = PrecursorBody.RequireList;
-
-                        if (EnsureList.Count == 0 && PrecursorBody.EnsureList.Count > 0)
-                            EffectiveEnsureList = PrecursorBody.EnsureList;
+                            if (EnsureList.Count == 0 && PrecursorBody.EnsureList.Count > 0)
+                                EffectiveEnsureList = PrecursorBody.EnsureList;
+                        }
                     }
                     break;
 
@@ -150,16 +152,18 @@
                             }
 
                         Debug.Assert(ParentOverload != null);
+
                         ICSharpCommandOverload ParentPrecursorOverload = ParentOverload.Precursor;
-                        Debug.Assert(ParentPrecursorOverload != null);
+                        if (ParentPrecursorOverload != null)
+                        {
+                            ICSharpBody PrecursorBody = ParentPrecursorOverload.Body;
 
-                        ICSharpBody PrecursorBody = ParentPrecursorOverload.Body;
+                            if (RequireList.Count == 0 && PrecursorBody.RequireList.Count > 0)
+                                EffectiveRequireList = PrecursorBody.RequireList;
 
-                        if (RequireList.Count == 0 && PrecursorBody.RequireList.Count > 0)
-                            EffectiveRequireList = PrecursorBody.RequireList;
-
-                        if (EnsureList.Count == 0 && PrecursorBody.EnsureList.Count > 0)
-                            EffectiveEnsureList = PrecursorBody.EnsureList;
+                            if (EnsureList.Count == 0 && PrecursorBody.EnsureList.Count > 0)
+                                EffectiveEnsureList = PrecursorBody.EnsureList;
+                        }
                     }
                     break;
 
@@ -173,13 +177,14 @@
                         else if (this == AsPropertyFeature.SetterBody)
                             PrecursorBody = AsPropertyFeature.OriginalPrecursor.SetterBody;
 
-                        Debug.Assert(PrecursorBody != null);
+                        if (PrecursorBody != null)
+                        {
+                            if (RequireList.Count == 0 && PrecursorBody.RequireList.Count > 0)
+                                EffectiveRequireList = PrecursorBody.RequireList;
 
-                        if (RequireList.Count == 0 && PrecursorBody.RequireList.Count > 0)
-                            EffectiveRequireList = PrecursorBody.RequireList;
-
-                        if (EnsureList.Count == 0 && PrecursorBody.EnsureList.Count > 0)
-                            EffectiveEnsureList = PrecursorBody.EnsureList;
+                            if (EnsureList.Count == 0 && PrecursorBody.EnsureList.Count > 0)
+                                EffectiveEnsureList = PrecursorBody.EnsureList;
+                        }
                     }
                     break;
 
@@ -193,13 +198,14 @@
                         else if (this == AsIndexerFeature.SetterBody)
                             PrecursorBody = AsIndexerFeature.OriginalPrecursor.SetterBody;
 
-                        Debug.Assert(PrecursorBody != null);
+                        if (PrecursorBody != null)
+                        {
+                            if (RequireList.Count == 0 && PrecursorBody.RequireList.Count > 0)
+                                EffectiveRequireList = PrecursorBody.RequireList;
 
-                        if (RequireList.Count == 0 && PrecursorBody.RequireList.Count > 0)
-                            EffectiveRequireList = PrecursorBody.RequireList;
-
-                        if (EnsureList.Count == 0 && PrecursorBody.EnsureList.Count > 0)
-                            EffectiveEnsureList = PrecursorBody.EnsureList;
+                            if (EnsureList.Count == 0 && PrecursorBody.EnsureList.Count > 0)
+                                EffectiveEnsureList = PrecursorBody.EnsureList;
+                        }
                     }
                     break;
             }
