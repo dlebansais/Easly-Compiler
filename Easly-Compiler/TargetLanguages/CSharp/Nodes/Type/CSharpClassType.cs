@@ -132,6 +132,8 @@
                     ClassName = "List";
 
                 Result = ClassName + TypeArguments2CSharpName(usingCollection, TypeArgumentList, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
+
+                usingCollection.AddUsing("System.Collections.Generic");
             }
             else if (BaseClassGuid == LanguageClasses.OnceReference.Guid)
                 Result = "OnceReference" + TypeArguments2CSharpName(usingCollection, TypeArgumentList, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);

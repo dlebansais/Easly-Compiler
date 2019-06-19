@@ -32,6 +32,11 @@
         /// The exit entity. Can be null.
         /// </summary>
         string ExitEntityName { get; }
+
+        /// <summary>
+        /// The list of loop invariants.
+        /// </summary>
+        IList<ICSharpAssertion> InvariantList { get; }
     }
 
     /// <summary>
@@ -74,6 +79,12 @@
 
             if (source.ExitEntityName.IsAssigned)
                 ExitEntityName = ((IIdentifier)source.ExitEntityName.Item).ValidText.Item;
+
+            foreach (IAssertion Item in Source.InvariantList)
+            {
+                ICSharpAssertion NewAssertion = CSharpAssertion.Create(context, Item);
+                InvariantList.Add(NewAssertion);
+            }
         }
         #endregion
 
@@ -102,6 +113,11 @@
         /// The exit entity. Can be null.
         /// </summary>
         public string ExitEntityName { get; }
+
+        /// <summary>
+        /// The list of loop invariants.
+        /// </summary>
+        public IList<ICSharpAssertion> InvariantList { get; } = new List<ICSharpAssertion>();
         #endregion
 
         #region Client Interface
@@ -130,6 +146,8 @@
 
                 LoopInstructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.AlreadyInserted, false);
 
+                WriteCSharpInvariant(writer);
+
                 writer.WriteEmptyLine();
                 writer.IncreaseIndent();
                 writer.WriteIndentedLine($"if ({ExitEntityNameString})");
@@ -137,6 +155,19 @@
                 writer.WriteIndentedLine("break;");
                 writer.DecreaseIndent();
                 writer.DecreaseIndent();
+                writer.WriteIndentedLine("}");
+            }
+            else if (InvariantList.Count > 0)
+            {
+                writer.WriteIndentedLine($"foreach ({TypeString} {IndexerNameString} in {OverListString})");
+
+                writer.WriteIndentedLine("{");
+                LoopInstructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.AlreadyInserted, false);
+
+                writer.IncreaseIndent();
+                WriteCSharpInvariant(writer);
+                writer.DecreaseIndent();
+
                 writer.WriteIndentedLine("}");
             }
             else
@@ -148,6 +179,15 @@
 
             //TODO: InvariantBlocks
             //TODO: Variant
+        }
+
+        private void WriteCSharpInvariant(ICSharpWriter writer)
+        {
+            if (InvariantList.Count > 0)
+                writer.WriteEmptyLine();
+
+            foreach (ICSharpAssertion Assertion in InvariantList)
+                Assertion.WriteCSharp(writer);
         }
         #endregion
     }

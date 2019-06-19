@@ -169,8 +169,8 @@
 
             if (ParentFeature.Owner.InvariantList.Count > 0)
             {
-                writer.WriteIndentedLine("CheckInvariant();");
                 writer.WriteEmptyLine();
+                writer.WriteIndentedLine("CheckInvariant();");
             }
 
             if (flags.HasFlag(CSharpBodyFlags.HasResult))

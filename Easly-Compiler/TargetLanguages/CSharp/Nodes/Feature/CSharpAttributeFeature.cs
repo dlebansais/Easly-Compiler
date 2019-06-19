@@ -157,11 +157,12 @@
                     writer.WriteIndentedLine("{");
                     writer.IncreaseIndent();
 
+                    writer.WriteIndentedLine($"{AttributeString} = value;");
+
+                    writer.WriteEmptyLine();
                     foreach (ICSharpAssertion Assertion in EnsureList)
                         Assertion.WriteCSharp(writer);
 
-                    writer.WriteEmptyLine();
-                    writer.WriteIndentedLine($"{AttributeString} = value;");
                     writer.DecreaseIndent();
                     writer.WriteIndentedLine("}");
                 }

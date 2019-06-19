@@ -42,6 +42,11 @@
         /// The loop variant. Can be null.
         /// </summary>
         ICSharpExpression VariantExpression { get; }
+
+        /// <summary>
+        /// The list of loop invariants.
+        /// </summary>
+        IList<ICSharpAssertion> InvariantList { get; }
     }
 
     /// <summary>
@@ -98,6 +103,12 @@
 
             if (source.Variant.IsAssigned)
                 VariantExpression = CSharpExpression.Create(context, (IExpression)source.Variant.Item);
+
+            foreach (IAssertion Item in Source.InvariantList)
+            {
+                ICSharpAssertion NewAssertion = CSharpAssertion.Create(context, Item);
+                InvariantList.Add(NewAssertion);
+            }
         }
         #endregion
 
@@ -136,6 +147,11 @@
         /// The loop variant. Can be null.
         /// </summary>
         public ICSharpExpression VariantExpression { get; }
+
+        /// <summary>
+        /// The list of loop invariants.
+        /// </summary>
+        public IList<ICSharpAssertion> InvariantList { get; } = new List<ICSharpAssertion>();
         #endregion
 
         #region Client Interface
@@ -188,6 +204,11 @@
             foreach (ICSharpInstruction Item in InitInstructionList)
                 Item.WriteCSharp(writer);
 
+            WriteCSharpInvariant(writer);
+
+            if (InvariantList.Count > 0)
+                writer.WriteEmptyLine();
+
             string WhileString = WhileCondition.CSharpText(writer);
 
             writer.WriteIndentedLine($"while ({WhileString})");
@@ -215,7 +236,7 @@
                 writer.WriteIndentedLine("LoopVariant = NewVariantResult;");
             }
 
-            // TODO: Invariants
+            WriteCSharpInvariant(writer);
 
             writer.DecreaseIndent();
             writer.WriteIndentedLine("}");
@@ -230,6 +251,15 @@
                 writer.DecreaseIndent();
                 writer.WriteIndentedLine("}");
             }
+        }
+
+        private void WriteCSharpInvariant(ICSharpWriter writer)
+        {
+            if (InvariantList.Count > 0)
+                writer.WriteEmptyLine();
+
+            foreach (ICSharpAssertion Assertion in InvariantList)
+                Assertion.WriteCSharp(writer);
         }
         #endregion
     }
