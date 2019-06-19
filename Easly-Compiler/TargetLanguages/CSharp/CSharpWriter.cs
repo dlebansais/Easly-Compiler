@@ -148,17 +148,20 @@
         /// </summary>
         public void CommitLines()
         {
+            List<string> SortedUsingList = new List<string>(UsingList);
+            SortedUsingList.Sort();
+
             int i = 0;
-            while (i < UsingList.Count)
-                if (i + 1 < UsingList.Count && UsingList[i] == UsingList[i + 1])
-                    UsingList.RemoveAt(i + 1);
+            while (i < SortedUsingList.Count)
+                if (i + 1 < SortedUsingList.Count && SortedUsingList[i] == SortedUsingList[i + 1])
+                    SortedUsingList.RemoveAt(i + 1);
                 else
                     i++;
 
-            foreach (string UsingDirective in UsingList)
+            foreach (string UsingDirective in SortedUsingList)
                 WriteLine($"    using {UsingDirective};");
 
-            if (UsingList.Count > 0)
+            if (SortedUsingList.Count > 0)
                 WriteLine(string.Empty);
 
             foreach (string Line in LineList)
