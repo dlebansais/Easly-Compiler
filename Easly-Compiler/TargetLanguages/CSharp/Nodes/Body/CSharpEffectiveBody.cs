@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -107,10 +108,106 @@
             writer.WriteIndentedLine("{");
             writer.IncreaseIndent();
 
-            foreach (ICSharpAssertion Assertion in RequireList)
+            IList<ICSharpAssertion> EffectiveRequireList = RequireList;
+            IList<ICSharpAssertion> EffectiveEnsureList = EnsureList;
+
+            switch (ParentFeature)
+            {
+                case ICSharpFunctionFeature AsFunctionFeature:
+                    if (AsFunctionFeature.OriginalPrecursor != null)
+                    {
+                        ICSharpQueryOverload ParentOverload = null;
+                        foreach (ICSharpQueryOverload Overload in AsFunctionFeature.OverloadList)
+                            if (Overload.Body == this)
+                            {
+                                ParentOverload = Overload;
+                                break;
+                            }
+
+                        Debug.Assert(ParentOverload != null);
+                        ICSharpQueryOverload ParentPrecursorOverload = ParentOverload.Precursor;
+                        Debug.Assert(ParentPrecursorOverload != null);
+
+                        ICSharpBody PrecursorBody = ParentPrecursorOverload.Body;
+
+                        if (RequireList.Count == 0 && PrecursorBody.RequireList.Count > 0)
+                            EffectiveRequireList = PrecursorBody.RequireList;
+
+                        if (EnsureList.Count == 0 && PrecursorBody.EnsureList.Count > 0)
+                            EffectiveEnsureList = PrecursorBody.EnsureList;
+                    }
+                    break;
+
+                case ICSharpProcedureFeature AsProcedureFeature:
+                    if (AsProcedureFeature.OriginalPrecursor != null)
+                    {
+                        ICSharpCommandOverload ParentOverload = null;
+                        foreach (ICSharpCommandOverload Overload in AsProcedureFeature.OverloadList)
+                            if (Overload.Body == this)
+                            {
+                                ParentOverload = Overload;
+                                break;
+                            }
+
+                        Debug.Assert(ParentOverload != null);
+                        ICSharpCommandOverload ParentPrecursorOverload = ParentOverload.Precursor;
+                        Debug.Assert(ParentPrecursorOverload != null);
+
+                        ICSharpBody PrecursorBody = ParentPrecursorOverload.Body;
+
+                        if (RequireList.Count == 0 && PrecursorBody.RequireList.Count > 0)
+                            EffectiveRequireList = PrecursorBody.RequireList;
+
+                        if (EnsureList.Count == 0 && PrecursorBody.EnsureList.Count > 0)
+                            EffectiveEnsureList = PrecursorBody.EnsureList;
+                    }
+                    break;
+
+                case ICSharpPropertyFeature AsPropertyFeature:
+                    if (AsPropertyFeature.OriginalPrecursor != null)
+                    {
+                        ICSharpBody PrecursorBody = null;
+
+                        if (this == AsPropertyFeature.GetterBody)
+                            PrecursorBody = AsPropertyFeature.OriginalPrecursor.GetterBody;
+                        else if (this == AsPropertyFeature.SetterBody)
+                            PrecursorBody = AsPropertyFeature.OriginalPrecursor.SetterBody;
+
+                        Debug.Assert(PrecursorBody != null);
+
+                        if (RequireList.Count == 0 && PrecursorBody.RequireList.Count > 0)
+                            EffectiveRequireList = PrecursorBody.RequireList;
+
+                        if (EnsureList.Count == 0 && PrecursorBody.EnsureList.Count > 0)
+                            EffectiveEnsureList = PrecursorBody.EnsureList;
+                    }
+                    break;
+
+                case ICSharpIndexerFeature AsIndexerFeature:
+                    if (AsIndexerFeature.OriginalPrecursor != null)
+                    {
+                        ICSharpBody PrecursorBody = null;
+
+                        if (this == AsIndexerFeature.GetterBody)
+                            PrecursorBody = AsIndexerFeature.OriginalPrecursor.GetterBody;
+                        else if (this == AsIndexerFeature.SetterBody)
+                            PrecursorBody = AsIndexerFeature.OriginalPrecursor.SetterBody;
+
+                        Debug.Assert(PrecursorBody != null);
+
+                        if (RequireList.Count == 0 && PrecursorBody.RequireList.Count > 0)
+                            EffectiveRequireList = PrecursorBody.RequireList;
+
+                        if (EnsureList.Count == 0 && PrecursorBody.EnsureList.Count > 0)
+                            EffectiveEnsureList = PrecursorBody.EnsureList;
+                    }
+                    break;
+            }
+
+            foreach (ICSharpAssertion Assertion in EffectiveRequireList)
                 Assertion.WriteCSharp(writer);
 
-            if (RequireList.Count > 0)
+            if (EffectiveRequireList.Count > 0)
                 writer.WriteEmptyLine();
 
             /*TODO
@@ -154,11 +251,11 @@
                 Item.WriteCSharp(writer);
             }
 
-            if (EnsureList.Count > 0)
+            if (EffectiveEnsureList.Count > 0)
             {
                 writer.WriteEmptyLine();
 
-                foreach (ICSharpAssertion Assertion in EnsureList)
+                foreach (ICSharpAssertion Assertion in EffectiveEnsureList)
                     Assertion.WriteCSharp(writer);
 
                 if (flags.HasFlag(CSharpBodyFlags.HasResult))

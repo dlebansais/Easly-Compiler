@@ -383,7 +383,7 @@
 
             IsIdentical &= overload1.ParameterList.Count == overload2.ParameterList.Count;
             IsIdentical &= overload1.ParameterEnd == overload2.ParameterEnd;
-            IsIdentical &= overload1.ResultList.Count != overload2.ResultList.Count;
+            IsIdentical &= overload1.ResultList.Count == overload2.ResultList.Count;
 
             for (int i = 0; i < overload1.ParameterList.Count && i < overload2.ParameterList.Count; i++)
             {

@@ -90,7 +90,8 @@
         protected CSharpScopeAttributeFeature(ICSharpContext context, ICSharpClass owner, IScopeAttributeFeature source)
             : this(owner, source)
         {
-            Init(context);
+            InitOverloadsAndBodies(context);
+            InitHierarchy(context);
         }
         #endregion
 
@@ -118,15 +119,23 @@
 
         #region Client Interface
         /// <summary>
-        /// Initializes the feature.
+        /// Initializes the feature overloads and bodies.
         /// </summary>
         /// <param name="context">The initialization context.</param>
-        public override void Init(ICSharpContext context)
+        public override void InitOverloadsAndBodies(ICSharpContext context)
         {
             Type = CSharpType.Create(context, Source.ResolvedEffectiveType.Item);
 
             if (Source.DefaultValue.IsAssigned)
                 DefaultValue = CSharpExpression.Create(context, Source.DefaultValue.Item);
+        }
+
+        /// <summary>
+        /// Initializes the feature precursor hierarchy.
+        /// </summary>
+        /// <param name="context">The initialization context.</param>
+        public override void InitHierarchy(ICSharpContext context)
+        {
         }
 
         /// <summary>

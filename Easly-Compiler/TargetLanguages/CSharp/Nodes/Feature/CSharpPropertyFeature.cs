@@ -55,6 +55,11 @@
         ICSharpBody SetterBody { get; }
 
         /// <summary>
+        /// The precursor if any. Can be null.
+        /// </summary>
+        ICSharpPropertyFeature OriginalPrecursor { get; }
+
+        /// <summary>
         /// Mark this feature as both read and write.
         /// </summary>
         void MarkAsForcedReadWrite();
@@ -136,14 +141,19 @@
         /// Body of the setter. Can be null.
         /// </summary>
         public ICSharpBody SetterBody { get; private set; }
+
+        /// <summary>
+        /// The precursor if any. Can be null.
+        /// </summary>
+        public ICSharpPropertyFeature OriginalPrecursor { get; private set; }
         #endregion
 
         #region Client Interface
         /// <summary>
-        /// Initializes the feature.
+        /// Initializes the feature overloads and bodies.
         /// </summary>
         /// <param name="context">The initialization context.</param>
-        public override void Init(ICSharpContext context)
+        public override void InitOverloadsAndBodies(ICSharpContext context)
         {
             EntityType = CSharpType.Create(context, Source.ResolvedEntityType.Item);
 
@@ -152,6 +162,22 @@
 
             if (Source.SetterBody.IsAssigned)
                 SetterBody = CSharpBody.Create(context, this, (ICompiledBody)Source.SetterBody.Item);
+        }
+
+        /// <summary>
+        /// Initializes the feature precursor hierarchy.
+        /// </summary>
+        /// <param name="context">The initialization context.</param>
+        public override void InitHierarchy(ICSharpContext context)
+        {
+            if (Instance.OriginalPrecursor.IsAssigned)
+            {
+                IPrecursorInstance Item = Instance.OriginalPrecursor.Item;
+                ICompiledFeature PrecursorFeature = Item.Precursor.Feature;
+
+                OriginalPrecursor = context.GetFeature(PrecursorFeature) as ICSharpPropertyFeature;
+                Debug.Assert(OriginalPrecursor != null);
+            }
         }
 
         /// <summary>

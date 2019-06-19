@@ -23,6 +23,12 @@
         /// The overload body.
         /// </summary>
         ICSharpBody Body { get; }
+
+        /// <summary>
+        /// Sets the precursor.
+        /// </summary>
+        /// <param name="precursor">The precursor.</param>
+        void SetPrecursor(ICSharpQueryOverload precursor);
     }
 
     /// <summary>
@@ -100,6 +106,18 @@
         #endregion
 
         #region Client Interface
+        /// <summary>
+        /// Sets the precursor.
+        /// </summary>
+        /// <param name="precursor">The precursor.</param>
+        public virtual void SetPrecursor(ICSharpQueryOverload precursor)
+        {
+            Debug.Assert(precursor != null);
+            Debug.Assert(Precursor == null);
+
+            Precursor = precursor;
+        }
+
         /// <summary>
         /// Writes down the C# overload of a feature.
         /// </summary>

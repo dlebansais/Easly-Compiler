@@ -334,9 +334,9 @@ namespace CompilerNode
 
         private static bool CheckGetterConsistency(ISource source, IOptionalReference<BaseNode.IBody> optionalGetter, IErrorList errorList)
         {
-            if (source.EmbeddingBody is IEffectiveBody AsEffectiveBody)
+            if (source.EmbeddingBody is IBody AsBody)
             {
-                if (optionalGetter.IsAssigned && AsEffectiveBody == optionalGetter.Item)
+                if (optionalGetter.IsAssigned && AsBody == optionalGetter.Item)
                     return true;
             }
 

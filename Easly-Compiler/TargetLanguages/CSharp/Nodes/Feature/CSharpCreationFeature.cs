@@ -78,16 +78,24 @@
 
         #region Client Interface
         /// <summary>
-        /// Initializes the feature.
+        /// Initializes the feature overloads and bodies.
         /// </summary>
         /// <param name="context">The initialization context.</param>
-        public override void Init(ICSharpContext context)
+        public override void InitOverloadsAndBodies(ICSharpContext context)
         {
             foreach (ICommandOverload Overload in Source.OverloadList)
             {
                 ICSharpCommandOverload NewOverload = CSharpCommandOverload.Create(context, Overload, this, Owner);
                 OverloadList.Add(NewOverload);
             }
+        }
+
+        /// <summary>
+        /// Initializes the feature precursor hierarchy.
+        /// </summary>
+        /// <param name="context">The initialization context.</param>
+        public override void InitHierarchy(ICSharpContext context)
+        {
         }
 
         /// <summary>

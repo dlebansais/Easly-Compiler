@@ -35,10 +35,16 @@
         string CoexistingPrecursorName { get; }
 
         /// <summary>
-        /// Initializes the feature.
+        /// Initializes the feature overloads and bodies.
         /// </summary>
         /// <param name="context">The initialization context.</param>
-        void Init(ICSharpContext context);
+        void InitOverloadsAndBodies(ICSharpContext context);
+
+        /// <summary>
+        /// Initializes the feature precursor hierarchy.
+        /// </summary>
+        /// <param name="context">The initialization context.</param>
+        void InitHierarchy(ICSharpContext context);
 
         /// <summary>
         /// Mark this feature as an override of a virtual parent.
@@ -97,10 +103,16 @@
         string CoexistingPrecursorName { get; }
 
         /// <summary>
-        /// Initializes the feature.
+        /// Initializes the feature overloads and bodies.
         /// </summary>
         /// <param name="context">The initialization context.</param>
-        void Init(ICSharpContext context);
+        void InitOverloadsAndBodies(ICSharpContext context);
+
+        /// <summary>
+        /// Initializes the feature precursor hierarchy.
+        /// </summary>
+        /// <param name="context">The initialization context.</param>
+        void InitHierarchy(ICSharpContext context);
 
         /// <summary>
         /// Mark this feature as an override of a virtual parent.
@@ -190,10 +202,16 @@
 
         #region Client Interface
         /// <summary>
-        /// Initializes the feature.
+        /// Initializes the feature overloads and bodies.
         /// </summary>
         /// <param name="context">The initialization context.</param>
-        public abstract void Init(ICSharpContext context);
+        public abstract void InitOverloadsAndBodies(ICSharpContext context);
+
+        /// <summary>
+        /// Initializes the feature precursor hierarchy.
+        /// </summary>
+        /// <param name="context">The initialization context.</param>
+        public abstract void InitHierarchy(ICSharpContext context);
 
         /// <summary>
         /// Writes down the C# feature.

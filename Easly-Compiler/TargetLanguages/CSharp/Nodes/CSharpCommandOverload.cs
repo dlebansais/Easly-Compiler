@@ -11,9 +11,20 @@
     public interface ICSharpCommandOverload : ICSharpSource<ICommandOverload>, ICSharpOverload
     {
         /// <summary>
+        /// The precursor overload. Can be null.
+        /// </summary>
+        new ICSharpCommandOverload Precursor { get; }
+
+        /// <summary>
         /// The overload body.
         /// </summary>
         ICSharpBody Body { get; }
+
+        /// <summary>
+        /// Sets the precursor.
+        /// </summary>
+        /// <param name="precursor">The precursor.</param>
+        void SetPrecursor(ICSharpCommandOverload precursor);
     }
 
     /// <summary>
@@ -75,10 +86,23 @@
         /// <summary>
         /// The precursor overload. Can be null.
         /// </summary>
-        public ICSharpOverload Precursor { get; private set; }
+        public ICSharpCommandOverload Precursor { get; private set; }
+        ICSharpOverload ICSharpOverload.Precursor { get { return Precursor; } }
         #endregion
 
         #region Client Interface
+        /// <summary>
+        /// Sets the precursor.
+        /// </summary>
+        /// <param name="precursor">The precursor.</param>
+        public virtual void SetPrecursor(ICSharpCommandOverload precursor)
+        {
+            Debug.Assert(precursor != null);
+            Debug.Assert(Precursor == null);
+
+            Precursor = precursor;
+        }
+
         /// <summary>
         /// Writes down the C# overload of a feature.
         /// </summary>

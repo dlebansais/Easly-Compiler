@@ -85,7 +85,13 @@
             foreach (KeyValuePair<ICompiledFeature, ICSharpFeature> Entry in FeatureTable)
             {
                 ICSharpFeature Feature = Entry.Value;
-                Feature.Init(Context);
+                Feature.InitOverloadsAndBodies(Context);
+            }
+
+            foreach (KeyValuePair<ICompiledFeature, ICSharpFeature> Entry in FeatureTable)
+            {
+                ICSharpFeature Feature = Entry.Value;
+                Feature.InitHierarchy(Context);
             }
 
             foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)

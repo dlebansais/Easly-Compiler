@@ -92,13 +92,21 @@
 
         #region Client Interface
         /// <summary>
-        /// Initializes the feature.
+        /// Initializes the feature overloads and bodies.
         /// </summary>
         /// <param name="context">The initialization context.</param>
-        public override void Init(ICSharpContext context)
+        public override void InitOverloadsAndBodies(ICSharpContext context)
         {
             Type = CSharpType.Create(context, Source.ResolvedEntityType.Item);
             ConstantExpression = CSharpExpression.Create(context, (IExpression)Source.ConstantValue);
+        }
+
+        /// <summary>
+        /// Initializes the feature precursor hierarchy.
+        /// </summary>
+        /// <param name="context">The initialization context.</param>
+        public override void InitHierarchy(ICSharpContext context)
+        {
         }
 
         /// <summary>

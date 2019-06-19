@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -27,6 +28,11 @@
         /// True if this feature as an override of a virtual parent.
         /// </summary>
         new bool IsOverride { get; }
+
+        /// <summary>
+        /// The precursor if any. Can be null.
+        /// </summary>
+        ICSharpProcedureFeature OriginalPrecursor { get; }
     }
 
     /// <summary>
@@ -74,19 +80,62 @@
         /// The list of overloads.
         /// </summary>
         public IList<ICSharpOverload> OverloadList { get; } = new List<ICSharpOverload>();
+
+        /// <summary>
+        /// The precursor if any. Can be null.
+        /// </summary>
+        public ICSharpProcedureFeature OriginalPrecursor { get; private set; }
         #endregion
 
         #region Client Interface
         /// <summary>
-        /// Initializes the feature.
+        /// Initializes the feature overloads and bodies.
         /// </summary>
         /// <param name="context">The initialization context.</param>
-        public override void Init(ICSharpContext context)
+        public override void InitOverloadsAndBodies(ICSharpContext context)
         {
             foreach (ICommandOverload Overload in Source.OverloadList)
             {
                 ICSharpCommandOverload NewOverload = CSharpCommandOverload.Create(context, Overload, this, Owner);
                 OverloadList.Add(NewOverload);
+            }
+        }
+
+        /// <summary>
+        /// Initializes the feature precursor hierarchy.
+        /// </summary>
+        /// <param name="context">The initialization context.</param>
+        public override void InitHierarchy(ICSharpContext context)
+        {
+            if (Instance.OriginalPrecursor.IsAssigned)
+            {
+                IPrecursorInstance Item = Instance.OriginalPrecursor.Item;
+                ICompiledFeature PrecursorFeature = Item.Precursor.Feature;
+
+                OriginalPrecursor = context.GetFeature(PrecursorFeature) as ICSharpProcedureFeature;
+                Debug.Assert(OriginalPrecursor != null);
+
+                IList<ICSharpOverload> PrecursorOverloadList = OriginalPrecursor.OverloadList;
+
+                foreach (ICSharpCommandOverload Overload in OverloadList)
+                {
+                    ICommandOverloadType ResolvedAssociatedType = Overload.Source.ResolvedAssociatedType.Item;
+                    ICSharpCommandOverload ParentPrecursorOverload = null;
+
+                    foreach (ICSharpCommandOverload PrecursorOverload in PrecursorOverloadList)
+                    {
+                        ICommandOverloadType PrecursorResolvedAssociatedType = PrecursorOverload.Source.ResolvedAssociatedType.Item;
+
+                        if (ObjectType.CommandOverloadConformToBase(ResolvedAssociatedType, PrecursorResolvedAssociatedType, ErrorList.Ignored, ErrorList.NoLocation))
+                        {
+                            Debug.Assert(ParentPrecursorOverload == null);
+                            ParentPrecursorOverload = PrecursorOverload;
+                        }
+                    }
+
+                    Debug.Assert(ParentPrecursorOverload != null);
+                    Overload.SetPrecursor(ParentPrecursorOverload);
+                }
             }
         }
 
