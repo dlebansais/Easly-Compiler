@@ -224,14 +224,20 @@ namespace CompilerNode
         {
             if (ResolvedEffectiveTypeName.IsAssigned || ResolvedEffectiveType.IsAssigned)
             {
+                Debug.Assert(ResolvedAgentTypeName.IsAssigned);
+                Debug.Assert(ResolvedAgentType.IsAssigned);
                 Debug.Assert(ResolvedEffectiveTypeName.IsAssigned);
                 Debug.Assert(ResolvedEffectiveType.IsAssigned);
 
+                Debug.Assert(ResolvedAgentTypeName.Item == attributeTypeName);
+                Debug.Assert(ResolvedAgentType.Item == attributeType);
                 Debug.Assert(ResolvedEffectiveTypeName.Item == attributeTypeName);
                 Debug.Assert(ResolvedEffectiveType.Item == attributeType);
             }
             else
             {
+                ResolvedAgentTypeName.Item = attributeTypeName;
+                ResolvedAgentType.Item = attributeType;
                 ResolvedEffectiveTypeName.Item = attributeTypeName;
                 ResolvedEffectiveType.Item = attributeType;
             }

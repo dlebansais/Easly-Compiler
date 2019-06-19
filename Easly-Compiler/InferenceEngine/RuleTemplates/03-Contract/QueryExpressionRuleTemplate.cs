@@ -52,6 +52,7 @@
 
             if (node.EmbeddingClass != null && node.EmbeddingClass.EntityName.Text == "Coverage Result Of Expression")
             {
+
             }
 
             Success &= QueryExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IResultException ResolvedException, out ISealableList<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out ICompiledFeature ResolvedFinalFeature, out IDiscrete ResolvedFinalDiscrete, out ISealableList<IParameter> SelectedResultList, out IFeatureCall FeatureCall, out bool InheritBySideAttribute);
@@ -82,6 +83,11 @@
             ISealableList<IParameter> SelectedResultList = AdditionalData.Item3;
             IFeatureCall FeatureCall = AdditionalData.Item4;
             bool InheritBySideAttribute = AdditionalData.Item5;
+
+            if (node.Query.Path[0].Text == "Item")
+            {
+
+            }
 
             node.ResolvedResult.Item = ResolvedResult;
 
