@@ -12,6 +12,11 @@
         /// The Easly expression from which the C# expression is created.
         /// </summary>
         new IAssertionTagExpression Source { get; }
+
+        /// <summary>
+        /// The target expression.
+        /// </summary>
+        ICSharpExpression BooleanExpression { get; }
     }
 
     /// <summary>
@@ -38,6 +43,7 @@
         protected CSharpAssertionTagExpression(ICSharpContext context, IAssertionTagExpression source)
             : base(context, source)
         {
+            BooleanExpression = Create(context, source.ResolvedBooleanExpression.Item);
         }
         #endregion
 
@@ -46,6 +52,11 @@
         /// The Easly expression from which the C# expression is created.
         /// </summary>
         public new IAssertionTagExpression Source { get { return (IAssertionTagExpression)base.Source; } }
+
+        /// <summary>
+        /// The target expression.
+        /// </summary>
+        public ICSharpExpression BooleanExpression { get; }
         #endregion
 
         #region Client Interface
@@ -55,7 +66,7 @@
         /// <param name="usingCollection">The collection of using directives.</param>
         public override string CSharpText(ICSharpUsingCollection usingCollection)
         {
-            return string.Empty; // TODO
+            return CSharpText(usingCollection, new List<ICSharpQualifiedName>());
         }
 
         /// <summary>
@@ -65,7 +76,7 @@
         /// <param name="destinationList">The list of destinations.</param>
         public override string CSharpText(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList)
         {
-            return string.Empty; // TODO
+            return BooleanExpression.CSharpText(usingCollection);
         }
         #endregion
     }
