@@ -78,7 +78,11 @@
         /// <param name="writer">The stream on which to write.</param>
         public override void WriteCSharp(ICSharpWriter writer)
         {
-            string CoexistingPrecursorName = CSharpNames.ToCSharpIdentifier($"{ParentFeature.CoexistingPrecursorName} Base");
+            string CoexistingPrecursorName = string.Empty;
+            string CoexistingPrecursorRootName = ParentFeature.CoexistingPrecursorName;
+
+            if (!string.IsNullOrEmpty(CoexistingPrecursorRootName))
+                CoexistingPrecursorName = CSharpNames.ToCSharpIdentifier(CoexistingPrecursorRootName + " " + "Base");
 
             string ArgumentListString = CSharpArgument.CSharpArgumentList(writer, FeatureCall, new List<ICSharpQualifiedName>());
 

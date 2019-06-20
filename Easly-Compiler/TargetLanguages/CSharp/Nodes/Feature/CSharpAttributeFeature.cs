@@ -157,11 +157,11 @@
                 writer.WriteIndentedLine($"{ExportString} {TypeString} {AttributeString} {{ get {{ return {SingletonString}; }} }}");
             else
             {
-                writer.WriteIndentedLine($"{ExportString} {TypeString} {AttributeString} {{ get; private set; }}");
+                writer.WriteIndentedLine($"{ExportString} {TypeString} {AttributeString} {{ get; protected set; }}");
 
                 if (EnsureList.Count > 0)
                 {
-                    writer.WriteIndentedLine($"private void Set_{AttributeString}({TypeString} value)");
+                    writer.WriteIndentedLine($"protected void Set_{AttributeString}({TypeString} value)");
                     writer.WriteIndentedLine("{");
                     writer.IncreaseIndent();
 

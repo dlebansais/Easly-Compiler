@@ -270,7 +270,7 @@
 
             // TODO: ExceptionHandlerList
 
-            if (ParentFeature.Owner.InvariantList.Count > 0)
+            if (ParentFeature.Owner.HasCheckInvariant)
             {
                 writer.WriteEmptyLine();
                 writer.WriteIndentedLine("CheckInvariant();");

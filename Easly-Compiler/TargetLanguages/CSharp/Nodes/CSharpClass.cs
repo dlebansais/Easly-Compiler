@@ -96,6 +96,11 @@
         bool HasCheckInvariantMethod { get; }
 
         /// <summary>
+        /// True if the class implements or inherits a method to check the class invariant.
+        /// </summary>
+        bool HasCheckInvariant { get; }
+
+        /// <summary>
         /// True if the class is a singleton with generic parameters.
         /// </summary>
         bool IsParameterizedSingleton { get; }
@@ -310,6 +315,11 @@
         /// True if the class implements the method to check the class invariant.
         /// </summary>
         public bool HasCheckInvariantMethod { get { return InvariantList.Count > 0; } }
+
+        /// <summary>
+        /// True if the class implements or inherits a method to check the class invariant.
+        /// </summary>
+        public bool HasCheckInvariant { get { return HasCheckInvariantMethod || (BaseClass != null && BaseClass.HasCheckInvariant); } }
 
         /// <summary>
         /// True if the class is a singleton with generic parameters.
@@ -1735,7 +1745,7 @@
         {
             isMultiline = true;
 
-            bool HasPrecursorInvariant = BaseClass != null && BaseClass.HasCheckInvariantMethod;
+            bool HasPrecursorInvariant = BaseClass != null && BaseClass.HasCheckInvariant;
             string ExportStatus = HasPrecursorInvariant ? "override" : "virtual";
 
             writer.WriteIndentedLine("#region Invariant");

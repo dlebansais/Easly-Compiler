@@ -17,7 +17,7 @@
         /// <summary>
         /// The feature whose precursor is being called.
         /// </summary>
-        ICSharpFeatureWithName Feature { get; }
+        ICSharpFeatureWithName ParentFeature { get; }
 
         /// <summary>
         /// The feature call.
@@ -49,8 +49,8 @@
         protected CSharpPrecursorExpression(ICSharpContext context, IPrecursorExpression source)
             : base(context, source)
         {
-            Feature = context.GetFeature((ICompiledFeature)source.EmbeddingFeature) as ICSharpFeatureWithName;
-            Debug.Assert(Feature != null);
+            ParentFeature = context.GetFeature((ICompiledFeature)source.EmbeddingFeature) as ICSharpFeatureWithName;
+            Debug.Assert(ParentFeature != null);
 
             FeatureCall = new CSharpFeatureCall(context, source.FeatureCall.Item);
         }
@@ -65,7 +65,7 @@
         /// <summary>
         /// The feature whose precursor is being called.
         /// </summary>
-        public ICSharpFeatureWithName Feature { get; }
+        public ICSharpFeatureWithName ParentFeature { get; }
 
         /// <summary>
         /// The feature call.
@@ -91,19 +91,23 @@
         public override string CSharpText(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList)
         {
             string CoexistingPrecursorName = string.Empty;
-            string CoexistingPrecursorRootName = Feature.CoexistingPrecursorName;
+            string CoexistingPrecursorRootName = ParentFeature.CoexistingPrecursorName;
 
             if (!string.IsNullOrEmpty(CoexistingPrecursorRootName))
                 CoexistingPrecursorName = CSharpNames.ToCSharpIdentifier(CoexistingPrecursorRootName + " " + "Base");
 
             string ArgumentListText = CSharpArgument.CSharpArgumentList(usingCollection, FeatureCall, destinationList);
 
+            bool HasArguments = (ParentFeature is ICSharpFunctionFeature) || FeatureCall.ArgumentList.Count > 0;
+            if (HasArguments)
+                ArgumentListText = $"({ArgumentListText})";
+
             if (!string.IsNullOrEmpty(CoexistingPrecursorRootName))
-                return CoexistingPrecursorName + "(" + ArgumentListText + ")";
+                return $"{CoexistingPrecursorName}{ArgumentListText}";
             else
             {
-                string FunctionName = CSharpNames.ToCSharpIdentifier(Feature.Name);
-                return "base" + "." + FunctionName + "(" + ArgumentListText + ")";
+                string FunctionName = CSharpNames.ToCSharpIdentifier(ParentFeature.Name);
+                return $"base.{FunctionName}{ArgumentListText}";
             }
         }
         #endregion
