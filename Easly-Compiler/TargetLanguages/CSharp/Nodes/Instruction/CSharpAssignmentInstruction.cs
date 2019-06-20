@@ -96,17 +96,25 @@
         {
             if (DestinationList.Count > 1)
             {
+                bool IsHandled = false;
                 switch (SourceExpression)
                 {
                     case ICSharpQueryExpression AsQueryExpression:
-                        WriteCSharpQueryExpression(writer, AsQueryExpression);
+                    case ICSharpBinaryOperatorExpression AsBinaryOperatorExpression:
+                    case ICSharpPrecursorExpression AsPrecursorExpression:
+                        WriteCSharpMultiple(writer);
+                        IsHandled = true;
                         break;
 
                     default:
+                        /*
                         string AssignementString = SourceExpression.CSharpText(writer, DestinationList, -1);
                         writer.WriteIndentedLine($"{AssignementString};");
+                        */
                         break;
                 }
+
+                Debug.Assert(IsHandled);
             }
             else
                 WriteCSharpSingle(writer);
@@ -135,33 +143,28 @@
             }
         }
 
-        private void WriteCSharpQueryExpression(ICSharpWriter writer, ICSharpQueryExpression expression)
+        private void WriteCSharpMultiple(ICSharpWriter writer)
         {
-            IResultType SourceResult = expression.Source.ResolvedResult.Item;
+            IResultType SourceResult = SourceExpression.Source.ResolvedResult.Item;
             Debug.Assert(SourceResult.Count >= DestinationList.Count);
 
-            bool IsSimple = true;
+            int ResultNameIndex = SourceExpression.Source.ResolvedResult.Item.ResultNameIndex;
 
-            foreach (ICSharpQualifiedName QualifiedName in DestinationList)
-                if (!QualifiedName.IsSimple)
-                    IsSimple = false;
+            if (ResultNameIndex < 0)
+                WriteCSharpMultipleNoResult(writer);
+            else
+                WriteCSharpMultipleWithResult(writer, ResultNameIndex);
 
-            int ResultNameIndex = expression.Source.ResolvedResult.Item.ResultNameIndex;
-
-            //if (IsSimple)
-                if (ResultNameIndex < 0)
-                    WriteCSharpMultipleNoResult(writer, expression);
-                else
-                    WriteCSharpMultipleWithResult(writer, expression, ResultNameIndex);
+            CopyComplexPaths(writer, ResultNameIndex);
         }
 
-        private void WriteCSharpMultipleNoResult(ICSharpWriter writer, ICSharpQueryExpression expression)
+        private void WriteCSharpMultipleNoResult(ICSharpWriter writer)
         {
-            string AssignementString = expression.CSharpText(writer, DestinationList, -1);
+            string AssignementString = SourceExpression.CSharpText(writer, DestinationList, -1);
             writer.WriteIndentedLine($"{AssignementString};");
         }
 
-        private void WriteCSharpMultipleWithResult(ICSharpWriter writer, ICSharpQueryExpression expression, int resultNameIndex)
+        private void WriteCSharpMultipleWithResult(ICSharpWriter writer, int resultNameIndex)
         {
             Debug.Assert(resultNameIndex < DestinationList.Count);
             IList<IIdentifier> ValidPath = DestinationList[resultNameIndex].Source.ValidPath.Item;
@@ -169,8 +172,26 @@
 
             string ResultDestinationName = ValidPath[0].ValidText.Item;
 
-            string AssignementString = expression.CSharpText(writer, DestinationList, resultNameIndex);
+            string AssignementString = SourceExpression.CSharpText(writer, DestinationList, resultNameIndex);
             writer.WriteIndentedLine($"{ResultDestinationName} = {AssignementString};");
+        }
+
+        private void CopyComplexPaths(ICSharpWriter writer, int resultNameIndex)
+        {
+            for (int i = 0; i < DestinationList.Count; i++)
+            {
+                if (i == resultNameIndex)
+                    continue;
+
+                ICSharpQualifiedName Destination = DestinationList[i];
+                if (!Destination.IsSimple)
+                {
+                    string DestinationText = Destination.CSharpText(writer, 0);
+                    string TempText = DestinationText.Replace('.', '_');
+
+                    writer.WriteIndentedLine($"{DestinationText} = Temp_{TempText};");
+                }
+            }
         }
         #endregion
     }
