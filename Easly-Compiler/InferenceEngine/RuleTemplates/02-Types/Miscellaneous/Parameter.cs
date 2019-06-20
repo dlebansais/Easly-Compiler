@@ -54,5 +54,11 @@
         {
             return parameterTable.Exists((IParameter item) => item.Name == name);
         }
+
+        /// <summary></summary>
+        public override string ToString()
+        {
+            return $"Parameter '{Name}'";
+        }
     }
 }

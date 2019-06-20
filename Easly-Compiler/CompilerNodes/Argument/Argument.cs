@@ -227,17 +227,31 @@ namespace CompilerNode
                 IExpression Source = (IExpression)Argument.Source;
                 IList<IIdentifier> ParameterList = Argument.ParameterList;
 
-                for (int j = 0; j < Argument.ResolvedResult.Item.Count; j++)
+                if (ParameterList.Count > 1 && Argument.ResolvedResult.Item.Count == 1)
                 {
-                    IExpressionType Item = Argument.ResolvedResult.Item.At(j);
-                    Item.SetName(ParameterList[j].ValidText.Item);
+                    IExpressionType Item = Argument.ResolvedResult.Item.At(0);
 
-                    if (mergedArgumentList.Exists((IExpressionType other) => { return Item.Name == other.Name; }))
-                        if (!DuplicateNameTable.ContainsKey(Item.Name))
-                            DuplicateNameTable.Add(Item.Name, Argument);
+                    for (int j = 0; j < ParameterList.Count; j++)
+                    {
+                        IExpressionType ItemJ = new ExpressionType(Item.ValueTypeName, Item.ValueType, ParameterList[j].ValidText.Item);
+                        ItemJ.SetSource(Source, 0);
+                        mergedArgumentList.Add(ItemJ);
+                    }
+                }
+                else
+                {
+                    for (int j = 0; j < Argument.ResolvedResult.Item.Count; j++)
+                    {
+                        IExpressionType Item = Argument.ResolvedResult.Item.At(j);
+                        Item.SetName(ParameterList[j].ValidText.Item);
 
-                    Item.SetSource(Source, j);
-                    mergedArgumentList.Add(Item);
+                        if (mergedArgumentList.Exists((IExpressionType other) => { return Item.Name == other.Name; }))
+                            if (!DuplicateNameTable.ContainsKey(Item.Name))
+                                DuplicateNameTable.Add(Item.Name, Argument);
+
+                        Item.SetSource(Source, j);
+                        mergedArgumentList.Add(Item);
+                    }
                 }
             }
 
