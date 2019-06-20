@@ -12,6 +12,11 @@
         /// List of nodes with cyclic dependencies by names.
         /// </summary>
         IList<string> NameList { get; }
+
+        /// <summary>
+        /// The pass name when the error occured.
+        /// </summary>
+        string PassName { get; }
     }
 
     /// <summary>
@@ -23,13 +28,15 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="ErrorCyclicDependency"/> class.
         /// </summary>
-        /// <param name="nameList">List of nodes with cyclic dependencies by names</param>
-        public ErrorCyclicDependency(IList<string> nameList)
+        /// <param name="nameList">List of nodes with cyclic dependencies by names.</param>
+        /// <param name="passName">The pass name when the error occured.</param>
+        public ErrorCyclicDependency(IList<string> nameList, string passName)
             : base(ErrorLocation.NoLocation)
         {
             Debug.Assert(nameList.Count >= 1);
 
             NameList = nameList;
+            PassName = passName;
         }
         #endregion
 
@@ -38,6 +45,11 @@
         /// List of nodes with cyclic dependencies by names.
         /// </summary>
         public IList<string> NameList { get; }
+
+        /// <summary>
+        /// The pass name when the error occured.
+        /// </summary>
+        public string PassName { get; }
 
         /// <summary>
         /// The error message.
@@ -55,7 +67,7 @@
 
                 Result += $" and '{NameList[NameList.Count - 1]}'";
 
-                return $"Cyclic dependencies detected in {Result}.";
+                return $"Cyclic dependencies in pass {PassName} detected in {Result}.";
             }
         }
         #endregion

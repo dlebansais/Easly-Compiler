@@ -138,15 +138,13 @@ namespace CompilerNode
             {
                 InnerLoopScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 LocalScope = new SealableDictionary<string, IScopeAttributeFeature>();
-                AdditionalScope = new SealableDictionary<string, IScopeAttributeFeature>(); // Don't seal it yet, not until indexers are handled.
                 InnerScopes = new List<IScopeHolder>();
                 FullScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                if (!FullScope.IsSealed) FullScope.Seal();
-                AdditionalScope = AdditionalScope.CloneUnsealed();
+                AdditionalScope = new SealableDictionary<string, IScopeAttributeFeature>(); // Don't seal it yet, not until indexers are handled.
                 ResolvedResult = new OnceReference<IResultType>();
                 ResolvedInitResult = new OnceReference<IResultType>();
                 IsHandled = true;

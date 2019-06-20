@@ -211,6 +211,7 @@
 
             node.ResolvedInitResult.Item = ResultType.Empty;
 
+            node.AdditionalScope.Merge(node.InnerLoopScope);
             node.AdditionalScope.Seal();
         }
         #endregion

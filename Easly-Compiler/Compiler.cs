@@ -213,8 +213,13 @@
 
                     if (CheckClassAndLibraryNames(root))
                     {
-                        if (ResolveIdentifiers(root) && ResolveTypes(root) && ResolveContract(root) && ResolveBody(root))
+                        if (ResolveIdentifiers(root) && ResolveTypes(root))
                         {
+                            SealScope(root);
+
+                            if (ResolveContract(root) && ResolveBody(root))
+                            {
+                            }
                         }
                     }
                 }
@@ -982,7 +987,7 @@
                 foreach (ILibrary Library in UnresolvedLibraryList)
                     NameList.Add(Library.ValidLibraryName);
 
-                ErrorList.AddError(new ErrorCyclicDependency(NameList));
+                ErrorList.AddError(new ErrorCyclicDependency(NameList, "Library"));
             }
 
             Debug.Assert(Success || !ErrorList.IsEmpty);
@@ -1030,29 +1035,29 @@
         /// <summary></summary>
         protected virtual bool ResolveIdentifiers(IRoot root)
         {
-            return Resolve(root, RuleTemplateSet.Identifiers);
+            return Resolve(root, RuleTemplateSet.Identifiers, "Identifiers");
         }
 
         /// <summary></summary>
         protected virtual bool ResolveTypes(IRoot root)
         {
-            return Resolve(root, RuleTemplateSet.Types);
+            return Resolve(root, RuleTemplateSet.Types, "Types");
         }
 
         /// <summary></summary>
         protected virtual bool ResolveContract(IRoot root)
         {
-            return Resolve(root, RuleTemplateSet.Contract);
+            return Resolve(root, RuleTemplateSet.Contract, "Contract");
         }
 
         /// <summary></summary>
         protected virtual bool ResolveBody(IRoot root)
         {
-            return Resolve(root, RuleTemplateSet.Body);
+            return Resolve(root, RuleTemplateSet.Body, "Body");
         }
 
         /// <summary></summary>
-        protected virtual bool Resolve(IRoot root, IRuleTemplateList ruleTemplateList)
+        protected virtual bool Resolve(IRoot root, IRuleTemplateList ruleTemplateList, string passName)
         {
             BuildInferenceSourceList Context = new BuildInferenceSourceList(ruleTemplateList);
             IWalkCallbacks<BuildInferenceSourceList> Callbacks = new WalkCallbacks<BuildInferenceSourceList>() { HandlerNode = ListAllSources, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() };
@@ -1064,7 +1069,7 @@
             IList<ISource> SourceList = Context.SourceList;
             InferenceEngine Engine = new InferenceEngine(ruleTemplateList, SourceList, ClassList, true, InferenceRetries);
 
-            bool Success = Engine.Solve(ErrorList);
+            bool Success = Engine.Solve(ErrorList, passName);
 
             Debug.Assert(Success || !ErrorList.IsEmpty);
             return Success;
@@ -1088,6 +1093,34 @@
                     context.SourceList.Add(Source);
                     break;
                 }
+
+            return true;
+        }
+
+        /// <summary></summary>
+        protected virtual void SealScope(IRoot root)
+        {
+            object Context = null;
+            IWalkCallbacks<object> Callbacks = new WalkCallbacks<object>() { HandlerNode = SealAllScopes, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() };
+            IList<IClass> ClassList = root.ClassList;
+
+            foreach (IClass Class in ClassList)
+                NodeTreeWalk<object>.Walk(Class, Callbacks, Context);
+        }
+
+        /// <summary></summary>
+        protected virtual bool SealAllScopes(BaseNode.INode node, BaseNode.INode parentNode, string propertyName, IWalkCallbacks<object> callbacks, object context)
+        {
+            ISource Source = node as ISource;
+            Debug.Assert(Source != null);
+
+            if (Scope.IsScopeHolder(Source))
+            {
+                IScopeHolder ScopeHolder = Source as IScopeHolder;
+                Debug.Assert(ScopeHolder != null);
+
+                ScopeHolder.FullScope.Seal();
+            }
 
             return true;
         }

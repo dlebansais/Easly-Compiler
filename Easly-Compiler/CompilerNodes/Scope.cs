@@ -137,15 +137,14 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 LocalScope = new SealableDictionary<string, IScopeAttributeFeature>();
-                AdditionalScope = new SealableDictionary<string, IScopeAttributeFeature>();
-                AdditionalScope.Seal();
                 InnerScopes = new List<IScopeHolder>();
                 FullScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                if (!FullScope.IsSealed) FullScope.Seal();
+                AdditionalScope = new SealableDictionary<string, IScopeAttributeFeature>();
+                AdditionalScope.Seal();
                 ResolvedResult = new OnceReference<IResultType>();
                 IsHandled = true;
             }
@@ -226,6 +225,18 @@ namespace CompilerNode
         /// List of exceptions the scope can throw.
         /// </summary>
         public OnceReference<IResultException> ResolvedException { get; private set; } = new OnceReference<IResultException>();
+
+        /// <summary>
+        /// Checks if a source is a valid scope holder.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        public static bool IsScopeHolder(ISource source)
+        {
+            if (source is IAssertion AsAssertion)
+                return AsAssertion.ParentSource is IScopeHolder;
+            else
+                return source is IScopeHolder;
+        }
 
         /// <summary>
         /// Gets the scope associated to a node.

@@ -665,15 +665,14 @@ namespace CompilerNode
                 NamespaceTable = new SealableDictionary<string, ISealableDictionary>();
                 LocalScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 LocalScope.Seal();
-                AdditionalScope = new SealableDictionary<string, IScopeAttributeFeature>();
-                AdditionalScope.Seal();
                 InnerScopes = new List<IScopeHolder>();
                 FullScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                if (!FullScope.IsSealed) FullScope.Seal();
+                AdditionalScope = new SealableDictionary<string, IScopeAttributeFeature>();
+                AdditionalScope.Seal();
                 ResolvedBodyTagList = new OnceReference<IList<IBody>>();
                 ResolvedNodeWithDefaultList = new OnceReference<IList<IExpression>>();
                 ResolvedNodeWithNumberConstantList = new OnceReference<IList<IExpression>>();

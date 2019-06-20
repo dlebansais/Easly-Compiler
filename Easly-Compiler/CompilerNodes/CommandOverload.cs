@@ -143,8 +143,6 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 LocalScope = new SealableDictionary<string, IScopeAttributeFeature>();
-                AdditionalScope = new SealableDictionary<string, IScopeAttributeFeature>();
-                AdditionalScope.Seal();
                 InnerScopes = new List<IScopeHolder>();
                 FullScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 ParameterTable = new SealableList<IParameter>();
@@ -153,7 +151,8 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                if (!FullScope.IsSealed) FullScope.Seal();
+                AdditionalScope = new SealableDictionary<string, IScopeAttributeFeature>();
+                AdditionalScope.Seal();
                 ResolvedBody = new OnceReference<ICompiledBody>();
                 IsHandled = true;
             }

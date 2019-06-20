@@ -39,8 +39,9 @@
         /// Execute all rules until the source list is exhausted.
         /// </summary>
         /// <param name="errorList">List of errors found.</param>
+        /// <param name="passName">The pass name.</param>
         /// <returns>True if there is no source left to process.</returns>
-        bool Solve(IErrorList errorList);
+        bool Solve(IErrorList errorList, string passName);
     }
 
     /// <summary>
@@ -106,8 +107,9 @@
         /// Execute all rules until the source list is exhausted.
         /// </summary>
         /// <param name="errorList">List of errors found.</param>
+        /// <param name="passName">The pass name.</param>
         /// <returns>True if there is no source left to process.</returns>
-        public virtual bool Solve(IErrorList errorList)
+        public virtual bool Solve(IErrorList errorList, string passName)
         {
             bool Success;
             bool? LastTryResult = null;
@@ -118,7 +120,7 @@
                     Rule.Clear();
 
                 IErrorList TryErrorList = new ErrorList();
-                bool TryResult = SolveWithRetry(TryErrorList);
+                bool TryResult = SolveWithRetry(TryErrorList, passName);
                 if (Retries == 0)
                 {
                     errorList.AddErrors(TryErrorList);
@@ -150,8 +152,9 @@
         /// Execute all rules until the source list is exhausted.
         /// </summary>
         /// <param name="errorList">List of errors found.</param>
+        /// <param name="passName">The pass name.</param>
         /// <returns>True if there is no source left to process.</returns>
-        protected virtual bool SolveWithRetry(IErrorList errorList)
+        protected virtual bool SolveWithRetry(IErrorList errorList, string passName)
         {
             IList<IClass> ResolvedClassList = new List<IClass>();
             IList<IClass> UnresolvedClassList = new List<IClass>(ClassList);
@@ -177,7 +180,7 @@
                 foreach (IClass Class in UnresolvedClassList)
                     NameList.Add(Class.ValidClassName);
 
-                errorList.AddError(new ErrorCyclicDependency(NameList));
+                errorList.AddError(new ErrorCyclicDependency(NameList, passName));
                 Success = false;
             }
 

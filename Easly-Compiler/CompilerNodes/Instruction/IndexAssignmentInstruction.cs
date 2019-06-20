@@ -118,15 +118,14 @@
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 LocalScope = new SealableDictionary<string, IScopeAttributeFeature>();
-                AdditionalScope = new SealableDictionary<string, IScopeAttributeFeature>();
-                AdditionalScope.Seal();
                 InnerScopes = new List<IScopeHolder>();
                 FullScope = new SealableDictionary<string, IScopeAttributeFeature>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
-                if (!FullScope.IsSealed) FullScope.Seal();
+                AdditionalScope = new SealableDictionary<string, IScopeAttributeFeature>();
+                AdditionalScope.Seal();
                 ResolvedResult = new OnceReference<IResultType>();
                 IsHandled = true;
             }

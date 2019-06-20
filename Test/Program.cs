@@ -32,8 +32,9 @@
             }
 
             Debug.WriteLine(ErrorList.ToString());
+            Console.WriteLine(ErrorList.ToString());
 
-            return ErrorList.IsEmpty ? 0 : -1;
+            return ErrorList.IsEmpty ? 0 : -1 * ((List<IError>)ErrorList).Count;
         }
 
         static ICompiler CreateCompiler()

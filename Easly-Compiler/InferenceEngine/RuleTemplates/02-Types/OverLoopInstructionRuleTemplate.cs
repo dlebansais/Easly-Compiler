@@ -93,7 +93,6 @@
             node.InnerLoopScope.Seal();
 
             node.LocalScope.Seal();
-            node.AdditionalScope.Merge(CheckedScope);
 
             ScopeHolder.RecursiveAdd(CheckedScope, node.InnerScopes);
 

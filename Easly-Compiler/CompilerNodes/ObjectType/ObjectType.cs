@@ -527,6 +527,13 @@
             return Result;
         }
 
+        /// <summary>
+        /// Checks that a query overload conforms to another.
+        /// </summary>
+        /// <param name="derivedType">The derived type.</param>
+        /// <param name="baseType">The base type.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="sourceLocation">The location for reporting errors.</param>
         public static bool QueryOverloadConformToBase(IQueryOverloadType derivedType, IQueryOverloadType baseType, IErrorList errorList, ISource sourceLocation)
         {
             bool Result = true;
@@ -744,6 +751,13 @@
             return Result;
         }
 
+        /// <summary>
+        /// Checks that a command overload conforms to another.
+        /// </summary>
+        /// <param name="derivedType">The derived type.</param>
+        /// <param name="baseType">The base type.</param>
+        /// <param name="errorList">The list of errors found.</param>
+        /// <param name="sourceLocation">The location for reporting errors.</param>
         public static bool CommandOverloadConformToBase(ICommandOverloadType derivedType, ICommandOverloadType baseType, IErrorList errorList, ISource sourceLocation)
         {
             bool Result = true;
