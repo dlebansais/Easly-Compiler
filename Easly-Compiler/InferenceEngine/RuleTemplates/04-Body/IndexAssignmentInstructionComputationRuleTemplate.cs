@@ -93,9 +93,12 @@
                     IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
                     ParameterTableList.Add(AsIndexerType.ParameterTable);
 
+                    IList<ISealableList<IParameter>> ResultTableList = new List<ISealableList<IParameter>>();
+                    ResultTableList.Add(new SealableList<IParameter>());
+
                     ICompiledType DestinationType = AsIndexerType.ResolvedEntityType.Item;
 
-                    if (!Argument.CheckAssignmentConformance(ParameterTableList, node.ArgumentList, Source, DestinationType, ErrorList, node, out IFeatureCall FeatureCall))
+                    if (!Argument.CheckAssignmentConformance(ParameterTableList, ResultTableList, node.ArgumentList, Source, DestinationType, ErrorList, node, out IFeatureCall FeatureCall))
                         return false;
 
                     ObjectType.FillResultPath(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, Destination.ValidResultTypePath.Item);

@@ -80,7 +80,7 @@
         public override void WriteCSharp(ICSharpWriter writer)
         {
             string SourceString = SourceExpression.CSharpText(writer);
-            string ArgumentListString = CSharpArgument.CSharpArgumentList(writer, FeatureCall, new List<ICSharpQualifiedName>());
+            string ArgumentListString = CSharpArgument.CSharpArgumentList(writer, FeatureCall);
 
             writer.WriteIndentedLine($"base[{ArgumentListString}] = {SourceString};");
         }

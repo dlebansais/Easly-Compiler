@@ -293,10 +293,10 @@ namespace CompilerNode
             if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, errorList))
                 return false;
 
-            if (!ResolveCall(node, selectedPrecursor, MergedArgumentList, TypeArgumentStyle, errorList, out resolvedResult, out resolvedException, out ISealableList<IParameter> SelectedParameterList, out List<IExpressionType> ResolvedArgumentList))
+            if (!ResolveCall(node, selectedPrecursor, MergedArgumentList, TypeArgumentStyle, errorList, out resolvedResult, out resolvedException, out ISealableList<IParameter> SelectedParameterList, out ISealableList<IParameter> SelectedResultList, out List<IExpressionType> ResolvedArgumentList))
                 return false;
 
-            featureCall = new FeatureCall(SelectedParameterList, ArgumentList, ResolvedArgumentList, TypeArgumentStyle);
+            featureCall = new FeatureCall(SelectedParameterList, SelectedResultList, ArgumentList, ResolvedArgumentList, TypeArgumentStyle);
 
             bool IsHandled = false;
 
@@ -324,11 +324,12 @@ namespace CompilerNode
             return true;
         }
 
-        private static bool ResolveCall(IPrecursorExpression node, IFeatureInstance selectedPrecursor, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        private static bool ResolveCall(IPrecursorExpression node, IFeatureInstance selectedPrecursor, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IParameter> selectedParameterList, out ISealableList<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList)
         {
             resolvedResult = null;
             resolvedException = null;
             selectedParameterList = null;
+            selectedResultList = null;
             resolvedArgumentList = null;
 
             IList<IArgument> ArgumentList = node.ArgumentList;
@@ -348,7 +349,7 @@ namespace CompilerNode
                     break;
 
                 case IConstantFeature AsConstantFeature:
-                    Success = ResolveCallClass(node, selectedPrecursor, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out selectedParameterList, out resolvedArgumentList);
+                    Success = ResolveCallClass(node, selectedPrecursor, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out selectedParameterList, out selectedResultList, out resolvedArgumentList);
                     IsHandled = true;
                     break;
 
@@ -356,7 +357,7 @@ namespace CompilerNode
                     IFunctionType FunctionType = AsFunctionFeature.ResolvedAgentType.Item as IFunctionType;
                     Debug.Assert(FunctionType != null);
 
-                    Success = ResolveCallFunction(node, selectedPrecursor, FunctionType, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out selectedParameterList, out resolvedArgumentList);
+                    Success = ResolveCallFunction(node, selectedPrecursor, FunctionType, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out selectedParameterList, out selectedResultList, out resolvedArgumentList);
                     IsHandled = true;
                     break;
 
@@ -364,7 +365,7 @@ namespace CompilerNode
                     IPropertyType PropertyType = AsPropertyFeature.ResolvedAgentType.Item as IPropertyType;
                     Debug.Assert(PropertyType != null);
 
-                    Success = ResolveCallProperty(node, selectedPrecursor, PropertyType, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out selectedParameterList, out resolvedArgumentList);
+                    Success = ResolveCallProperty(node, selectedPrecursor, PropertyType, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out selectedParameterList, out selectedResultList, out resolvedArgumentList);
                     IsHandled = true;
                     break;
             }
@@ -374,37 +375,12 @@ namespace CompilerNode
             return Success;
         }
 
-        private static bool ResolveCallFunction(IPrecursorExpression node, IFeatureInstance selectedPrecursor, IFunctionType callType, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        private static bool ResolveCallClass(IPrecursorExpression node, IFeatureInstance selectedPrecursor, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IParameter> selectedParameterList, out ISealableList<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList)
         {
             resolvedResult = null;
             resolvedException = null;
             selectedParameterList = null;
-            resolvedArgumentList = null;
-
-            IList<IArgument> ArgumentList = node.ArgumentList;
-            ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
-            IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
-
-            foreach (IQueryOverloadType Overload in callType.OverloadList)
-                ParameterTableList.Add(Overload.ParameterTable);
-
-            if (!Argument.ArgumentsConformToParameters(ParameterTableList, mergedArgumentList, argumentStyle, errorList, node, out int SelectedIndex))
-                return false;
-
-            IQueryOverloadType SelectedOverload = callType.OverloadList[SelectedIndex];
-            resolvedResult = new ResultType(SelectedOverload.ResultTypeList);
-            resolvedException = new ResultException(SelectedOverload.ExceptionIdentifierList);
-            selectedParameterList = SelectedOverload.ParameterTable;
-            resolvedArgumentList = mergedArgumentList;
-
-            return true;
-        }
-
-        private static bool ResolveCallClass(IPrecursorExpression node, IFeatureInstance selectedPrecursor, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
-        {
-            resolvedResult = null;
-            resolvedException = null;
-            selectedParameterList = null;
+            selectedResultList = null;
             resolvedArgumentList = null;
 
             IList<IArgument> ArgumentList = node.ArgumentList;
@@ -424,17 +400,47 @@ namespace CompilerNode
 
                 resolvedException = new ResultException();
                 selectedParameterList = new SealableList<IParameter>();
+                selectedResultList = new SealableList<IParameter>();
                 resolvedArgumentList = new List<IExpressionType>();
             }
 
             return true;
         }
 
-        private static bool ResolveCallProperty(IPrecursorExpression node, IFeatureInstance selectedPrecursor, IPropertyType callType, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IParameter> selectedParameterList, out List<IExpressionType> resolvedArgumentList)
+        private static bool ResolveCallFunction(IPrecursorExpression node, IFeatureInstance selectedPrecursor, IFunctionType callType, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IParameter> selectedParameterList, out ISealableList<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList)
         {
             resolvedResult = null;
             resolvedException = null;
             selectedParameterList = null;
+            selectedResultList = null;
+            resolvedArgumentList = null;
+
+            IList<IArgument> ArgumentList = node.ArgumentList;
+            ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
+            IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
+
+            foreach (IQueryOverloadType Overload in callType.OverloadList)
+                ParameterTableList.Add(Overload.ParameterTable);
+
+            if (!Argument.ArgumentsConformToParameters(ParameterTableList, mergedArgumentList, argumentStyle, errorList, node, out int SelectedIndex))
+                return false;
+
+            IQueryOverloadType SelectedOverload = callType.OverloadList[SelectedIndex];
+            resolvedResult = new ResultType(SelectedOverload.ResultTypeList);
+            resolvedException = new ResultException(SelectedOverload.ExceptionIdentifierList);
+            selectedParameterList = SelectedOverload.ParameterTable;
+            selectedResultList = SelectedOverload.ResultTable;
+            resolvedArgumentList = mergedArgumentList;
+
+            return true;
+        }
+
+        private static bool ResolveCallProperty(IPrecursorExpression node, IFeatureInstance selectedPrecursor, IPropertyType callType, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IParameter> selectedParameterList, out ISealableList<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList)
+        {
+            resolvedResult = null;
+            resolvedException = null;
+            selectedParameterList = null;
+            selectedResultList = null;
             resolvedArgumentList = null;
 
             IList<IArgument> ArgumentList = node.ArgumentList;
@@ -455,6 +461,7 @@ namespace CompilerNode
             }
 
             selectedParameterList = new SealableList<IParameter>();
+            selectedResultList = new SealableList<IParameter>();
             resolvedArgumentList = new List<IExpressionType>();
 
             return true;

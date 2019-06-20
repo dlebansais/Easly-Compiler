@@ -35,6 +35,11 @@
         bool IsAttributeWithContract { get; }
 
         /// <summary>
+        /// True if the qualified name is simple.
+        /// </summary>
+        bool IsSimple { get; }
+
+        /// <summary>
         /// Gets the source code corresponding to the qualified name.
         /// </summary>
         /// <param name="usingCollection">The collection of using directives.</param>
@@ -131,6 +136,11 @@
         /// True if the final feature is an attribute with ensure clauses.
         /// </summary>
         public bool IsAttributeWithContract { get; }
+
+        /// <summary>
+        /// True if the qualified name is simple.
+        /// </summary>
+        public bool IsSimple { get { return ClassPath.Count == 1; } }
         #endregion
 
         #region Client Interface

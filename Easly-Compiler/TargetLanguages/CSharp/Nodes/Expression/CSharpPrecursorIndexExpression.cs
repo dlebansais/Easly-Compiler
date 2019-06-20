@@ -80,7 +80,7 @@
         /// <param name="usingCollection">The collection of using directives.</param>
         public override string CSharpText(ICSharpUsingCollection usingCollection)
         {
-            return CSharpText(usingCollection, new List<ICSharpQualifiedName>());
+            return CSharpText(usingCollection, new List<ICSharpQualifiedName>(), -1);
         }
 
         /// <summary>
@@ -88,9 +88,10 @@
         /// </summary>
         /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="destinationList">The list of destinations.</param>
-        public override string CSharpText(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList)
+        /// <param name="skippedIndex">Index of a destination to skip.</param>
+        public override string CSharpText(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
         {
-            string ArgumentListText = CSharpArgument.CSharpArgumentList(usingCollection, FeatureCall, destinationList);
+            string ArgumentListText = CSharpArgument.CSharpArgumentList(usingCollection, FeatureCall, destinationList, skippedIndex);
 
             return $"base[{ArgumentListText}]";
         }

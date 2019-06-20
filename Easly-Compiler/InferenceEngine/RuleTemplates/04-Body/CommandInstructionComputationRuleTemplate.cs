@@ -116,7 +116,7 @@
                 IList<IIdentifier> CommandInstructionException = SelectedOverload.ExceptionIdentifierList;
                 ResultException.Merge(ResolvedException, CommandInstructionException);
 
-                IFeatureCall FeatureCall = new FeatureCall(SelectedParameterList, ArgumentList, MergedArgumentList, ArgumentStyle);
+                IFeatureCall FeatureCall = new FeatureCall(SelectedParameterList, new List<IParameter>(), ArgumentList, MergedArgumentList, ArgumentStyle);
 
                 data = new Tuple<IResultException, ICompiledFeature, ICommandOverloadType, IFeatureCall, IProcedureType>(ResolvedException, FinalFeature, SelectedOverload, FeatureCall, CommandFinalType);
             }

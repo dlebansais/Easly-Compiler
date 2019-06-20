@@ -282,13 +282,16 @@ namespace CompilerNode
                 IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
                 ParameterTableList.Add(AsIndexerType.ParameterTable);
 
+                IList<ISealableList<IParameter>> ResultTableList = new List<ISealableList<IParameter>>();
+                ResultTableList.Add(new SealableList<IParameter>());
+
                 int SelectedIndex;
                 if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, TypeArgumentStyle, errorList, node, out SelectedIndex))
                     return false;
 
                 resolvedResult = new ResultType(AsIndexerType.ResolvedEntityTypeName.Item, AsIndexerType.ResolvedEntityType.Item, string.Empty);
                 resolvedException = new ResultException(AsIndexerType.GetExceptionIdentifierList);
-                featureCall = new FeatureCall(ParameterTableList[SelectedIndex], ArgumentList, MergedArgumentList, TypeArgumentStyle);
+                featureCall = new FeatureCall(ParameterTableList[SelectedIndex], ResultTableList[SelectedIndex], ArgumentList, MergedArgumentList, TypeArgumentStyle);
 
                 Argument.AddConstantArguments(ArgumentList, constantSourceList);
             }

@@ -366,7 +366,7 @@ namespace CompilerNode
                     resolvedResult = new ResultType(SelectedOverload.ResultTypeList);
                     resolvedException = new ResultException(SelectedOverload.ExceptionIdentifierList);
                     selectedResultList = SelectedOverload.ResultTable;
-                    featureCall = new FeatureCall(SelectedOverload.ParameterTable, ArgumentList, MergedArgumentList, TypeArgumentStyle);
+                    featureCall = new FeatureCall(SelectedOverload.ParameterTable, SelectedOverload.ResultTable, ArgumentList, MergedArgumentList, TypeArgumentStyle);
                     IsHandled = true;
                     break;
 

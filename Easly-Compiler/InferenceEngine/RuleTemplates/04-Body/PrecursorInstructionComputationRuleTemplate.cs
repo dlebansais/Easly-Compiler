@@ -129,7 +129,7 @@
 
                 ResultException.Merge(ResolvedException, PrecursorInstructionException);
 
-                IFeatureCall FeatureCall = new FeatureCall(SelectedParameterList, node.ArgumentList, MergedArgumentList, TypeArgumentStyle);
+                IFeatureCall FeatureCall = new FeatureCall(SelectedParameterList, new List<IParameter>(), node.ArgumentList, MergedArgumentList, TypeArgumentStyle);
 
                 data = new Tuple<IResultException, IFeatureCall>(ResolvedException, FeatureCall);
             }

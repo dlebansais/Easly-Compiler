@@ -172,6 +172,12 @@
                         }
                         else
                         {
+                            if (ResultType != "void")
+                            {
+                                Flags |= CSharpBodyFlags.HasResult;
+                                ResultString = ResultType;
+                            }
+
                             foreach (ICSharpParameter Item in ResultList)
                             {
                                 string InitValueString;

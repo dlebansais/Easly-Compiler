@@ -177,7 +177,7 @@
 
                 if (FeatureCall.ArgumentList.Count > 0)
                 {
-                    string ArgumentListText = CSharpArgument.CSharpArgumentList(writer, FeatureCall, new List<ICSharpQualifiedName>());
+                    string ArgumentListText = CSharpArgument.CSharpArgumentList(writer, FeatureCall);
 
                     writer.WriteIndentedLine($"{AgentIdentifierText}({CommandText}, {ArgumentListText});");
                 }
@@ -187,7 +187,7 @@
             else
             {
                 CommandText = Command.CSharpText(writer, SkipLastInPath ? 1 : 0);
-                string ArgumentListText = CSharpArgument.CSharpArgumentList(writer, FeatureCall, new List<ICSharpQualifiedName>());
+                string ArgumentListText = CSharpArgument.CSharpArgumentList(writer, FeatureCall);
 
                 writer.WriteIndentedLine($"{CommandText}({ArgumentListText});");
             }

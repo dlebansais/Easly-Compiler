@@ -96,32 +96,81 @@
         {
             if (DestinationList.Count > 1)
             {
-                string AssignementString = SourceExpression.CSharpText(writer, DestinationList);
+                switch (SourceExpression)
+                {
+                    case ICSharpQueryExpression AsQueryExpression:
+                        WriteCSharpQueryExpression(writer, AsQueryExpression);
+                        break;
 
-                writer.WriteIndentedLine($"{AssignementString};");
+                    default:
+                        string AssignementString = SourceExpression.CSharpText(writer, DestinationList, -1);
+                        writer.WriteIndentedLine($"{AssignementString};");
+                        break;
+                }
+            }
+            else
+                WriteCSharpSingle(writer);
+        }
+
+        private void WriteCSharpSingle(ICSharpWriter writer)
+        {
+            Debug.Assert(DestinationList.Count == 1);
+
+            ICSharpQualifiedName Destination = DestinationList[0];
+            ICSharpFeature Feature = Destination.Feature;
+
+            if (Destination.IsAttributeWithContract)
+            {
+                string SetterText = Destination.CSharpSetter(writer);
+                string SourceText = SourceExpression.CSharpText(writer);
+
+                writer.WriteIndentedLine($"{SetterText}({SourceText});");
             }
             else
             {
-                Debug.Assert(DestinationList.Count == 1);
+                string DestinationText = Destination.DecoratedCSharpText(writer, 0);
+                string SourceText = SourceExpression.CSharpText(writer);
 
-                ICSharpQualifiedName Destination = DestinationList[0];
-                ICSharpFeature Feature = Destination.Feature;
-
-                if (Destination.IsAttributeWithContract)
-                {
-                    string SetterText = Destination.CSharpSetter(writer);
-                    string SourceText = SourceExpression.CSharpText(writer);
-
-                    writer.WriteIndentedLine($"{SetterText}({SourceText});");
-                }
-                else
-                {
-                    string DestinationText = Destination.DecoratedCSharpText(writer, 0);
-                    string SourceText = SourceExpression.CSharpText(writer);
-
-                    writer.WriteIndentedLine($"{DestinationText} = {SourceText};");
-                }
+                writer.WriteIndentedLine($"{DestinationText} = {SourceText};");
             }
+        }
+
+        private void WriteCSharpQueryExpression(ICSharpWriter writer, ICSharpQueryExpression expression)
+        {
+            IResultType SourceResult = expression.Source.ResolvedResult.Item;
+            Debug.Assert(SourceResult.Count >= DestinationList.Count);
+
+            bool IsSimple = true;
+
+            foreach (ICSharpQualifiedName QualifiedName in DestinationList)
+                if (!QualifiedName.IsSimple)
+                    IsSimple = false;
+
+            int ResultNameIndex = expression.Source.ResolvedResult.Item.ResultNameIndex;
+
+            //if (IsSimple)
+                if (ResultNameIndex < 0)
+                    WriteCSharpMultipleNoResult(writer, expression);
+                else
+                    WriteCSharpMultipleWithResult(writer, expression, ResultNameIndex);
+        }
+
+        private void WriteCSharpMultipleNoResult(ICSharpWriter writer, ICSharpQueryExpression expression)
+        {
+            string AssignementString = expression.CSharpText(writer, DestinationList, -1);
+            writer.WriteIndentedLine($"{AssignementString};");
+        }
+
+        private void WriteCSharpMultipleWithResult(ICSharpWriter writer, ICSharpQueryExpression expression, int resultNameIndex)
+        {
+            Debug.Assert(resultNameIndex < DestinationList.Count);
+            IList<IIdentifier> ValidPath = DestinationList[resultNameIndex].Source.ValidPath.Item;
+            Debug.Assert(ValidPath.Count == 1);
+
+            string ResultDestinationName = ValidPath[0].ValidText.Item;
+
+            string AssignementString = expression.CSharpText(writer, DestinationList, resultNameIndex);
+            writer.WriteIndentedLine($"{ResultDestinationName} = {AssignementString};");
         }
         #endregion
     }

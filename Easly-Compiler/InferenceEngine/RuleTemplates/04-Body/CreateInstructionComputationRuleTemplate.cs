@@ -236,7 +236,7 @@
                 return false;
 
             selectedOverload = AsProcedureType.OverloadList[SelectedIndex];
-            featureCall = new FeatureCall(ParameterTableList[SelectedIndex], node.ArgumentList, MergedArgumentList, TypeArgumentStyle);
+            featureCall = new FeatureCall(ParameterTableList[SelectedIndex], new List<IParameter>(), node.ArgumentList, MergedArgumentList, TypeArgumentStyle);
 
             return true;
         }

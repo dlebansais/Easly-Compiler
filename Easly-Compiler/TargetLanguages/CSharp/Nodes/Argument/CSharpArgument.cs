@@ -82,10 +82,21 @@
         /// </summary>
         /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="featureCall">Details of the call.</param>
-        /// <param name="destinationList">List of destination features.</param>
-        public static string CSharpArgumentList(ICSharpUsingCollection usingCollection, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList)
+        public static string CSharpArgumentList(ICSharpUsingCollection usingCollection, ICSharpFeatureCall featureCall)
         {
-            if (featureCall.Count == 0)
+            return CSharpArgumentList(usingCollection, featureCall, new List<ICSharpQualifiedName>(), -1);
+        }
+
+        /// <summary>
+        /// Gets the source code of arguments of a feature call.
+        /// </summary>
+        /// <param name="usingCollection">The collection of using directives.</param>
+        /// <param name="featureCall">Details of the call.</param>
+        /// <param name="destinationList">List of destination features.</param>
+        /// <param name="skippedIndex">Index of a destination to skip.</param>
+        public static string CSharpArgumentList(ICSharpUsingCollection usingCollection, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
+        {
+            if (featureCall.Count == 0 && destinationList.Count == 0)
                 return string.Empty;
 
             string Result = null;
@@ -94,11 +105,11 @@
             {
                 case TypeArgumentStyles.None:
                 case TypeArgumentStyles.Positional:
-                    Result = CSharpPositionalArgumentList(usingCollection, featureCall.ParameterList, featureCall.ArgumentList, destinationList);
+                    Result = CSharpPositionalArgumentList(usingCollection, featureCall, destinationList, skippedIndex);
                     break;
 
                 case TypeArgumentStyles.Assignment:
-                    Result = CSharpAssignmentArgumentList(usingCollection, featureCall.ParameterList, featureCall.ArgumentList, destinationList);
+                    Result = CSharpAssignmentArgumentList(usingCollection, featureCall, destinationList, skippedIndex);
                     break;
             }
 
@@ -107,17 +118,21 @@
             return Result;
         }
 
-        private static string CSharpPositionalArgumentList(ICSharpUsingCollection usingCollection, IList<ICSharpParameter> parameterList, IList<ICSharpArgument> argumentList, IList<ICSharpQualifiedName> destinationList)
+        private static string CSharpPositionalArgumentList(ICSharpUsingCollection usingCollection, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
         {
+            IList<ICSharpParameter> ParameterList = featureCall.ParameterList;
+            IList<ICSharpParameter> ResultList = featureCall.ResultList;
+            IList<ICSharpArgument> ArgumentList = featureCall.ArgumentList;
+
             int i;
             string Result = string.Empty;
 
-            for (i = 0; i < argumentList.Count; i++)
+            for (i = 0; i < ArgumentList.Count; i++)
             {
                 if (Result.Length > 0)
                     Result += ", ";
 
-                ICSharpPositionalArgument Argument = argumentList[i] as ICSharpPositionalArgument;
+                ICSharpPositionalArgument Argument = ArgumentList[i] as ICSharpPositionalArgument;
                 Debug.Assert(Argument != null);
 
                 ICSharpExpression SourceExpression = Argument.SourceExpression;
@@ -125,12 +140,12 @@
                 Result += SourceExpression.CSharpText(usingCollection);
             }
 
-            for (; i < parameterList.Count; i++)
+            for (; i < ParameterList.Count; i++)
             {
                 if (Result.Length > 0)
                     Result += ", ";
 
-                ICSharpParameter Parameter = parameterList[i];
+                ICSharpParameter Parameter = ParameterList[i];
                 ICSharpScopeAttributeFeature Feature = Parameter.Feature;
                 ICSharpExpression DefaultValue = Feature.DefaultValue;
 
@@ -139,34 +154,54 @@
                 Result += DefaultValue.CSharpText(usingCollection);
             }
 
-            foreach (ICSharpQualifiedName Destination in destinationList)
+            for (i = 0; i < destinationList.Count; i++)
             {
+                ICSharpQualifiedName Destination = destinationList[i];
+                if (i == skippedIndex)
+                    continue;
+
                 if (Result.Length > 0)
                     Result += ", ";
 
-                string DestinationText = Destination.CSharpText(usingCollection, 0);
+                if (!Destination.IsSimple)
+                {
+                    Debug.Assert(i < ResultList.Count);
+                    ICSharpParameter ResultParameter = ResultList[i];
 
-                Result += $"out {DestinationText}";
+                    string TempTypeText = ResultParameter.Feature.Type.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+                    string TempText = Destination.CSharpText(usingCollection, 0).Replace('.', '_');
+                    Result += $"out {TempTypeText} Temp_{TempText}";
+                }
+                else
+                {
+                    string DestinationText = Destination.CSharpText(usingCollection, 0);
+                    Result += $"out {DestinationText}";
+                }
             }
 
             return Result;
         }
 
-        private static string CSharpAssignmentArgumentList(ICSharpUsingCollection usingCollection, IList<ICSharpParameter> parameterList, IList<ICSharpArgument> argumentList, IList<ICSharpQualifiedName> destinationList)
+        private static string CSharpAssignmentArgumentList(ICSharpUsingCollection usingCollection, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
         {
-            string Result = string.Empty;
+            IList<ICSharpParameter> ParameterList = featureCall.ParameterList;
+            IList<ICSharpParameter> ResultList = featureCall.ResultList;
+            IList<ICSharpArgument> ArgumentList = featureCall.ArgumentList;
 
-            for (int i = 0; i < parameterList.Count; i++)
+            string Result = string.Empty;
+            int i;
+
+            for (i = 0; i < ParameterList.Count; i++)
             {
                 if (Result.Length > 0)
                     Result += ", ";
 
-                ICSharpParameter Parameter = parameterList[i];
+                ICSharpParameter Parameter = ParameterList[i];
                 string ParameterName = Parameter.Name;
 
                 ICSharpExpression SourceExpression = null;
 
-                foreach (ICSharpAssignmentArgument Argument in argumentList)
+                foreach (ICSharpAssignmentArgument Argument in ArgumentList)
                     foreach (string Name in Argument.ParameterNameList)
                         if (ParameterName == Name)
                         {
@@ -187,14 +222,25 @@
                 }
             }
 
-            foreach (ICSharpQualifiedName Destination in destinationList)
+            for (i = 0; i < destinationList.Count; i++)
             {
+                ICSharpQualifiedName Destination = destinationList[i];
+                if (i == skippedIndex)
+                    continue;
+
                 if (Result.Length > 0)
                     Result += ", ";
 
-                string DestinationText = Destination.CSharpText(usingCollection, 0);
-
-                Result += $"out {DestinationText}";
+                if (!Destination.IsSimple)
+                {
+                    string TempText = Destination.CSharpText(usingCollection, 0).Replace('.', '_');
+                    Result += $"out Temp_{TempText}";
+                }
+                else
+                {
+                    string DestinationText = Destination.CSharpText(usingCollection, 0);
+                    Result += $"out {DestinationText}";
+                }
             }
 
             return Result;
@@ -267,40 +313,93 @@
             }
 
             if (resultList.Count == 1)
-            {
-                ICSharpParameter Result = resultList[0];
-                ICSharpScopeAttributeFeature ResultAttribute = Result.Feature;
-
-                /*if (FeatureTextType == FeatureTextTypes.Interface)
-                    ResultType = CSharpTypes.Type2CSharpString(ResultAttribute.ResolvedFeatureType.Item, Context, CSharpTypeFormats.AsInterface);
-                else
-                    ResultType = CSharpTypes.Type2CSharpString(ResultAttribute.ResolvedFeatureType.Item, Context, CSharpTypeFormats.None);*/
-                resultTypeText = ResultAttribute.Type.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
-            }
-
+                BuildResultListSingle(usingCollection, resultList, out resultTypeText);
             else
             {
-                resultTypeText = "void";
-
-                foreach (ICSharpParameter Result in resultList)
+                int ResultIndex = -1;
+                for (int i = 0; i < resultList.Count; i++)
                 {
-                    ICSharpScopeAttributeFeature ResultAttribute = Result.Feature;
-                    ICSharpType ParameterType = ResultAttribute.Type;
+                    ICSharpParameter Result = resultList[i];
+                    if (Result.Name == nameof(BaseNode.Keyword.Result))
+                    {
+                        ResultIndex = i;
+                        break;
+                    }
+                }
 
+                if (ResultIndex < 0)
+                    BuildResultListNoResult(usingCollection, resultList, ref parameterListText, ref parameterNameListText, out resultTypeText);
+                else
+                    BuildResultListWithResult(usingCollection, resultList, ResultIndex, ref parameterListText, ref parameterNameListText, out resultTypeText);
+            }
+        }
+
+        private static void BuildResultListSingle(ICSharpUsingCollection usingCollection, IList<ICSharpParameter> resultList, out string resultTypeText)
+        {
+            Debug.Assert(resultList.Count == 1);
+
+            ICSharpParameter Result = resultList[0];
+            ICSharpScopeAttributeFeature ResultAttribute = Result.Feature;
+
+            /*if (FeatureTextType == FeatureTextTypes.Interface)
+                ResultType = CSharpTypes.Type2CSharpString(ResultAttribute.ResolvedFeatureType.Item, Context, CSharpTypeFormats.AsInterface);
+            else
+                ResultType = CSharpTypes.Type2CSharpString(ResultAttribute.ResolvedFeatureType.Item, Context, CSharpTypeFormats.None);*/
+            resultTypeText = ResultAttribute.Type.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+        }
+
+        private static void BuildResultListNoResult(ICSharpUsingCollection usingCollection, IList<ICSharpParameter> resultList, ref string parameterListText, ref string parameterNameListText, out string resultTypeText)
+        {
+            resultTypeText = "void";
+
+            foreach (ICSharpParameter Result in resultList)
+            {
+                ICSharpScopeAttributeFeature ResultAttribute = Result.Feature;
+                ICSharpType ParameterType = ResultAttribute.Type;
+                CSharpTypeFormats ParameterFormat = ParameterType.HasInterfaceText ? CSharpTypeFormats.AsInterface : CSharpTypeFormats.Normal;
+
+                string TypeString = ParameterType.Type2CSharpString(usingCollection, ParameterFormat, CSharpNamespaceFormats.None);
+                string AttributeString = CSharpNames.ToCSharpIdentifier(Result.Name);
+
+                if (parameterListText.Length > 0)
+                    parameterListText += ", ";
+                if (parameterNameListText.Length > 0)
+                    parameterNameListText += ", ";
+
+                parameterListText += $"out {TypeString} {AttributeString}";
+                parameterNameListText += $"out {AttributeString}";
+            }
+        }
+
+        private static void BuildResultListWithResult(ICSharpUsingCollection usingCollection, IList<ICSharpParameter> resultList, int resultIndex, ref string parameterListText, ref string parameterNameListText, out string resultTypeText)
+        {
+            resultTypeText = null;
+
+            for (int i = 0; i < resultList.Count; i++)
+            {
+                ICSharpParameter Result = resultList[i];
+                ICSharpScopeAttributeFeature ResultAttribute = Result.Feature;
+                ICSharpType ParameterType = ResultAttribute.Type;
+                CSharpTypeFormats ParameterFormat = ParameterType.HasInterfaceText ? CSharpTypeFormats.AsInterface : CSharpTypeFormats.Normal;
+
+                string TypeString = ParameterType.Type2CSharpString(usingCollection, ParameterFormat, CSharpNamespaceFormats.None);
+                string AttributeString = CSharpNames.ToCSharpIdentifier(Result.Name);
+
+                if (i == resultIndex)
+                    resultTypeText = TypeString;
+                else
+                {
                     if (parameterListText.Length > 0)
                         parameterListText += ", ";
                     if (parameterNameListText.Length > 0)
                         parameterNameListText += ", ";
 
-                    CSharpTypeFormats ParameterFormat = ParameterType.HasInterfaceText ? CSharpTypeFormats.AsInterface : CSharpTypeFormats.Normal;
-
-                    string TypeString = ParameterType.Type2CSharpString(usingCollection, ParameterFormat, CSharpNamespaceFormats.None);
-                    string AttributeString = CSharpNames.ToCSharpIdentifier(Result.Name);
-
                     parameterListText += $"out {TypeString} {AttributeString}";
                     parameterNameListText += $"out {AttributeString}";
                 }
             }
+
+            Debug.Assert(resultTypeText != null);
         }
         #endregion
     }

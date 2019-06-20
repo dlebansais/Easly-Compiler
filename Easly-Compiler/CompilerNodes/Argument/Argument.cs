@@ -440,13 +440,14 @@ namespace CompilerNode
         /// Checks the validity of an assignment of a source to a destination, with arguments.
         /// </summary>
         /// <param name="parameterTableList">The list of expected parameters.</param>
+        /// <param name="resultTableList">The list of results.</param>
         /// <param name="argumentList">The list of actual arguments.</param>
         /// <param name="sourceExpression">Expression in the assignment.</param>
         /// <param name="destinationType">The expected type for the expression.</param>
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="source">The source to use when reporting errors.</param>
         /// <param name="featureCall">Details of the feature call.</param>
-        public static bool CheckAssignmentConformance(IList<ISealableList<IParameter>> parameterTableList, IList<IArgument> argumentList, IExpression sourceExpression, ICompiledType destinationType, IErrorList errorList, ISource source, out IFeatureCall featureCall)
+        public static bool CheckAssignmentConformance(IList<ISealableList<IParameter>> parameterTableList, IList<ISealableList<IParameter>> resultTableList, IList<IArgument> argumentList, IExpression sourceExpression, ICompiledType destinationType, IErrorList errorList, ISource source, out IFeatureCall featureCall)
         {
             featureCall = null;
             IResultType SourceResult = sourceExpression.ResolvedResult.Item;
@@ -465,6 +466,7 @@ namespace CompilerNode
             }
 
             ISealableList<IParameter> SelectedParameterList = parameterTableList[SelectedIndex];
+            ISealableList<IParameter> SelectedResultList = resultTableList[SelectedIndex];
             ICompiledType SourceType = SourceResult.At(0).ValueType;
 
             if (!ObjectType.TypeConformToBase(SourceType, destinationType, errorList, sourceExpression, isConversionAllowed: true))
@@ -473,7 +475,7 @@ namespace CompilerNode
                 return false;
             }
 
-            featureCall = new FeatureCall(SelectedParameterList, argumentList, MergedArgumentList, TypeArgumentStyle);
+            featureCall = new FeatureCall(SelectedParameterList, SelectedResultList, argumentList, MergedArgumentList, TypeArgumentStyle);
 
             return true;
         }

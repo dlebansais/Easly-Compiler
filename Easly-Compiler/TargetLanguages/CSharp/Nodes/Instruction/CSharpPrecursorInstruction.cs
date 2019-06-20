@@ -84,7 +84,7 @@
             if (!string.IsNullOrEmpty(CoexistingPrecursorRootName))
                 CoexistingPrecursorName = CSharpNames.ToCSharpIdentifier(CoexistingPrecursorRootName + " " + "Base");
 
-            string ArgumentListString = CSharpArgument.CSharpArgumentList(writer, FeatureCall, new List<ICSharpQualifiedName>());
+            string ArgumentListString = CSharpArgument.CSharpArgumentList(writer, FeatureCall);
 
             if (CoexistingPrecursorName.Length > 0)
                 writer.WriteIndentedLine($"{CoexistingPrecursorName}({ArgumentListString});");

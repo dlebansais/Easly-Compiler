@@ -30,7 +30,8 @@
         /// </summary>
         /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="destinationList">List of destinations.</param>
-        string CSharpText(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList);
+        /// <param name="skippedIndex">Index of a destination to skip.</param>
+        string CSharpText(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList, int skippedIndex);
     }
 
     /// <summary>
@@ -185,7 +186,8 @@
         /// </summary>
         /// <param name="usingCollection">The collection of using directives.</param>
         /// <param name="destinationList">List of destinations.</param>
-        public abstract string CSharpText(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList);
+        /// <param name="skippedIndex">Index of a destination to skip.</param>
+        public abstract string CSharpText(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList, int skippedIndex);
         #endregion
     }
 }

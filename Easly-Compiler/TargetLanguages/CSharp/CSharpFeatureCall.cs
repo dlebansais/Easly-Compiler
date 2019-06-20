@@ -15,6 +15,11 @@
         IList<ICSharpParameter> ParameterList { get; }
 
         /// <summary>
+        /// The list of results for the selected overload.
+        /// </summary>
+        IList<ICSharpParameter> ResultList { get; }
+
+        /// <summary>
         /// The list of arguments.
         /// </summary>
         IList<ICSharpArgument> ArgumentList { get; }
@@ -50,6 +55,13 @@
                 ParameterList.Add(NewParameter);
             }
 
+            foreach (IParameter Item in source.ResultList)
+            {
+                ICSharpClass Owner = context.GetClass(Item.ResolvedParameter.Location.EmbeddingClass);
+                ICSharpParameter NewParameter = CSharpParameter.Create(context, Item, Owner);
+                ResultList.Add(NewParameter);
+            }
+
             foreach (IArgument Item in source.ArgumentList)
             {
                 ICSharpArgument NewArgument = CSharpArgument.Create(context, Item);
@@ -68,6 +80,11 @@
         /// The list of parameters for the selected overload.
         /// </summary>
         public IList<ICSharpParameter> ParameterList { get; } = new List<ICSharpParameter>();
+
+        /// <summary>
+        /// The list of results for the selected overload.
+        /// </summary>
+        public IList<ICSharpParameter> ResultList { get; } = new List<ICSharpParameter>();
 
         /// <summary>
         /// The list of arguments.

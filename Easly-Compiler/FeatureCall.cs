@@ -16,6 +16,11 @@
         IList<IParameter> ParameterList { get; }
 
         /// <summary>
+        /// List of results from the selected overload.
+        /// </summary>
+        IList<IParameter> ResultList { get; }
+
+        /// <summary>
         /// Arguments of the call.
         /// </summary>
         IList<IArgument> ArgumentList { get; }
@@ -48,6 +53,7 @@
         public FeatureCall()
         {
             ParameterList = new List<IParameter>();
+            ResultList = new List<IParameter>();
             ArgumentList = new List<IArgument>();
             ResolvedArgumentList = new List<IExpressionType>();
             TypeArgumentStyle = TypeArgumentStyles.None;
@@ -59,12 +65,14 @@
         /// Initializes a new instance of the <see cref="FeatureCall"/> class.
         /// </summary>
         /// <param name="parameterList">List of parameters from the selected overload.</param>
+        /// <param name="resultList">List of results from the selected overload.</param>
         /// <param name="argumentList">Arguments of the call.</param>
         /// <param name="resolvedArgumentList">Resolved arguments of the call.</param>
         /// <param name="typeArgumentStyle">The argument passing style.</param>
-        public FeatureCall(IList<IParameter> parameterList, IList<IArgument> argumentList, IList<IExpressionType> resolvedArgumentList, TypeArgumentStyles typeArgumentStyle)
+        public FeatureCall(IList<IParameter> parameterList, IList<IParameter> resultList, IList<IArgument> argumentList, IList<IExpressionType> resolvedArgumentList, TypeArgumentStyles typeArgumentStyle)
         {
             ParameterList = parameterList;
+            ResultList = resultList;
             ArgumentList = argumentList;
             ResolvedArgumentList = resolvedArgumentList;
             TypeArgumentStyle = typeArgumentStyle;
@@ -76,6 +84,11 @@
         /// List of parameters from the selected overload.
         /// </summary>
         public IList<IParameter> ParameterList { get; }
+
+        /// <summary>
+        /// List of results from the selected overload.
+        /// </summary>
+        public IList<IParameter> ResultList { get; }
 
         /// <summary>
         /// Resolved arguments of the call.
@@ -95,7 +108,7 @@
         /// <summary>
         /// True if the call has no parameters or arguments.
         /// </summary>
-        public bool IsEmpty { get { return ParameterList.Count == 0 && ArgumentList.Count == 0 && ResolvedArgumentList.Count == 0 && TypeArgumentStyle == TypeArgumentStyles.None; } }
+        public bool IsEmpty { get { return ParameterList.Count == 0 && ResultList.Count <= 1 && ArgumentList.Count == 0 && ResolvedArgumentList.Count == 0 && TypeArgumentStyle == TypeArgumentStyles.None; } }
         #endregion
 
         #region Client Interface

@@ -105,7 +105,7 @@
 
                 ResultException.Merge(ResolvedException, SelectedOverload.ExceptionIdentifierList);
 
-                IFeatureCall FeatureCall = new FeatureCall(SelectedOverload.ParameterTable, node.ArgumentList, MergedArgumentList, TypeArgumentStyle);
+                IFeatureCall FeatureCall = new FeatureCall(SelectedOverload.ParameterTable, new List<IParameter>(), node.ArgumentList, MergedArgumentList, TypeArgumentStyle);
 
                 data = new Tuple<ICompiledType, IResultException, IFeatureCall>(ResolvedType, ResolvedException, FeatureCall);
             }

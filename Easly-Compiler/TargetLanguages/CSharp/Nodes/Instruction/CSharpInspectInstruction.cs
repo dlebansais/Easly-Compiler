@@ -97,7 +97,7 @@
         /// <param name="writer">The stream on which to write.</param>
         public override void WriteCSharp(ICSharpWriter writer)
         {
-            string SourceString = SourceExpression.CSharpText(writer, new List<ICSharpQualifiedName>());
+            string SourceString = SourceExpression.CSharpText(writer);
 
             writer.WriteIndentedLine($"switch ({SourceString})");
             writer.WriteIndentedLine("{");

@@ -63,13 +63,15 @@
                     return false;
 
                 IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
+                IList<ISealableList<IParameter>> ResultTableList = new List<ISealableList<IParameter>>();
                 ICompiledFeature OperatorFeature = SelectedPrecursor.Feature;
                 IIndexerType AsIndexerType = OperatorFeature.ResolvedAgentType.Item as IIndexerType;
                 Debug.Assert(AsIndexerType != null);
 
                 ParameterTableList.Add(AsIndexerType.ParameterTable);
+                ResultTableList.Add(new SealableList<IParameter>());
 
-                if (!Argument.CheckAssignmentConformance(ParameterTableList, node.ArgumentList, SourceExpression, AsIndexerType.ResolvedEntityType.Item, ErrorList, node, out IFeatureCall FeatureCall))
+                if (!Argument.CheckAssignmentConformance(ParameterTableList, ResultTableList, node.ArgumentList, SourceExpression, AsIndexerType.ResolvedEntityType.Item, ErrorList, node, out IFeatureCall FeatureCall))
                     return false;
 
                 IResultException ResolvedException = new ResultException();
