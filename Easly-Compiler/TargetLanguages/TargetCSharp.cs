@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
     using BaseNodeHelper;
     using CompilerNode;
     using Easly;
@@ -142,6 +143,9 @@
                 ICSharpClass Class = Entry.Value;
                 Class.CreateDelegates();
             }
+
+            if (!Directory.Exists(OutputRootFolder))
+                Directory.CreateDirectory(OutputRootFolder);
 
             foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
             {

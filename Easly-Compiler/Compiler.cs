@@ -1081,8 +1081,9 @@
             ISource Source = node as ISource;
             Debug.Assert(Source != null);
 
-#if COVERAGE
             Source.Reset(context.RuleTemplateList);
+
+#if COVERAGE
             Debug.Assert(!Source.IsResolved(context.RuleTemplateList));
             Debug.Assert(Source.ToString().Length > 0);
 #endif
