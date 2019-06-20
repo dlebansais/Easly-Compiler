@@ -399,6 +399,8 @@ namespace CompilerNode
                 for (int i = 0; i < overload.ParameterList.Count && i < Item.ParameterList.Count; i++)
                 {
                     IsMatching &= overload.ParameterList[i].ValidEntity.Item.ResolvedEffectiveType.Item == Item.ParameterList[i].ValidEntity.Item.ResolvedEffectiveType.Item;
+                    IsMatching &= overload.ParameterList[i].ValidEntity.Item.DefaultValue.IsAssigned == Item.ParameterList[i].ValidEntity.Item.DefaultValue.IsAssigned;
+                    IsMatching &= IsDefaultValueMatching(overload.ParameterList[i].ValidEntity.Item.DefaultValue, Item.ParameterList[i].ValidEntity.Item.DefaultValue);
 
                     if (IsMatching)
                     {
@@ -421,6 +423,11 @@ namespace CompilerNode
             }
 
             return IsOverloadFound;
+        }
+
+        private static bool IsDefaultValueMatching(IOptionalReference<IExpression> value1, IOptionalReference<IExpression> value2)
+        {
+            return value1.IsAssigned && value2.IsAssigned && Expression.IsExpressionEqual(value1.Item, value2.Item);
         }
 
         /// <summary>

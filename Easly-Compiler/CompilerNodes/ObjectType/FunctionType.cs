@@ -431,6 +431,7 @@ namespace CompilerNode
                 IScopeAttributeFeature OverloadAttribute2 = overload2.ParameterList[i].ValidEntity.Item;
 
                 IsMatching &= OverloadAttribute1.ResolvedEffectiveType.Item == OverloadAttribute2.ResolvedEffectiveType.Item;
+                IsMatching &= IsDefaultValueMatching(OverloadAttribute1.DefaultValue, OverloadAttribute2.DefaultValue);
             }
 
             return IsMatching;
@@ -448,9 +449,15 @@ namespace CompilerNode
                 IScopeAttributeFeature OverloadAttribute2 = overload2.ResultList[i].ValidEntity.Item;
 
                 IsMatching &= OverloadAttribute1.ResolvedEffectiveType.Item == OverloadAttribute2.ResolvedEffectiveType.Item;
+                IsMatching &= IsDefaultValueMatching(OverloadAttribute1.DefaultValue, OverloadAttribute2.DefaultValue);
             }
 
             return IsMatching;
+        }
+
+        private static bool IsDefaultValueMatching(IOptionalReference<IExpression> value1, IOptionalReference<IExpression> value2)
+        {
+            return value1.IsAssigned && value2.IsAssigned && Expression.IsExpressionEqual(value1.Item, value2.Item);
         }
 
         /// <summary>

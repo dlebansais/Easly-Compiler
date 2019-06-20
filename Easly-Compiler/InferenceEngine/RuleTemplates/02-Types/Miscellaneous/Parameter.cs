@@ -58,7 +58,8 @@
         /// <summary></summary>
         public override string ToString()
         {
-            return $"Parameter '{Name}'";
+            string Value = ResolvedParameter.DefaultValue.IsAssigned ? $" = {ResolvedParameter.DefaultValue.Item.ExpressionToString}" : string.Empty;
+            return $"Parameter '{Name}'{Value}";
         }
     }
 }

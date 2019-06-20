@@ -56,7 +56,8 @@
 
             foreach (IQueryOverloadType OverloadType in ResolvedFeatureType.OverloadList)
             {
-                //Debug.Assert(OverloadType.ConformantResultTable.IsSealed); TODO find why not
+                // TODO find why not
+                // Debug.Assert(OverloadType.ConformantResultTable.IsSealed);
                 Debug.Assert(OverloadType.ResultTypeList.Count == OverloadType.ResultTable.Count);
             }
 
