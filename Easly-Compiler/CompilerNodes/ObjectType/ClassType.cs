@@ -409,6 +409,8 @@
                         {
                             string GenericName = TypeArgumentEntry.Key;
                             ICompiledType TypeArgument = TypeArgumentEntry.Value;
+
+                            Debug.Assert(ResolvedTypeArgumentTable.ContainsKey(GenericName));
                             ICompiledType ResolvedTypeArgument = ResolvedTypeArgumentTable[GenericName];
 
                             AllArgumentsEqual &= TypeArgument == ResolvedTypeArgument;

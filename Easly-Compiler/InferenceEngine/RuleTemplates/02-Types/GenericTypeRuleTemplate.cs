@@ -229,7 +229,17 @@
 
                 if (!resolvedTable.ContainsKey(GenericName))
                 {
-                    if (!Generic.DefaultValue.IsAssigned)
+                    if (Generic.DefaultValue.IsAssigned)
+                    {
+                        IObjectType DefaultValue = (IObjectType)Generic.DefaultValue.Item;
+
+                        Debug.Assert(DefaultValue.ResolvedType.IsAssigned);
+                        ICompiledType ActualArgumentType = DefaultValue.ResolvedType.Item;
+
+                        resolvedTable.Add(GenericName, ActualArgumentType);
+                        locationTable.Add(GenericName, null);
+                    }
+                    else
                     {
                         AddSourceError(new ErrorMissingTypeArgument(node, GenericName));
                         Result = false;
