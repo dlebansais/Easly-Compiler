@@ -321,6 +321,10 @@ namespace CompilerNode
 
             Debug.Assert(IsHandled);
 
+#if COVERAGE
+            Debug.Assert(!node.IsComplex);
+#endif
+
             return true;
         }
 
@@ -384,10 +388,6 @@ namespace CompilerNode
             resolvedArgumentList = null;
 
             IList<IArgument> ArgumentList = node.ArgumentList;
-            ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
-            ITypeName OperatorTypeName = OperatorFeature.ResolvedEffectiveTypeName.Item;
-            ICompiledType OperatorType = OperatorFeature.ResolvedEffectiveType.Item;
-            IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
 
             if (ArgumentList.Count > 0)
             {
@@ -396,6 +396,11 @@ namespace CompilerNode
             }
             else
             {
+                ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
+                ITypeName OperatorTypeName = OperatorFeature.ResolvedEffectiveTypeName.Item;
+                ICompiledType OperatorType = OperatorFeature.ResolvedEffectiveType.Item;
+                IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
+
                 resolvedResult = new ResultType(OperatorTypeName, OperatorType, string.Empty);
 
                 resolvedException = new ResultException();
@@ -444,27 +449,35 @@ namespace CompilerNode
             resolvedArgumentList = null;
 
             IList<IArgument> ArgumentList = node.ArgumentList;
-            ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
-            IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
 
-            IPropertyFeature Property = (IPropertyFeature)OperatorFeature;
-            string PropertyName = ((IFeatureWithName)Property).EntityName.Text;
-
-            resolvedResult = new ResultType(callType.ResolvedEntityTypeName.Item, callType.ResolvedEntityType.Item, PropertyName);
-
-            resolvedException = new ResultException();
-
-            if (Property.GetterBody.IsAssigned)
+            if (ArgumentList.Count > 0)
             {
-                IBody GetterBody = (IBody)Property.GetterBody.Item;
-                resolvedException = new ResultException(GetterBody.ExceptionIdentifierList);
+                errorList.AddError(new ErrorInvalidExpression(node));
+                return false;
             }
+            else
+            {
+                ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
+                IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
+                IPropertyFeature Property = (IPropertyFeature)OperatorFeature;
+                string PropertyName = ((IFeatureWithName)Property).EntityName.Text;
 
-            selectedParameterList = new SealableList<IParameter>();
-            selectedResultList = new SealableList<IParameter>();
-            resolvedArgumentList = new List<IExpressionType>();
+                resolvedResult = new ResultType(callType.ResolvedEntityTypeName.Item, callType.ResolvedEntityType.Item, PropertyName);
 
-            return true;
+                resolvedException = new ResultException();
+
+                if (Property.GetterBody.IsAssigned)
+                {
+                    IBody GetterBody = (IBody)Property.GetterBody.Item;
+                    resolvedException = new ResultException(GetterBody.ExceptionIdentifierList);
+                }
+
+                selectedParameterList = new SealableList<IParameter>();
+                selectedResultList = new SealableList<IParameter>();
+                resolvedArgumentList = new List<IExpressionType>();
+
+                return true;
+            }
         }
         #endregion
 

@@ -210,6 +210,10 @@ namespace CompilerNode
 
             ResultException.Propagate(Source.ResolvedException, out resolvedException);
 
+#if COVERAGE
+            Debug.Assert(node.IsComplex);
+#endif
+
             return true;
         }
         #endregion

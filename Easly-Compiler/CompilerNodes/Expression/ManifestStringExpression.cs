@@ -246,6 +246,10 @@ namespace CompilerNode
             resolvedException = new ResultException();
             expressionConstant = new StringLanguageConstant(ValidText);
 
+#if COVERAGE
+            Debug.Assert(!node.IsComplex);
+#endif
+
             return true;
         }
         #endregion

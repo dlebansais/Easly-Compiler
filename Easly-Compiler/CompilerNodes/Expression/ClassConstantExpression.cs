@@ -314,6 +314,10 @@ namespace CompilerNode
             resolvedResult = new ResultType(ConstantTypeName, ConstantType, ValidConstantText);
             resolvedException = new ResultException();
 
+#if COVERAGE
+            Debug.Assert(!node.IsComplex);
+#endif
+
             return true;
         }
         #endregion

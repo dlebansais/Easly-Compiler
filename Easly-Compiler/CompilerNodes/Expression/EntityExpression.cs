@@ -266,6 +266,10 @@ namespace CompilerNode
             resolvedResult = new ResultType(EntityTypeName, EntityType, ValidText);
             resolvedException = new ResultException();
 
+#if COVERAGE
+            Debug.Assert(!node.IsComplex);
+#endif
+
             return true;
         }
         #endregion

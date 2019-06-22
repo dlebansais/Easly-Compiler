@@ -254,6 +254,10 @@
             ResultException.Merge(resolvedException, LeftExpression.ResolvedException);
             ResultException.Merge(resolvedException, RightExpression.ResolvedException);
 
+#if COVERAGE
+            Debug.Assert(node.IsComplex);
+#endif
+
             return true;
         }
         #endregion

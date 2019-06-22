@@ -243,6 +243,10 @@ namespace CompilerNode
             resolvedException = new ResultException();
             resolvedFinalFeature = FinalFeature;
 
+#if COVERAGE
+            Debug.Assert(!node.IsComplex);
+#endif
+
             return true;
         }
         #endregion

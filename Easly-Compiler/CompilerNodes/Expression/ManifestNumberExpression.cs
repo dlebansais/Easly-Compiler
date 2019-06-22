@@ -260,6 +260,10 @@
 
             expressionConstant = new NumberLanguageConstant(FormattedNumber.Canonical);
 
+#if COVERAGE
+            Debug.Assert(!node.IsComplex);
+#endif
+
             return true;
         }
         #endregion

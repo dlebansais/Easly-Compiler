@@ -301,6 +301,10 @@ namespace CompilerNode
                 return false;
             }
 
+#if COVERAGE
+            Debug.Assert(!node.IsComplex);
+#endif
+
             return true;
         }
         #endregion

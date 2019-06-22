@@ -392,6 +392,10 @@ namespace CompilerNode
 
             Debug.Assert(IsHandled);
 
+#if COVERAGE
+            Debug.Assert(!node.IsComplex);
+#endif
+
             return true;
         }
         #endregion

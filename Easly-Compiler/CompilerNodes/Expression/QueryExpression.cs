@@ -311,6 +311,10 @@ namespace CompilerNode
 
             Debug.Assert(FinalFeature != null || FinalDiscrete != null);
 
+#if COVERAGE
+            Debug.Assert(!node.IsComplex);
+#endif
+
             if (FinalFeature != null)
             {
                 resolvedFinalFeature = FinalFeature;
@@ -387,7 +391,8 @@ namespace CompilerNode
                     break;
 
                 case IClassType AsClassType:
-                    resolvedResult = new ResultType(finalTypeName, AsClassType, ValidText);
+                case ITupleType AsTupleType:
+                    resolvedResult = new ResultType(finalTypeName, finalType, ValidText);
 
                     resolvedException = new ResultException();
                     selectedResultList = new SealableList<IParameter>();
@@ -397,15 +402,6 @@ namespace CompilerNode
 
                 case IFormalGenericType AsFormalGenericType:
                     resolvedResult = new ResultType(finalTypeName, AsFormalGenericType, ValidText);
-
-                    resolvedException = new ResultException();
-                    selectedResultList = new SealableList<IParameter>();
-                    featureCall = new FeatureCall();
-                    IsHandled = true;
-                    break;
-
-                case ITupleType AsTupleType:
-                    resolvedResult = new ResultType(finalTypeName, AsTupleType, ValidText);
 
                     resolvedException = new ResultException();
                     selectedResultList = new SealableList<IParameter>();

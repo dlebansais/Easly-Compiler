@@ -218,6 +218,11 @@ namespace CompilerNode
 
                         expressionConstant = new EntityLanguageConstant(ClassIndexer);
                     }
+                    else
+                    {
+                        errorList.AddError(new ErrorMissingIndexer(node));
+                        return false;
+                    }
                     break;
 
                 default:
@@ -232,6 +237,10 @@ namespace CompilerNode
 
             resolvedResult = new ResultType(EntityTypeName, EntityType, string.Empty);
             resolvedException = new ResultException();
+
+#if COVERAGE
+            Debug.Assert(!node.IsComplex);
+#endif
 
             return true;
         }

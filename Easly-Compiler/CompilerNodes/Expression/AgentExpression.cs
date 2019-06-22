@@ -291,6 +291,10 @@ namespace CompilerNode
             resolvedException = new ResultException();
             expressionConstant = new AgentLanguageConstant(resolvedFeature);
 
+#if COVERAGE
+            Debug.Assert(!node.IsComplex);
+#endif
+
             return true;
         }
         #endregion

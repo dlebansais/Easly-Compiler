@@ -306,6 +306,10 @@
 
             resolvedException = new ResultException();
 
+#if COVERAGE
+            Debug.Assert(!node.IsComplex);
+#endif
+
             return true;
         }
 

@@ -230,6 +230,10 @@ namespace CompilerNode
                 ResolvedBooleanExpression
             };
 
+#if COVERAGE
+            Debug.Assert(!node.IsComplex);
+#endif
+
             return true;
         }
         #endregion

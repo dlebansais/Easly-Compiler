@@ -234,6 +234,10 @@
             resolvedResult = new ResultType(BooleanTypeName, BooleanType, string.Empty);
             ResultException.Propagate(RightExpression.ResolvedException, out resolvedException);
 
+#if COVERAGE
+            Debug.Assert(node.IsComplex);
+#endif
+
             return true;
         }
         #endregion
