@@ -88,6 +88,7 @@
     <Compile Include="FeatureWithEntity.cs" />
     <Compile Include="InferenceEngine\RuleTemplateList.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllConversionsRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\02-Types\AssertionRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\IndexQueryExpressionConstantRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\KeywordEntityExpressionRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\PrecursorIndexExpressionConstantRuleTemplate.cs" />
@@ -591,7 +592,7 @@
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\AssignmentInstructionContractRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\AssignmentArgumentRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\AssertionTagExpressionRuleTemplate.cs" />
-    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\AssertionRuleTemplate.cs" />
+    <Compile Include="InferenceEngine\RuleTemplates\03-Contract\AssertionContractRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\AsLongAsInstructionContractRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\AllInheritanceTagsRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\AllEntitiesWithDefaultRuleTemplate.cs" />

@@ -153,7 +153,7 @@
             new AllEntitiesWithDefaultRuleTemplate(),
             new AllInheritanceTagsRuleTemplate(),
             new AsLongAsInstructionContractRuleTemplate(),
-            new AssertionRuleTemplate(),
+            new AssertionContractRuleTemplate(),
             new AssertionTagExpressionConstantRuleTemplate(),
             new AssertionTagExpressionRuleTemplate(),
             new AssertionTagExpressionSourceRuleTemplate(),

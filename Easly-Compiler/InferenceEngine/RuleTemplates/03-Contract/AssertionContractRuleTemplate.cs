@@ -7,17 +7,17 @@
     /// <summary>
     /// A rule to process <see cref="IAssertion"/>.
     /// </summary>
-    public interface IAssertionRuleTemplate : IRuleTemplate
+    public interface IAssertionContractRuleTemplate : IRuleTemplate
     {
     }
 
     /// <summary>
     /// A rule to process <see cref="IAssertion"/>.
     /// </summary>
-    public class AssertionRuleTemplate : RuleTemplate<IAssertion, AssertionRuleTemplate>, IAssertionRuleTemplate
+    public class AssertionContractRuleTemplate : RuleTemplate<IAssertion, AssertionContractRuleTemplate>, IAssertionContractRuleTemplate
     {
         #region Init
-        static AssertionRuleTemplate()
+        static AssertionContractRuleTemplate()
         {
             SourceTemplateList = new List<ISourceTemplate>()
             {
@@ -85,6 +85,11 @@
                 NewContract = new TaggedContract(BooleanExpression);
 
             node.ResolvedContract.Item = NewContract;
+
+#if COVERAGE
+            Debug.Assert(node.AdditionalScope.Count == 0);
+            Debug.Assert(node.InnerScopes.Count == 0);
+#endif
         }
         #endregion
     }

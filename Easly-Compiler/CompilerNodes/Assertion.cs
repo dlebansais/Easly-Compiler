@@ -80,8 +80,15 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Types)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers)
             {
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Types)
+            {
+                AdditionalScope = new SealableDictionary<string, IScopeAttributeFeature>();
+                AdditionalScope.Seal();
+                InnerScopes = new List<IScopeHolder>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Contract)
@@ -138,12 +145,12 @@ namespace CompilerNode
         /// <summary>
         /// Additional entities such as loop indexer.
         /// </summary>
-        public ISealableDictionary<string, IScopeAttributeFeature> AdditionalScope { get { return ((IScopeHolder)ParentSource).AdditionalScope; } }
+        public ISealableDictionary<string, IScopeAttributeFeature> AdditionalScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
 
         /// <summary>
         /// List of scopes containing the current instance.
         /// </summary>
-        public IList<IScopeHolder> InnerScopes { get { return ((IScopeHolder)ParentSource).InnerScopes; } }
+        public IList<IScopeHolder> InnerScopes { get; private set; } = new List<IScopeHolder>();
 
         /// <summary>
         /// All reachable entities.
