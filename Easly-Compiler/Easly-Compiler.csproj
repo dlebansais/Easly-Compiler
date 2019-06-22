@@ -88,7 +88,6 @@
     <Compile Include="FeatureWithEntity.cs" />
     <Compile Include="InferenceEngine\RuleTemplateList.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\02-Types\AllConversionsRuleTemplate.cs" />
-    <Compile Include="InferenceEngine\RuleTemplates\02-Types\AssertionRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\IndexQueryExpressionConstantRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\KeywordEntityExpressionRuleTemplate.cs" />
     <Compile Include="InferenceEngine\RuleTemplates\03-Contract\PrecursorIndexExpressionConstantRuleTemplate.cs" />
