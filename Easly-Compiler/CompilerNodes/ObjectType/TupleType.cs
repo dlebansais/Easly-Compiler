@@ -297,6 +297,9 @@ namespace CompilerNode
         /// <param name="resolvedType">The proposed type instance.</param>
         public void InstanciateType(ICompiledTypeWithFeature instancingClassType, ref ITypeName resolvedTypeName, ref ICompiledType resolvedType)
         {
+            ISealableDictionary<ITypeName, ICompiledType> TypeTable = GetTypeTable();
+            Debug.Assert(TypeTable.Count == 0);
+
             bool IsNewInstance = false;
 
             IList<IEntityDeclaration> InstancedFieldList = new List<IEntityDeclaration>();
@@ -318,8 +321,8 @@ namespace CompilerNode
 
             if (IsNewInstance)
             {
-                ISealableDictionary<ITypeName, ICompiledType> TypeTable = instancingClassType.GetTypeTable();
-                ResolveType(TypeTable, EntityDeclarationList, Sharing, out resolvedTypeName, out resolvedType);
+                ISealableDictionary<ITypeName, ICompiledType> InstancingTypeTable = instancingClassType.GetTypeTable();
+                ResolveType(InstancingTypeTable, EntityDeclarationList, Sharing, out resolvedTypeName, out resolvedType);
             }
         }
 

@@ -1611,25 +1611,6 @@
             }
         }
 
-        private static ISealableDictionary<string, IScopeAttributeFeature> ScopeFromType(ICompiledType type)
-        {
-            ISealableDictionary<string, IScopeAttributeFeature> Result = new SealableDictionary<string, IScopeAttributeFeature>();
-
-            if (type is ITupleType AsTupleType)
-            {
-                foreach (IEntityDeclaration Item in AsTupleType.EntityDeclarationList)
-                {
-                    IName EntityName = (IName)Item.EntityName;
-                    string Name = EntityName.ValidText.Item;
-                    IScopeAttributeFeature Attribute = Item.ValidEntity.Item;
-
-                    Result.Add(Name, Attribute);
-                }
-            }
-
-            return Result;
-        }
-
         /// <summary>
         /// Update all elements along a path with their type, previously validated.
         /// </summary>
@@ -1677,6 +1658,31 @@
                 if (index + 1 < validPath.Count)
                     FillResultPath(baseClass, ResolvedFeatureType, null, validPath, index + 1, resultPath);
             }
+        }
+
+        /// <summary>
+        /// Gets the type table of the provided type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        public static ISealableDictionary<ITypeName, ICompiledType> GetTypeTable(ICompiledTypeWithFeature type)
+        {
+            ISealableDictionary<ITypeName, ICompiledType> Result = null;
+
+            switch (type)
+            {
+                case IClassType AsClassType:
+                case ITupleType AsTupleType:
+                    Result = type.GetTypeTable();
+                    break;
+
+                case IFormalGenericType AsFormalGenericType:
+                    Result = type.GetTypeTable();
+                    break;
+            }
+
+            Debug.Assert(Result != null);
+
+            return Result;
         }
     }
 }

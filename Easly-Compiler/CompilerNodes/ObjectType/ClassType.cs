@@ -351,8 +351,8 @@
 
             if (IsNewInstance)
             {
-                ISealableDictionary<ITypeName, ICompiledType> TypeTable = instancingClassType.GetTypeTable();
-                ResolveType(TypeTable, BaseClass, InstancedTypeArgumentTable, instancingClassType, out resolvedTypeName, out resolvedType);
+                ISealableDictionary<ITypeName, ICompiledType> InstancingTypeTable = instancingClassType.GetTypeTable();
+                ResolveType(InstancingTypeTable, BaseClass, InstancedTypeArgumentTable, instancingClassType, out resolvedTypeName, out resolvedType);
             }
         }
         #endregion

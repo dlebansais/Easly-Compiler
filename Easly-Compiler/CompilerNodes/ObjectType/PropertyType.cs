@@ -528,27 +528,7 @@
         /// <summary>
         /// Gets a string representation of the expression.
         /// </summary>
-        public string TypeToString
-        {
-            get
-            {
-                string Result = null;
-
-                switch (BaseType)
-                {
-                    case IObjectType AsObjectType:
-                        Result = $"property {{{AsObjectType.TypeToString}}}";
-                        break;
-
-                    case IClassType AsClassType:
-                        Result = $"property {{{AsClassType.BaseClass.EntityName.Text}}}";
-                        break;
-                }
-
-                Debug.Assert(Result != null);
-                return Result;
-            }
-        }
+        public string TypeToString { get { return $"property {{{((IObjectType)BaseType).TypeToString}}}"; } }
 
         /// <summary></summary>
         public override string ToString()
