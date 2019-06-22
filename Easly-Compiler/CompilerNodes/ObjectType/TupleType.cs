@@ -282,11 +282,6 @@ namespace CompilerNode
         public OnceReference<ITypedef> OriginatingTypedef { get; private set; } = new OnceReference<ITypedef>();
 
         /// <summary>
-        /// The type to use instead of this type for a source or destination type, for the purpose of path searching.
-        /// </summary>
-        public ICompiledType TypeAsDestinationOrSource { get { return this; } }
-
-        /// <summary>
         /// Gets the type table for this type.
         /// </summary>
         public ISealableDictionary<ITypeName, ICompiledType> GetTypeTable()

@@ -301,11 +301,6 @@ namespace CompilerNode
         public OnceReference<ITypedef> OriginatingTypedef { get; private set; } = new OnceReference<ITypedef>();
 
         /// <summary>
-        /// The type to use instead of this type for a source or destination type, for the purpose of path searching.
-        /// </summary>
-        public ICompiledType TypeAsDestinationOrSource { get { return this; } }
-
-        /// <summary>
         /// Creates an instance of a class type, or reuse an existing instance.
         /// </summary>
         /// <param name="instancingClassType">The class type to instanciate.</param>
@@ -457,7 +452,7 @@ namespace CompilerNode
 
         private static bool IsDefaultValueMatching(IOptionalReference<IExpression> value1, IOptionalReference<IExpression> value2)
         {
-            return value1.IsAssigned && value2.IsAssigned && Expression.IsExpressionEqual(value1.Item, value2.Item);
+            return (!value1.IsAssigned && !value2.IsAssigned) || (value1.IsAssigned && value2.IsAssigned && Expression.IsExpressionEqual(value1.Item, value2.Item));
         }
 
         /// <summary>
