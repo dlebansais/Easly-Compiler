@@ -52,6 +52,7 @@
             Debug.Assert(BaseType.ResolvedType.IsAssigned);
 
             ICompiledTypeWithFeature ResolvedBaseType = BaseType.ResolvedType.Item as ICompiledTypeWithFeature;
+
             if (ResolvedBaseType == null)
             {
                 AddSourceError(new ErrorClassTypeRequired(node));

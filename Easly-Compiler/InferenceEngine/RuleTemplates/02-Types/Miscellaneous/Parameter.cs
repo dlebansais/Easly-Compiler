@@ -33,6 +33,10 @@
         {
             Name = name;
             ResolvedParameter = resolvedParameter;
+
+#if COVERAGE
+            string DebugString = ToString();
+#endif
         }
 
         /// <summary>
