@@ -61,19 +61,36 @@
                 else if (MaxAttachmentCount < AttachmentItem.AttachTypeList.Count)
                     MaxAttachmentCount = AttachmentItem.AttachTypeList.Count;
 
-            bool ConformanceError = false;
-            for (int i = 0; i < MaxAttachmentCount; i++)
+            bool[] AttachmentToAny = new bool[MaxAttachmentCount];
+            BaseNode.CopySemantic[] AttachmentType = new BaseNode.CopySemantic[MaxAttachmentCount];
+
+            for (int i = 0; i < node.AttachmentList.Count; i++)
             {
-                ICompiledType SourceType = SourceResult.At(i).ValueType;
+                IAttachment Attachment = node.AttachmentList[i];
+                bool ConformanceError = true;
 
-                if (SourceType == ClassType.ClassAnyType)
-                    ConformanceError |= CheckConsistencyAny(node, i);
-                else
-                    ConformanceError |= CheckConsistencyTyped(node, i, SourceType);
+                for (int j = 0; j < MaxAttachmentCount; j++)
+                    if (j < Attachment.AttachTypeList.Count)
+                    {
+                        ICompiledType SourceType = SourceResult.At(j).ValueType;
+                        IObjectType AttachType = Attachment.AttachTypeList[j];
+                        ICompiledType DestinationType = AttachType.ResolvedType.Item;
+
+                        if (!ObjectType.TypesHaveCommonDescendant(EmbeddingClass, DestinationType, SourceType))
+                        {
+                            AddSourceError(new ErrorInvalidAttachment(Attachment));
+                            return false;
+                        }
+                        else
+                            ConformanceError &= CheckConsistencyTyped(node, i, j, SourceType);
+                    }
+
+                if (ConformanceError)
+                {
+                    AddSourceError(new ErrorInvalidAttachment(Attachment));
+                    return false;
+                }
             }
-
-            if (ConformanceError)
-                return false;
 
             if (Success)
             {
@@ -96,129 +113,23 @@
             return Success;
         }
 
-        private bool CheckConsistencyAny(IAttachmentInstruction node, int index)
+        private bool CheckConsistencyTyped(IAttachmentInstruction node, int indexAttachment, int indexType, ICompiledType destinationType)
         {
-            bool ConformanceError = false;
-            bool AttachmentToAny = false;
-            BaseNode.CopySemantic AttachmentType = BaseNode.CopySemantic.Any;
+            bool IsAlreadyConforming = false;
 
-            foreach (IAttachment AttachmentItem in node.AttachmentList)
-                if (index < AttachmentItem.AttachTypeList.Count)
-                    ConformanceError |= CheckConsistencyAnyReferenceOrValue(AttachmentItem, index, ref AttachmentType, ref AttachmentToAny);
-
-            if (!ConformanceError && !AttachmentToAny)
-                ConformanceError = CheckConsistencyAnyConformance(node, index);
-
-            return ConformanceError;
-        }
-
-        private bool CheckConsistencyAnyReferenceOrValue(IAttachment attachment, int index, ref BaseNode.CopySemantic attachmentType, ref bool attachmentToAny)
-        {
-            bool ConformanceError = false;
-            IObjectType AttachType = attachment.AttachTypeList[index];
-            ICompiledType DestinationType = AttachType.ResolvedType.Item;
-
-            if (DestinationType.IsReference)
+            for (int i = 0; i < indexAttachment; i++)
             {
-                if (attachmentType == BaseNode.CopySemantic.Value || attachmentToAny)
+                IAttachment Attachment = node.AttachmentList[i];
+                if (indexType < Attachment.AttachTypeList.Count)
                 {
-                    AddSourceError(new ErrorInvalidAttachment(attachment));
-                    ConformanceError = true;
-                }
-                else if (attachmentType == BaseNode.CopySemantic.Any)
-                    attachmentType = BaseNode.CopySemantic.Reference;
-            }
-            else if (DestinationType.IsValue)
-            {
-                if (attachmentType == BaseNode.CopySemantic.Reference || attachmentToAny)
-                {
-                    AddSourceError(new ErrorInvalidAttachment(attachment));
-                    ConformanceError = true;
-                }
-                else if (attachmentType == BaseNode.CopySemantic.Any)
-                    attachmentType = BaseNode.CopySemantic.Value;
-            }
-            else if (attachmentToAny)
-            {
-                AddSourceError(new ErrorInvalidAttachment(attachment));
-                ConformanceError = true;
-            }
-            else if (attachmentType != BaseNode.CopySemantic.Any)
-            {
-                AddSourceError(new ErrorInvalidAttachment(attachment));
-                ConformanceError = true;
-            }
-            else
-                attachmentToAny = true;
+                    IObjectType AttachedType = Attachment.AttachTypeList[indexType];
+                    ICompiledType PreviousDestinationType = AttachedType.ResolvedType.Item;
 
-            return ConformanceError;
-        }
-
-        private bool CheckConsistencyAnyConformance(IAttachmentInstruction node, int index)
-        {
-            bool ConformanceError = false;
-
-            for (int j = 0; j < node.AttachmentList.Count; j++)
-            {
-                IAttachment AttachmentItem = node.AttachmentList[j];
-                if (index < AttachmentItem.AttachTypeList.Count)
-                {
-                    IObjectType AttachType = AttachmentItem.AttachTypeList[index];
-                    ICompiledType DestinationType = AttachType.ResolvedType.Item;
-
-                    for (int k = 0; k < j; k++)
-                    {
-                        IAttachment PreviousAttachmentItem = node.AttachmentList[k];
-                        IObjectType PreviousAttachType = PreviousAttachmentItem.AttachTypeList[index];
-                        ICompiledType PreviousDestinationType = PreviousAttachType.ResolvedType.Item;
-
-                        if (ObjectType.TypeConformToBase(DestinationType, PreviousDestinationType, isConversionAllowed: false))
-                        {
-                            AddSourceError(new ErrorInvalidAttachment(AttachmentItem));
-                            ConformanceError = true;
-                        }
-                    }
+                    IsAlreadyConforming |= ObjectType.TypeConformToBase(destinationType, PreviousDestinationType, isConversionAllowed: false);
                 }
             }
 
-            return ConformanceError;
-        }
-
-        private bool CheckConsistencyTyped(IAttachmentInstruction node, int index, ICompiledType sourceType)
-        {
-            bool ConformanceError = false;
-            IClass EmbeddingClass = node.EmbeddingClass;
-
-            for (int j = 0; j < node.AttachmentList.Count; j++)
-            {
-                IAttachment AttachmentItem = node.AttachmentList[j];
-                if (index < AttachmentItem.AttachTypeList.Count)
-                {
-                    IObjectType AttachType = AttachmentItem.AttachTypeList[index];
-                    ICompiledType DestinationType = AttachType.ResolvedType.Item;
-
-                    if (!ObjectType.TypesHaveCommonDescendant(EmbeddingClass, DestinationType, sourceType))
-                    {
-                        AddSourceError(new ErrorInvalidAttachment(AttachmentItem));
-                        ConformanceError = true;
-                    }
-                    else
-                        for (int k = 0; k < j; k++)
-                        {
-                            IAttachment PreviousAttachmentItem = node.AttachmentList[k];
-                            IObjectType PreviousAttachType = PreviousAttachmentItem.AttachTypeList[index];
-                            ICompiledType PreviousDestinationType = PreviousAttachType.ResolvedType.Item;
-
-                            if (ObjectType.TypeConformToBase(DestinationType, PreviousDestinationType, isConversionAllowed: false))
-                            {
-                                AddSourceError(new ErrorInvalidAttachment(AttachmentItem));
-                                ConformanceError = true;
-                            }
-                        }
-                }
-            }
-
-            return ConformanceError;
+            return IsAlreadyConforming;
         }
 
         /// <summary>
