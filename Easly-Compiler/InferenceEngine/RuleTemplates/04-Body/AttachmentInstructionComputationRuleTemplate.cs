@@ -61,9 +61,6 @@
                 else if (MaxAttachmentCount < AttachmentItem.AttachTypeList.Count)
                     MaxAttachmentCount = AttachmentItem.AttachTypeList.Count;
 
-            bool[] AttachmentToAny = new bool[MaxAttachmentCount];
-            BaseNode.CopySemantic[] AttachmentType = new BaseNode.CopySemantic[MaxAttachmentCount];
-
             for (int i = 0; i < node.AttachmentList.Count; i++)
             {
                 IAttachment Attachment = node.AttachmentList[i];
@@ -82,7 +79,7 @@
                             return false;
                         }
                         else
-                            ConformanceError &= CheckConsistencyTyped(node, i, j, SourceType);
+                            ConformanceError &= CheckConsistencyTyped(node, i, j, DestinationType);
                     }
 
                 if (ConformanceError)
