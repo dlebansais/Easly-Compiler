@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
     using Easly;
 
@@ -51,20 +52,18 @@
             bool Success = true;
             data = null;
 
-            if (node.Anchor != BaseNode.Keyword.Current)
+            // The 'Current' case is handled in KeywordAnchoredTypeCurrentRuleTemplate.
+            Debug.Assert(node.Anchor != BaseNode.Keyword.Current);
+
+            IClass EmbeddingClass = node.EmbeddingClass;
+            IErrorList CheckErrorList = new ErrorList();
+            if (!KeywordExpression.IsKeywordAvailable(node.Anchor, node, CheckErrorList, out ITypeName ResultTypeName, out ICompiledType ResultType))
             {
-                IClass EmbeddingClass = node.EmbeddingClass;
-                IErrorList CheckErrorList = new ErrorList();
-                if (!KeywordExpression.IsKeywordAvailable(node.Anchor, node, CheckErrorList, out ITypeName ResultTypeName, out ICompiledType ResultType))
-                {
-                    AddSourceErrorList(CheckErrorList);
-                    Success = false;
-                }
-                else
-                    data = new Tuple<ITypeName, ICompiledType>(ResultTypeName, ResultType);
+                AddSourceErrorList(CheckErrorList);
+                Success = false;
             }
             else
-                data = new Tuple<ITypeName, ICompiledType>(Class.ClassAny.ResolvedClassTypeName.Item, Class.ClassAny.ResolvedClassType.Item);
+                data = new Tuple<ITypeName, ICompiledType>(ResultTypeName, ResultType);
 
             return Success;
         }

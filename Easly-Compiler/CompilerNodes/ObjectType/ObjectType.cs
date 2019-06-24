@@ -1659,30 +1659,5 @@
                     FillResultPath(baseClass, ResolvedFeatureType, null, validPath, index + 1, resultPath);
             }
         }
-
-        /// <summary>
-        /// Gets the type table of the provided type.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        public static ISealableDictionary<ITypeName, ICompiledType> GetTypeTable(ICompiledTypeWithFeature type)
-        {
-            ISealableDictionary<ITypeName, ICompiledType> Result = null;
-
-            switch (type)
-            {
-                case IClassType AsClassType:
-                case ITupleType AsTupleType:
-                    Result = type.GetTypeTable();
-                    break;
-
-                case IFormalGenericType AsFormalGenericType:
-                    Result = type.GetTypeTable();
-                    break;
-            }
-
-            Debug.Assert(Result != null);
-
-            return Result;
-        }
     }
 }

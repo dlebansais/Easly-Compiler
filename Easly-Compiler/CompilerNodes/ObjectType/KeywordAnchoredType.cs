@@ -126,7 +126,14 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 Debug.Assert(ResolvedTypeName.IsAssigned == ResolvedType.IsAssigned);
+                Debug.Assert(ResolvedOtherTypeName.IsAssigned == ResolvedOtherType.IsAssigned);
+                Debug.Assert(ResolvedCurrentTypeName.IsAssigned == ResolvedCurrentType.IsAssigned);
+
                 IsResolved = ResolvedType.IsAssigned;
+
+                Debug.Assert(ResolvedOtherType.IsAssigned || !IsResolved);
+                Debug.Assert(ResolvedCurrentType.IsAssigned || !IsResolved);
+
                 IsHandled = true;
             }
 
