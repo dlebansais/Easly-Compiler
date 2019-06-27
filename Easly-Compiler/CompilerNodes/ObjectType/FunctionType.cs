@@ -444,10 +444,16 @@ namespace CompilerNode
                 IScopeAttributeFeature OverloadAttribute2 = overload2.ResultList[i].ValidEntity.Item;
 
                 IsMatching &= OverloadAttribute1.ResolvedEffectiveType.Item == OverloadAttribute2.ResolvedEffectiveType.Item;
+                IsMatching &= IsResultNameMatching(OverloadAttribute1.EntityName.Text, OverloadAttribute2.EntityName.Text);
                 IsMatching &= IsDefaultValueMatching(OverloadAttribute1.DefaultValue, OverloadAttribute2.DefaultValue);
             }
 
             return IsMatching;
+        }
+
+        private static bool IsResultNameMatching(string name1, string name2)
+        {
+            return (name1 == nameof(BaseNode.Keyword.Result)) == (name2 == nameof(BaseNode.Keyword.Result));
         }
 
         private static bool IsDefaultValueMatching(IOptionalReference<IExpression> value1, IOptionalReference<IExpression> value2)

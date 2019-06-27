@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -14,10 +15,23 @@
         IList<ICSharpType> AttachTypeList { get; }
 
         /// <summary>
+        /// The attachment instructions;
+        /// </summary>
+        ICSharpScope Instructions { get; }
+
+        /// <summary>
         /// Writes down the C# attachment.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        void WriteCSharp(ICSharpWriter writer);
+        /// <param name="index">Index of the attachment in the list.</param>
+        /// <param name="destinationEntityList">The list of entities to attach.</param>
+        void WriteCSharpIf(ICSharpWriter writer, int index, IList<string> destinationEntityList);
+
+        /// <summary>
+        /// Writes down the C# attachment.
+        /// </summary>
+        /// <param name="writer">The stream on which to write.</param>
+        void WriteCSharpCase(ICSharpWriter writer);
     }
 
     /// <summary>
@@ -30,18 +44,20 @@
         /// Create a new C# attachment.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
-        public static ICSharpAttachment Create(ICSharpContext context, IAttachment source)
+        public static ICSharpAttachment Create(ICSharpContext context, ICSharpFeature parentFeature, IAttachment source)
         {
-            return new CSharpAttachment(context, source);
+            return new CSharpAttachment(context, parentFeature, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpAttachment"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
+        /// <param name="parentFeature">The parent feature.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
-        protected CSharpAttachment(ICSharpContext context, IAttachment source)
+        protected CSharpAttachment(ICSharpContext context, ICSharpFeature parentFeature, IAttachment source)
             : base(source)
         {
             foreach (IScopeAttributeFeature Entity in source.ResolvedLocalEntitiesList)
@@ -49,6 +65,8 @@
                 ICSharpType NewType = CSharpType.Create(context, Entity.ResolvedEffectiveType.Item);
                 AttachTypeList.Add(NewType);
             }
+
+            Instructions = CSharpScope.Create(context, parentFeature, (IScope)source.Instructions);
         }
         #endregion
 
@@ -57,6 +75,12 @@
         /// The list of attaching types.
         /// </summary>
         public IList<ICSharpType> AttachTypeList { get; } = new List<ICSharpType>();
+
+        /// <summary>
+        /// The attachment instructions;
+        /// </summary>
+        public ICSharpScope Instructions { get; }
+
         #endregion
 
         #region Client Interface
@@ -64,9 +88,47 @@
         /// Writes down the C# attachment.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        public virtual void WriteCSharp(ICSharpWriter writer)
+        /// <param name="index">Index of the attachment in the list.</param>
+        /// <param name="destinationEntityList">The list of entities to attach.</param>
+        public void WriteCSharpIf(ICSharpWriter writer, int index, IList<string> destinationEntityList)
         {
-            //TODO
+            Debug.Assert(destinationEntityList.Count >= AttachTypeList.Count);
+
+            string ElseIfText = index > 0 ? "else " : string.Empty;
+            string AttachmentText = string.Empty;
+
+            for (int i = 0; i < AttachTypeList.Count; i++)
+            {
+                string EntityText = $"Temp_{destinationEntityList[i]}";
+                string AttachedEntityText = $"{destinationEntityList[i]}{index}";
+                string TypeText = AttachTypeList[i].Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+                string TypeAttachmentText = $"({EntityText} is {TypeText} As{TypeText}{AttachedEntityText})";
+
+                if (AttachmentText.Length > 0)
+                    AttachmentText += " && ";
+
+                AttachmentText += TypeAttachmentText;
+            }
+
+            string IfLine = $"{ElseIfText}if ({AttachmentText})";
+
+            writer.WriteIndentedLine(IfLine);
+            Instructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Indifferent, false);
+        }
+
+        /// <summary>
+        /// Writes down the C# attachment.
+        /// </summary>
+        /// <param name="writer">The stream on which to write.</param>
+        public void WriteCSharpCase(ICSharpWriter writer)
+        {
+            Debug.Assert(AttachTypeList.Count == 1);
+
+            string TypeText = AttachTypeList[0].Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+            string AttachmentLine = $"case {TypeText} As{TypeText}:";
+
+            writer.WriteIndentedLine(AttachmentLine);
+            Instructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.AlreadyInserted, true);
         }
         #endregion
     }

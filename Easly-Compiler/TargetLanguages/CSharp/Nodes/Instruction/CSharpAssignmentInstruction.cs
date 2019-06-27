@@ -23,6 +23,11 @@
         /// The expression source of the assignment.
         /// </summary>
         ICSharpExpression SourceExpression { get; }
+
+        /// <summary>
+        /// The associated C# assignment.
+        /// </summary>
+        ICSharpAssignment Assignment { get; }
     }
 
     /// <summary>
@@ -67,6 +72,8 @@
                 ICSharpQualifiedName NewDestination = CSharpQualifiedName.Create(context, Destination, FinalFeature, null, false);
                 DestinationList.Add(NewDestination);
             }
+
+            Assignment = new CSharpAssignment(DestinationList, SourceExpression);
         }
         #endregion
 
@@ -85,6 +92,11 @@
         /// The expression source of the assignment.
         /// </summary>
         public ICSharpExpression SourceExpression { get; }
+
+        /// <summary>
+        /// The associated C# assignment.
+        /// </summary>
+        public ICSharpAssignment Assignment { get; }
         #endregion
 
         #region Client Interface
@@ -94,104 +106,7 @@
         /// <param name="writer">The stream on which to write.</param>
         public override void WriteCSharp(ICSharpWriter writer)
         {
-            if (DestinationList.Count > 1)
-            {
-                bool IsHandled = false;
-                switch (SourceExpression)
-                {
-                    case ICSharpQueryExpression AsQueryExpression:
-                    case ICSharpBinaryOperatorExpression AsBinaryOperatorExpression:
-                    case ICSharpPrecursorExpression AsPrecursorExpression:
-                        WriteCSharpMultiple(writer);
-                        IsHandled = true;
-                        break;
-
-                    default:
-                        /*
-                        string AssignementString = SourceExpression.CSharpText(writer, DestinationList, -1);
-                        writer.WriteIndentedLine($"{AssignementString};");
-                        */
-                        break;
-                }
-
-                Debug.Assert(IsHandled);
-            }
-            else
-                WriteCSharpSingle(writer);
-        }
-
-        private void WriteCSharpSingle(ICSharpWriter writer)
-        {
-            Debug.Assert(DestinationList.Count == 1);
-
-            ICSharpQualifiedName Destination = DestinationList[0];
-            ICSharpFeature Feature = Destination.Feature;
-
-            if (Destination.IsAttributeWithContract)
-            {
-                string SetterText = Destination.CSharpSetter(writer);
-                string SourceText = SourceExpression.CSharpText(writer);
-
-                writer.WriteIndentedLine($"{SetterText}({SourceText});");
-            }
-            else
-            {
-                string DestinationText = Destination.DecoratedCSharpText(writer, 0);
-                string SourceText = SourceExpression.CSharpText(writer);
-
-                writer.WriteIndentedLine($"{DestinationText} = {SourceText};");
-            }
-        }
-
-        private void WriteCSharpMultiple(ICSharpWriter writer)
-        {
-            IResultType SourceResult = SourceExpression.Source.ResolvedResult.Item;
-            Debug.Assert(SourceResult.Count >= DestinationList.Count);
-
-            int ResultNameIndex = SourceExpression.Source.ResolvedResult.Item.ResultNameIndex;
-
-            if (ResultNameIndex < 0)
-                WriteCSharpMultipleNoResult(writer);
-            else
-                WriteCSharpMultipleWithResult(writer, ResultNameIndex);
-
-            CopyComplexPaths(writer, ResultNameIndex);
-        }
-
-        private void WriteCSharpMultipleNoResult(ICSharpWriter writer)
-        {
-            string AssignementString = SourceExpression.CSharpText(writer, DestinationList, -1);
-            writer.WriteIndentedLine($"{AssignementString};");
-        }
-
-        private void WriteCSharpMultipleWithResult(ICSharpWriter writer, int resultNameIndex)
-        {
-            Debug.Assert(resultNameIndex < DestinationList.Count);
-            IList<IIdentifier> ValidPath = DestinationList[resultNameIndex].Source.ValidPath.Item;
-            Debug.Assert(ValidPath.Count == 1);
-
-            string ResultDestinationName = ValidPath[0].ValidText.Item;
-
-            string AssignementString = SourceExpression.CSharpText(writer, DestinationList, resultNameIndex);
-            writer.WriteIndentedLine($"{ResultDestinationName} = {AssignementString};");
-        }
-
-        private void CopyComplexPaths(ICSharpWriter writer, int resultNameIndex)
-        {
-            for (int i = 0; i < DestinationList.Count; i++)
-            {
-                if (i == resultNameIndex)
-                    continue;
-
-                ICSharpQualifiedName Destination = DestinationList[i];
-                if (!Destination.IsSimple)
-                {
-                    string DestinationText = Destination.CSharpText(writer, 0);
-                    string TempText = DestinationText.Replace('.', '_');
-
-                    writer.WriteIndentedLine($"{DestinationText} = Temp_{TempText};");
-                }
-            }
+            Assignment.WriteCSharp(writer, false, false, true, out IList<string> DestinationEntityList);
         }
         #endregion
     }

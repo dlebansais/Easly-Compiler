@@ -84,17 +84,19 @@
         /// <param name="featureCall">Details of the call.</param>
         public static string CSharpArgumentList(ICSharpUsingCollection usingCollection, ICSharpFeatureCall featureCall)
         {
-            return CSharpArgumentList(usingCollection, featureCall, new List<ICSharpQualifiedName>(), -1);
+            return CSharpArgumentList(usingCollection, false, false, featureCall, new List<ICSharpQualifiedName>(), -1);
         }
 
         /// <summary>
         /// Gets the source code of arguments of a feature call.
         /// </summary>
         /// <param name="usingCollection">The collection of using directives.</param>
+        /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
+        /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         /// <param name="featureCall">Details of the call.</param>
         /// <param name="destinationList">List of destination features.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        public static string CSharpArgumentList(ICSharpUsingCollection usingCollection, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
+        public static string CSharpArgumentList(ICSharpUsingCollection usingCollection, bool isNeverSimple, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
         {
             if (featureCall.Count == 0 && destinationList.Count == 0)
                 return string.Empty;
@@ -105,11 +107,11 @@
             {
                 case TypeArgumentStyles.None:
                 case TypeArgumentStyles.Positional:
-                    Result = CSharpPositionalArgumentList(usingCollection, featureCall, destinationList, skippedIndex);
+                    Result = CSharpPositionalArgumentList(usingCollection, isNeverSimple, isDeclaredInPlace, featureCall, destinationList, skippedIndex);
                     break;
 
                 case TypeArgumentStyles.Assignment:
-                    Result = CSharpAssignmentArgumentList(usingCollection, featureCall, destinationList, skippedIndex);
+                    Result = CSharpAssignmentArgumentList(usingCollection, isNeverSimple, isDeclaredInPlace, featureCall, destinationList, skippedIndex);
                     break;
             }
 
@@ -118,7 +120,7 @@
             return Result;
         }
 
-        private static string CSharpPositionalArgumentList(ICSharpUsingCollection usingCollection, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
+        private static string CSharpPositionalArgumentList(ICSharpUsingCollection usingCollection, bool isNeverSimple, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
         {
             IList<ICSharpParameter> ParameterList = featureCall.ParameterList;
             IList<ICSharpParameter> ResultList = featureCall.ResultList;
@@ -163,7 +165,7 @@
                 if (Result.Length > 0)
                     Result += ", ";
 
-                if (!Destination.IsSimple)
+                if (!Destination.IsSimple || isNeverSimple)
                 {
                     Debug.Assert(i < ResultList.Count);
                     ICSharpParameter ResultParameter = ResultList[i];
@@ -182,7 +184,7 @@
             return Result;
         }
 
-        private static string CSharpAssignmentArgumentList(ICSharpUsingCollection usingCollection, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
+        private static string CSharpAssignmentArgumentList(ICSharpUsingCollection usingCollection, bool isNeverSimple, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
         {
             IList<ICSharpParameter> ParameterList = featureCall.ParameterList;
             IList<ICSharpParameter> ResultList = featureCall.ResultList;

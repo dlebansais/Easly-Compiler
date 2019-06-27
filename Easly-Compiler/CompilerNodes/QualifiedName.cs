@@ -32,6 +32,34 @@
     /// </summary>
     public class QualifiedName : BaseNode.QualifiedName, IQualifiedName
     {
+        #region Init
+        /// <summary>
+        /// Initializes a new instance of the <see cref="QualifiedName"/> class.
+        /// This constructor is required for deserialization.
+        /// </summary>
+        public QualifiedName()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="QualifiedName"/> class.
+        /// </summary>
+        /// <param name="source">The pre-constructed source.</param>
+        /// <param name="sourceType">The qualified name resolved type.</param>
+        public QualifiedName(BaseNode.IQualifiedName source, IExpressionType sourceType)
+        {
+            Debug.Assert(source.Path.Count == 1);
+
+            BaseNode.IIdentifier Identifier = source.Path[0];
+            IIdentifier NewIdentifier = new Identifier(Identifier.Text);
+
+            ValidPath.Item = new List<IIdentifier>();
+            ValidPath.Item.Add(NewIdentifier);
+            ValidResultTypePath.Item = new List<IExpressionType>();
+            ValidResultTypePath.Item.Add(sourceType);
+        }
+        #endregion
+
         #region Implementation of ISource
         /// <summary>
         /// The parent node, null if root.

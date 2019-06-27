@@ -29,9 +29,11 @@
         /// Gets the source code corresponding to the expression.
         /// </summary>
         /// <param name="usingCollection">The collection of using directives.</param>
+        /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
+        /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         /// <param name="destinationList">List of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        string CSharpText(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList, int skippedIndex);
+        string CSharpText(ICSharpUsingCollection usingCollection, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex);
     }
 
     /// <summary>
@@ -185,9 +187,11 @@
         /// Gets the source code corresponding to the expression.
         /// </summary>
         /// <param name="usingCollection">The collection of using directives.</param>
+        /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
+        /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         /// <param name="destinationList">List of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        public abstract string CSharpText(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList, int skippedIndex);
+        public abstract string CSharpText(ICSharpUsingCollection usingCollection, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex);
         #endregion
     }
 }
