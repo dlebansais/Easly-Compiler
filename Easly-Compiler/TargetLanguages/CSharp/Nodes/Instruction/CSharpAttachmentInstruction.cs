@@ -76,7 +76,7 @@
 
             foreach (IAttachment Attachment in source.AttachmentList)
             {
-                ICSharpAttachment NewAttachment = CSharpAttachment.Create(context, parentFeature, Attachment);
+                ICSharpAttachment NewAttachment = CSharpAttachment.Create(context, this, Attachment);
                 AttachmentList.Add(NewAttachment);
             }
 

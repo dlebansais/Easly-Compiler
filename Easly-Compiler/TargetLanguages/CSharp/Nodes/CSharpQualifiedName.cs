@@ -170,7 +170,12 @@
 
                 IIdentifier Item = Source.ValidPath.Item[i];
                 ICSharpClass ItemClass = i < ClassPath.Count ? ClassPath[i] : null;
-                string ItemText = CSharpNames.ToCSharpIdentifier(Item.ValidText.Item);
+                string ItemText = Item.ValidText.Item;
+
+                if (i == 0 && usingCollection.AttachmentMap.ContainsKey(Item.ValidText.Item))
+                    ItemText = usingCollection.AttachmentMap[ItemText];
+                else
+                    ItemText = CSharpNames.ToCSharpIdentifier(ItemText);
 
                 if (ItemClass != null)
                     if (ItemClass.IsUnparameterizedSingleton && ItemClass.ValidSourceName != "Microsoft .NET")

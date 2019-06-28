@@ -10,6 +10,11 @@
     public interface ICSharpAttachment : ICSharpSource<IAttachment>
     {
         /// <summary>
+        /// The parent instruction.
+        /// </summary>
+        ICSharpAttachmentInstruction ParentInstruction { get; }
+
+        /// <summary>
         /// The list of attaching types.
         /// </summary>
         IList<ICSharpType> AttachTypeList { get; }
@@ -44,33 +49,40 @@
         /// Create a new C# attachment.
         /// </summary>
         /// <param name="context">The creation context.</param>
-        /// <param name="parentFeature">The parent feature.</param>
+        /// <param name="parentInstruction">The parent instruction.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
-        public static ICSharpAttachment Create(ICSharpContext context, ICSharpFeature parentFeature, IAttachment source)
+        public static ICSharpAttachment Create(ICSharpContext context, ICSharpAttachmentInstruction parentInstruction, IAttachment source)
         {
-            return new CSharpAttachment(context, parentFeature, source);
+            return new CSharpAttachment(context, parentInstruction, source);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpAttachment"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
-        /// <param name="parentFeature">The parent feature.</param>
+        /// <param name="parentInstruction">The parent instruction.</param>
         /// <param name="source">The Easly node from which the C# node is created.</param>
-        protected CSharpAttachment(ICSharpContext context, ICSharpFeature parentFeature, IAttachment source)
+        protected CSharpAttachment(ICSharpContext context, ICSharpAttachmentInstruction parentInstruction, IAttachment source)
             : base(source)
         {
+            ParentInstruction = parentInstruction;
+
             foreach (IScopeAttributeFeature Entity in source.ResolvedLocalEntitiesList)
             {
                 ICSharpType NewType = CSharpType.Create(context, Entity.ResolvedEffectiveType.Item);
                 AttachTypeList.Add(NewType);
             }
 
-            Instructions = CSharpScope.Create(context, parentFeature, (IScope)source.Instructions);
+            Instructions = CSharpScope.Create(context, parentInstruction.ParentFeature, (IScope)source.Instructions);
         }
         #endregion
 
         #region Properties
+        /// <summary>
+        /// The parent instruction.
+        /// </summary>
+        public ICSharpAttachmentInstruction ParentInstruction { get; }
+
         /// <summary>
         /// The list of attaching types.
         /// </summary>
@@ -102,18 +114,25 @@
                 string EntityText = $"Temp_{destinationEntityList[i]}";
                 string AttachedEntityText = $"{destinationEntityList[i]}{index}";
                 string TypeText = AttachTypeList[i].Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
-                string TypeAttachmentText = $"({EntityText} is {TypeText} As{TypeText}{AttachedEntityText})";
+                string NameAttached = $"As{TypeText}{AttachedEntityText}";
+
+                string TypeAttachmentText = $"({EntityText} is {TypeText} {NameAttached})";
 
                 if (AttachmentText.Length > 0)
                     AttachmentText += " && ";
 
                 AttachmentText += TypeAttachmentText;
+
+                writer.AddAttachment(destinationEntityList[i], NameAttached);
             }
 
             string IfLine = $"{ElseIfText}if ({AttachmentText})";
 
             writer.WriteIndentedLine(IfLine);
             Instructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Indifferent, false);
+
+            for (int i = 0; i < AttachTypeList.Count; i++)
+                writer.RemoveAttachment(destinationEntityList[i]);
         }
 
         /// <summary>

@@ -78,6 +78,11 @@
         /// Current indentation level.
         /// </summary>
         public int IndentLevel { get; private set; }
+
+        /// <summary>
+        /// Map of attached variable names.
+        /// </summary>
+        public IDictionary<string, string> AttachmentMap { get; } = new Dictionary<string, string>();
         #endregion
 
         #region Client Interface
@@ -133,6 +138,29 @@
             Debug.Assert(IndentLevel > 0);
 
             IndentLevel--;
+        }
+
+        /// <summary>
+        /// Adds a name and its corresponding attached name to the attachment map.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="nameAttached">The corresponding attached name.</param>
+        public void AddAttachment(string name, string nameAttached)
+        {
+            Debug.Assert(!AttachmentMap.ContainsKey(name));
+
+            AttachmentMap.Add(name, nameAttached);
+        }
+
+        /// <summary>
+        /// Removes a name and its corresponding attached name from the attachment map.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        public void RemoveAttachment(string name)
+        {
+            Debug.Assert(AttachmentMap.ContainsKey(name));
+
+            AttachmentMap.Remove(name);
         }
 
         /// <summary>
