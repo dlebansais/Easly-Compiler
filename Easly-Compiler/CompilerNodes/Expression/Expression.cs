@@ -210,12 +210,15 @@ namespace CompilerNode
             if (resultType.TryGetResult(out ICompiledType FinalType))
             {
                 bool IsBooleanTypeAvailable = IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, expression, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
+                bool IsEventTypeAvailable = IsLanguageTypeAvailable(LanguageClasses.Event.Guid, expression, out ITypeName EventTypeName, out ICompiledType EventType);
                 bool IsNumberTypeAvailable = IsLanguageTypeAvailable(LanguageClasses.Number.Guid, expression, out ITypeName NumberTypeName, out ICompiledType NumberType);
                 bool IsCharacterTypeAvailable = IsLanguageTypeAvailable(LanguageClasses.Character.Guid, expression, out ITypeName CharacterTypeName, out ICompiledType CharacterType);
                 bool IsStringTypeAvailable = IsLanguageTypeAvailable(LanguageClasses.String.Guid, expression, out ITypeName StringTypeName, out ICompiledType StringType);
 
                 if (IsBooleanTypeAvailable && FinalType == BooleanType)
                     Constant = new BooleanLanguageConstant();
+                else if (IsEventTypeAvailable && FinalType == EventType)
+                    Constant = NeutralLanguageConstant.NotConstant;
                 else if (IsNumberTypeAvailable && FinalType == NumberType)
                     Constant = new NumberLanguageConstant();
                 else if (IsCharacterTypeAvailable && FinalType == CharacterType)

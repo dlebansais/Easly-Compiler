@@ -19,7 +19,7 @@
             { LanguageClasses.ConstantEntity.Guid, "ConstantEntity" },
             { LanguageClasses.Entity.Guid, "Entity" },
             { LanguageClasses.ProcedureEntity.Guid, "ProcedureEntity" },
-            { LanguageClasses.Event.Guid, "event" },
+            { LanguageClasses.Event.Guid, "Event" },
             { LanguageClasses.Number.Guid, "int" },
             { LanguageClasses.PropertyEntity.Guid, "PropertyEntity" },
             { LanguageClasses.IndexerEntity.Guid, "IndexerEntity" },
@@ -48,6 +48,39 @@
             { LanguageClasses.BitFieldEnumeration.Guid, "enum" },
             { LanguageClasses.FunctionEntity.Guid, "FunctionEntity" },
             { LanguageClasses.UniversallyUniqueIdentifier.Guid, "Guid" },
+        };
+
+        public static Dictionary<string, string> NameUsingTable { get; } = new Dictionary<string, string>()
+        {
+            { "AttributeEntity", "Easly" },
+            { "ConstantEntity", "Easly" },
+            { "Entity", "Easly" },
+            { "ProcedureEntity", "Easly" },
+            { "Event", "Easly" },
+            { "PropertyEntity", "Easly" },
+            { "IndexerEntity", "Easly" },
+            { "LocalEntity", "Easly" },
+            { "OnceReference", "Easly" },
+            { "OverLoopSource", "Easly" },
+            { "AnyOnceReference", "Easly" },
+            { "OptionalReference", "Easly" },
+            { "DateTime", "System" },
+            { "AnyDetachableReference", "Easly" },
+            { "AnyOptionalReference", "Easly" },
+            { "FeatureEntity", "Easly" },
+            { "KeyValuePair", "System.Collections.Generic" },
+            { "SpecializedTypeEntity", "Easly" },
+            { "DetachableReference", "Easly" },
+            { "NamedFeatureEntity", "Easly" },
+            { "StableReference", "Easly" },
+            { "AnyStableReference", "Easly" },
+            { "Dictionary", "System.Collections.Generic" },
+            { "List", "System.Collections.Generic" },
+            { "Exception", "System" },
+            { "SealableHashtable", "Easly" },
+            { "TypeEntity", "Easly" },
+            { "FunctionEntity", "Easly" },
+            { "Guid", "System" },
         };
     }
 }

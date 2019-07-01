@@ -148,7 +148,14 @@
             else if (BaseClassGuid == LanguageClasses.StableReference.Guid)
                 Result = "StableReference" + TypeArguments2CSharpName(usingCollection, TypeArgumentList, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
             else if (LanguageClasses.GuidToName.ContainsKey(BaseClassGuid))
+            {
                 Result = CSharpLanguageClasses.GuidToName[BaseClassGuid];
+                if (CSharpLanguageClasses.NameUsingTable.ContainsKey(Result))
+                {
+                    string UsingDirective = CSharpLanguageClasses.NameUsingTable[Result];
+                    usingCollection.AddUsing(UsingDirective);
+                }
+            }
             else
             {
                 string ClassName;

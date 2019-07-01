@@ -155,26 +155,24 @@
                 writer.WriteIndentedLine($"{ExportString} event {TypeString} {AttributeString};");
             else if (Type.GetSingletonString(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None, out string SingletonString))
                 writer.WriteIndentedLine($"{ExportString} {TypeString} {AttributeString} {{ get {{ return {SingletonString}; }} }}");
-            else
+            else if (EnsureList.Count > 0)
             {
-                writer.WriteIndentedLine($"{ExportString} {TypeString} {AttributeString} {{ get; protected set; }}");
+                writer.WriteIndentedLine($"{ExportString} {TypeString} {AttributeString} {{ get; private set; }}");
+                writer.WriteIndentedLine($"protected void Set_{AttributeString}({TypeString} value)");
+                writer.WriteIndentedLine("{");
+                writer.IncreaseIndent();
 
-                if (EnsureList.Count > 0)
-                {
-                    writer.WriteIndentedLine($"protected void Set_{AttributeString}({TypeString} value)");
-                    writer.WriteIndentedLine("{");
-                    writer.IncreaseIndent();
+                writer.WriteIndentedLine($"{AttributeString} = value;");
 
-                    writer.WriteIndentedLine($"{AttributeString} = value;");
+                writer.WriteEmptyLine();
+                foreach (ICSharpAssertion Assertion in EnsureList)
+                    Assertion.WriteCSharp(writer);
 
-                    writer.WriteEmptyLine();
-                    foreach (ICSharpAssertion Assertion in EnsureList)
-                        Assertion.WriteCSharp(writer);
-
-                    writer.DecreaseIndent();
-                    writer.WriteIndentedLine("}");
-                }
+                writer.DecreaseIndent();
+                writer.WriteIndentedLine("}");
             }
+            else
+                writer.WriteIndentedLine($"{ExportString} {TypeString} {AttributeString} {{ get; protected set; }}");
         }
         #endregion
     }

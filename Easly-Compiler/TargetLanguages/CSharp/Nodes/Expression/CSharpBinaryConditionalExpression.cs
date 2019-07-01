@@ -112,22 +112,22 @@
             string LeftText = LeftExpression.CSharpText(usingCollection);
             string RightText = RightExpression.CSharpText(usingCollection);
 
-            string WaitName = null;
+            string OperatorName = null;
 
             switch (Source.Conditional)
             {
                 case BaseNode.ConditionalTypes.And:
-                    WaitName = "WaitAll";
+                    OperatorName = "&&";
                     break;
 
                 case BaseNode.ConditionalTypes.Or:
-                    WaitName = "WaitAny";
+                    OperatorName = "||";
                     break;
             }
 
-            Debug.Assert(WaitName != null);
+            Debug.Assert(OperatorName != null);
 
-            return $"Event.{WaitName}(new Event[] {{ {LeftText}, {RightText} }})";
+            return $"({LeftText} {OperatorName} {RightText}).IsSignaled";
         }
 
         private string CSharpTextBoolean(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList)

@@ -17,7 +17,7 @@
         /// <summary>
         /// Sets the <see cref="IsEventExpression"/> property.
         /// </summary>
-        void SetIsEventExpression(bool isEventExpression);
+        void SetIsEventExpression();
     }
 
     /// <summary>
@@ -195,9 +195,9 @@
         /// <summary>
         /// Sets the <see cref="IsEventExpression"/> property.
         /// </summary>
-        public void SetIsEventExpression(bool isEventExpression)
+        public void SetIsEventExpression()
         {
-            IsEventExpression = isEventExpression;
+            IsEventExpression = true;
         }
 
         /// <summary>
@@ -238,12 +238,23 @@
                 return false;
             }
 
-            node.SetIsEventExpression(LeftExpressionClassType != BooleanType);
+            bool IsEventExpression = LeftExpressionClassType != BooleanType;
+            if (IsEventExpression)
+            {
+                if (!((node.ParentSource is IBinaryConditionalExpression) || (node.ParentSource is IConditional) || (node.ParentSource is ICheckInstruction)))
+                {
+                    errorList.AddError(new ErrorInvalidExpression(node));
+                    return false;
+                }
+
+                node.SetIsEventExpression();
+                resolvedResult = new ResultType(EventTypeName, EventType, string.Empty);
+            }
+            else
+                resolvedResult = new ResultType(BooleanTypeName, BooleanType, string.Empty);
 
             constantSourceList.Add(LeftExpression);
             constantSourceList.Add(RightExpression);
-
-            resolvedResult = new ResultType(BooleanTypeName, BooleanType, string.Empty);
 
             resolvedException = new ResultException();
             ResultException.Merge(resolvedException, LeftExpression.ResolvedException);
