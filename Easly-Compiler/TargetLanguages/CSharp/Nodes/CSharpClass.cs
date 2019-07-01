@@ -1034,6 +1034,7 @@
                     sw.WriteLine("  </ItemGroup>");
                     sw.WriteLine("  <ItemGroup>");
                     sw.WriteLine("    <Compile Include=\"Language\\DetachableReference.cs\" />");
+                    sw.WriteLine("    <Compile Include=\"Language\\Event.cs\" />");
                     sw.WriteLine("    <Compile Include=\"Language\\OnceReference.cs\" />");
                     sw.WriteLine("    <Compile Include=\"Language\\OptionalReference.cs\" />");
                     sw.WriteLine("    <Compile Include=\"Language\\StableReference.cs\" />");
