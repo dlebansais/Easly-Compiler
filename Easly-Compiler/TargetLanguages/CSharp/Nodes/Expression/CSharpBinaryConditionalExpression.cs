@@ -123,6 +123,14 @@
                 case BaseNode.ConditionalTypes.Or:
                     OperatorName = "||";
                     break;
+
+                case BaseNode.ConditionalTypes.Xor:
+                    OperatorName = "^";
+                    break;
+
+                case BaseNode.ConditionalTypes.Implies:
+                    OperatorName = "/";
+                    break;
             }
 
             Debug.Assert(OperatorName != null);
@@ -135,22 +143,31 @@
             string LeftText = NestedExpressionText(usingCollection, LeftExpression);
             string RightText = NestedExpressionText(usingCollection, RightExpression);
 
-            string OperatorName = null;
-
-            switch (Source.Conditional)
+            if (Source.Conditional == BaseNode.ConditionalTypes.Implies)
+                return $"!{LeftText} || {RightText}";
+            else
             {
-                case BaseNode.ConditionalTypes.And:
-                    OperatorName = "&&";
-                    break;
+                string OperatorName = null;
 
-                case BaseNode.ConditionalTypes.Or:
-                    OperatorName = "||";
-                    break;
+                switch (Source.Conditional)
+                {
+                    case BaseNode.ConditionalTypes.And:
+                        OperatorName = "&&";
+                        break;
+
+                    case BaseNode.ConditionalTypes.Or:
+                        OperatorName = "||";
+                        break;
+
+                    case BaseNode.ConditionalTypes.Xor:
+                        OperatorName = "^";
+                        break;
+                }
+
+                Debug.Assert(OperatorName != null);
+
+                return $"{LeftText} {OperatorName} {RightText}";
             }
-
-            Debug.Assert(OperatorName != null);
-
-            return $"{LeftText} {OperatorName} {RightText}";
         }
 
         private string NestedExpressionText(ICSharpUsingCollection usingCollection, ICSharpExpression expression)

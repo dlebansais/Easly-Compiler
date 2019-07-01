@@ -92,6 +92,14 @@
                         case BaseNode.ConditionalTypes.Or:
                             ExpressionConstant = new BooleanLanguageConstant(LeftConstantValue.Value || RightConstantValue.Value);
                             break;
+
+                        case BaseNode.ConditionalTypes.Xor:
+                            ExpressionConstant = new BooleanLanguageConstant(LeftConstantValue.Value ^ RightConstantValue.Value);
+                            break;
+
+                        case BaseNode.ConditionalTypes.Implies:
+                            ExpressionConstant = new BooleanLanguageConstant(!LeftConstantValue.Value || RightConstantValue.Value);
+                            break;
                     }
 
                     Debug.Assert(ExpressionConstant is IBooleanLanguageConstant);
