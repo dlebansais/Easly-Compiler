@@ -53,21 +53,27 @@
                 AddSourceError(new ErrorInvalidExpression(BooleanExpression));
                 Success = false;
             }
-            else if (!Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType))
-            {
-                AddSourceError(new ErrorBooleanTypeMissing(node));
-                Success = false;
-            }
             else
             {
-                IExpressionType ContractType = ResolvedResult.At(0);
-                if (ContractType.ValueType != BooleanType)
+                bool IsBooleanTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
+                bool IsEventTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Event.Guid, node, out ITypeName EventTypeName, out ICompiledType EventType);
+
+                if (!IsBooleanTypeAvailable && !IsEventTypeAvailable)
                 {
-                    AddSourceError(new ErrorInvalidExpression(BooleanExpression));
+                    AddSourceError(new ErrorBooleanTypeMissing(node));
                     Success = false;
                 }
                 else
-                    data = BooleanExpression.ResolvedException.Item;
+                {
+                    IExpressionType ContractType = ResolvedResult.At(0);
+                    if (ContractType.ValueType != BooleanType && ContractType.ValueType != EventType)
+                    {
+                        AddSourceError(new ErrorInvalidExpression(BooleanExpression));
+                        Success = false;
+                    }
+                    else
+                        data = BooleanExpression.ResolvedException.Item;
+                }
             }
 
             return Success;

@@ -20,6 +20,11 @@
         bool IsComplex { get; }
 
         /// <summary>
+        /// True if the expression returns only one result.
+        /// </summary>
+        bool IsSingleResult { get; }
+
+        /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
         /// <param name="usingCollection">The collection of using directives.</param>
@@ -174,6 +179,11 @@
         /// True if the expression is complex (and requires to be surrounded with parenthesis).
         /// </summary>
         public virtual bool IsComplex { get { return Source.IsComplex; } }
+
+        /// <summary>
+        /// True if the expression returns only one result.
+        /// </summary>
+        public virtual bool IsSingleResult { get { return Source.ResolvedResult.Item.Count == 1; } }
         #endregion
 
         #region Client Interface

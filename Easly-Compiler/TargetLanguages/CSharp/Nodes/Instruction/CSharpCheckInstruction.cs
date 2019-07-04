@@ -69,7 +69,8 @@
         {
             string ExpressionText = BooleanExpression.CSharpText(writer);
 
-            writer.WriteIndentedLine("Debug.Assert({ExpressionText});");
+            writer.WriteIndentedLine($"Debug.Assert({ExpressionText});");
+            writer.AddUsing("System.Diagnostics");
         }
         #endregion
     }

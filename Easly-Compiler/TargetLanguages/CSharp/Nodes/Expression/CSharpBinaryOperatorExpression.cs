@@ -69,7 +69,16 @@
                     if (AsClassType.BaseClass.ClassGuid == LanguageClasses.Number.Guid)
                         IsCallingNumberFeature = true;
             }
+
+            if (!LeftExpression.IsSingleResult || !RightExpression.IsSingleResult)
+            {
+                RightAssignment = new CSharpAssignment(context, "temp", RightExpression);
+                LeftAssignment = new CSharpAssignment(context, "temp", LeftExpression);
+            }
         }
+
+        ICSharpAssignment RightAssignment;
+        ICSharpAssignment LeftAssignment;
         #endregion
 
         #region Properties
@@ -119,19 +128,64 @@
         /// <param name="skippedIndex">Index of a destination to skip.</param>
         public override string CSharpText(ICSharpUsingCollection usingCollection, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
         {
-            string LeftText = NestedExpressionText(usingCollection, LeftExpression);
-            string RightText = NestedExpressionText(usingCollection, RightExpression);
             string OperatorText = Operator.Name;
 
             if (IsCallingNumberFeature)
             {
-                if (OperatorText == "≥")
-                    OperatorText = ">=";
-                else if (OperatorText == "≤")
-                    OperatorText = "<=";
+                switch (OperatorText)
+                {
+                    case "≥":
+                        OperatorText = ">=";
+                        break;
+                    case "≤":
+                        OperatorText = "<=";
+                        break;
+                    case "shift right":
+                        OperatorText = ">>";
+                        break;
+                    case "shift left":
+                        OperatorText = "<<";
+                        break;
+                    case "modulo":
+                        OperatorText = "%";
+                        break;
+                    case "bitwise and":
+                        OperatorText = "&";
+                        break;
+                    case "bitwise or":
+                        OperatorText = "|";
+                        break;
+                    case "bitwise xor":
+                        OperatorText = "^";
+                        break;
+                }
             }
+            else
+                OperatorText = CSharpNames.ToCSharpIdentifier(OperatorText);
 
-            return $"{LeftText} {OperatorText} {RightText}";
+            if (IsCallingNumberFeature)
+            {
+                string LeftText = NestedExpressionText(usingCollection, LeftExpression);
+                string RightText = NestedExpressionText(usingCollection, RightExpression);
+
+                return $"{LeftText} {OperatorText} {RightText}";
+            }
+            else if (LeftExpression.IsSingleResult && RightExpression.IsSingleResult)
+            {
+                string LeftText = NestedExpressionText(usingCollection, LeftExpression);
+                string RightText = RightExpression.CSharpText(usingCollection);
+
+                return $"{LeftText}.{OperatorText}({RightText})";
+            }
+            else
+            {
+                RightAssignment.WriteCSharp(usingCollection as ICSharpWriter, true, true, false, out IList<string> DestinationEntityList);
+
+                string LeftText = NestedExpressionText(usingCollection, LeftExpression);
+                string RightText = RightExpression.CSharpText(usingCollection);
+
+                return $"{LeftText}.{OperatorText}({RightText})";
+            }
         }
 
         private string NestedExpressionText(ICSharpUsingCollection usingCollection, ICSharpExpression expression)

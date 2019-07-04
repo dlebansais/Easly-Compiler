@@ -78,6 +78,37 @@
 
             SourceExpression = sourceExpression;
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CSharpAssignment"/> class.
+        /// </summary>
+        /// <param name="context">The creation context.</param>
+        /// <param name="tempPrefix">The prefix to add to destination names.</param>
+        /// <param name="sourceExpression">The expression source of the assignment.</param>
+        public CSharpAssignment(ICSharpContext context, string tempPrefix, ICSharpExpression sourceExpression)
+        {
+            DestinationList = new List<ICSharpQualifiedName>();
+            IResultType ResolvedResult = sourceExpression.Source.ResolvedResult.Item;
+
+            for (int i = 0; i < ResolvedResult.Count; i++)
+            {
+                IExpressionType Result = ResolvedResult.At(i);
+
+                string Text = Result.Name;
+                BaseNode.IQualifiedName BaseNodeDestination = BaseNodeHelper.NodeHelper.CreateSimpleQualifiedName(Text);
+                IExpressionType DestinationType = ResolvedResult.At(i);
+
+                IQualifiedName Destination = new QualifiedName(BaseNodeDestination, DestinationType);
+
+                IScopeAttributeFeature DestinationAttributeFeature = new ScopeAttributeFeature(sourceExpression.Source, Text, DestinationType.ValueTypeName, DestinationType.ValueType);
+                ICSharpScopeAttributeFeature DestinationFeature = CSharpScopeAttributeFeature.Create(context, null, DestinationAttributeFeature);
+
+                ICSharpQualifiedName CSharpDestination = CSharpQualifiedName.Create(context, Destination, DestinationFeature, null, false);
+                DestinationList.Add(CSharpDestination);
+            }
+
+            SourceExpression = sourceExpression;
+        }
         #endregion
 
         #region Properties

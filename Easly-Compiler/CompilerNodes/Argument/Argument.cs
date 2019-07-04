@@ -354,7 +354,7 @@ namespace CompilerNode
                     }
                 }
 
-                if (IsMatching)
+                if (IsMatching && j == arguments.Count)
                 {
                     Debug.Assert(!SelectedOverload.IsAssigned);
 
