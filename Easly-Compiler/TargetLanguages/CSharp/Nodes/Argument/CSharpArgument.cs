@@ -84,7 +84,8 @@
         /// <param name="featureCall">Details of the call.</param>
         public static string CSharpArgumentList(ICSharpWriter writer, ICSharpFeatureCall featureCall)
         {
-            return CSharpArgumentList(writer, false, false, featureCall, new List<ICSharpQualifiedName>(), -1);
+            CSharpArgumentList(writer, false, false, featureCall, new List<ICSharpQualifiedName>(), -1, out string callText, out string resultText);
+            return callText;
         }
 
         /// <summary>
@@ -96,56 +97,61 @@
         /// <param name="featureCall">Details of the call.</param>
         /// <param name="destinationList">List of destination features.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        public static string CSharpArgumentList(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
+        /// <param name="callText">The string to use for a call upon return.</param>
+        /// <param name="resultText">The string to use for a nested call with the result upon return.</param>
+        public static void CSharpArgumentList(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string callText, out string resultText)
         {
             if (featureCall.Count == 0 && destinationList.Count == 0)
-                return string.Empty;
+            {
+                callText = string.Empty;
+                resultText = string.Empty;
+            }
 
-            string Result = null;
+            callText = null;
+            resultText = null;
 
             switch (featureCall.ArgumentStyle)
             {
                 case TypeArgumentStyles.None:
                 case TypeArgumentStyles.Positional:
-                    Result = CSharpPositionalArgumentList(writer, isNeverSimple, isDeclaredInPlace, featureCall, destinationList, skippedIndex);
+                    CSharpPositionalArgumentList(writer, isNeverSimple, isDeclaredInPlace, featureCall, destinationList, skippedIndex, out callText, out resultText);
                     break;
 
                 case TypeArgumentStyles.Assignment:
-                    Result = CSharpAssignmentArgumentList(writer, isNeverSimple, isDeclaredInPlace, featureCall, destinationList, skippedIndex);
+                    CSharpAssignmentArgumentList(writer, isNeverSimple, isDeclaredInPlace, featureCall, destinationList, skippedIndex, out callText, out resultText);
                     break;
             }
 
-            Debug.Assert(Result != null);
-
-            return Result;
+            Debug.Assert(callText != null);
+            Debug.Assert(resultText != null);
         }
 
-        private static string CSharpPositionalArgumentList(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
+        private static void CSharpPositionalArgumentList(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string callText, out string resultText)
         {
             IList<ICSharpParameter> ParameterList = featureCall.ParameterList;
             IList<ICSharpParameter> ResultList = featureCall.ResultList;
             IList<ICSharpArgument> ArgumentList = featureCall.ArgumentList;
 
             int i;
-            string Result = string.Empty;
+            callText = string.Empty;
 
             for (i = 0; i < ArgumentList.Count; i++)
             {
-                if (Result.Length > 0)
-                    Result += ", ";
+                if (callText.Length > 0)
+                    callText += ", ";
 
                 ICSharpPositionalArgument Argument = ArgumentList[i] as ICSharpPositionalArgument;
                 Debug.Assert(Argument != null);
 
                 ICSharpExpression SourceExpression = Argument.SourceExpression;
 
-                Result += SourceExpression.CSharpText(writer);
+                callText += SourceExpression.CSharpText(writer);
             }
 
             for (; i < ParameterList.Count; i++)
             {
-                if (Result.Length > 0)
-                    Result += ", ";
+                if (callText.Length > 0)
+                    callText += ", ";
 
                 ICSharpParameter Parameter = ParameterList[i];
                 ICSharpScopeAttributeFeature Feature = Parameter.Feature;
@@ -153,50 +159,25 @@
 
                 Debug.Assert(DefaultValue != null);
 
-                Result += DefaultValue.CSharpText(writer);
+                callText += DefaultValue.CSharpText(writer);
             }
 
-            for (i = 0; i < destinationList.Count; i++)
-            {
-                ICSharpQualifiedName Destination = destinationList[i];
-                if (i == skippedIndex)
-                    continue;
-
-                if (Result.Length > 0)
-                    Result += ", ";
-
-                if (!Destination.IsSimple || isNeverSimple)
-                {
-                    Debug.Assert(i < ResultList.Count);
-                    ICSharpParameter ResultParameter = ResultList[i];
-
-                    string TempTypeText = ResultParameter.Feature.Type.Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
-                    string TempText = Destination.CSharpText(writer, 0).Replace('.', '_');
-                    Result += $"out {TempTypeText} Temp_{TempText}";
-                }
-                else
-                {
-                    string DestinationText = Destination.CSharpText(writer, 0);
-                    Result += $"out {DestinationText}";
-                }
-            }
-
-            return Result;
+            CSharpAssignmentResultList(writer, isNeverSimple, featureCall, destinationList, skippedIndex, ref callText, out resultText);
         }
 
-        private static string CSharpAssignmentArgumentList(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
+        private static void CSharpAssignmentArgumentList(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string callText, out string resultText)
         {
             IList<ICSharpParameter> ParameterList = featureCall.ParameterList;
             IList<ICSharpParameter> ResultList = featureCall.ResultList;
             IList<ICSharpArgument> ArgumentList = featureCall.ArgumentList;
 
-            string Result = string.Empty;
             int i;
+            callText = string.Empty;
 
             for (i = 0; i < ParameterList.Count; i++)
             {
-                if (Result.Length > 0)
-                    Result += ", ";
+                if (callText.Length > 0)
+                    callText += ", ";
 
                 ICSharpParameter Parameter = ParameterList[i];
                 string ParameterName = Parameter.Name;
@@ -212,7 +193,7 @@
                         }
 
                 if (SourceExpression != null)
-                    Result += SourceExpression.CSharpText(writer);
+                    callText += SourceExpression.CSharpText(writer);
                 else
                 {
                     ICSharpScopeAttributeFeature Feature = Parameter.Feature;
@@ -220,32 +201,48 @@
 
                     Debug.Assert(DefaultValue != null);
 
-                    Result += DefaultValue.CSharpText(writer);
+                    callText += DefaultValue.CSharpText(writer);
                 }
             }
 
-            for (i = 0; i < destinationList.Count; i++)
+            CSharpAssignmentResultList(writer, isNeverSimple, featureCall, destinationList, skippedIndex, ref callText, out resultText);
+        }
+
+        private static void CSharpAssignmentResultList(ICSharpWriter writer, bool isNeverSimple, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex, ref string callText, out string resultText)
+        {
+            IList<ICSharpParameter> ResultList = featureCall.ResultList;
+
+            resultText = string.Empty;
+
+            for (int i = 0; i < destinationList.Count; i++)
             {
                 ICSharpQualifiedName Destination = destinationList[i];
                 if (i == skippedIndex)
                     continue;
 
-                if (Result.Length > 0)
-                    Result += ", ";
+                if (callText.Length > 0)
+                    callText += ", ";
 
-                if (!Destination.IsSimple)
+                if (resultText.Length > 0)
+                    resultText += ", ";
+
+                if (!Destination.IsSimple || isNeverSimple)
                 {
+                    Debug.Assert(i < ResultList.Count);
+                    ICSharpParameter callTextParameter = ResultList[i];
+
+                    string TempTypeText = callTextParameter.Feature.Type.Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
                     string TempText = Destination.CSharpText(writer, 0).Replace('.', '_');
-                    Result += $"out Temp_{TempText}";
+                    callText += $"out {TempTypeText} Temp_{TempText}";
+                    resultText += $"Temp_{TempText}";
                 }
                 else
                 {
                     string DestinationText = Destination.CSharpText(writer, 0);
-                    Result += $"out {DestinationText}";
+                    callText += $"out {DestinationText}";
+                    resultText += DestinationText;
                 }
             }
-
-            return Result;
         }
 
         /// <summary>

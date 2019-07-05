@@ -39,12 +39,13 @@
         /// Writes down the C# instruction.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
+        /// <param name="expressionContext">The context.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         /// <param name="destinationList">List of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
         /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
-        void WriteCSharp(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText);
+        void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText);
     }
 
     /// <summary>
@@ -208,18 +209,24 @@
         /// Gets the source code corresponding to the expression.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        public abstract string CSharpText(ICSharpWriter writer);
+        public virtual string CSharpText(ICSharpWriter writer)
+        {
+            ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
+            WriteCSharp(writer, ExpressionContext, false, false, new List<ICSharpQualifiedName>(), -1, out string LastExpressionText);
+            return LastExpressionText;
+        }
 
         /// <summary>
         /// Writes down the C# instruction.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
+        /// <param name="expressionContext">The context.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         /// <param name="destinationList">List of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
         /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
-        public abstract void WriteCSharp(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText);
+        public abstract void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText);
         #endregion
     }
 }

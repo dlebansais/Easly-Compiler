@@ -648,6 +648,7 @@
     <Compile Include="TargetLanguages\CSharp\CSharpBodyFlags.cs" />
     <Compile Include="TargetLanguages\CSharp\ClassSplitting.cs" />
     <Compile Include="TargetLanguages\CSharp\CSharpConstructorTypes.cs" />
+    <Compile Include="TargetLanguages\CSharp\CSharpExpressionContext.cs" />
     <Compile Include="TargetLanguages\CSharp\CSharpFeatureCall.cs" />
     <Compile Include="TargetLanguages\CSharp\CSharpContext.cs" />
     <Compile Include="TargetLanguages\CSharp\CSharpFeatureTextTypes.cs" />

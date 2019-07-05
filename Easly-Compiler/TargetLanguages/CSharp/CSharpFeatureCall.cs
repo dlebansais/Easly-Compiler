@@ -101,5 +101,12 @@
         /// </summary>
         public TypeArgumentStyles ArgumentStyle { get; }
         #endregion
+
+        #region Client Interface
+        public virtual string CallText()
+        {
+            return string.Empty;
+        }
+        #endregion
     }
 }

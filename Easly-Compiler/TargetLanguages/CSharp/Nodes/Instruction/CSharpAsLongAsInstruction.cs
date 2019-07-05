@@ -98,7 +98,6 @@
         public override void WriteCSharp(ICSharpWriter writer)
         {
             // TODO scope of locals
-            string ContinueConditionString = ContinueCondition.CSharpText(writer);
 
             for (int i = 0; i < ContinuationList.Count; i++)
             {
@@ -107,6 +106,7 @@
                 if (i > 0)
                     writer.WriteEmptyLine();
 
+                string ContinueConditionString = ContinueCondition.CSharpText(writer);
                 writer.WriteIndentedLine($"if ({ContinueConditionString})");
                 Item.WriteCSharpInstructions(writer);
 
@@ -146,6 +146,7 @@
             {
                 writer.WriteEmptyLine();
 
+                string ContinueConditionString = ContinueCondition.CSharpText(writer);
                 string ComplexContinueConditionString = ContinueCondition.IsComplex ? $"({ContinueConditionString})" : ContinueConditionString;
 
                 writer.WriteIndentedLine($"if (!{ComplexContinueConditionString})");

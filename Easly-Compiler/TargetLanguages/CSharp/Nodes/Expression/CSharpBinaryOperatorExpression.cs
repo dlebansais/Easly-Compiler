@@ -157,22 +157,13 @@
         /// Gets the source code corresponding to the expression.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        public override string CSharpText(ICSharpWriter writer)
-        {
-            WriteCSharp(writer, false, false, new List<ICSharpQualifiedName>(), -1, out string LastExpressionText);
-            return LastExpressionText;
-        }
-
-        /// <summary>
-        /// Gets the source code corresponding to the expression.
-        /// </summary>
-        /// <param name="writer">The stream on which to write.</param>
+        /// <param name="expressionContext">The context.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         /// <param name="destinationList">The list of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
         /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
-        public override void WriteCSharp(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
         {
             if (IsCallingNumberFeature)
                 WriteCSharpNumberOperator(writer, isNeverSimple, isDeclaredInPlace, destinationList, skippedIndex, out lastExpressionText);
@@ -237,7 +228,9 @@
                 Debug.Assert(RightNameList != null);
 
                 string LeftText = NestedExpressionText(writer, LeftExpression);
-                RightExpression.WriteCSharp(writer, true, true, RightNameList, RightResultNameIndex, out string RightExpressionText);
+
+                ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
+                RightExpression.WriteCSharp(writer, ExpressionContext, true, true, RightNameList, RightResultNameIndex, out string RightExpressionText);
 
                 lastExpressionText = $"{LeftText }.{OperatorText}({RightExpressionText})";
             }
@@ -245,7 +238,9 @@
             {
                 Debug.Assert(LeftNameList != null);
 
-                LeftExpression.WriteCSharp(writer, true, true, LeftNameList, LeftResultNameIndex, out string LeftExpressionText);
+                ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
+                LeftExpression.WriteCSharp(writer, ExpressionContext, true, true, LeftNameList, LeftResultNameIndex, out string LeftExpressionText);
+
                 string RightText = RightExpression.CSharpText(writer);
 
                 lastExpressionText = $"{LeftExpressionText}.{OperatorText}({RightText})";
@@ -255,8 +250,11 @@
                 Debug.Assert(LeftNameList != null);
                 Debug.Assert(RightNameList != null);
 
-                LeftExpression.WriteCSharp(writer, true, true, LeftNameList, LeftResultNameIndex, out string LeftExpressionText);
-                RightExpression.WriteCSharp(writer, true, true, RightNameList, RightResultNameIndex, out string RightExpressionText);
+                ICSharpExpressionContext LeftExpressionContext = new CSharpExpressionContext();
+                LeftExpression.WriteCSharp(writer, LeftExpressionContext, true, true, LeftNameList, LeftResultNameIndex, out string LeftExpressionText);
+
+                ICSharpExpressionContext RightExpressionContext = new CSharpExpressionContext();
+                RightExpression.WriteCSharp(writer, RightExpressionContext, true, true, RightNameList, RightResultNameIndex, out string RightExpressionText);
 
                 lastExpressionText = $"{LeftExpressionText}.{OperatorText}({RightExpressionText})";
             }
