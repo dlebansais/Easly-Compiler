@@ -90,6 +90,12 @@
         {
             string ExpressionString = BooleanExpression.CSharpText(writer);
 
+            if (BooleanExpression.IsEventExpression)
+                if (BooleanExpression.IsComplex)
+                    ExpressionString = $"({ExpressionString}).IsSignaled";
+                else
+                    ExpressionString += ".IsSignaled";
+
             string Condition;
             if (isElseIf)
                 Condition = "else if";

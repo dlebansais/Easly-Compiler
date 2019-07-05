@@ -214,7 +214,7 @@
 
         private void WriteCSharpMultipleNoResult(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace)
         {
-            string AssignementString = SourceExpression.CSharpText(writer, isNeverSimple, isDeclaredInPlace, DestinationList, -1);
+            SourceExpression.WriteCSharp(writer, isNeverSimple, isDeclaredInPlace, DestinationList, -1, out string AssignementString);
             writer.WriteIndentedLine($"{AssignementString};");
         }
 
@@ -228,7 +228,7 @@
 
             string ResultDestinationName = ValidPath[0].ValidText.Item;
 
-            string AssignementString = SourceExpression.CSharpText(writer, isNeverSimple, isDeclaredInPlace, DestinationList, resultNameIndex);
+            SourceExpression.WriteCSharp(writer, isNeverSimple, isDeclaredInPlace, DestinationList, resultNameIndex, out string AssignementString);
 
             if (isDeclaredInPlace)
             {

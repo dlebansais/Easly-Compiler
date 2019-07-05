@@ -23,11 +23,6 @@
         /// The right expression.
         /// </summary>
         ICSharpExpression RightExpression { get; }
-
-        /// <summary>
-        /// True if the condition is on events.
-        /// </summary>
-        bool IsEventExpression { get; }
     }
 
     /// <summary>
@@ -74,43 +69,40 @@
         /// The right expression.
         /// </summary>
         public ICSharpExpression RightExpression { get; }
-
-        /// <summary>
-        /// True if the condition is on events.
-        /// </summary>
-        public bool IsEventExpression { get { return Source.IsEventExpression; } }
         #endregion
 
         #region Client Interface
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="usingCollection">The collection of using directives.</param>
-        public override string CSharpText(ICSharpUsingCollection usingCollection)
+        /// <param name="writer">The stream on which to write.</param>
+        public override string CSharpText(ICSharpWriter writer)
         {
-            return CSharpText(usingCollection, false, false, new List<ICSharpQualifiedName>(), -1);
+            WriteCSharp(writer, false, false, new List<ICSharpQualifiedName>(), -1, out string LastExpressionText);
+            return LastExpressionText;
         }
 
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="usingCollection">The collection of using directives.</param>
+        /// <param name="writer">The stream on which to write.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         /// <param name="destinationList">The list of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        public override string CSharpText(ICSharpUsingCollection usingCollection, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
+        /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
+        public override void WriteCSharp(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
         {
             if (IsEventExpression)
-                return CSharpTextEvent(usingCollection, destinationList);
+                lastExpressionText = CSharpTextEvent(writer, destinationList);
             else
-                return CSharpTextBoolean(usingCollection, destinationList);
+                WriteCSharpBoolean(writer, destinationList, out lastExpressionText);
         }
 
-        private string CSharpTextEvent(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList)
+        private string CSharpTextEvent(ICSharpWriter writer, IList<ICSharpQualifiedName> destinationList)
         {
-            string LeftText = LeftExpression.CSharpText(usingCollection);
-            string RightText = RightExpression.CSharpText(usingCollection);
+            string LeftText = NestedExpressionText(writer, LeftExpression);
+            string RightText = NestedExpressionText(writer, RightExpression);
 
             string OperatorName = null;
 
@@ -135,44 +127,52 @@
 
             Debug.Assert(OperatorName != null);
 
-            return $"({LeftText} {OperatorName} {RightText}).IsSignaled";
+            return $"{LeftText} {OperatorName} {RightText}";
         }
 
-        private string CSharpTextBoolean(ICSharpUsingCollection usingCollection, IList<ICSharpQualifiedName> destinationList)
+        private void WriteCSharpBoolean(ICSharpWriter writer, IList<ICSharpQualifiedName> destinationList, out string lastExpressionText)
         {
-            string LeftText = NestedExpressionText(usingCollection, LeftExpression);
-            string RightText = NestedExpressionText(usingCollection, RightExpression);
+            if (LeftExpression.IsSingleResult && RightExpression.IsSingleResult)
+            {
+                string LeftText = NestedExpressionText(writer, LeftExpression);
+                string RightText = NestedExpressionText(writer, RightExpression);
 
-            if (Source.Conditional == BaseNode.ConditionalTypes.Implies)
-                return $"!{LeftText} || {RightText}";
+                if (Source.Conditional == BaseNode.ConditionalTypes.Implies)
+                    lastExpressionText = $"!{LeftText} || {RightText}";
+                else
+                {
+                    string OperatorName = null;
+
+                    switch (Source.Conditional)
+                    {
+                        case BaseNode.ConditionalTypes.And:
+                            OperatorName = "&&";
+                            break;
+
+                        case BaseNode.ConditionalTypes.Or:
+                            OperatorName = "||";
+                            break;
+
+                        case BaseNode.ConditionalTypes.Xor:
+                            OperatorName = "^";
+                            break;
+                    }
+
+                    Debug.Assert(OperatorName != null);
+
+                    lastExpressionText = $"{LeftText} {OperatorName} {RightText}";
+                }
+            }
             else
             {
-                string OperatorName = null;
-
-                switch (Source.Conditional)
-                {
-                    case BaseNode.ConditionalTypes.And:
-                        OperatorName = "&&";
-                        break;
-
-                    case BaseNode.ConditionalTypes.Or:
-                        OperatorName = "||";
-                        break;
-
-                    case BaseNode.ConditionalTypes.Xor:
-                        OperatorName = "^";
-                        break;
-                }
-
-                Debug.Assert(OperatorName != null);
-
-                return $"{LeftText} {OperatorName} {RightText}";
+                //TODO
+                lastExpressionText = "TODO";
             }
         }
 
-        private string NestedExpressionText(ICSharpUsingCollection usingCollection, ICSharpExpression expression)
+        private string NestedExpressionText(ICSharpWriter writer, ICSharpExpression expression)
         {
-            string Result = expression.CSharpText(usingCollection);
+            string Result = expression.CSharpText(writer);
 
             if (expression.IsComplex)
                 Result = $"({Result})";

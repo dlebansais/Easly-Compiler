@@ -77,21 +77,23 @@
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="usingCollection">The collection of using directives.</param>
-        public override string CSharpText(ICSharpUsingCollection usingCollection)
+        /// <param name="writer">The stream on which to write.</param>
+        public override string CSharpText(ICSharpWriter writer)
         {
-            return CSharpText(usingCollection, false, false, new List<ICSharpQualifiedName>(), -1);
+            WriteCSharp(writer, false, false, new List<ICSharpQualifiedName>(), -1, out string LastExpressionText);
+            return LastExpressionText;
         }
 
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="usingCollection">The collection of using directives.</param>
+        /// <param name="writer">The stream on which to write.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         /// <param name="destinationList">The list of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        public override string CSharpText(ICSharpUsingCollection usingCollection, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
+        /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
+        public override void WriteCSharp(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
         {
             string CoexistingPrecursorName = string.Empty;
             string CoexistingPrecursorRootName = ParentFeature.CoexistingPrecursorName;
@@ -99,18 +101,18 @@
             if (!string.IsNullOrEmpty(CoexistingPrecursorRootName))
                 CoexistingPrecursorName = CSharpNames.ToCSharpIdentifier(CoexistingPrecursorRootName + " " + "Base");
 
-            string ArgumentListText = CSharpArgument.CSharpArgumentList(usingCollection, isNeverSimple, isDeclaredInPlace, FeatureCall, destinationList, skippedIndex);
+            string ArgumentListText = CSharpArgument.CSharpArgumentList(writer, isNeverSimple, isDeclaredInPlace, FeatureCall, destinationList, skippedIndex);
 
             bool HasArguments = (ParentFeature is ICSharpFunctionFeature) || FeatureCall.ArgumentList.Count > 0;
             if (HasArguments)
                 ArgumentListText = $"({ArgumentListText})";
 
             if (!string.IsNullOrEmpty(CoexistingPrecursorRootName))
-                return $"{CoexistingPrecursorName}{ArgumentListText}";
+                lastExpressionText = $"{CoexistingPrecursorName}{ArgumentListText}";
             else
             {
                 string FunctionName = CSharpNames.ToCSharpIdentifier(ParentFeature.Name);
-                return $"base.{FunctionName}{ArgumentListText}";
+                lastExpressionText = $"base.{FunctionName}{ArgumentListText}";
             }
         }
         #endregion

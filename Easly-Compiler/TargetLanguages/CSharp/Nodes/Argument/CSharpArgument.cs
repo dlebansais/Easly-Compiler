@@ -80,23 +80,23 @@
         /// <summary>
         /// Gets the source code of arguments of a feature call.
         /// </summary>
-        /// <param name="usingCollection">The collection of using directives.</param>
+        /// <param name="writer">The stream on which to write.</param>
         /// <param name="featureCall">Details of the call.</param>
-        public static string CSharpArgumentList(ICSharpUsingCollection usingCollection, ICSharpFeatureCall featureCall)
+        public static string CSharpArgumentList(ICSharpWriter writer, ICSharpFeatureCall featureCall)
         {
-            return CSharpArgumentList(usingCollection, false, false, featureCall, new List<ICSharpQualifiedName>(), -1);
+            return CSharpArgumentList(writer, false, false, featureCall, new List<ICSharpQualifiedName>(), -1);
         }
 
         /// <summary>
         /// Gets the source code of arguments of a feature call.
         /// </summary>
-        /// <param name="usingCollection">The collection of using directives.</param>
+        /// <param name="writer">The stream on which to write.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         /// <param name="featureCall">Details of the call.</param>
         /// <param name="destinationList">List of destination features.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        public static string CSharpArgumentList(ICSharpUsingCollection usingCollection, bool isNeverSimple, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
+        public static string CSharpArgumentList(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
         {
             if (featureCall.Count == 0 && destinationList.Count == 0)
                 return string.Empty;
@@ -107,11 +107,11 @@
             {
                 case TypeArgumentStyles.None:
                 case TypeArgumentStyles.Positional:
-                    Result = CSharpPositionalArgumentList(usingCollection, isNeverSimple, isDeclaredInPlace, featureCall, destinationList, skippedIndex);
+                    Result = CSharpPositionalArgumentList(writer, isNeverSimple, isDeclaredInPlace, featureCall, destinationList, skippedIndex);
                     break;
 
                 case TypeArgumentStyles.Assignment:
-                    Result = CSharpAssignmentArgumentList(usingCollection, isNeverSimple, isDeclaredInPlace, featureCall, destinationList, skippedIndex);
+                    Result = CSharpAssignmentArgumentList(writer, isNeverSimple, isDeclaredInPlace, featureCall, destinationList, skippedIndex);
                     break;
             }
 
@@ -120,7 +120,7 @@
             return Result;
         }
 
-        private static string CSharpPositionalArgumentList(ICSharpUsingCollection usingCollection, bool isNeverSimple, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
+        private static string CSharpPositionalArgumentList(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
         {
             IList<ICSharpParameter> ParameterList = featureCall.ParameterList;
             IList<ICSharpParameter> ResultList = featureCall.ResultList;
@@ -139,7 +139,7 @@
 
                 ICSharpExpression SourceExpression = Argument.SourceExpression;
 
-                Result += SourceExpression.CSharpText(usingCollection);
+                Result += SourceExpression.CSharpText(writer);
             }
 
             for (; i < ParameterList.Count; i++)
@@ -153,7 +153,7 @@
 
                 Debug.Assert(DefaultValue != null);
 
-                Result += DefaultValue.CSharpText(usingCollection);
+                Result += DefaultValue.CSharpText(writer);
             }
 
             for (i = 0; i < destinationList.Count; i++)
@@ -170,13 +170,13 @@
                     Debug.Assert(i < ResultList.Count);
                     ICSharpParameter ResultParameter = ResultList[i];
 
-                    string TempTypeText = ResultParameter.Feature.Type.Type2CSharpString(usingCollection, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
-                    string TempText = Destination.CSharpText(usingCollection, 0).Replace('.', '_');
+                    string TempTypeText = ResultParameter.Feature.Type.Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
+                    string TempText = Destination.CSharpText(writer, 0).Replace('.', '_');
                     Result += $"out {TempTypeText} Temp_{TempText}";
                 }
                 else
                 {
-                    string DestinationText = Destination.CSharpText(usingCollection, 0);
+                    string DestinationText = Destination.CSharpText(writer, 0);
                     Result += $"out {DestinationText}";
                 }
             }
@@ -184,7 +184,7 @@
             return Result;
         }
 
-        private static string CSharpAssignmentArgumentList(ICSharpUsingCollection usingCollection, bool isNeverSimple, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
+        private static string CSharpAssignmentArgumentList(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
         {
             IList<ICSharpParameter> ParameterList = featureCall.ParameterList;
             IList<ICSharpParameter> ResultList = featureCall.ResultList;
@@ -212,7 +212,7 @@
                         }
 
                 if (SourceExpression != null)
-                    Result += SourceExpression.CSharpText(usingCollection);
+                    Result += SourceExpression.CSharpText(writer);
                 else
                 {
                     ICSharpScopeAttributeFeature Feature = Parameter.Feature;
@@ -220,7 +220,7 @@
 
                     Debug.Assert(DefaultValue != null);
 
-                    Result += DefaultValue.CSharpText(usingCollection);
+                    Result += DefaultValue.CSharpText(writer);
                 }
             }
 
@@ -235,12 +235,12 @@
 
                 if (!Destination.IsSimple)
                 {
-                    string TempText = Destination.CSharpText(usingCollection, 0).Replace('.', '_');
+                    string TempText = Destination.CSharpText(writer, 0).Replace('.', '_');
                     Result += $"out Temp_{TempText}";
                 }
                 else
                 {
-                    string DestinationText = Destination.CSharpText(usingCollection, 0);
+                    string DestinationText = Destination.CSharpText(writer, 0);
                     Result += $"out {DestinationText}";
                 }
             }

@@ -69,6 +69,12 @@
         {
             string ExpressionText = BooleanExpression.CSharpText(writer);
 
+            if (BooleanExpression.IsEventExpression)
+                if (BooleanExpression.IsComplex)
+                    ExpressionText = $"({ExpressionText}).IsSignaled";
+                else
+                    ExpressionText += ".IsSignaled";
+
             writer.WriteIndentedLine($"Debug.Assert({ExpressionText});");
             writer.AddUsing("System.Diagnostics");
         }

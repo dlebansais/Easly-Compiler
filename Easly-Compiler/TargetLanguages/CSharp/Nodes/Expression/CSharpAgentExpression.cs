@@ -117,50 +117,50 @@
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="usingCollection">The collection of using directives.</param>
-        public override string CSharpText(ICSharpUsingCollection usingCollection)
+        /// <param name="writer">The stream on which to write.</param>
+        public override string CSharpText(ICSharpWriter writer)
         {
-            return CSharpText(usingCollection, false, false, new List<ICSharpQualifiedName>(), -1);
+            WriteCSharp(writer, false, false, new List<ICSharpQualifiedName>(), -1, out string LastExpressionText);
+            return LastExpressionText;
         }
 
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="usingCollection">The collection of using directives.</param>
+        /// <param name="writer">The stream on which to write.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         /// <param name="destinationList">The list of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        public override string CSharpText(ICSharpUsingCollection usingCollection, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
+        /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
+        public override void WriteCSharp(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
         {
-            string Result = null;
+            lastExpressionText = null;
 
             switch (Delegated)
             {
                 case ICSharpAttributeFeature AsAttributeFeature:
-                    Result = CSharpTextAttribute(usingCollection, AsAttributeFeature, destinationList);
+                    lastExpressionText = CSharpTextAttribute(writer, AsAttributeFeature, destinationList);
                     break;
 
                 case ICSharpConstantFeature AsConstantFeature:
-                    Result = CSharpTextConstant(usingCollection, AsConstantFeature, destinationList);
+                    lastExpressionText = CSharpTextConstant(writer, AsConstantFeature, destinationList);
                     break;
 
                 case ICSharpProcedureFeature AsProcedureFeature:
-                    Result = CSharpTextProcedure(usingCollection, AsProcedureFeature, destinationList);
+                    lastExpressionText = CSharpTextProcedure(writer, AsProcedureFeature, destinationList);
                     break;
 
                 case ICSharpFunctionFeature AsFunctionFeature:
-                    Result = CSharpTextFunction(usingCollection, AsFunctionFeature, destinationList);
+                    lastExpressionText = CSharpTextFunction(writer, AsFunctionFeature, destinationList);
                     break;
 
                 case ICSharpPropertyFeature AsPropertyFeature:
-                    Result = CSharpTextProperty(usingCollection, AsPropertyFeature, destinationList);
+                    lastExpressionText = CSharpTextProperty(writer, AsPropertyFeature, destinationList);
                     break;
             }
 
-            Debug.Assert(Result != null);
-
-            return Result;
+            Debug.Assert(lastExpressionText != null);
         }
 
         private string CSharpTextAttribute(ICSharpUsingCollection usingCollection, ICSharpAttributeFeature feature, IList<ICSharpQualifiedName> destinationList)

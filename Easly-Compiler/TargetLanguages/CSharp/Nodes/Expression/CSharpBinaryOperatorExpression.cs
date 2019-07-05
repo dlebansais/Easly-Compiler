@@ -70,15 +70,59 @@
                         IsCallingNumberFeature = true;
             }
 
-            if (!LeftExpression.IsSingleResult || !RightExpression.IsSingleResult)
+            if (!IsCallingNumberFeature)
             {
-                RightAssignment = new CSharpAssignment(context, "temp", RightExpression);
-                LeftAssignment = new CSharpAssignment(context, "temp", LeftExpression);
+                if (!LeftExpression.IsSingleResult)
+                {
+                    IResultType LeftResultType = LeftExpression.Source.ResolvedResult.Item;
+                    LeftNameList = new List<ICSharpQualifiedName>();
+                    LeftResultNameIndex = LeftResultType.ResultNameIndex;
+
+                    for (int i = 0; i < LeftResultType.Count; i++)
+                    {
+                        IExpressionType DestinationType = LeftResultType.At(i);
+                        string Text = DestinationType.Name;
+
+                        BaseNode.IQualifiedName BaseNodeDestination = BaseNodeHelper.NodeHelper.CreateSimpleQualifiedName(Text);
+                        IQualifiedName Destination = new QualifiedName(BaseNodeDestination, DestinationType);
+
+                        IScopeAttributeFeature DestinationAttributeFeature = new ScopeAttributeFeature(LeftExpression.Source, Text, DestinationType.ValueTypeName, DestinationType.ValueType);
+                        ICSharpScopeAttributeFeature DestinationFeature = CSharpScopeAttributeFeature.Create(context, null, DestinationAttributeFeature);
+
+                        ICSharpQualifiedName CSharpDestination = CSharpQualifiedName.Create(context, Destination, DestinationFeature, null, false);
+                        LeftNameList.Add(CSharpDestination);
+                    }
+                }
+
+                if (!RightExpression.IsSingleResult)
+                {
+                    IResultType RightResultType = RightExpression.Source.ResolvedResult.Item;
+                    RightNameList = new List<ICSharpQualifiedName>();
+                    RightResultNameIndex = RightResultType.ResultNameIndex;
+
+                    for (int i = 0; i < RightResultType.Count; i++)
+                    {
+                        IExpressionType DestinationType = RightResultType.At(i);
+                        string Text = DestinationType.Name;
+
+                        BaseNode.IQualifiedName BaseNodeDestination = BaseNodeHelper.NodeHelper.CreateSimpleQualifiedName(Text);
+                        IQualifiedName Destination = new QualifiedName(BaseNodeDestination, DestinationType);
+
+                        IScopeAttributeFeature DestinationAttributeFeature = new ScopeAttributeFeature(RightExpression.Source, Text, DestinationType.ValueTypeName, DestinationType.ValueType);
+                        ICSharpScopeAttributeFeature DestinationFeature = CSharpScopeAttributeFeature.Create(context, null, DestinationAttributeFeature);
+
+                        ICSharpQualifiedName CSharpDestination = CSharpQualifiedName.Create(context, Destination, DestinationFeature, null, false);
+                        RightNameList.Add(CSharpDestination);
+                    }
+                }
             }
         }
 
-        ICSharpAssignment RightAssignment;
-        ICSharpAssignment LeftAssignment;
+        private IList<ICSharpQualifiedName> LeftNameList;
+        private int LeftResultNameIndex = -1;
+
+        private IList<ICSharpQualifiedName> RightNameList;
+        private int RightResultNameIndex = -1;
         #endregion
 
         #region Properties
@@ -112,21 +156,23 @@
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="usingCollection">The collection of using directives.</param>
-        public override string CSharpText(ICSharpUsingCollection usingCollection)
+        /// <param name="writer">The stream on which to write.</param>
+        public override string CSharpText(ICSharpWriter writer)
         {
-            return CSharpText(usingCollection, false, false, new List<ICSharpQualifiedName>(), -1);
+            WriteCSharp(writer, false, false, new List<ICSharpQualifiedName>(), -1, out string LastExpressionText);
+            return LastExpressionText;
         }
 
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="usingCollection">The collection of using directives.</param>
+        /// <param name="writer">The stream on which to write.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         /// <param name="destinationList">The list of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        public override string CSharpText(ICSharpUsingCollection usingCollection, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex)
+        /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
+        public override void WriteCSharp(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
         {
             string OperatorText = Operator.Name;
 
@@ -165,32 +211,51 @@
 
             if (IsCallingNumberFeature)
             {
-                string LeftText = NestedExpressionText(usingCollection, LeftExpression);
-                string RightText = NestedExpressionText(usingCollection, RightExpression);
+                string LeftText = NestedExpressionText(writer, LeftExpression);
+                string RightText = NestedExpressionText(writer, RightExpression);
 
-                return $"{LeftText} {OperatorText} {RightText}";
+                lastExpressionText = $"{LeftText} {OperatorText} {RightText}";
             }
             else if (LeftExpression.IsSingleResult && RightExpression.IsSingleResult)
             {
-                string LeftText = NestedExpressionText(usingCollection, LeftExpression);
-                string RightText = RightExpression.CSharpText(usingCollection);
+                string LeftText = NestedExpressionText(writer, LeftExpression);
+                string RightText = RightExpression.CSharpText(writer);
 
-                return $"{LeftText}.{OperatorText}({RightText})";
+                lastExpressionText = $"{LeftText}.{OperatorText}({RightText})";
+            }
+            else if (LeftExpression.IsSingleResult)
+            {
+                Debug.Assert(RightNameList != null);
+
+                string LeftText = NestedExpressionText(writer, LeftExpression);
+                RightExpression.WriteCSharp(writer, true, true, RightNameList, RightResultNameIndex, out string RightExpressionText);
+
+                lastExpressionText = $"{LeftText }.{OperatorText}({RightExpressionText})";
+            }
+            else if (RightExpression.IsSingleResult)
+            {
+                Debug.Assert(LeftNameList != null);
+
+                LeftExpression.WriteCSharp(writer, true, true, LeftNameList, LeftResultNameIndex, out string LeftExpressionText);
+                string RightText = RightExpression.CSharpText(writer);
+
+                lastExpressionText = $"{LeftExpressionText}.{OperatorText}({RightText})";
             }
             else
             {
-                RightAssignment.WriteCSharp(usingCollection as ICSharpWriter, true, true, false, out IList<string> DestinationEntityList);
+                Debug.Assert(LeftNameList != null);
+                Debug.Assert(RightNameList != null);
 
-                string LeftText = NestedExpressionText(usingCollection, LeftExpression);
-                string RightText = RightExpression.CSharpText(usingCollection);
+                LeftExpression.WriteCSharp(writer, true, true, LeftNameList, LeftResultNameIndex, out string LeftExpressionText);
+                RightExpression.WriteCSharp(writer, true, true, RightNameList, RightResultNameIndex, out string RightExpressionText);
 
-                return $"{LeftText}.{OperatorText}({RightText})";
+                lastExpressionText = $"{LeftExpressionText}.{OperatorText}({RightExpressionText})";
             }
         }
 
-        private string NestedExpressionText(ICSharpUsingCollection usingCollection, ICSharpExpression expression)
+        private string NestedExpressionText(ICSharpWriter writer, ICSharpExpression expression)
         {
-            string Result = expression.CSharpText(usingCollection);
+            string Result = expression.CSharpText(writer);
 
             if (expression.IsComplex)
                 Result = $"({Result})";

@@ -25,20 +25,26 @@
         bool IsSingleResult { get; }
 
         /// <summary>
-        /// Gets the source code corresponding to the expression.
+        /// True if the condition is on events.
         /// </summary>
-        /// <param name="usingCollection">The collection of using directives.</param>
-        string CSharpText(ICSharpUsingCollection usingCollection);
+        bool IsEventExpression { get; }
 
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="usingCollection">The collection of using directives.</param>
+        /// <param name="writer">The stream on which to write.</param>
+        string CSharpText(ICSharpWriter writer);
+
+        /// <summary>
+        /// Writes down the C# instruction.
+        /// </summary>
+        /// <param name="writer">The stream on which to write.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         /// <param name="destinationList">List of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        string CSharpText(ICSharpUsingCollection usingCollection, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex);
+        /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
+        void WriteCSharp(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText);
     }
 
     /// <summary>
@@ -184,24 +190,36 @@
         /// True if the expression returns only one result.
         /// </summary>
         public virtual bool IsSingleResult { get { return Source.ResolvedResult.Item.Count == 1; } }
+
+        /// <summary>
+        /// True if the condition is on events.
+        /// </summary>
+        public virtual bool IsEventExpression
+        {
+            get
+            {
+                return Expression.IsLanguageTypeAvailable(LanguageClasses.Event.Guid, Source, out ITypeName EventTypeName, out ICompiledType EventType) && IsSingleResult && Source.ResolvedResult.Item.At(0).ValueType == EventType;
+            }
+        }
         #endregion
 
         #region Client Interface
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
-        /// <param name="usingCollection">The collection of using directives.</param>
-        public abstract string CSharpText(ICSharpUsingCollection usingCollection);
+        /// <param name="writer">The stream on which to write.</param>
+        public abstract string CSharpText(ICSharpWriter writer);
 
         /// <summary>
-        /// Gets the source code corresponding to the expression.
+        /// Writes down the C# instruction.
         /// </summary>
-        /// <param name="usingCollection">The collection of using directives.</param>
+        /// <param name="writer">The stream on which to write.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         /// <param name="destinationList">List of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        public abstract string CSharpText(ICSharpUsingCollection usingCollection, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex);
+        /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
+        public abstract void WriteCSharp(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText);
         #endregion
     }
 }
