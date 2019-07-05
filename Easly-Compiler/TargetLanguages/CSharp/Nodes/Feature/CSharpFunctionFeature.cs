@@ -140,6 +140,19 @@
         }
 
         /// <summary>
+        /// Gets the feature output format.
+        /// </summary>
+        /// <param name="selectedOverloadType">The selected overload type.</param>
+        /// <param name="hasReturn">True upon return if the feature returns a value.</param>
+        /// <param name="outgoingParameterCount">The number of 'out' parameters upon return.</param>
+        public override void GetOutputFormat(ICSharpQueryOverloadType selectedOverloadType, out bool hasReturn, out int outgoingParameterCount)
+        {
+            Debug.Assert(selectedOverloadType != null);
+
+            selectedOverloadType.GetOutputFormat(out hasReturn, out outgoingParameterCount);
+        }
+
+        /// <summary>
         /// Writes down the C# feature.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>

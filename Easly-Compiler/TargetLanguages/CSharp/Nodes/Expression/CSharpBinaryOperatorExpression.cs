@@ -174,49 +174,58 @@
         /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
         public override void WriteCSharp(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
         {
-            string OperatorText = Operator.Name;
-
             if (IsCallingNumberFeature)
-            {
-                switch (OperatorText)
-                {
-                    case "≥":
-                        OperatorText = ">=";
-                        break;
-                    case "≤":
-                        OperatorText = "<=";
-                        break;
-                    case "shift right":
-                        OperatorText = ">>";
-                        break;
-                    case "shift left":
-                        OperatorText = "<<";
-                        break;
-                    case "modulo":
-                        OperatorText = "%";
-                        break;
-                    case "bitwise and":
-                        OperatorText = "&";
-                        break;
-                    case "bitwise or":
-                        OperatorText = "|";
-                        break;
-                    case "bitwise xor":
-                        OperatorText = "^";
-                        break;
-                }
-            }
+                WriteCSharpNumberOperator(writer, isNeverSimple, isDeclaredInPlace, destinationList, skippedIndex, out lastExpressionText);
             else
-                OperatorText = CSharpNames.ToCSharpIdentifier(OperatorText);
+                WriteCSharpCustomOperator(writer, isNeverSimple, isDeclaredInPlace, destinationList, skippedIndex, out lastExpressionText);
+        }
 
-            if (IsCallingNumberFeature)
+        private void WriteCSharpNumberOperator(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        {
+            string OperatorText = null;
+
+            switch (Operator.Name)
             {
-                string LeftText = NestedExpressionText(writer, LeftExpression);
-                string RightText = NestedExpressionText(writer, RightExpression);
-
-                lastExpressionText = $"{LeftText} {OperatorText} {RightText}";
+                case "≥":
+                    OperatorText = ">=";
+                    break;
+                case "≤":
+                    OperatorText = "<=";
+                    break;
+                case "shift right":
+                    OperatorText = ">>";
+                    break;
+                case "shift left":
+                    OperatorText = "<<";
+                    break;
+                case "modulo":
+                    OperatorText = "%";
+                    break;
+                case "bitwise and":
+                    OperatorText = "&";
+                    break;
+                case "bitwise or":
+                    OperatorText = "|";
+                    break;
+                case "bitwise xor":
+                    OperatorText = "^";
+                    break;
+                default:
+                    OperatorText = Operator.Name;
+                    break;
             }
-            else if (LeftExpression.IsSingleResult && RightExpression.IsSingleResult)
+
+            string LeftText = NestedExpressionText(writer, LeftExpression);
+            string RightText = NestedExpressionText(writer, RightExpression);
+
+            lastExpressionText = $"{LeftText} {OperatorText} {RightText}";
+        }
+
+        private void WriteCSharpCustomOperator(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        {
+            string OperatorText = CSharpNames.ToCSharpIdentifier(Operator.Name);
+
+            if (LeftExpression.IsSingleResult && RightExpression.IsSingleResult)
             {
                 string LeftText = NestedExpressionText(writer, LeftExpression);
                 string RightText = RightExpression.CSharpText(writer);

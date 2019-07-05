@@ -48,12 +48,12 @@
             data = null;
             bool Success = true;
 
-            Success &= QueryExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IResultException ResolvedException, out ISealableList<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out ICompiledFeature ResolvedFinalFeature, out IDiscrete ResolvedFinalDiscrete, out ISealableList<IParameter> SelectedResultList, out IFeatureCall FeatureCall, out bool InheritBySideAttribute);
+            Success &= QueryExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IResultException ResolvedException, out ISealableList<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out ICompiledFeature ResolvedFinalFeature, out IDiscrete ResolvedFinalDiscrete, out ISealableList<IParameter> SelectedResultList, out IQueryOverloadType SelectedOverloadType, out IFeatureCall FeatureCall, out bool InheritBySideAttribute);
 
             if (Success)
             {
-                Tuple<ICompiledFeature, IDiscrete, ISealableList<IParameter>, IFeatureCall, bool> AdditionalData = new Tuple<ICompiledFeature, IDiscrete, ISealableList<IParameter>, IFeatureCall, bool>(ResolvedFinalFeature, ResolvedFinalDiscrete, SelectedResultList, FeatureCall, InheritBySideAttribute);
-                data = new Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, Tuple<ICompiledFeature, IDiscrete, ISealableList<IParameter>, IFeatureCall, bool>>(ResolvedResult, ResolvedException, ConstantSourceList, ExpressionConstant, AdditionalData);
+                Tuple<ICompiledFeature, IDiscrete, ISealableList<IParameter>, IQueryOverloadType, IFeatureCall, bool> AdditionalData = new Tuple<ICompiledFeature, IDiscrete, ISealableList<IParameter>, IQueryOverloadType, IFeatureCall, bool>(ResolvedFinalFeature, ResolvedFinalDiscrete, SelectedResultList, SelectedOverloadType, FeatureCall, InheritBySideAttribute);
+                data = new Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, Tuple<ICompiledFeature, IDiscrete, ISealableList<IParameter>, IQueryOverloadType, IFeatureCall, bool>>(ResolvedResult, ResolvedException, ConstantSourceList, ExpressionConstant, AdditionalData);
             }
 
             return Success;
@@ -66,20 +66,23 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IQueryExpression node, object data)
         {
-            IResultType ResolvedResult = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, Tuple<ICompiledFeature, IDiscrete, ISealableList<IParameter>, IFeatureCall, bool>>)data).Item1;
-            IResultException ResolvedException = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, Tuple<ICompiledFeature, IDiscrete, ISealableList<IParameter>, IFeatureCall, bool>>)data).Item2;
-            ISealableList<IExpression> ConstantSourceList = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, Tuple<ICompiledFeature, IDiscrete, ISealableList<IParameter>, IFeatureCall, bool>>)data).Item3;
-            ILanguageConstant ExpressionConstant = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, Tuple<ICompiledFeature, IDiscrete, ISealableList<IParameter>, IFeatureCall, bool>>)data).Item4;
-            Tuple<ICompiledFeature, IDiscrete, ISealableList<IParameter>, IFeatureCall, bool> AdditionalData = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, Tuple<ICompiledFeature, IDiscrete, ISealableList<IParameter>, IFeatureCall, bool>>)data).Item5;
+            IResultType ResolvedResult = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, Tuple<ICompiledFeature, IDiscrete, ISealableList<IParameter>, IQueryOverloadType, IFeatureCall, bool>>)data).Item1;
+            IResultException ResolvedException = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, Tuple<ICompiledFeature, IDiscrete, ISealableList<IParameter>, IQueryOverloadType, IFeatureCall, bool>>)data).Item2;
+            ISealableList<IExpression> ConstantSourceList = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, Tuple<ICompiledFeature, IDiscrete, ISealableList<IParameter>, IQueryOverloadType, IFeatureCall, bool>>)data).Item3;
+            ILanguageConstant ExpressionConstant = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, Tuple<ICompiledFeature, IDiscrete, ISealableList<IParameter>, IQueryOverloadType, IFeatureCall, bool>>)data).Item4;
+            Tuple<ICompiledFeature, IDiscrete, ISealableList<IParameter>, IQueryOverloadType, IFeatureCall, bool> AdditionalData = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, Tuple<ICompiledFeature, IDiscrete, ISealableList<IParameter>, IQueryOverloadType, IFeatureCall, bool>>)data).Item5;
             ICompiledFeature ResolvedFinalFeature = AdditionalData.Item1;
             IDiscrete ResolvedFinalDiscrete = AdditionalData.Item2;
             ISealableList<IParameter> SelectedResultList = AdditionalData.Item3;
-            IFeatureCall FeatureCall = AdditionalData.Item4;
-            bool InheritBySideAttribute = AdditionalData.Item5;
+            IQueryOverloadType SelectedOverloadType = AdditionalData.Item4;
+            IFeatureCall FeatureCall = AdditionalData.Item5;
+            bool InheritBySideAttribute = AdditionalData.Item6;
 
             node.ResolvedException.Item = ResolvedException;
             node.SelectedResultList.AddRange(SelectedResultList);
             node.SelectedResultList.Seal();
+            if (SelectedOverloadType != null)
+                node.SelectedOverloadType.Item = SelectedOverloadType;
             node.FeatureCall.Item = FeatureCall;
             node.InheritBySideAttribute = InheritBySideAttribute;
         }

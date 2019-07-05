@@ -33,6 +33,11 @@
         /// The query.
         /// </summary>
         ICSharpQualifiedName Query { get; }
+
+        /// <summary>
+        /// The selected overload type. Can be null.
+        /// </summary>
+        ICSharpQueryOverloadType SelectedOverloadType { get; }
     }
 
     /// <summary>
@@ -87,6 +92,15 @@
 
             Debug.Assert((Feature != null && Discrete == null) || (Feature == null && Discrete != null));
 
+            if (Source.SelectedOverloadType.IsAssigned)
+            {
+                Debug.Assert(Feature != null);
+
+                SelectedOverloadType = CSharpQueryOverloadType.Create(context, Source.SelectedOverloadType.Item, Feature.Owner);
+            }
+            else
+                SelectedOverloadType = null;
+
             Query = CSharpQualifiedName.Create(context, (IQualifiedName)Source.Query, Feature, Discrete, source.InheritBySideAttribute);
         }
         #endregion
@@ -116,6 +130,53 @@
         /// The query.
         /// </summary>
         public ICSharpQualifiedName Query { get; }
+
+        /// <summary>
+        /// The selected overload type. Can be null.
+        /// </summary>
+        public ICSharpQueryOverloadType SelectedOverloadType { get; }
+
+        /// <summary>
+        /// True if calling an agent.
+        /// </summary>
+        public bool IsAgent
+        {
+            get
+            {
+                bool Result;
+
+                switch (Feature)
+                {
+                    case ICSharpAttributeFeature AsAttributeFeature:
+                    case ICSharpConstantFeature AsConstantFeature:
+                    case ICSharpFunctionFeature AsFunctionFeature:
+                    case ICSharpPropertyFeature AsPropertyFeature:
+                        Result = false;
+                        break;
+
+                    case ICSharpScopeAttributeFeature AsScopeAttributeFeature:
+                        switch (AsScopeAttributeFeature.Type)
+                        {
+                            case ICSharpProcedureType AsProcedureType:
+                            case ICSharpFunctionType AsFunctionType:
+                            case ICSharpPropertyType AsPropertyType:
+                                Result = true;
+                                break;
+
+                            default:
+                                Result = false;
+                                break;
+                        }
+                        break;
+
+                    default:
+                        Result = true;
+                        break;
+                }
+
+                return Result;
+            }
+        }
         #endregion
 
         #region Client Interface
@@ -140,63 +201,12 @@
         /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
         public override void WriteCSharp(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
         {
-            string ArgumentListText = CSharpArgument.CSharpArgumentList(writer, isNeverSimple, isDeclaredInPlace, FeatureCall, destinationList, skippedIndex);
-            string QueryText = Query.CSharpText(writer, 0);
-
-            bool IsAgent;
-            switch (Feature)
-            {
-                case ICSharpAttributeFeature AsAttributeFeature:
-                case ICSharpConstantFeature AsConstantFeature:
-                case ICSharpFunctionFeature AsFunctionFeature:
-                case ICSharpPropertyFeature AsPropertyFeature:
-                    IsAgent = false;
-                    break;
-
-                case ICSharpScopeAttributeFeature AsScopeAttributeFeature:
-                    switch (AsScopeAttributeFeature.Type)
-                    {
-                        case ICSharpProcedureType AsProcedureType:
-                        case ICSharpFunctionType AsFunctionType:
-                        case ICSharpPropertyType AsPropertyType:
-                            IsAgent = true;
-                            break;
-
-                        default:
-                            IsAgent = false;
-                            break;
-                    }
-                    break;
-
-                default:
-                    IsAgent = true;
-                    break;
-            }
-
             if (IsAgent)
-            {
-                IIdentifier AgentIdentifier = (IIdentifier)Source.Query.Path[Source.Query.Path.Count - 1];
-                string AgentIdentifierText = CSharpNames.ToCSharpIdentifier(AgentIdentifier.ValidText.Item);
-
-                if (Source.Query.Path.Count > 1)
-                    QueryText = Query.CSharpText(writer, 1);
-                else
-                    QueryText = "this";
-
-                if (FeatureCall.ArgumentList.Count > 0)
-                    lastExpressionText = $"{AgentIdentifierText}({QueryText}, {ArgumentListText})";
-                else
-                    lastExpressionText = $"{AgentIdentifierText}({QueryText})";
-            }
+                WriteCSharpAgentCall(writer, isNeverSimple, isDeclaredInPlace, destinationList, skippedIndex, out lastExpressionText);
+            else if (Discrete != null)
+                WriteCSharpDiscreteCall(writer, isNeverSimple, isDeclaredInPlace, destinationList, skippedIndex, out lastExpressionText);
             else
-            {
-                if (ArgumentListText.Length > 0)
-                    lastExpressionText = $"{QueryText}({ArgumentListText})";
-                else if (Feature is ICSharpFunctionFeature)
-                    lastExpressionText = $"{QueryText}()";
-                else
-                    lastExpressionText = QueryText;
-            }
+                WriteCSharpFeatureCall(writer, isNeverSimple, isDeclaredInPlace, destinationList, skippedIndex, out lastExpressionText);
 
             /*
             else
@@ -231,6 +241,61 @@
 
                 return Query.DecoratedCSharpText(cSharpNamespace, 0);
             }*/
+        }
+
+        private void WriteCSharpAgentCall(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        {
+            string ArgumentListText = CSharpArgument.CSharpArgumentList(writer, isNeverSimple, isDeclaredInPlace, FeatureCall, destinationList, skippedIndex);
+            string QueryText = Query.CSharpText(writer, 0);
+
+            IIdentifier AgentIdentifier = (IIdentifier)Source.Query.Path[Source.Query.Path.Count - 1];
+            string AgentIdentifierText = CSharpNames.ToCSharpIdentifier(AgentIdentifier.ValidText.Item);
+
+            if (Source.Query.Path.Count > 1)
+                QueryText = Query.CSharpText(writer, 1);
+            else
+                QueryText = "this";
+
+            if (FeatureCall.ArgumentList.Count > 0)
+                lastExpressionText = $"{AgentIdentifierText}({QueryText}, {ArgumentListText})";
+            else
+                lastExpressionText = $"{AgentIdentifierText}({QueryText})";
+        }
+
+        private void WriteCSharpDiscreteCall(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        {
+            Debug.Assert(FeatureCall.ParameterList.Count == 0);
+            Debug.Assert(FeatureCall.ResultList.Count == 0);
+
+            lastExpressionText = Query.CSharpText(writer, 0);
+        }
+
+        private void WriteCSharpFeatureCall(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        {
+            Feature.GetOutputFormat(SelectedOverloadType, out bool HasReturn, out int OutgoingParameterCount);
+
+            string ArgumentListText = CSharpArgument.CSharpArgumentList(writer, isNeverSimple, isDeclaredInPlace, FeatureCall, destinationList, skippedIndex);
+            string QueryText = Query.CSharpText(writer, 0);
+
+            if (OutgoingParameterCount == 0)
+            {
+                if (ArgumentListText.Length > 0)
+                    lastExpressionText = $"{QueryText}({ArgumentListText})";
+                else if (Feature is ICSharpFunctionFeature)
+                    lastExpressionText = $"{QueryText}()";
+                else
+                    lastExpressionText = QueryText;
+            }
+            else if (HasReturn)
+            {
+                writer.WriteIndentedLine($"var temp = {QueryText}({ArgumentListText});");
+                lastExpressionText = "temp";
+            }
+            else
+            {
+                writer.WriteIndentedLine($"{QueryText}({ArgumentListText});");
+                lastExpressionText = "temp";
+            }
         }
         #endregion
     }

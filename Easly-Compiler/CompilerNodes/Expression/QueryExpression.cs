@@ -32,6 +32,11 @@ namespace CompilerNode
         ISealableList<IParameter> SelectedResultList { get; }
 
         /// <summary>
+        /// The selected overload, if any.
+        /// </summary>
+        OnceReference<IQueryOverloadType> SelectedOverloadType { get; }
+
+        /// <summary>
         /// Details of the feature call.
         /// </summary>
         OnceReference<IFeatureCall> FeatureCall { get; }
@@ -148,6 +153,7 @@ namespace CompilerNode
             {
                 ResolvedException = new OnceReference<IResultException>();
                 SelectedResultList = new SealableList<IParameter>();
+                SelectedOverloadType = new OnceReference<IQueryOverloadType>();
                 FeatureCall = new OnceReference<IFeatureCall>();
                 InheritBySideAttribute = false;
                 IsHandled = true;
@@ -239,6 +245,11 @@ namespace CompilerNode
         public ISealableList<IParameter> SelectedResultList { get; private set; } = new SealableList<IParameter>();
 
         /// <summary>
+        /// The selected overload, if any.
+        /// </summary>
+        public OnceReference<IQueryOverloadType> SelectedOverloadType { get; private set; } = new OnceReference<IQueryOverloadType>();
+
+        /// <summary>
         /// Details of the feature call.
         /// </summary>
         public OnceReference<IFeatureCall> FeatureCall { get; private set; } = new OnceReference<IFeatureCall>();
@@ -285,9 +296,10 @@ namespace CompilerNode
         /// <param name="resolvedFinalFeature">The feature if the end of the path is a feature.</param>
         /// <param name="resolvedFinalDiscrete">The discrete if the end of the path is a discrete.</param>
         /// <param name="selectedResultList">The selected results.</param>
+        /// <param name="selectedOverloadType">The selected overload.</param>
         /// <param name="featureCall">Details of the feature call.</param>
         /// <param name="inheritBySideAttribute">Inherit the side-by-side attribute.</param>
-        public static bool ResolveCompilerReferences(IQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out ISealableList<IParameter> selectedResultList, out IFeatureCall featureCall, out bool inheritBySideAttribute)
+        public static bool ResolveCompilerReferences(IQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature, out IDiscrete resolvedFinalDiscrete, out ISealableList<IParameter> selectedResultList, out IQueryOverloadType selectedOverloadType, out IFeatureCall featureCall, out bool inheritBySideAttribute)
         {
             resolvedResult = null;
             resolvedException = null;
@@ -296,6 +308,7 @@ namespace CompilerNode
             resolvedFinalFeature = null;
             resolvedFinalDiscrete = null;
             selectedResultList = null;
+            selectedOverloadType = null;
             featureCall = null;
 
             IQualifiedName Query = (IQualifiedName)node.Query;
@@ -318,7 +331,7 @@ namespace CompilerNode
             if (FinalFeature != null)
             {
                 resolvedFinalFeature = FinalFeature;
-                return ResolveFeature(node, errorList, resolvedFinalFeature, FinalTypeName, FinalType, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedResultList, out featureCall);
+                return ResolveFeature(node, errorList, resolvedFinalFeature, FinalTypeName, FinalType, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out selectedResultList, out selectedOverloadType, out featureCall);
             }
             else
             {
@@ -329,13 +342,14 @@ namespace CompilerNode
             }
         }
 
-        private static bool ResolveFeature(IQueryExpression node, IErrorList errorList, ICompiledFeature resolvedFinalFeature, ITypeName finalTypeName, ICompiledType finalType, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ISealableList<IParameter> selectedResultList, out IFeatureCall featureCall)
+        private static bool ResolveFeature(IQueryExpression node, IErrorList errorList, ICompiledFeature resolvedFinalFeature, ITypeName finalTypeName, ICompiledType finalType, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ISealableList<IParameter> selectedResultList, out IQueryOverloadType selectedOverloadType, out IFeatureCall featureCall)
         {
             resolvedResult = null;
             resolvedException = null;
             constantSourceList = new SealableList<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
             selectedResultList = null;
+            selectedOverloadType = null;
             featureCall = null;
 
             ISealableDictionary<string, IScopeAttributeFeature> LocalScope = Scope.CurrentScope(node);
@@ -366,11 +380,11 @@ namespace CompilerNode
                     if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, TypeArgumentStyle, errorList, node, out SelectedIndex))
                         return false;
 
-                    IQueryOverloadType SelectedOverload = AsFunctionType.OverloadList[SelectedIndex];
-                    resolvedResult = new ResultType(SelectedOverload.ResultTypeList);
-                    resolvedException = new ResultException(SelectedOverload.ExceptionIdentifierList);
-                    selectedResultList = SelectedOverload.ResultTable;
-                    featureCall = new FeatureCall(SelectedOverload.ParameterTable, SelectedOverload.ResultTable, ArgumentList, MergedArgumentList, TypeArgumentStyle);
+                    selectedOverloadType = AsFunctionType.OverloadList[SelectedIndex];
+                    resolvedResult = new ResultType(selectedOverloadType.ResultTypeList);
+                    resolvedException = new ResultException(selectedOverloadType.ExceptionIdentifierList);
+                    selectedResultList = selectedOverloadType.ResultTable;
+                    featureCall = new FeatureCall(selectedOverloadType.ParameterTable, selectedOverloadType.ResultTable, ArgumentList, MergedArgumentList, TypeArgumentStyle);
                     IsHandled = true;
                     break;
 

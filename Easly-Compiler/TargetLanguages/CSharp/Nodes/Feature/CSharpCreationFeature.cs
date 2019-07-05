@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -96,6 +97,20 @@
         /// <param name="context">The initialization context.</param>
         public override void InitHierarchy(ICSharpContext context)
         {
+        }
+
+        /// <summary>
+        /// Gets the feature output format.
+        /// </summary>
+        /// <param name="selectedOverloadType">The selected overload type.</param>
+        /// <param name="hasReturn">True upon return if the feature returns a value.</param>
+        /// <param name="outgoingParameterCount">The number of 'out' parameters upon return.</param>
+        public override void GetOutputFormat(ICSharpQueryOverloadType selectedOverloadType, out bool hasReturn, out int outgoingParameterCount)
+        {
+            Debug.Assert(selectedOverloadType == null);
+
+            hasReturn = false;
+            outgoingParameterCount = 0;
         }
 
         /// <summary>

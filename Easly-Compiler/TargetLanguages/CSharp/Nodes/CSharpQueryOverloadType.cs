@@ -18,6 +18,13 @@
         /// The list of results.
         /// </summary>
         IList<ICSharpParameter> ResultList { get; }
+
+        /// <summary>
+        /// Gets the feature output format.
+        /// </summary>
+        /// <param name="hasReturn">True upon return if the feature returns a value.</param>
+        /// <param name="outgoingParameterCount">The number of 'out' parameters upon return.</param>
+        void GetOutputFormat(out bool hasReturn, out int outgoingParameterCount);
     }
 
     /// <summary>
@@ -73,6 +80,22 @@
         #endregion
 
         #region Client Interface
+        /// <summary>
+        /// Gets the feature output format.
+        /// </summary>
+        /// <param name="hasReturn">True upon return if the feature returns a value.</param>
+        /// <param name="outgoingParameterCount">The number of 'out' parameters upon return.</param>
+        public virtual void GetOutputFormat(out bool hasReturn, out int outgoingParameterCount)
+        {
+            hasReturn = false;
+
+            foreach (ICSharpParameter Result in ResultList)
+                if (Result.Name == nameof(BaseNode.Keyword.Result))
+                    hasReturn = true;
+
+            outgoingParameterCount = hasReturn ? ResultList.Count - 1 : ResultList.Count;
+        }
+
         /// <summary>
         /// Writes down the C# overload of a feature.
         /// </summary>
