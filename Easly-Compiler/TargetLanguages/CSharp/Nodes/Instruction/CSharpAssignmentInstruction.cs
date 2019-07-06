@@ -23,11 +23,6 @@
         /// The expression source of the assignment.
         /// </summary>
         ICSharpExpression SourceExpression { get; }
-
-        /// <summary>
-        /// The associated C# assignment.
-        /// </summary>
-        ICSharpAssignment Assignment { get; }
     }
 
     /// <summary>
@@ -72,8 +67,6 @@
                 ICSharpQualifiedName NewDestination = CSharpQualifiedName.Create(context, Destination, FinalFeature, null, false);
                 DestinationList.Add(NewDestination);
             }
-
-            Assignment = new CSharpAssignment(DestinationList, SourceExpression);
         }
         #endregion
 
@@ -92,11 +85,6 @@
         /// The expression source of the assignment.
         /// </summary>
         public ICSharpExpression SourceExpression { get; }
-
-        /// <summary>
-        /// The associated C# assignment.
-        /// </summary>
-        public ICSharpAssignment Assignment { get; }
         #endregion
 
         #region Client Interface
@@ -106,7 +94,35 @@
         /// <param name="writer">The stream on which to write.</param>
         public override void WriteCSharp(ICSharpWriter writer)
         {
-            Assignment.WriteCSharp(writer, false, false, true, out IList<string> DestinationEntityList);
+            List<string> DestinationNameList = new List<string>();
+            IDictionary<string, ICSharpQualifiedName> DestinationTable = new Dictionary<string, ICSharpQualifiedName>();
+
+            foreach (ICSharpQualifiedName Destination in DestinationList)
+            {
+                string DestinationName;
+
+                if (Destination.IsSimple)
+                    DestinationName = Destination.SimpleName;
+                else
+                {
+                    DestinationName = writer.GetTemporaryName();
+                    DestinationTable.Add(DestinationName, Destination);
+                }
+
+                DestinationNameList.Add(DestinationName);
+            }
+
+            ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext(DestinationNameList);
+
+            SourceExpression.WriteCSharp(writer, ExpressionContext, false, false, new List<ICSharpQualifiedName>(), -1, out string LastExpressionText);
+
+            foreach (KeyValuePair<string, ICSharpQualifiedName> Entry in DestinationTable)
+            {
+                string ResultName = Entry.Key;
+                string DestinationName = Entry.Value.CSharpText(writer, 0);
+
+                writer.WriteIndentedLine($"{DestinationName} = {ResultName};");
+            }
         }
         #endregion
     }

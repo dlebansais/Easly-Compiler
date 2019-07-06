@@ -105,7 +105,7 @@
             Condition += $" ({ExpressionString})";
             writer.WriteIndentedLine(Condition);
 
-            Instructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Indifferent, false);
+            Instructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Mandatory, false);
         }
         #endregion
     }

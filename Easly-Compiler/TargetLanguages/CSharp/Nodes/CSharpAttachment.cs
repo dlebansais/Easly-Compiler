@@ -129,7 +129,7 @@
             string IfLine = $"{ElseIfText}if ({AttachmentText})";
 
             writer.WriteIndentedLine(IfLine);
-            Instructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Indifferent, false);
+            Instructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Mandatory, false);
 
             for (int i = 0; i < AttachTypeList.Count; i++)
                 writer.RemoveAttachment(destinationEntityList[i]);

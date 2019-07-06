@@ -98,7 +98,7 @@
         /// <param name="writer">The stream on which to write.</param>
         public virtual void WriteCSharpInstructions(ICSharpWriter writer)
         {
-            Instructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Indifferent, false);
+            Instructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Mandatory, false);
         }
 
         /// <summary>

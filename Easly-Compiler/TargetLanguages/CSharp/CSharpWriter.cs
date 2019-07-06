@@ -203,6 +203,28 @@
             }
         }
 
+        /// <summary>
+        /// Gets a temporary name from a source name.
+        /// </summary>
+        public string GetTemporaryName()
+        {
+            string TemporaryName = "temp";
+
+            return TemporaryName;
+        }
+
+        /// <summary>
+        /// Gets a temporary name from a source name.
+        /// </summary>
+        /// <param name="sourceName">The source name.</param>
+        public string GetTemporaryName(string sourceName)
+        {
+            string CSharpIdentifier = CSharpNames.ToCSharpIdentifier(sourceName);
+            string TemporaryName = $"temp_{CSharpIdentifier}";
+
+            return TemporaryName;
+        }
+
         private IList<string> UsingList { get; } = new List<string>();
         private IList<string> LineList { get; } = new List<string>();
         #endregion

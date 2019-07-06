@@ -34,5 +34,16 @@
         /// </summary>
         /// <param name="name">The name.</param>
         void RemoveAttachment(string name);
+
+        /// <summary>
+        /// Gets a temporary name.
+        /// </summary>
+        string GetTemporaryName();
+
+        /// <summary>
+        /// Gets a temporary name from a source name.
+        /// </summary>
+        /// <param name="sourceName">The source name.</param>
+        string GetTemporaryName(string sourceName);
     }
 }

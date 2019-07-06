@@ -33,11 +33,6 @@
         /// Instructions for the else case. Can be null.
         /// </summary>
         ICSharpScope ElseInstructions { get; }
-
-        /// <summary>
-        /// The associated C# assignment of the source.
-        /// </summary>
-        ICSharpAssignment Assignment { get; }
     }
 
     /// <summary>
@@ -68,10 +63,26 @@
         {
             SourceExpression = CSharpExpression.Create(context, (IExpression)source.Source);
 
-            foreach (IName EntityName in source.EntityNameList)
+            DestinationList = new List<ICSharpQualifiedName>();
+            IResultType ResolvedResult = SourceExpression.Source.ResolvedResult.Item;
+
+            for (int i = 0; i < source.EntityNameList.Count; i++)
             {
+                IName EntityName = source.EntityNameList[i];
+
                 string ValidName = EntityName.ValidText.Item;
                 EntityNameList.Add(ValidName);
+
+                BaseNode.IQualifiedName BaseNodeDestination = BaseNodeHelper.NodeHelper.CreateSimpleQualifiedName(ValidName);
+                IExpressionType DestinationType = ResolvedResult.At(i);
+
+                IQualifiedName Destination = new QualifiedName(BaseNodeDestination, DestinationType);
+
+                IScopeAttributeFeature DestinationAttributeFeature = new ScopeAttributeFeature(EntityName, ValidName, DestinationType.ValueTypeName, DestinationType.ValueType);
+                ICSharpScopeAttributeFeature DestinationFeature = CSharpScopeAttributeFeature.Create(context, null, DestinationAttributeFeature);
+
+                ICSharpQualifiedName CSharpDestination = CSharpQualifiedName.Create(context, Destination, DestinationFeature, null, false);
+                DestinationList.Add(CSharpDestination);
             }
 
             foreach (IAttachment Attachment in source.AttachmentList)
@@ -83,8 +94,11 @@
             if (source.ElseInstructions.IsAssigned)
                 ElseInstructions = CSharpScope.Create(context, parentFeature, (IScope)source.ElseInstructions.Item);
 
-            Assignment = new CSharpAssignment(context, source.EntityNameList, "temp", SourceExpression);
+            ExpressionContext = new CSharpExpressionContext(EntityNameList);
         }
+
+        private IList<ICSharpQualifiedName> DestinationList;
+        private ICSharpExpressionContext ExpressionContext;
         #endregion
 
         #region Properties
@@ -112,11 +126,6 @@
         /// Instructions for the else case. Can be null.
         /// </summary>
         public ICSharpScope ElseInstructions { get; }
-
-        /// <summary>
-        /// The associated C# assignment of the source.
-        /// </summary>
-        public ICSharpAssignment Assignment { get; }
         #endregion
 
         #region Client Interface
@@ -134,13 +143,9 @@
 
         private void WriteCSharpSwitch(ICSharpWriter writer)
         {
-            Assignment.WriteCSharp(writer, true, true, true, out IList<string> DestinationEntityList);
+            SourceExpression.WriteCSharp(writer, ExpressionContext, true, true, new List<ICSharpQualifiedName>(), -1, out string LastExpressionText);
 
-            Debug.Assert(DestinationEntityList.Count > 0);
-
-            string DestinationEntity = DestinationEntityList[0];
-
-            writer.WriteIndentedLine($"switch ({DestinationEntity})");
+            writer.WriteIndentedLine($"switch ({LastExpressionText})");
             writer.WriteIndentedLine("{");
             writer.IncreaseIndent();
 
@@ -156,18 +161,18 @@
 
         private void WriteCSharpIf(ICSharpWriter writer)
         {
-            Assignment.WriteCSharp(writer, true, true, false, out IList<string> DestinationEntityList);
+            SourceExpression.WriteCSharp(writer, ExpressionContext, true, true, DestinationList, -1, out string LastExpressionText);
 
             for (int i = 0; i < AttachmentList.Count; i++)
             {
                 ICSharpAttachment Attachment = AttachmentList[i];
-                Attachment.WriteCSharpIf(writer, i, DestinationEntityList);
+                Attachment.WriteCSharpIf(writer, i, EntityNameList);
             }
 
             if (ElseInstructions != null)
             {
                 writer.WriteIndentedLine("else");
-                ElseInstructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Indifferent, false);
+                ElseInstructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Mandatory, false);
             }
         }
         #endregion

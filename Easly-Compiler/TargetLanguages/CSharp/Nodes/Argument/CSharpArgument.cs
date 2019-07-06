@@ -106,24 +106,26 @@
                 callText = string.Empty;
                 resultText = string.Empty;
             }
-
-            callText = null;
-            resultText = null;
-
-            switch (featureCall.ArgumentStyle)
+            else
             {
-                case TypeArgumentStyles.None:
-                case TypeArgumentStyles.Positional:
-                    CSharpPositionalArgumentList(writer, isNeverSimple, isDeclaredInPlace, featureCall, destinationList, skippedIndex, out callText, out resultText);
-                    break;
+                callText = null;
+                resultText = null;
 
-                case TypeArgumentStyles.Assignment:
-                    CSharpAssignmentArgumentList(writer, isNeverSimple, isDeclaredInPlace, featureCall, destinationList, skippedIndex, out callText, out resultText);
-                    break;
+                switch (featureCall.ArgumentStyle)
+                {
+                    case TypeArgumentStyles.None:
+                    case TypeArgumentStyles.Positional:
+                        CSharpPositionalArgumentList(writer, isNeverSimple, isDeclaredInPlace, featureCall, destinationList, skippedIndex, out callText, out resultText);
+                        break;
+
+                    case TypeArgumentStyles.Assignment:
+                        CSharpAssignmentArgumentList(writer, isNeverSimple, isDeclaredInPlace, featureCall, destinationList, skippedIndex, out callText, out resultText);
+                        break;
+                }
+
+                Debug.Assert(callText != null);
+                Debug.Assert(resultText != null);
             }
-
-            Debug.Assert(callText != null);
-            Debug.Assert(resultText != null);
         }
 
         private static void CSharpPositionalArgumentList(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string callText, out string resultText)
@@ -214,9 +216,8 @@
 
             resultText = string.Empty;
 
-            for (int i = 0; i < destinationList.Count; i++)
+            for (int i = 0; i < ResultList.Count; i++)
             {
-                ICSharpQualifiedName Destination = destinationList[i];
                 if (i == skippedIndex)
                     continue;
 
@@ -226,13 +227,24 @@
                 if (resultText.Length > 0)
                     resultText += ", ";
 
-                if (!Destination.IsSimple || isNeverSimple)
+                ICSharpQualifiedName Destination = i < destinationList.Count ? destinationList[i] : null;
+
+                if (Destination == null || !Destination.IsSimple || isNeverSimple)
                 {
                     Debug.Assert(i < ResultList.Count);
                     ICSharpParameter callTextParameter = ResultList[i];
 
                     string TempTypeText = callTextParameter.Feature.Type.Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
-                    string TempText = Destination.CSharpText(writer, 0).Replace('.', '_');
+
+                    string TempText;
+                    if (Destination != null)
+                    {
+                        TempText = Destination.CSharpText(writer, 0).Replace('.', '_');
+                        TempText = Destination.CSharpText(writer, 0).Replace('.', '_');
+                    }
+                    else
+                        TempText = ResultList[i].Name;
+
                     callText += $"out {TempTypeText} Temp_{TempText}";
                     resultText += $"Temp_{TempText}";
                 }

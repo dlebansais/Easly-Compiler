@@ -10,14 +10,14 @@
     public interface ICSharpAssignment
     {
         /// <summary>
-        /// The list of assignment destinations.
-        /// </summary>
-        IList<ICSharpQualifiedName> DestinationList { get; }
-
-        /// <summary>
         /// The expression source of the assignment.
         /// </summary>
         ICSharpExpression SourceExpression { get; }
+
+        /// <summary>
+        /// The list of names for each assigned resulst.
+        /// </summary>
+        IList<string> DestinationNameList { get; }
 
         /// <summary>
         /// Writes down the C# instruction.
@@ -25,9 +25,7 @@
         /// <param name="writer">The stream on which to write.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
-        /// <param name="isOutputAssigned">True if temporary 'out' variable should be assigned to their destination.</param>
-        /// <param name="destinationEntityList">The list of destinations assigned upon return.</param>
-        void WriteCSharp(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, bool isOutputAssigned, out IList<string> destinationEntityList);
+        void WriteCSharp(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace);
     }
 
     /// <summary>
@@ -39,11 +37,30 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpAssignment"/> class.
         /// </summary>
+        /// <param name="context">The creation context.</param>
         /// <param name="destinationList">The list of assignment destinations.</param>
         /// <param name="sourceExpression">The expression source of the assignment.</param>
-        public CSharpAssignment(IList<ICSharpQualifiedName> destinationList, ICSharpExpression sourceExpression)
+        public CSharpAssignment(ICSharpContext context, IList<ICSharpQualifiedName> destinationList, ICSharpExpression sourceExpression)
         {
-            DestinationList = destinationList;
+            DestinationNameList = new List<string>();
+            DestinationTable = new Dictionary<string, ICSharpQualifiedName>();
+/*
+            foreach (ICSharpQualifiedName Destination in destinationList)
+            {
+                string DestinationName;
+
+                if (Destination.IsSimple)
+                    DestinationName = Destination.SimpleName;
+                else
+                {
+                    DestinationName = context.GetTemporaryName();
+                    DestinationTable.Add(DestinationName, Destination);
+                }
+
+                DestinationNameList.Add(DestinationName);
+            }
+            */
+            ExpressionContext = new CSharpExpressionContext(DestinationNameList);
             SourceExpression = sourceExpression;
         }
 
@@ -51,76 +68,37 @@
         /// Initializes a new instance of the <see cref="CSharpAssignment"/> class.
         /// </summary>
         /// <param name="context">The creation context.</param>
-        /// <param name="destinationNameList">The list of destination names.</param>
-        /// <param name="tempPrefix">The prefix to add to destination names.</param>
+        /// <param name="destinationList">The list of assignment destinations.</param>
         /// <param name="sourceExpression">The expression source of the assignment.</param>
-        public CSharpAssignment(ICSharpContext context, IList<IName> destinationNameList, string tempPrefix, ICSharpExpression sourceExpression)
+        public CSharpAssignment(ICSharpContext context, IList<IName> destinationList, ICSharpExpression sourceExpression)
         {
-            DestinationList = new List<ICSharpQualifiedName>();
-            IResultType ResolvedResult = sourceExpression.Source.ResolvedResult.Item;
+            DestinationNameList = new List<string>();
+            DestinationTable = new Dictionary<string, ICSharpQualifiedName>();
 
-            for (int i = 0; i < destinationNameList.Count; i++)
+            foreach (IName Destination in destinationList)
             {
-                IName Name = destinationNameList[i];
-
-                string Text = Name.ValidText.Item;
-                BaseNode.IQualifiedName BaseNodeDestination = BaseNodeHelper.NodeHelper.CreateSimpleQualifiedName(Text);
-                IExpressionType DestinationType = ResolvedResult.At(i);
-
-                IQualifiedName Destination = new QualifiedName(BaseNodeDestination, DestinationType);
-
-                IScopeAttributeFeature DestinationAttributeFeature = new ScopeAttributeFeature(Name, Text, DestinationType.ValueTypeName, DestinationType.ValueType);
-                ICSharpScopeAttributeFeature DestinationFeature = CSharpScopeAttributeFeature.Create(context, null, DestinationAttributeFeature);
-
-                ICSharpQualifiedName CSharpDestination = CSharpQualifiedName.Create(context, Destination, DestinationFeature, null, false);
-                DestinationList.Add(CSharpDestination);
+                string DestinationName = Destination.ValidText.Item;
+                DestinationNameList.Add(DestinationName);
             }
 
+            ExpressionContext = new CSharpExpressionContext(DestinationNameList);
             SourceExpression = sourceExpression;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CSharpAssignment"/> class.
-        /// </summary>
-        /// <param name="context">The creation context.</param>
-        /// <param name="tempPrefix">The prefix to add to destination names.</param>
-        /// <param name="sourceExpression">The expression source of the assignment.</param>
-        public CSharpAssignment(ICSharpContext context, string tempPrefix, ICSharpExpression sourceExpression)
-        {
-            DestinationList = new List<ICSharpQualifiedName>();
-            IResultType ResolvedResult = sourceExpression.Source.ResolvedResult.Item;
-
-            for (int i = 0; i < ResolvedResult.Count; i++)
-            {
-                IExpressionType Result = ResolvedResult.At(i);
-
-                string Text = Result.Name;
-                BaseNode.IQualifiedName BaseNodeDestination = BaseNodeHelper.NodeHelper.CreateSimpleQualifiedName(Text);
-                IExpressionType DestinationType = ResolvedResult.At(i);
-
-                IQualifiedName Destination = new QualifiedName(BaseNodeDestination, DestinationType);
-
-                IScopeAttributeFeature DestinationAttributeFeature = new ScopeAttributeFeature(sourceExpression.Source, Text, DestinationType.ValueTypeName, DestinationType.ValueType);
-                ICSharpScopeAttributeFeature DestinationFeature = CSharpScopeAttributeFeature.Create(context, null, DestinationAttributeFeature);
-
-                ICSharpQualifiedName CSharpDestination = CSharpQualifiedName.Create(context, Destination, DestinationFeature, null, false);
-                DestinationList.Add(CSharpDestination);
-            }
-
-            SourceExpression = sourceExpression;
-        }
+        private ICSharpExpressionContext ExpressionContext;
+        private IDictionary<string, ICSharpQualifiedName> DestinationTable;
         #endregion
 
         #region Properties
         /// <summary>
-        /// The list of assignment destinations.
-        /// </summary>
-        public IList<ICSharpQualifiedName> DestinationList { get; }
-
-        /// <summary>
         /// The expression source of the assignment.
         /// </summary>
         public ICSharpExpression SourceExpression { get; }
+
+        /// <summary>
+        /// The list of names for each assigned resulst.
+        /// </summary>
+        public IList<string> DestinationNameList { get; }
         #endregion
 
         #region Client Interface
@@ -130,10 +108,19 @@
         /// <param name="writer">The stream on which to write.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
-        /// <param name="isOutputAssigned">True if temporary 'out' variable should be assigned to their destination.</param>
-        /// <param name="destinationEntityList">The list of destinations assigned upon return.</param>
-        public virtual void WriteCSharp(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, bool isOutputAssigned, out IList<string> destinationEntityList)
+        public virtual void WriteCSharp(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace)
         {
+            SourceExpression.WriteCSharp(writer, ExpressionContext, isNeverSimple, isDeclaredInPlace, new List<ICSharpQualifiedName>(), -1, out string LastExpressionText);
+
+            foreach (KeyValuePair<string, ICSharpQualifiedName> Entry in DestinationTable)
+            {
+                string ResultName = Entry.Key;
+                string DestinationName = Entry.Value.CSharpText(writer, 0);
+
+                writer.WriteIndentedLine($"{DestinationName} = {ResultName};");
+            }
+
+#if REMOVED
             if (DestinationList.Count > 1)
             {
                 bool IsHandled = false;
@@ -159,8 +146,10 @@
             }
             else
                 WriteCSharpSingle(writer, isDeclaredInPlace, out destinationEntityList);
+#endif
         }
 
+#if REMOVED
         private void WriteCSharpSingle(ICSharpWriter writer, bool isDeclaredInPlace, out IList<string> destinationEntityList)
         {
             Debug.Assert(DestinationList.Count == 1);
@@ -214,7 +203,6 @@
 
         private void WriteCSharpMultipleNoResult(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace)
         {
-            ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
             SourceExpression.WriteCSharp(writer, ExpressionContext, isNeverSimple, isDeclaredInPlace, DestinationList, -1, out string AssignementString);
             writer.WriteIndentedLine($"{AssignementString};");
         }
@@ -229,7 +217,6 @@
 
             string ResultDestinationName = ValidPath[0].ValidText.Item;
 
-            ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
             SourceExpression.WriteCSharp(writer, ExpressionContext, isNeverSimple, isDeclaredInPlace, DestinationList, resultNameIndex, out string AssignementString);
 
             if (isDeclaredInPlace)
@@ -276,6 +263,7 @@
                 }
             }
         }
+#endif
         #endregion
     }
 }

@@ -150,7 +150,7 @@
                 string ComplexContinueConditionString = ContinueCondition.IsComplex ? $"({ContinueConditionString})" : ContinueConditionString;
 
                 writer.WriteIndentedLine($"if (!{ComplexContinueConditionString})");
-                ElseInstructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Indifferent, false);
+                ElseInstructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Mandatory, false);
             }
         }
         #endregion

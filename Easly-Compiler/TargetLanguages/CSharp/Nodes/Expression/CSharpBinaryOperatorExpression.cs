@@ -61,16 +61,19 @@
             Debug.Assert(Operator != null);
 
             IResultType ResolvedLeftResult = LeftExpression.Source.ResolvedResult.Item;
+            IExpressionType PreferredLeftResult = ResolvedLeftResult.Preferred;
+            Debug.Assert(PreferredLeftResult != null);
 
-            for (int i = 0; i < ResolvedLeftResult.Count; i++)
+            if (PreferredLeftResult.ValueType is IClassType AsClassType)
+                if (AsClassType.BaseClass.ClassGuid == LanguageClasses.Number.Guid)
+                    IsCallingNumberFeature = true;
+
+            if (IsCallingNumberFeature)
             {
-                ICompiledType OperatorBaseType = ResolvedLeftResult.At(i).ValueType;
-                if (OperatorBaseType is IClassType AsClassType)
-                    if (AsClassType.BaseClass.ClassGuid == LanguageClasses.Number.Guid)
-                        IsCallingNumberFeature = true;
+                IResultType ResolvedRightResult = RightExpression.Source.ResolvedResult.Item;
+                Debug.Assert(ResolvedRightResult.Count == 1);
             }
-
-            if (!IsCallingNumberFeature)
+            else
             {
                 if (!LeftExpression.IsSingleResult)
                 {
@@ -166,12 +169,12 @@
         public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
         {
             if (IsCallingNumberFeature)
-                WriteCSharpNumberOperator(writer, isNeverSimple, isDeclaredInPlace, destinationList, skippedIndex, out lastExpressionText);
+                WriteCSharpNumberOperator(writer, expressionContext, isNeverSimple, isDeclaredInPlace, destinationList, skippedIndex, out lastExpressionText);
             else
-                WriteCSharpCustomOperator(writer, isNeverSimple, isDeclaredInPlace, destinationList, skippedIndex, out lastExpressionText);
+                WriteCSharpCustomOperator(writer, expressionContext, isNeverSimple, isDeclaredInPlace, destinationList, skippedIndex, out lastExpressionText);
         }
 
-        private void WriteCSharpNumberOperator(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        private void WriteCSharpNumberOperator(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
         {
             string OperatorText = null;
 
@@ -212,7 +215,7 @@
             lastExpressionText = $"{LeftText} {OperatorText} {RightText}";
         }
 
-        private void WriteCSharpCustomOperator(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        private void WriteCSharpCustomOperator(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
         {
             string OperatorText = CSharpNames.ToCSharpIdentifier(Operator.Name);
 

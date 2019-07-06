@@ -40,6 +40,11 @@
         bool IsSimple { get; }
 
         /// <summary>
+        /// Te qualified name if simple.
+        /// </summary>
+        string SimpleName { get; }
+
+        /// <summary>
         /// Gets the source code corresponding to the qualified name.
         /// </summary>
         /// <param name="usingCollection">The collection of using directives.</param>
@@ -141,6 +146,19 @@
         /// True if the qualified name is simple.
         /// </summary>
         public bool IsSimple { get { return ClassPath.Count == 1; } }
+
+        /// <summary>
+        /// True if the qualified name is simple.
+        /// </summary>
+        public string SimpleName
+        {
+            get
+            {
+                Debug.Assert(IsSimple);
+
+                return Source.ValidPath.Item[0].Text;
+            }
+        }
         #endregion
 
         #region Client Interface
