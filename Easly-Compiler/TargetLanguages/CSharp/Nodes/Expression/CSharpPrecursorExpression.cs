@@ -15,9 +15,19 @@
         new IPrecursorExpression Source { get; }
 
         /// <summary>
+        /// The precursor feature.
+        /// </summary>
+        ICSharpFeatureWithName PrecursorFeature { get; }
+
+        /// <summary>
         /// The feature whose precursor is being called.
         /// </summary>
         ICSharpFeatureWithName ParentFeature { get; }
+
+        /// <summary>
+        /// The selected overload type. Can be null.
+        /// </summary>
+        ICSharpQueryOverloadType SelectedOverloadType { get; }
 
         /// <summary>
         /// The feature call.
@@ -49,10 +59,18 @@
         protected CSharpPrecursorExpression(ICSharpContext context, IPrecursorExpression source)
             : base(context, source)
         {
+            PrecursorFeature = context.GetFeature(source.ResolvedPrecursor.Item.Feature) as ICSharpFeatureWithName;
+            Debug.Assert(PrecursorFeature != null);
+
             ParentFeature = context.GetFeature((ICompiledFeature)source.EmbeddingFeature) as ICSharpFeatureWithName;
             Debug.Assert(ParentFeature != null);
 
             FeatureCall = new CSharpFeatureCall(context, source.FeatureCall.Item);
+
+            if (Source.SelectedOverloadType.IsAssigned)
+                SelectedOverloadType = CSharpQueryOverloadType.Create(context, Source.SelectedOverloadType.Item, PrecursorFeature.Owner);
+            else
+                SelectedOverloadType = null;
         }
         #endregion
 
@@ -63,9 +81,19 @@
         public new IPrecursorExpression Source { get { return (IPrecursorExpression)base.Source; } }
 
         /// <summary>
+        /// The precursor feature.
+        /// </summary>
+        public ICSharpFeatureWithName PrecursorFeature { get; }
+
+        /// <summary>
         /// The feature whose precursor is being called.
         /// </summary>
         public ICSharpFeatureWithName ParentFeature { get; }
+
+        /// <summary>
+        /// The selected overload type. Can be null.
+        /// </summary>
+        public ICSharpQueryOverloadType SelectedOverloadType { get; }
 
         /// <summary>
         /// The feature call.
@@ -90,7 +118,10 @@
             if (!string.IsNullOrEmpty(CoexistingPrecursorRootName))
                 CoexistingPrecursorName = CSharpNames.ToCSharpIdentifier(CoexistingPrecursorRootName + " " + "Base");
 
-            CSharpArgument.CSharpArgumentList(writer, expressionContext, isNeverSimple, isDeclaredInPlace, FeatureCall, skippedIndex, false, out string ArgumentListText, out IList<string> OutgoingResultList);
+            PrecursorFeature.GetOutputFormat(SelectedOverloadType, out int OutgoingParameterCount, out int ReturnValueIndex);
+
+            CSharpArgument.CSharpArgumentList(writer, expressionContext, isNeverSimple, isDeclaredInPlace, FeatureCall, ReturnValueIndex, false, out string ArgumentListText, out IList<string> OutgoingResultList);
+            Debug.Assert(OutgoingParameterCount > 0);
 
             bool HasArguments = (ParentFeature is ICSharpFunctionFeature) || FeatureCall.ArgumentList.Count > 0;
             if (HasArguments)
@@ -101,7 +132,30 @@
             else
             {
                 string FunctionName = CSharpNames.ToCSharpIdentifier(ParentFeature.Name);
-                expressionContext.SetSingleReturnValue($"base.{FunctionName}{ArgumentListText}");
+
+                if (OutgoingParameterCount == 1)
+                {
+                    if (ArgumentListText.Length > 0)
+                        expressionContext.SetSingleReturnValue($"base.{FunctionName}{ArgumentListText}");
+                    else if (SelectedOverloadType != null)
+                        expressionContext.SetSingleReturnValue($"base.{FunctionName}()");
+                    else
+                        expressionContext.SetSingleReturnValue($"base.{FunctionName}");
+                }
+                else
+                {
+                    if (ReturnValueIndex >= 0)
+                    {
+                        string TemporaryResultName = writer.GetTemporaryName();
+                        writer.WriteIndentedLine($"var {TemporaryResultName} = base.{FunctionName}{ArgumentListText};");
+
+                        OutgoingResultList.Insert(ReturnValueIndex, TemporaryResultName);
+                    }
+                    else
+                        writer.WriteIndentedLine($"base.{FunctionName}{ArgumentListText};");
+
+                    expressionContext.SetMultipleResult(OutgoingResultList, ReturnValueIndex);
+                }
             }
         }
         #endregion

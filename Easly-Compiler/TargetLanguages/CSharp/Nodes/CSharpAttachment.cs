@@ -29,8 +29,9 @@
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
         /// <param name="index">Index of the attachment in the list.</param>
-        /// <param name="destinationEntityList">The list of entities to attach.</param>
-        void WriteCSharpIf(ICSharpWriter writer, int index, IList<string> destinationEntityList);
+        /// <param name="entityNameList">The list of entities to attach.</param>
+        /// <param name="expressionContext">The attached expression context.</param>
+        void WriteCSharpIf(ICSharpWriter writer, int index, IList<ICSharpVariableContext> entityNameList, ICSharpExpressionContext expressionContext);
 
         /// <summary>
         /// Writes down the C# attachment.
@@ -102,18 +103,21 @@
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
         /// <param name="index">Index of the attachment in the list.</param>
-        /// <param name="destinationEntityList">The list of entities to attach.</param>
-        public void WriteCSharpIf(ICSharpWriter writer, int index, IList<string> destinationEntityList)
+        /// <param name="entityNameList">The list of entities to attach.</param>
+        /// <param name="expressionContext">The attached expression context.</param>
+        public void WriteCSharpIf(ICSharpWriter writer, int index, IList<ICSharpVariableContext> entityNameList, ICSharpExpressionContext expressionContext)
         {
-            Debug.Assert(destinationEntityList.Count >= AttachTypeList.Count);
+            IList<string> CompleteDestinationNameList = expressionContext.CompleteDestinationNameList;
+
+            Debug.Assert(CompleteDestinationNameList.Count >= AttachTypeList.Count);
 
             string ElseIfText = index > 0 ? "else " : string.Empty;
             string AttachmentText = string.Empty;
 
             for (int i = 0; i < AttachTypeList.Count; i++)
             {
-                string EntityText = $"Temp_{destinationEntityList[i]}";
-                string AttachedEntityText = $"{destinationEntityList[i]}{index}";
+                string EntityText = CompleteDestinationNameList[i];
+                string AttachedEntityText = writer.GetTemporaryName(CompleteDestinationNameList[i]);
                 string TypeText = AttachTypeList[i].Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
                 string NameAttached = $"As{TypeText}{AttachedEntityText}";
 
@@ -124,7 +128,7 @@
 
                 AttachmentText += TypeAttachmentText;
 
-                writer.AddAttachment(destinationEntityList[i], NameAttached);
+                writer.AddAttachment(entityNameList[i].Name, NameAttached);
             }
 
             string IfLine = $"{ElseIfText}if ({AttachmentText})";
@@ -133,7 +137,7 @@
             Instructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Mandatory, false);
 
             for (int i = 0; i < AttachTypeList.Count; i++)
-                writer.RemoveAttachment(destinationEntityList[i]);
+                writer.RemoveAttachment(entityNameList[i].Name);
         }
 
         /// <summary>

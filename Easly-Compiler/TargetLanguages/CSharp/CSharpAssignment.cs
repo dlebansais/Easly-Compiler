@@ -17,7 +17,7 @@
         /// <summary>
         /// The list of names for each assigned resulst.
         /// </summary>
-        IList<string> DestinationNameList { get; }
+        IList<ICSharpVariableContext> DestinationNameList { get; }
 
         /// <summary>
         /// Writes down the C# instruction.
@@ -42,7 +42,7 @@
         /// <param name="sourceExpression">The expression source of the assignment.</param>
         public CSharpAssignment(ICSharpContext context, IList<ICSharpQualifiedName> destinationList, ICSharpExpression sourceExpression)
         {
-            DestinationNameList = new List<string>();
+            DestinationNameList = new List<ICSharpVariableContext>();
             DestinationTable = new Dictionary<string, ICSharpQualifiedName>();
 /*
             foreach (ICSharpQualifiedName Destination in destinationList)
@@ -72,13 +72,13 @@
         /// <param name="sourceExpression">The expression source of the assignment.</param>
         public CSharpAssignment(ICSharpContext context, IList<IName> destinationList, ICSharpExpression sourceExpression)
         {
-            DestinationNameList = new List<string>();
+            DestinationNameList = new List<ICSharpVariableContext>();
             DestinationTable = new Dictionary<string, ICSharpQualifiedName>();
 
             foreach (IName Destination in destinationList)
             {
                 string DestinationName = Destination.ValidText.Item;
-                DestinationNameList.Add(DestinationName);
+                DestinationNameList.Add(new CSharpVariableContext(DestinationName));
             }
 
             ExpressionContext = new CSharpExpressionContext(DestinationNameList);
@@ -98,7 +98,7 @@
         /// <summary>
         /// The list of names for each assigned resulst.
         /// </summary>
-        public IList<string> DestinationNameList { get; }
+        public IList<ICSharpVariableContext> DestinationNameList { get; }
         #endregion
 
         #region Client Interface

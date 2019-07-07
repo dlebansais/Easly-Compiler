@@ -248,10 +248,10 @@
                 if (!isAgentCall && callText.Length > 0)
                     callText += ", ";
 
-                string Destination = i < expressionContext.DestinationNameList.Count ? expressionContext.DestinationNameList[i] : null;
+                ICSharpVariableContext Destination = i < expressionContext.DestinationNameList.Count ? expressionContext.DestinationNameList[i] : null;
                 string ResultText;
 
-                if (Destination == null /*|| !Destination.IsSimple*/ || isNeverSimple)
+                if (Destination == null /*|| !Destination.IsSimple*/ || isNeverSimple || !Destination.IsDeclared)
                 {
                     Debug.Assert(i < ResultList.Count);
                     ICSharpParameter callTextParameter = ResultList[i];
@@ -260,7 +260,7 @@
 
                     string TempText;
                     if (Destination != null)
-                        TempText = Destination;
+                        TempText = Destination.Name;
                     else
                         TempText = ResultList[i].Name;
 
@@ -273,7 +273,7 @@
                 }
                 else
                 {
-                    string DestinationText = Destination;
+                    string DestinationText = Destination.Name;
 
                     if (!isAgentCall)
                         callText += $"out {DestinationText}";

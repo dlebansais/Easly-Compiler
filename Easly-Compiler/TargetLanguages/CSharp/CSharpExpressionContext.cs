@@ -11,7 +11,7 @@
         /// <summary>
         /// Name to use for destination variables.
         /// </summary>
-        IList<string> DestinationNameList { get; }
+        IList<ICSharpVariableContext> DestinationNameList { get; }
 
         /// <summary>
         /// Copy of <see cref="DestinationNameList"/> but with temporary variables added.
@@ -58,18 +58,19 @@
         /// </summary>
         public CSharpExpressionContext()
         {
-            DestinationNameList = new List<string>();
+            DestinationNameList = new List<ICSharpVariableContext>();
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CSharpExpressionContext"/> class.
         /// </summary>
-        public CSharpExpressionContext(IList<string> destinationNameList)
+        /// <param name="destinationNameList">The list of variables to use as destination.</param>
+        public CSharpExpressionContext(IList<ICSharpVariableContext> destinationNameList)
         {
             DestinationNameList = destinationNameList;
 
-            foreach (string Name in DestinationNameList)
-                CompleteDestinationNameList.Add(Name);
+            foreach (ICSharpVariableContext Item in DestinationNameList)
+                CompleteDestinationNameList.Add(Item.Name);
         }
         #endregion
 
@@ -78,7 +79,7 @@
         /// Name to use for destination variables.
         /// Contains names that can be assigned directly as 'out' results. May contain less names than results, and these extra results are allowed to be lost.
         /// </summary>
-        public IList<string> DestinationNameList { get; }
+        public IList<ICSharpVariableContext> DestinationNameList { get; }
 
         /// <summary>
         /// Copy of <see cref="DestinationNameList"/> but with temporary variables added.
@@ -155,7 +156,7 @@
             ReturnValue = value;
 
             if (DestinationNameList.Count == 1)
-                FilledDestinationTable.Add(DestinationNameList[0], null);
+                FilledDestinationTable.Add(DestinationNameList[0].Name, null);
         }
 
         /// <summary>
@@ -178,7 +179,7 @@
                 }
 
                 if (i < DestinationNameList.Count)
-                    FilledDestinationTable.Add(DestinationNameList[i], OutgoingResult);
+                    FilledDestinationTable.Add(DestinationNameList[i].Name, OutgoingResult);
             }
 
             ReturnValueIndex = returnValueIndex;

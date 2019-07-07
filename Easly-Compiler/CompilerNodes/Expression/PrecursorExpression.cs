@@ -22,6 +22,11 @@ namespace CompilerNode
         OnceReference<IFeatureInstance> ResolvedPrecursor { get; }
 
         /// <summary>
+        /// The selected overload, if any.
+        /// </summary>
+        OnceReference<IQueryOverloadType> SelectedOverloadType { get; }
+
+        /// <summary>
         /// Details of the feature call.
         /// </summary>
         OnceReference<IFeatureCall> FeatureCall { get; }
@@ -131,6 +136,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
                 ResolvedException = new OnceReference<IResultException>();
+                SelectedOverloadType = new OnceReference<IQueryOverloadType>();
                 FeatureCall = new OnceReference<IFeatureCall>();
                 IsHandled = true;
             }
@@ -210,6 +216,11 @@ namespace CompilerNode
         public OnceReference<IFeatureInstance> ResolvedPrecursor { get; private set; } = new OnceReference<IFeatureInstance>();
 
         /// <summary>
+        /// The selected overload, if any.
+        /// </summary>
+        public OnceReference<IQueryOverloadType> SelectedOverloadType { get; private set; } = new OnceReference<IQueryOverloadType>();
+
+        /// <summary>
         /// Details of the feature call.
         /// </summary>
         public OnceReference<IFeatureCall> FeatureCall { get; private set; } = new OnceReference<IFeatureCall>();
@@ -260,14 +271,16 @@ namespace CompilerNode
         /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
         /// <param name="expressionConstant">The expression constant upon return.</param>
         /// <param name="selectedPrecursor">The precursor feature.</param>
+        /// <param name="selectedOverloadType">The selected overload.</param>
         /// <param name="featureCall">Details of the feature call.</param>
-        public static bool ResolveCompilerReferences(IPrecursorExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFeatureInstance selectedPrecursor, out IFeatureCall featureCall)
+        public static bool ResolveCompilerReferences(IPrecursorExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFeatureInstance selectedPrecursor, out IQueryOverloadType selectedOverloadType, out IFeatureCall featureCall)
         {
             resolvedResult = null;
             resolvedException = null;
             constantSourceList = new SealableList<IExpression>();
             expressionConstant = NeutralLanguageConstant.NotConstant;
             selectedPrecursor = null;
+            selectedOverloadType = null;
             featureCall = null;
 
             IOptionalReference<BaseNode.IObjectType> AncestorType = node.AncestorType;
@@ -293,7 +306,7 @@ namespace CompilerNode
             if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, errorList))
                 return false;
 
-            if (!ResolveCall(node, selectedPrecursor, MergedArgumentList, TypeArgumentStyle, errorList, out resolvedResult, out resolvedException, out ISealableList<IParameter> SelectedParameterList, out ISealableList<IParameter> SelectedResultList, out List<IExpressionType> ResolvedArgumentList))
+            if (!ResolveCall(node, selectedPrecursor, MergedArgumentList, TypeArgumentStyle, errorList, out resolvedResult, out resolvedException, out ISealableList<IParameter> SelectedParameterList, out ISealableList<IParameter> SelectedResultList, out List<IExpressionType> ResolvedArgumentList, out selectedOverloadType))
                 return false;
 
             featureCall = new FeatureCall(SelectedParameterList, SelectedResultList, ArgumentList, ResolvedArgumentList, TypeArgumentStyle);
@@ -328,13 +341,14 @@ namespace CompilerNode
             return true;
         }
 
-        private static bool ResolveCall(IPrecursorExpression node, IFeatureInstance selectedPrecursor, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IParameter> selectedParameterList, out ISealableList<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList)
+        private static bool ResolveCall(IPrecursorExpression node, IFeatureInstance selectedPrecursor, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IParameter> selectedParameterList, out ISealableList<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList, out IQueryOverloadType selectedOverloadType)
         {
             resolvedResult = null;
             resolvedException = null;
             selectedParameterList = null;
             selectedResultList = null;
             resolvedArgumentList = null;
+            selectedOverloadType = null;
 
             IList<IArgument> ArgumentList = node.ArgumentList;
             ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
@@ -361,7 +375,7 @@ namespace CompilerNode
                     IFunctionType FunctionType = AsFunctionFeature.ResolvedAgentType.Item as IFunctionType;
                     Debug.Assert(FunctionType != null);
 
-                    Success = ResolveCallFunction(node, selectedPrecursor, FunctionType, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out selectedParameterList, out selectedResultList, out resolvedArgumentList);
+                    Success = ResolveCallFunction(node, selectedPrecursor, FunctionType, mergedArgumentList, argumentStyle, errorList, out resolvedResult, out resolvedException, out selectedParameterList, out selectedResultList, out resolvedArgumentList, out selectedOverloadType);
                     IsHandled = true;
                     break;
 
@@ -412,13 +426,14 @@ namespace CompilerNode
             return true;
         }
 
-        private static bool ResolveCallFunction(IPrecursorExpression node, IFeatureInstance selectedPrecursor, IFunctionType callType, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IParameter> selectedParameterList, out ISealableList<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList)
+        private static bool ResolveCallFunction(IPrecursorExpression node, IFeatureInstance selectedPrecursor, IFunctionType callType, List<IExpressionType> mergedArgumentList, TypeArgumentStyles argumentStyle, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IParameter> selectedParameterList, out ISealableList<IParameter> selectedResultList, out List<IExpressionType> resolvedArgumentList, out IQueryOverloadType selectedOverloadType)
         {
             resolvedResult = null;
             resolvedException = null;
             selectedParameterList = null;
             selectedResultList = null;
             resolvedArgumentList = null;
+            selectedOverloadType = null;
 
             IList<IArgument> ArgumentList = node.ArgumentList;
             ICompiledFeature OperatorFeature = selectedPrecursor.Feature;
@@ -430,11 +445,11 @@ namespace CompilerNode
             if (!Argument.ArgumentsConformToParameters(ParameterTableList, mergedArgumentList, argumentStyle, errorList, node, out int SelectedIndex))
                 return false;
 
-            IQueryOverloadType SelectedOverload = callType.OverloadList[SelectedIndex];
-            resolvedResult = new ResultType(SelectedOverload.ResultTypeList);
-            resolvedException = new ResultException(SelectedOverload.ExceptionIdentifierList);
-            selectedParameterList = SelectedOverload.ParameterTable;
-            selectedResultList = SelectedOverload.ResultTable;
+            selectedOverloadType = callType.OverloadList[SelectedIndex];
+            resolvedResult = new ResultType(selectedOverloadType.ResultTypeList);
+            resolvedException = new ResultException(selectedOverloadType.ExceptionIdentifierList);
+            selectedParameterList = selectedOverloadType.ParameterTable;
+            selectedResultList = selectedOverloadType.ResultTable;
             resolvedArgumentList = mergedArgumentList;
 
             return true;

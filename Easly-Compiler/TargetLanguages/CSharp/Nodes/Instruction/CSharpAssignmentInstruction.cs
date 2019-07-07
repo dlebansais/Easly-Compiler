@@ -94,22 +94,29 @@
         /// <param name="writer">The stream on which to write.</param>
         public override void WriteCSharp(ICSharpWriter writer)
         {
-            List<string> DestinationNameList = new List<string>();
+            List<ICSharpVariableContext> DestinationNameList = new List<ICSharpVariableContext>();
             IDictionary<string, ICSharpQualifiedName> DestinationTable = new Dictionary<string, ICSharpQualifiedName>();
 
             foreach (ICSharpQualifiedName Destination in DestinationList)
             {
-                string DestinationName;
+                ICSharpVariableContext DestinationContext;
 
                 if (Destination.IsSimple)
-                    DestinationName = CSharpNames.ToCSharpIdentifier(Destination.SimpleName);
+                {
+                    string DestinationName = CSharpNames.ToCSharpIdentifier(Destination.SimpleName);
+                    if (writer.AttachmentMap.ContainsKey(DestinationName))
+                        DestinationName = writer.AttachmentMap[DestinationName];
+
+                    DestinationContext = new CSharpVariableContext(DestinationName);
+                }
                 else
                 {
-                    DestinationName = writer.GetTemporaryName();
+                    string DestinationName = writer.GetTemporaryName();
+                    DestinationContext = new CSharpVariableContext(DestinationName, isDeclared: false);
                     DestinationTable.Add(DestinationName, Destination);
                 }
 
-                DestinationNameList.Add(DestinationName);
+                DestinationNameList.Add(DestinationContext);
             }
 
             ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext(DestinationNameList);
@@ -121,7 +128,7 @@
             for (int i = 0; i < DestinationList.Count; i++)
             {
                 ICSharpQualifiedName Destination = DestinationList[i];
-                string Name = DestinationNameList[i];
+                string Name = DestinationNameList[i].Name;
 
                 Debug.Assert(FilledDestinationTable.ContainsKey(Name));
                 string ResultText = FilledDestinationTable[Name];

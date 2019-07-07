@@ -208,7 +208,9 @@
         /// </summary>
         public string GetTemporaryName()
         {
-            string TemporaryName = "temp";
+            string TemporaryName = $"temp_{TemporaryVariableIndex}";
+
+            TemporaryVariableIndex++;
 
             return TemporaryName;
         }

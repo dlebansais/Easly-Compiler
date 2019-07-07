@@ -22,7 +22,7 @@
         /// <summary>
         /// List of attached entities.
         /// </summary>
-        IList<string> EntityNameList { get; }
+        IList<ICSharpVariableContext> EntityNameList { get; }
 
         /// <summary>
         /// List of attachments.
@@ -70,7 +70,7 @@
                 IName EntityName = source.EntityNameList[i];
 
                 string ValidName = EntityName.ValidText.Item;
-                EntityNameList.Add(ValidName);
+                EntityNameList.Add(new CSharpVariableContext(ValidName));
             }
 
             foreach (IAttachment Attachment in source.AttachmentList)
@@ -98,7 +98,7 @@
         /// <summary>
         /// List of attached entities.
         /// </summary>
-        public IList<string> EntityNameList { get; } = new List<string>();
+        public IList<ICSharpVariableContext> EntityNameList { get; } = new List<ICSharpVariableContext>();
 
         /// <summary>
         /// List of attachments.
@@ -130,7 +130,7 @@
             SourceExpression.WriteCSharp(writer, ExpressionContext, true, true, -1);
 
             Debug.Assert(ExpressionContext.FilledDestinationTable.Count == 1);
-            string EntityName = EntityNameList[0];
+            string EntityName = EntityNameList[0].Name;
             string LastExpressionText = ExpressionContext.FilledDestinationTable[EntityName];
             if (LastExpressionText == null)
                 LastExpressionText = ExpressionContext.ReturnValue;
@@ -151,13 +151,13 @@
 
         private void WriteCSharpIf(ICSharpWriter writer)
         {
-            ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext(EntityNameList);
+            ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
             SourceExpression.WriteCSharp(writer, ExpressionContext, true, true, -1);
 
             for (int i = 0; i < AttachmentList.Count; i++)
             {
                 ICSharpAttachment Attachment = AttachmentList[i];
-                Attachment.WriteCSharpIf(writer, i, EntityNameList);
+                Attachment.WriteCSharpIf(writer, i, EntityNameList, ExpressionContext);
             }
 
             if (ElseInstructions != null)
