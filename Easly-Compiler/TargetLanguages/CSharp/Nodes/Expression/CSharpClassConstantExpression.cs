@@ -94,18 +94,16 @@
         /// <param name="expressionContext">The context.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
-        /// <param name="destinationList">The list of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
-        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
         {
             if (Feature != null)
                 if (Class.ValidSourceName == "Microsoft .NET")
-                    lastExpressionText = CSharpNames.ToDotNetIdentifier(Class.ValidClassName) + "." + CSharpNames.ToDotNetIdentifier(Feature.Name);
+                    expressionContext.SetSingleReturnValue(CSharpNames.ToDotNetIdentifier(Class.ValidClassName) + "." + CSharpNames.ToDotNetIdentifier(Feature.Name));
                 else
-                    lastExpressionText = CSharpNames.ToCSharpIdentifier(Class.ValidClassName) + "." + CSharpNames.ToCSharpIdentifier(Feature.Name);
+                    expressionContext.SetSingleReturnValue(CSharpNames.ToCSharpIdentifier(Class.ValidClassName) + "." + CSharpNames.ToCSharpIdentifier(Feature.Name));
             else
-                lastExpressionText = CSharpNames.ToCSharpIdentifier(Discrete.Name);
+                expressionContext.SetSingleReturnValue(CSharpNames.ToCSharpIdentifier(Discrete.Name));
         }
         #endregion
     }

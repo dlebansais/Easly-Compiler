@@ -121,40 +121,40 @@
         /// <param name="expressionContext">The context.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
-        /// <param name="destinationList">The list of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
-        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
         {
-            lastExpressionText = null;
+            string Result = null;
 
             switch (Delegated)
             {
                 case ICSharpAttributeFeature AsAttributeFeature:
-                    lastExpressionText = CSharpTextAttribute(writer, AsAttributeFeature, destinationList);
+                    Result = CSharpTextAttribute(writer, AsAttributeFeature);
                     break;
 
                 case ICSharpConstantFeature AsConstantFeature:
-                    lastExpressionText = CSharpTextConstant(writer, AsConstantFeature, destinationList);
+                    Result = CSharpTextConstant(writer, AsConstantFeature);
                     break;
 
                 case ICSharpProcedureFeature AsProcedureFeature:
-                    lastExpressionText = CSharpTextProcedure(writer, AsProcedureFeature, destinationList);
+                    Result = CSharpTextProcedure(writer, AsProcedureFeature);
                     break;
 
                 case ICSharpFunctionFeature AsFunctionFeature:
-                    lastExpressionText = CSharpTextFunction(writer, AsFunctionFeature, destinationList);
+                    Result = CSharpTextFunction(writer, AsFunctionFeature);
                     break;
 
                 case ICSharpPropertyFeature AsPropertyFeature:
-                    lastExpressionText = CSharpTextProperty(writer, AsPropertyFeature, destinationList);
+                    Result = CSharpTextProperty(writer, AsPropertyFeature);
                     break;
             }
 
-            Debug.Assert(lastExpressionText != null);
+            Debug.Assert(Result != null);
+
+            expressionContext.SetSingleReturnValue(Result);
         }
 
-        private string CSharpTextAttribute(ICSharpUsingCollection usingCollection, ICSharpAttributeFeature feature, IList<ICSharpQualifiedName> destinationList)
+        private string CSharpTextAttribute(ICSharpUsingCollection usingCollection, ICSharpAttributeFeature feature)
         {
             string Result;
 
@@ -170,7 +170,7 @@
             return Result;
         }
 
-        private string CSharpTextConstant(ICSharpUsingCollection usingCollection, ICSharpConstantFeature feature, IList<ICSharpQualifiedName> destinationList)
+        private string CSharpTextConstant(ICSharpUsingCollection usingCollection, ICSharpConstantFeature feature)
         {
             string Result;
 
@@ -186,7 +186,7 @@
             return Result;
         }
 
-        private string CSharpTextProcedure(ICSharpUsingCollection usingCollection, ICSharpProcedureFeature feature, IList<ICSharpQualifiedName> destinationList)
+        private string CSharpTextProcedure(ICSharpUsingCollection usingCollection, ICSharpProcedureFeature feature)
         {
             string Result;
 
@@ -222,7 +222,7 @@
             return Result;
         }
 
-        private string CSharpTextFunction(ICSharpUsingCollection usingCollection, ICSharpFunctionFeature feature, IList<ICSharpQualifiedName> destinationList)
+        private string CSharpTextFunction(ICSharpUsingCollection usingCollection, ICSharpFunctionFeature feature)
         {
             string Result;
 
@@ -258,7 +258,7 @@
             return Result;
         }
 
-        private string CSharpTextProperty(ICSharpUsingCollection usingCollection, ICSharpPropertyFeature feature, IList<ICSharpQualifiedName> destinationList)
+        private string CSharpTextProperty(ICSharpUsingCollection usingCollection, ICSharpPropertyFeature feature)
         {
             string Result;
 

@@ -36,7 +36,8 @@
         /// Writes down the C# attachment.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        void WriteCSharpCase(ICSharpWriter writer);
+        /// <param name="destinationEntity">The entity to attach.</param>
+        void WriteCSharpCase(ICSharpWriter writer, string destinationEntity);
     }
 
     /// <summary>
@@ -139,15 +140,20 @@
         /// Writes down the C# attachment.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
-        public void WriteCSharpCase(ICSharpWriter writer)
+        /// <param name="destinationEntity">The entity to attach.</param>
+        public void WriteCSharpCase(ICSharpWriter writer, string destinationEntity)
         {
             Debug.Assert(AttachTypeList.Count == 1);
 
             string TypeText = AttachTypeList[0].Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
-            string AttachmentLine = $"case {TypeText} As{TypeText}:";
+            string NameAttached = $"As{TypeText}";
+            string AttachmentLine = $"case {TypeText} {NameAttached}:";
 
             writer.WriteIndentedLine(AttachmentLine);
+
+            writer.AddAttachment(destinationEntity, NameAttached);
             Instructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.AlreadyInserted, true);
+            writer.RemoveAttachment(destinationEntity);
         }
         #endregion
     }

@@ -67,7 +67,10 @@
         /// <param name="writer">The stream on which to write.</param>
         public override void WriteCSharp(ICSharpWriter writer)
         {
-            string ExpressionText = BooleanExpression.CSharpText(writer);
+            ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
+            BooleanExpression.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
+
+            string ExpressionText = SourceExpressionContext.ReturnValue;
 
             if (BooleanExpression.IsEventExpression)
                 if (BooleanExpression.IsComplex)

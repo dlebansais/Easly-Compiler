@@ -127,7 +127,10 @@
         /// <param name="writer">The stream on which to write.</param>
         public override void WriteCSharp(ICSharpWriter writer)
         {
-            string OverListString = OverList.CSharpText(writer);
+            ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
+            OverList.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
+
+            string OverListString = SourceExpressionContext.ReturnValue;
 
             ICSharpScopeAttributeFeature Indexer = IndexerList[0];
             string IndexerNameString = Indexer.Name;

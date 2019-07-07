@@ -103,14 +103,14 @@
         /// Gets the feature output format.
         /// </summary>
         /// <param name="selectedOverloadType">The selected overload type.</param>
-        /// <param name="hasReturn">True upon return if the feature returns a value.</param>
         /// <param name="outgoingParameterCount">The number of 'out' parameters upon return.</param>
-        public override void GetOutputFormat(ICSharpQueryOverloadType selectedOverloadType, out bool hasReturn, out int outgoingParameterCount)
+        /// <param name="returnValueIndex">Index of the return value if the feature returns a value, -1 otherwise.</param>
+        public override void GetOutputFormat(ICSharpQueryOverloadType selectedOverloadType, out int outgoingParameterCount, out int returnValueIndex)
         {
             Debug.Assert(selectedOverloadType == null);
 
-            hasReturn = false;
             outgoingParameterCount = 0;
+            returnValueIndex = -1;
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -88,7 +89,11 @@
         /// <param name="isElseIf">True if the conditional is not the first.</param>
         public virtual void WriteCSharp(ICSharpWriter writer, bool isElseIf)
         {
-            string ExpressionString = BooleanExpression.CSharpText(writer);
+            ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
+            BooleanExpression.WriteCSharp(writer, ExpressionContext, false, false, -1);
+
+            string ExpressionString = ExpressionContext.ReturnValue;
+            Debug.Assert(ExpressionString != null);
 
             if (BooleanExpression.IsEventExpression)
                 if (BooleanExpression.IsComplex)

@@ -79,18 +79,16 @@
         /// <param name="expressionContext">The context.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
-        /// <param name="destinationList">The list of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
-        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
         {
             if (IsEventExpression)
-                lastExpressionText = CSharpTextEvent(writer, destinationList);
+                expressionContext.SetSingleReturnValue(CSharpTextEvent(writer, expressionContext));
             else
-                WriteCSharpBoolean(writer, destinationList, out lastExpressionText);
+                WriteCSharpBoolean(writer, expressionContext);
         }
 
-        private string CSharpTextEvent(ICSharpWriter writer, IList<ICSharpQualifiedName> destinationList)
+        private string CSharpTextEvent(ICSharpWriter writer, ICSharpExpressionContext expressionContext)
         {
             string LeftText = NestedExpressionText(writer, LeftExpression);
             string RightText = NestedExpressionText(writer, RightExpression);
@@ -121,7 +119,7 @@
             return $"{LeftText} {OperatorName} {RightText}";
         }
 
-        private void WriteCSharpBoolean(ICSharpWriter writer, IList<ICSharpQualifiedName> destinationList, out string lastExpressionText)
+        private void WriteCSharpBoolean(ICSharpWriter writer, ICSharpExpressionContext expressionContext)
         {
             if (LeftExpression.IsSingleResult && RightExpression.IsSingleResult)
             {
@@ -129,7 +127,7 @@
                 string RightText = NestedExpressionText(writer, RightExpression);
 
                 if (Source.Conditional == BaseNode.ConditionalTypes.Implies)
-                    lastExpressionText = $"!{LeftText} || {RightText}";
+                    expressionContext.SetSingleReturnValue($"!{LeftText} || {RightText}");
                 else
                 {
                     string OperatorName = null;
@@ -151,22 +149,25 @@
 
                     Debug.Assert(OperatorName != null);
 
-                    lastExpressionText = $"{LeftText} {OperatorName} {RightText}";
+                    expressionContext.SetSingleReturnValue($"{LeftText} {OperatorName} {RightText}");
                 }
             }
             else
             {
                 //TODO
-                lastExpressionText = "TODO";
+                expressionContext.SetSingleReturnValue("TODO");
             }
         }
 
         private string NestedExpressionText(ICSharpWriter writer, ICSharpExpression expression)
         {
-            string Result = expression.CSharpText(writer);
+            ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
+            expression.WriteCSharp(writer, ExpressionContext, false, false, -1);
 
-            if (expression.IsComplex)
-                Result = $"({Result})";
+            string ExpressionString = ExpressionContext.ReturnValue;
+            Debug.Assert(ExpressionString != null);
+
+            string Result = expression.IsComplex ? ExpressionString : $"({ExpressionString})";
 
             return Result;
         }

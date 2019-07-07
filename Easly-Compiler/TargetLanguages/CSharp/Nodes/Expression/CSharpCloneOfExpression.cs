@@ -88,18 +88,19 @@
         /// <param name="expressionContext">The context.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
-        /// <param name="destinationList">The list of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
-        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
         {
             // TODO clone of multiple result
 
             ICSharpType ClonedType = TypeList[0];
             string SourceTypeText = ClonedType.Type2CSharpString(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
-            string SourceText = SourceExpression.CSharpText(writer);
+            ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
+            SourceExpression.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
 
-            lastExpressionText = $"({SourceTypeText})({SourceText}).Clone()";
+            string SourceText = SourceExpressionContext.ReturnValue;
+
+            expressionContext.SetSingleReturnValue($"({SourceTypeText})({SourceText}).Clone()");
         }
         #endregion
     }

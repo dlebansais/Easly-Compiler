@@ -91,8 +91,14 @@
         public override void WriteCSharp(ICSharpWriter writer)
         {
             string DestinationString = Destination.CSharpText(writer, 0);
-            string SourceString = SourceExpression.CSharpText(writer);
-            string ArgumentListText = CSharpArgument.CSharpArgumentList(writer, FeatureCall);
+
+            ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
+            SourceExpression.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
+
+            string SourceString = SourceExpressionContext.ReturnValue;
+
+            ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
+            string ArgumentListText = CSharpArgument.CSharpArgumentList(writer, ExpressionContext, FeatureCall);
 
             writer.WriteIndentedLine($"{DestinationString}[{ArgumentListText}] = {SourceString};");
         }

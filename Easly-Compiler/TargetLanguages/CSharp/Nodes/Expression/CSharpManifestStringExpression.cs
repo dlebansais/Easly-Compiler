@@ -56,46 +56,44 @@
         /// <param name="expressionContext">The context.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
-        /// <param name="destinationList">The list of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
-        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
         {
-            lastExpressionText = string.Empty;
+            string Result = string.Empty;
 
             foreach (char c in Source.ValidText.Item)
                 switch (c)
                 {
                     case '\"':
-                        lastExpressionText += "\\\"";
+                        Result += "\\\"";
                         break;
                     case '\\':
-                        lastExpressionText += "\\\\";
+                        Result += "\\\\";
                         break;
                     case '\a':
-                        lastExpressionText += "\\a";
+                        Result += "\\a";
                         break;
                     case '\b':
-                        lastExpressionText += "\\b";
+                        Result += "\\b";
                         break;
                     case '\f':
-                        lastExpressionText += "\\f";
+                        Result += "\\f";
                         break;
                     case '\n':
-                        lastExpressionText += "\\n";
+                        Result += "\\n";
                         break;
                     case '\r':
-                        lastExpressionText += "\\r";
+                        Result += "\\r";
                         break;
                     case '\t':
-                        lastExpressionText += "\\t";
+                        Result += "\\t";
                         break;
                     default:
-                        lastExpressionText += c;
+                        Result += c;
                         break;
                 }
 
-            lastExpressionText = $"\"{lastExpressionText}\"";
+            expressionContext.SetSingleReturnValue($"\"{Result}\"");
         }
         #endregion
     }

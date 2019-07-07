@@ -209,7 +209,10 @@
             if (InvariantList.Count > 0)
                 writer.WriteEmptyLine();
 
-            string WhileString = WhileCondition.CSharpText(writer);
+            ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
+            WhileCondition.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
+
+            string WhileString = SourceExpressionContext.ReturnValue;
 
             writer.WriteIndentedLine($"while ({WhileString})");
             writer.WriteIndentedLine("{");
@@ -226,7 +229,10 @@
 
             if (VariantExpression != null)
             {
-                string ExpressionText = VariantExpression.CSharpText(writer);
+                ICSharpExpressionContext VariantExpressionContext = new CSharpExpressionContext();
+                VariantExpression.WriteCSharp(writer, VariantExpressionContext, false, false, -1);
+
+                string ExpressionText = VariantExpressionContext.ReturnValue;
 
                 writer.WriteIndentedLine($"double NewVariantResult = {ExpressionText};");
                 writer.WriteIndentedLine("if (NewVariantResult >= LoopVariant)// Takes advantage of the fact that 'x >= NaN' is always false");

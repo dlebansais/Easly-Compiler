@@ -114,40 +114,38 @@
         /// <param name="expressionContext">The context.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
-        /// <param name="destinationList">The list of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
-        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
         {
             string QueryText = Query.CSharpText(writer, 0);
-            lastExpressionText = null;
+            string Result = null;
 
             if (Feature != null)
             {
                 switch (Feature)
                 {
                     case ICSharpAttributeFeature AsAttributeFeature:
-                        lastExpressionText = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Property" + "(" + "\"" + QueryText + "\"" + ")";
+                        Result = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Property" + "(" + "\"" + QueryText + "\"" + ")";
                         break;
 
                     case ICSharpConstantFeature AsConstantFeature:
-                        lastExpressionText = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Property" + "(" + "\"" + QueryText + "\"" + ")";
+                        Result = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Property" + "(" + "\"" + QueryText + "\"" + ")";
                         break;
 
                     case ICSharpCreationFeature AsCreationFeature:
-                        lastExpressionText = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Procedure" + "(" + "\"" + QueryText + "\"" + ")";
+                        Result = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Procedure" + "(" + "\"" + QueryText + "\"" + ")";
                         break;
 
                     case ICSharpFunctionFeature AsFunctionFeature:
-                        lastExpressionText = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Function" + "(" + "\"" + QueryText + "\"" + ")";
+                        Result = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Function" + "(" + "\"" + QueryText + "\"" + ")";
                         break;
 
                     case ICSharpProcedureFeature AsProcedureFeature:
-                        lastExpressionText = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Procedure" + "(" + "\"" + QueryText + "\"" + ")";
+                        Result = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Procedure" + "(" + "\"" + QueryText + "\"" + ")";
                         break;
 
                     case ICSharpPropertyFeature AsPropertyFeature:
-                        lastExpressionText = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Property" + "(" + "\"" + QueryText + "\"" + ")";
+                        Result = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Property" + "(" + "\"" + QueryText + "\"" + ")";
                         break;
 
                     case ICSharpScopeAttributeFeature AsScopeAttributeFeature:
@@ -167,17 +165,19 @@
 
                         Result = "LocalEntity" + "." + "FromThis" + "(" + "this" + "," + " " + FeatureString + "," + " " + "\"" + QueryText + "\"" + ")";
                         */
-                        lastExpressionText = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Property" + "(" + "\"" + QueryText + "\"" + ")";
+                        Result = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Property" + "(" + "\"" + QueryText + "\"" + ")";
                         break;
                 }
             }
 
             else if (Discrete != null)
             {
-                lastExpressionText = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Property" + "(" + "\"" + QueryText + "\"" + ")";
+                Result = "Entity" + "." + "FromThis" + "(" + "this" + ")" + "." + "Property" + "(" + "\"" + QueryText + "\"" + ")";
             }
 
-            Debug.Assert(lastExpressionText != null);
+            Debug.Assert(Result != null);
+
+            expressionContext.SetSingleReturnValue(Result);
         }
         #endregion
     }

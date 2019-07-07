@@ -1188,7 +1188,13 @@
                 if (Item.ExplicitValue != null)
                 {
                     ICSharpExpression ExplicitValue = Item.ExplicitValue;
-                    Line += " " + "=" + " " + ExplicitValue.CSharpText(writer);
+                    ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
+                    ExplicitValue.WriteCSharp(writer, ExpressionContext, false, false, -1);
+
+                    string ExplicitValueText = ExpressionContext.ReturnValue;
+                    Debug.Assert(ExplicitValueText != null);
+
+                    Line += $" = {ExplicitValueText}";
                 }
 
                 if (i + 1 < DiscreteList.Count)

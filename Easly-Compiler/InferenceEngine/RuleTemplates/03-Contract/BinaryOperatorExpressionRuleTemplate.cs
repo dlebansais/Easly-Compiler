@@ -48,9 +48,9 @@
             data = null;
             bool Success = true;
 
-            Success &= BinaryOperatorExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IResultException ResolvedException, out ISealableList<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out IFunctionFeature SelectedFeature, out IQueryOverload SelectedOverload);
+            Success &= BinaryOperatorExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IResultException ResolvedException, out ISealableList<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out IFunctionFeature SelectedFeature, out IQueryOverload SelectedOverload, out IFeatureCall FeatureCall);
             if (Success)
-                data = new Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload>(ResolvedResult, ResolvedException, ConstantSourceList, ExpressionConstant, SelectedFeature, SelectedOverload);
+                data = new Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload, IFeatureCall>(ResolvedResult, ResolvedException, ConstantSourceList, ExpressionConstant, SelectedFeature, SelectedOverload, FeatureCall);
 
             return Success;
         }
@@ -62,18 +62,20 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IBinaryOperatorExpression node, object data)
         {
-            IResultType ResolvedResult = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload>)data).Item1;
-            IResultException ResolvedException = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload>)data).Item2;
-            ISealableList<IExpression> ConstantSourceList = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload>)data).Item3;
-            ILanguageConstant ExpressionConstant = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload>)data).Item4;
-            IFunctionFeature SelectedFeature = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload>)data).Item5;
-            IQueryOverload SelectedOverload = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload>)data).Item6;
+            IResultType ResolvedResult = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload, IFeatureCall>)data).Item1;
+            IResultException ResolvedException = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload, IFeatureCall>)data).Item2;
+            ISealableList<IExpression> ConstantSourceList = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload, IFeatureCall>)data).Item3;
+            ILanguageConstant ExpressionConstant = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload, IFeatureCall>)data).Item4;
+            IFunctionFeature SelectedFeature = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload, IFeatureCall>)data).Item5;
+            IQueryOverload SelectedOverload = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload, IFeatureCall>)data).Item6;
+            IFeatureCall FeatureCall = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFunctionFeature, IQueryOverload, IFeatureCall>)data).Item7;
 
             node.ResolvedResult.Item = ResolvedResult;
             node.ConstantSourceList.AddRange(ConstantSourceList);
             node.ConstantSourceList.Seal();
             node.SelectedFeature.Item = SelectedFeature;
             node.SelectedOverload.Item = SelectedOverload;
+            node.FeatureCall.Item = FeatureCall;
         }
         #endregion
     }

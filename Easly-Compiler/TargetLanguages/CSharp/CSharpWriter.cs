@@ -220,13 +220,16 @@
         public string GetTemporaryName(string sourceName)
         {
             string CSharpIdentifier = CSharpNames.ToCSharpIdentifier(sourceName);
-            string TemporaryName = $"temp_{CSharpIdentifier}";
+            string TemporaryName = $"temp_{TemporaryVariableIndex}_{CSharpIdentifier}";
+
+            TemporaryVariableIndex++;
 
             return TemporaryName;
         }
 
         private IList<string> UsingList { get; } = new List<string>();
         private IList<string> LineList { get; } = new List<string>();
+        private int TemporaryVariableIndex;
         #endregion
 
         #region Implementation of IDisposable

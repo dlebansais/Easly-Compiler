@@ -19,6 +19,11 @@ namespace CompilerNode
         /// The resolved operator feature overload.
         /// </summary>
         OnceReference<IQueryOverload> SelectedOverload { get; }
+
+        /// <summary>
+        /// Details of the feature call.
+        /// </summary>
+        OnceReference<IFeatureCall> FeatureCall { get; }
     }
 
     /// <summary>
@@ -91,6 +96,7 @@ namespace CompilerNode
                 ExpressionConstant = new OnceReference<ILanguageConstant>();
                 SelectedFeature = new OnceReference<IFunctionFeature>();
                 SelectedOverload = new OnceReference<IQueryOverload>();
+                FeatureCall = new OnceReference<IFeatureCall>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
@@ -124,6 +130,7 @@ namespace CompilerNode
                 Debug.Assert(ResolvedResult.IsAssigned || !IsResolved);
                 Debug.Assert(SelectedFeature.IsAssigned == ResolvedResult.IsAssigned);
                 Debug.Assert(SelectedOverload.IsAssigned == ResolvedResult.IsAssigned);
+                Debug.Assert(FeatureCall.IsAssigned == ResolvedResult.IsAssigned);
 
                 IsHandled = true;
             }
@@ -177,6 +184,11 @@ namespace CompilerNode
         public OnceReference<IQueryOverload> SelectedOverload { get; private set; } = new OnceReference<IQueryOverload>();
 
         /// <summary>
+        /// Details of the feature call.
+        /// </summary>
+        public OnceReference<IFeatureCall> FeatureCall { get; private set; } = new OnceReference<IFeatureCall>();
+
+        /// <summary>
         /// Compares two expressions.
         /// </summary>
         /// <param name="other">The other expression.</param>
@@ -213,7 +225,8 @@ namespace CompilerNode
         /// <param name="expressionConstant">The constant value upon return, if any.</param>
         /// <param name="selectedFeature">The matching feature upon return.</param>
         /// <param name="selectedOverload">The matching overload in <paramref name="selectedFeature"/> upon return.</param>
-        public static bool ResolveCompilerReferences(IBinaryOperatorExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFunctionFeature selectedFeature, out IQueryOverload selectedOverload)
+        /// <param name="featureCall">Details of the feature call.</param>
+        public static bool ResolveCompilerReferences(IBinaryOperatorExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFunctionFeature selectedFeature, out IQueryOverload selectedOverload, out IFeatureCall featureCall)
         {
             resolvedResult = null;
             resolvedException = null;
@@ -221,6 +234,7 @@ namespace CompilerNode
             expressionConstant = NeutralLanguageConstant.NotConstant;
             selectedFeature = null;
             selectedOverload = null;
+            featureCall = null;
 
             IExpression LeftExpression = (IExpression)node.LeftExpression;
             IIdentifier Operator = (IIdentifier)node.Operator;
@@ -260,6 +274,15 @@ namespace CompilerNode
                         resolvedResult = new ResultType(SelectedOverloadType.ResultTypeList);
                         selectedFeature = AsFunctionFeature;
                         selectedOverload = AsFunctionFeature.OverloadList[SelectedIndex];
+
+                        IArgument FirstArgument = new PositionalArgument(RightExpression);
+                        IList<IArgument> ArgumentList = new List<IArgument>() { FirstArgument };
+
+                        List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
+                        bool IsArgumentValid = Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, errorList);
+                        Debug.Assert(IsArgumentValid);
+
+                        featureCall = new FeatureCall(SelectedOverloadType.ParameterTable, SelectedOverloadType.ResultTable, ArgumentList, MergedArgumentList, TypeArgumentStyle);
                         resolvedException = new ResultException(SelectedOverloadType.ExceptionIdentifierList);
 
                         constantSourceList.Add(LeftExpression);

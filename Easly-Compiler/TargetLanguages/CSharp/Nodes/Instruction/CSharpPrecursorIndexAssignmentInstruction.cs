@@ -79,8 +79,13 @@
         /// <param name="writer">The stream on which to write.</param>
         public override void WriteCSharp(ICSharpWriter writer)
         {
-            string SourceString = SourceExpression.CSharpText(writer);
-            string ArgumentListString = CSharpArgument.CSharpArgumentList(writer, FeatureCall);
+            ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
+            SourceExpression.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
+
+            string SourceString = SourceExpressionContext.ReturnValue;
+
+            ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
+            string ArgumentListString = CSharpArgument.CSharpArgumentList(writer, ExpressionContext, FeatureCall);
 
             writer.WriteIndentedLine($"base[{ArgumentListString}] = {SourceString};");
         }

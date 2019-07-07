@@ -18,6 +18,41 @@ namespace CompilerNode
     /// </summary>
     public class PositionalArgument : BaseNode.PositionalArgument, IPositionalArgument
     {
+        #region Init
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PositionalArgument"/> class.
+        /// This constructor is required for deserialization.
+        /// </summary>
+        public PositionalArgument()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PositionalArgument"/> class.
+        /// </summary>
+        /// <param name="source">The source expression</param>
+        public PositionalArgument(IExpression source)
+        {
+            Documentation = BaseNodeHelper.NodeHelper.CreateEmptyDocumentation();
+            Source = source;
+
+            if (source.ResolvedResult.IsAssigned)
+                ResolvedResult.Item = source.ResolvedResult.Item;
+
+            if (source.ConstantSourceList.IsSealed)
+            {
+                ConstantSourceList.AddRange(source.ConstantSourceList);
+                ConstantSourceList.Seal();
+            }
+
+            if (source.ExpressionConstant.IsAssigned)
+                ExpressionConstant.Item = source.ExpressionConstant.Item;
+
+            if (source.ResolvedException.IsAssigned)
+                ResolvedException.Item = source.ResolvedException.Item;
+        }
+        #endregion
+
         #region Implementation of ISource
         /// <summary>
         /// The parent node, null if root.

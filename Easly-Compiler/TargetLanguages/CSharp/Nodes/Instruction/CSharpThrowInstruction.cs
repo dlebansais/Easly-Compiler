@@ -80,7 +80,8 @@
         public override void WriteCSharp(ICSharpWriter writer)
         {
             string ExceptionTypeString = ExceptionType.Type2CSharpString(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
-            string ArgumentListString = CSharpArgument.CSharpArgumentList(writer, FeatureCall);
+            ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
+            string ArgumentListString = CSharpArgument.CSharpArgumentList(writer, ExpressionContext, FeatureCall);
 
             // TODO: CreationRoutine
 

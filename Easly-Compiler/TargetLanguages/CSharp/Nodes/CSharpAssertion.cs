@@ -76,7 +76,12 @@
         /// <param name="writer">The stream on which to write.</param>
         public virtual void WriteCSharp(ICSharpWriter writer)
         {
-            string AssertionString = BooleanExpression.CSharpText(writer);
+            ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
+            BooleanExpression.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
+
+            string AssertionString = SourceExpressionContext.ReturnValue;
+            Debug.Assert(AssertionString != null);
+
             string TagString = string.IsNullOrEmpty(Tag) ? string.Empty : $" // {Tag}";
 
             writer.WriteIndentedLine($"Debug.Assert({AssertionString});{TagString}");

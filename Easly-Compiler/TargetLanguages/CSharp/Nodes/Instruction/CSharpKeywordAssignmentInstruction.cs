@@ -68,7 +68,11 @@
         public override void WriteCSharp(ICSharpWriter writer)
         {
             string DestinationString = Source.Destination.ToString();
-            string SourceString = SourceExpression.CSharpText(writer);
+
+            ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
+            SourceExpression.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
+
+            string SourceString = SourceExpressionContext.ReturnValue;
 
             writer.WriteIndentedLine($"{DestinationString} = {SourceString};");
         }

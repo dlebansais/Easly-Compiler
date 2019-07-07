@@ -110,7 +110,7 @@
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         public virtual void WriteCSharp(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace)
         {
-            SourceExpression.WriteCSharp(writer, ExpressionContext, isNeverSimple, isDeclaredInPlace, new List<ICSharpQualifiedName>(), -1, out string LastExpressionText);
+            SourceExpression.WriteCSharp(writer, ExpressionContext, isNeverSimple, isDeclaredInPlace, -1);
 
             foreach (KeyValuePair<string, ICSharpQualifiedName> Entry in DestinationTable)
             {

@@ -67,26 +67,27 @@
         /// <param name="expressionContext">The context.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
-        /// <param name="destinationList">The list of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
-        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
         {
             //TODO: event expression
-            CSharpTextBoolean(writer, destinationList, out lastExpressionText);
+            CSharpTextBoolean(writer, expressionContext);
         }
 
-        private void CSharpTextBoolean(ICSharpWriter writer, IList<ICSharpQualifiedName> destinationList, out string lastExpressionText)
+        private void CSharpTextBoolean(ICSharpWriter writer, ICSharpExpressionContext expressionContext)
         {
             string RightText = NestedExpressionText(writer, RightExpression);
             string OperatorName = "!";
 
-            lastExpressionText = $"{OperatorName}{RightText}";
+            expressionContext.SetSingleReturnValue($"{OperatorName}{RightText}");
         }
 
         private string NestedExpressionText(ICSharpWriter writer, ICSharpExpression expression)
         {
-            string Result = expression.CSharpText(writer);
+            ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
+            expression.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
+
+            string Result = SourceExpressionContext.ReturnValue;
 
             if (expression.IsComplex)
                 Result = $"({Result})";

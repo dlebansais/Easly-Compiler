@@ -57,50 +57,50 @@
         /// <param name="expressionContext">The context.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
-        /// <param name="destinationList">The list of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
-        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
         {
-            lastExpressionText = null;
+            string Result = null;
             //TODO
 
             switch (Source.Value)
             {
                 case BaseNode.Keyword.True:
-                    lastExpressionText = "true";
+                    Result = "true";
                     break;
 
                 case BaseNode.Keyword.False:
-                    lastExpressionText = "false";
+                    Result = "false";
                     break;
 
                 case BaseNode.Keyword.Current:
-                    lastExpressionText = "this";
+                    Result = "this";
                     break;
 
                 case BaseNode.Keyword.Value:
-                    lastExpressionText = "value";
+                    Result = "value";
                     break;
 
                 case BaseNode.Keyword.Result:
-                    lastExpressionText = "Result";
+                    Result = "Result";
                     break;
 
                 case BaseNode.Keyword.Retry:
-                    lastExpressionText = "Retry";
+                    Result = "Retry";
                     break;
 
                 case BaseNode.Keyword.Exception:
-                    lastExpressionText = "CaughtException";
+                    Result = "CaughtException";
                     break;
 
                 case BaseNode.Keyword.Indexer:
-                    lastExpressionText = "Indexer";
+                    Result = "Indexer";
                     break;
             }
 
-            Debug.Assert(lastExpressionText != null);
+            Debug.Assert(Result != null);
+
+            expressionContext.SetSingleReturnValue(Result);
         }
         #endregion
     }

@@ -187,17 +187,15 @@
         /// <param name="expressionContext">The context.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
-        /// <param name="destinationList">The list of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
-        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
         {
             if (IsAgent)
-                WriteCSharpAgentCall(writer, isNeverSimple, isDeclaredInPlace, destinationList, skippedIndex, out lastExpressionText);
+                WriteCSharpAgentCall(writer, expressionContext, isNeverSimple, isDeclaredInPlace, skippedIndex);
             else if (Discrete != null)
-                WriteCSharpDiscreteCall(writer, isNeverSimple, isDeclaredInPlace, destinationList, skippedIndex, out lastExpressionText);
+                WriteCSharpDiscreteCall(writer, expressionContext, isNeverSimple, isDeclaredInPlace, skippedIndex);
             else
-                WriteCSharpFeatureCall(writer, isNeverSimple, isDeclaredInPlace, destinationList, skippedIndex, out lastExpressionText);
+                WriteCSharpFeatureCall(writer, expressionContext, isNeverSimple, isDeclaredInPlace, skippedIndex);
 
             /*
             else
@@ -234,9 +232,9 @@
             }*/
         }
 
-        private void WriteCSharpAgentCall(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        private void WriteCSharpAgentCall(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
         {
-            CSharpArgument.CSharpArgumentList(writer, isNeverSimple, isDeclaredInPlace, FeatureCall, destinationList, skippedIndex, out string ArgumentListText, out string ResultListText);
+            CSharpArgument.CSharpArgumentList(writer, expressionContext, isNeverSimple, isDeclaredInPlace, FeatureCall, skippedIndex, true, out string ArgumentListText, out IList<string> OutgoingResultList);
             string QueryText = Query.CSharpText(writer, 0);
 
             IIdentifier AgentIdentifier = (IIdentifier)Source.Query.Path[Source.Query.Path.Count - 1];
@@ -248,50 +246,55 @@
                 QueryText = "this";
 
             if (FeatureCall.ArgumentList.Count > 0)
-                lastExpressionText = $"{AgentIdentifierText}({QueryText}, {ArgumentListText})";
+                expressionContext.SetSingleReturnValue($"{AgentIdentifierText}({QueryText}, {ArgumentListText})");
             else
-                lastExpressionText = $"{AgentIdentifierText}({QueryText})";
+                expressionContext.SetSingleReturnValue($"{AgentIdentifierText}({QueryText})");
         }
 
-        private void WriteCSharpDiscreteCall(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        private void WriteCSharpDiscreteCall(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
         {
             Debug.Assert(FeatureCall.ParameterList.Count == 0);
             Debug.Assert(FeatureCall.ResultList.Count == 0);
 
-            lastExpressionText = Query.CSharpText(writer, 0);
+            expressionContext.SetSingleReturnValue(Query.CSharpText(writer, 0));
         }
 
-        private void WriteCSharpFeatureCall(ICSharpWriter writer, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        private void WriteCSharpFeatureCall(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
         {
-            Feature.GetOutputFormat(SelectedOverloadType, out bool HasReturn, out int OutgoingParameterCount);
+            Feature.GetOutputFormat(SelectedOverloadType, out int OutgoingParameterCount, out int ReturnValueIndex);
 
-            CSharpArgument.CSharpArgumentList(writer, isNeverSimple, isDeclaredInPlace, FeatureCall, destinationList, skippedIndex, out string ArgumentListText, out string ResultListText);
+            CSharpArgument.CSharpArgumentList(writer, expressionContext, isNeverSimple, isDeclaredInPlace, FeatureCall, ReturnValueIndex, false, out string ArgumentListText, out IList<string> OutgoingResultList);
             string QueryText = Query.CSharpText(writer, 0);
 
-            if (OutgoingParameterCount == 0)
+            Debug.Assert(OutgoingParameterCount > 0);
+
+            if (OutgoingParameterCount == 1)
             {
                 if (ArgumentListText.Length > 0)
-                    lastExpressionText = $"{QueryText}({ArgumentListText})";
+                    expressionContext.SetSingleReturnValue($"{QueryText}({ArgumentListText})");
                 else if (Feature is ICSharpFunctionFeature)
-                    lastExpressionText = $"{QueryText}()";
+                    expressionContext.SetSingleReturnValue($"{QueryText}()");
                 else
-                    lastExpressionText = QueryText;
+                {
+                    if (writer.AttachmentMap.ContainsKey(QueryText))
+                        QueryText = writer.AttachmentMap[QueryText];
+
+                    expressionContext.SetSingleReturnValue(QueryText);
+                }
             }
             else
             {
-                if (HasReturn)
+                if (ReturnValueIndex >= 0)
                 {
-                    writer.WriteIndentedLine($"var temp = {QueryText}({ArgumentListText});");
-                    if (ResultListText.Length > 0)
-                        lastExpressionText = "temp";
-                    else
-                        lastExpressionText = $"temp, {ResultListText}";
+                    string TemporaryResultName = writer.GetTemporaryName();
+                    writer.WriteIndentedLine($"var {TemporaryResultName} = {QueryText}({ArgumentListText});");
+
+                    OutgoingResultList.Insert(ReturnValueIndex, TemporaryResultName);
                 }
                 else
-                {
                     writer.WriteIndentedLine($"{QueryText}({ArgumentListText});");
-                    lastExpressionText = ResultListText;
-                }
+
+                expressionContext.SetMultipleResult(OutgoingResultList, ReturnValueIndex);
             }
         }
         #endregion

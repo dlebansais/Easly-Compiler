@@ -63,7 +63,6 @@
         {
             SourceExpression = CSharpExpression.Create(context, (IExpression)source.Source);
 
-            DestinationList = new List<ICSharpQualifiedName>();
             IResultType ResolvedResult = SourceExpression.Source.ResolvedResult.Item;
 
             for (int i = 0; i < source.EntityNameList.Count; i++)
@@ -72,17 +71,6 @@
 
                 string ValidName = EntityName.ValidText.Item;
                 EntityNameList.Add(ValidName);
-
-                BaseNode.IQualifiedName BaseNodeDestination = BaseNodeHelper.NodeHelper.CreateSimpleQualifiedName(ValidName);
-                IExpressionType DestinationType = ResolvedResult.At(i);
-
-                IQualifiedName Destination = new QualifiedName(BaseNodeDestination, DestinationType);
-
-                IScopeAttributeFeature DestinationAttributeFeature = new ScopeAttributeFeature(EntityName, ValidName, DestinationType.ValueTypeName, DestinationType.ValueType);
-                ICSharpScopeAttributeFeature DestinationFeature = CSharpScopeAttributeFeature.Create(context, null, DestinationAttributeFeature);
-
-                ICSharpQualifiedName CSharpDestination = CSharpQualifiedName.Create(context, Destination, DestinationFeature, null, false);
-                DestinationList.Add(CSharpDestination);
             }
 
             foreach (IAttachment Attachment in source.AttachmentList)
@@ -93,12 +81,7 @@
 
             if (source.ElseInstructions.IsAssigned)
                 ElseInstructions = CSharpScope.Create(context, parentFeature, (IScope)source.ElseInstructions.Item);
-
-            ExpressionContext = new CSharpExpressionContext(EntityNameList);
         }
-
-        private IList<ICSharpQualifiedName> DestinationList;
-        private ICSharpExpressionContext ExpressionContext;
         #endregion
 
         #region Properties
@@ -143,7 +126,14 @@
 
         private void WriteCSharpSwitch(ICSharpWriter writer)
         {
-            SourceExpression.WriteCSharp(writer, ExpressionContext, true, true, new List<ICSharpQualifiedName>(), -1, out string LastExpressionText);
+            ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext(EntityNameList);
+            SourceExpression.WriteCSharp(writer, ExpressionContext, true, true, -1);
+
+            Debug.Assert(ExpressionContext.FilledDestinationTable.Count == 1);
+            string EntityName = EntityNameList[0];
+            string LastExpressionText = ExpressionContext.FilledDestinationTable[EntityName];
+            if (LastExpressionText == null)
+                LastExpressionText = ExpressionContext.ReturnValue;
 
             writer.WriteIndentedLine($"switch ({LastExpressionText})");
             writer.WriteIndentedLine("{");
@@ -152,7 +142,7 @@
             for (int i = 0; i < AttachmentList.Count; i++)
             {
                 ICSharpAttachment Attachment = AttachmentList[i];
-                Attachment.WriteCSharpCase(writer);
+                Attachment.WriteCSharpCase(writer, EntityName);
             }
 
             writer.DecreaseIndent();
@@ -161,7 +151,8 @@
 
         private void WriteCSharpIf(ICSharpWriter writer)
         {
-            SourceExpression.WriteCSharp(writer, ExpressionContext, true, true, DestinationList, -1, out string LastExpressionText);
+            ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext(EntityNameList);
+            SourceExpression.WriteCSharp(writer, ExpressionContext, true, true, -1);
 
             for (int i = 0; i < AttachmentList.Count; i++)
             {

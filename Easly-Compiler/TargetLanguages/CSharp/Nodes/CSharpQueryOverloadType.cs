@@ -22,9 +22,9 @@
         /// <summary>
         /// Gets the feature output format.
         /// </summary>
-        /// <param name="hasReturn">True upon return if the feature returns a value.</param>
         /// <param name="outgoingParameterCount">The number of 'out' parameters upon return.</param>
-        void GetOutputFormat(out bool hasReturn, out int outgoingParameterCount);
+        /// <param name="returnValueIndex">Index of the return value if the feature returns a value, -1 otherwise.</param>
+        void GetOutputFormat(out int outgoingParameterCount, out int returnValueIndex);
     }
 
     /// <summary>
@@ -83,17 +83,22 @@
         /// <summary>
         /// Gets the feature output format.
         /// </summary>
-        /// <param name="hasReturn">True upon return if the feature returns a value.</param>
         /// <param name="outgoingParameterCount">The number of 'out' parameters upon return.</param>
-        public virtual void GetOutputFormat(out bool hasReturn, out int outgoingParameterCount)
+        /// <param name="returnValueIndex">Index of the return value if the feature returns a value, -1 otherwise.</param>
+        public virtual void GetOutputFormat(out int outgoingParameterCount, out int returnValueIndex)
         {
-            hasReturn = false;
+            outgoingParameterCount = ResultList.Count;
+            returnValueIndex = -1;
 
-            foreach (ICSharpParameter Result in ResultList)
+            for (int i = 0; i < ResultList.Count; i++)
+            {
+                ICSharpParameter Result = ResultList[i];
                 if (Result.Name == nameof(BaseNode.Keyword.Result))
-                    hasReturn = true;
-
-            outgoingParameterCount = hasReturn ? ResultList.Count - 1 : ResultList.Count;
+                {
+                    Debug.Assert(returnValueIndex == -1);
+                    returnValueIndex = i;
+                }
+            }
         }
 
         /// <summary>

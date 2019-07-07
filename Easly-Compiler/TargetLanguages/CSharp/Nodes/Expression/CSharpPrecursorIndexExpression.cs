@@ -81,14 +81,12 @@
         /// <param name="expressionContext">The context.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
-        /// <param name="destinationList">The list of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
-        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
         {
-            CSharpArgument.CSharpArgumentList(writer, isNeverSimple, isDeclaredInPlace, FeatureCall, destinationList, skippedIndex, out string ArgumentListText, out string ResultListText);
+            CSharpArgument.CSharpArgumentList(writer, expressionContext, isNeverSimple, isDeclaredInPlace, FeatureCall, skippedIndex, false, out string ArgumentListText, out IList<string> OutgoingResultList);
 
-            lastExpressionText = $"base[{ArgumentListText}]";
+            expressionContext.SetSingleReturnValue($"base[{ArgumentListText}]");
         }
         #endregion
     }

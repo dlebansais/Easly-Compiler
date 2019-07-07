@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -97,7 +98,7 @@
         /// <param name="writer">The stream on which to write.</param>
         public override void WriteCSharp(ICSharpWriter writer)
         {
-            // TODO scope of locals
+            string ContinueExpressionText;
 
             for (int i = 0; i < ContinuationList.Count; i++)
             {
@@ -106,8 +107,9 @@
                 if (i > 0)
                     writer.WriteEmptyLine();
 
-                string ContinueConditionString = ContinueCondition.CSharpText(writer);
-                writer.WriteIndentedLine($"if ({ContinueConditionString})");
+                WriteCSharpContinueCondition(writer, out ContinueExpressionText);
+                writer.WriteIndentedLine($"if ({ContinueExpressionText})");
+
                 Item.WriteCSharpInstructions(writer);
 
                 int CleanupInstructionCount = 0;
@@ -146,11 +148,34 @@
             {
                 writer.WriteEmptyLine();
 
-                string ContinueConditionString = ContinueCondition.CSharpText(writer);
-                string ComplexContinueConditionString = ContinueCondition.IsComplex ? $"({ContinueConditionString})" : ContinueConditionString;
+                WriteCSharpContinueCondition(writer, out ContinueExpressionText);
+                writer.WriteIndentedLine($"if (!({ContinueExpressionText}))");
 
-                writer.WriteIndentedLine($"if (!{ComplexContinueConditionString})");
                 ElseInstructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Mandatory, false);
+            }
+        }
+
+        private void WriteCSharpContinueCondition(ICSharpWriter writer, out string continueExpressionText)
+        {
+            ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
+            ContinueCondition.WriteCSharp(writer, ExpressionContext, false, false, -1);
+
+            if (ExpressionContext.CompleteDestinationNameList.Count > 1)
+            {
+                continueExpressionText = string.Empty;
+
+                foreach (string DestinationName in ExpressionContext.CompleteDestinationNameList)
+                {
+                    if (continueExpressionText.Length > 0)
+                        continueExpressionText += " && ";
+
+                    continueExpressionText += DestinationName;
+                }
+            }
+            else
+            {
+                Debug.Assert(ExpressionContext.ReturnValue != null);
+                continueExpressionText = ExpressionContext.ReturnValue;
             }
         }
         #endregion

@@ -112,7 +112,8 @@
                     IsAnchoredToCreationType = true;
 
             string CreationRoutineString = CSharpNames.ToCSharpIdentifier(CreationRoutineName);
-            string ArgumentListText = CSharpArgument.CSharpArgumentList(writer, FeatureCall);
+            ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
+            string ArgumentListText = CSharpArgument.CSharpArgumentList(writer, ExpressionContext, FeatureCall);
 
             CSharpConstructorTypes ClassConstructorType = CSharpConstructorTypes.OneConstructor;
 

@@ -81,10 +81,8 @@
         /// <param name="expressionContext">The context.</param>
         /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
-        /// <param name="destinationList">The list of destinations.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        /// <param name="lastExpressionText">The text to use for the expression upon return.</param>
-        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, IList<ICSharpQualifiedName> destinationList, int skippedIndex, out string lastExpressionText)
+        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
         {
             string CoexistingPrecursorName = string.Empty;
             string CoexistingPrecursorRootName = ParentFeature.CoexistingPrecursorName;
@@ -92,18 +90,18 @@
             if (!string.IsNullOrEmpty(CoexistingPrecursorRootName))
                 CoexistingPrecursorName = CSharpNames.ToCSharpIdentifier(CoexistingPrecursorRootName + " " + "Base");
 
-            CSharpArgument.CSharpArgumentList(writer, isNeverSimple, isDeclaredInPlace, FeatureCall, destinationList, skippedIndex, out string ArgumentListText, out string ResultListText);
+            CSharpArgument.CSharpArgumentList(writer, expressionContext, isNeverSimple, isDeclaredInPlace, FeatureCall, skippedIndex, false, out string ArgumentListText, out IList<string> OutgoingResultList);
 
             bool HasArguments = (ParentFeature is ICSharpFunctionFeature) || FeatureCall.ArgumentList.Count > 0;
             if (HasArguments)
                 ArgumentListText = $"({ArgumentListText})";
 
             if (!string.IsNullOrEmpty(CoexistingPrecursorRootName))
-                lastExpressionText = $"{CoexistingPrecursorName}{ArgumentListText}";
+                expressionContext.SetSingleReturnValue($"{CoexistingPrecursorName}{ArgumentListText}");
             else
             {
                 string FunctionName = CSharpNames.ToCSharpIdentifier(ParentFeature.Name);
-                lastExpressionText = $"base.{FunctionName}{ArgumentListText}";
+                expressionContext.SetSingleReturnValue($"base.{FunctionName}{ArgumentListText}");
             }
         }
         #endregion

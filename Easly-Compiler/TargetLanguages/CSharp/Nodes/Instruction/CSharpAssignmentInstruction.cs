@@ -102,7 +102,7 @@
                 string DestinationName;
 
                 if (Destination.IsSimple)
-                    DestinationName = Destination.SimpleName;
+                    DestinationName = CSharpNames.ToCSharpIdentifier(Destination.SimpleName);
                 else
                 {
                     DestinationName = writer.GetTemporaryName();
@@ -114,14 +114,33 @@
 
             ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext(DestinationNameList);
 
-            SourceExpression.WriteCSharp(writer, ExpressionContext, false, false, new List<ICSharpQualifiedName>(), -1, out string LastExpressionText);
+            SourceExpression.WriteCSharp(writer, ExpressionContext, false, false, -1);
 
-            foreach (KeyValuePair<string, ICSharpQualifiedName> Entry in DestinationTable)
+            IDictionary<string, string> FilledDestinationTable = ExpressionContext.FilledDestinationTable;
+
+            for (int i = 0; i < DestinationList.Count; i++)
             {
-                string ResultName = Entry.Key;
-                string DestinationName = Entry.Value.CSharpText(writer, 0);
+                ICSharpQualifiedName Destination = DestinationList[i];
+                string Name = DestinationNameList[i];
 
-                writer.WriteIndentedLine($"{DestinationName} = {ResultName};");
+                Debug.Assert(FilledDestinationTable.ContainsKey(Name));
+                string ResultText = FilledDestinationTable[Name];
+
+                if (ResultText == null)
+                    ResultText = ExpressionContext.ReturnValue;
+
+                if (Destination.IsAttributeWithContract)
+                {
+                    string SetterText = Destination.CSharpSetter(writer);
+                    writer.WriteIndentedLine($"{SetterText}({ResultText});");
+                }
+                else if (DestinationTable.ContainsKey(Name))
+                {
+                    string DestinationName = DestinationTable[Name].CSharpText(writer, 0);
+                    writer.WriteIndentedLine($"{DestinationName} = {ResultText};");
+                }
+                else if (ResultText != Name)
+                    writer.WriteIndentedLine($"{Name} = {ResultText};");
             }
         }
         #endregion
