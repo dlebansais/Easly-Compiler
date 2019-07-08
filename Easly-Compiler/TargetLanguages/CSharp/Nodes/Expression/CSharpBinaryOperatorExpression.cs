@@ -172,18 +172,17 @@
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
         /// <param name="expressionContext">The context.</param>
-        /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
+        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isDeclaredInPlace, int skippedIndex)
         {
             if (IsCallingNumberFeature)
-                WriteCSharpNumberOperator(writer, expressionContext, isNeverSimple, isDeclaredInPlace, skippedIndex);
+                WriteCSharpNumberOperator(writer, expressionContext, isDeclaredInPlace, skippedIndex);
             else
-                WriteCSharpCustomOperator(writer, expressionContext, isNeverSimple, isDeclaredInPlace, skippedIndex);
+                WriteCSharpCustomOperator(writer, expressionContext, isDeclaredInPlace, skippedIndex);
         }
 
-        private void WriteCSharpNumberOperator(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
+        private void WriteCSharpNumberOperator(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isDeclaredInPlace, int skippedIndex)
         {
             string OperatorText = null;
 
@@ -224,7 +223,7 @@
             expressionContext.SetSingleReturnValue($"{LeftText} {OperatorText} {RightText}");
         }
 
-        private void WriteCSharpCustomOperator(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
+        private void WriteCSharpCustomOperator(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isDeclaredInPlace, int skippedIndex)
         {
             string OperatorText = CSharpNames.ToCSharpIdentifier(Operator.Name);
 
@@ -233,7 +232,7 @@
                 string LeftText = NestedExpressionText(writer, LeftExpression);
 
                 ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
-                RightExpression.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
+                RightExpression.WriteCSharp(writer, SourceExpressionContext, false, -1);
                 string RightText = SourceExpressionContext.ReturnValue;
 
                 expressionContext.SetSingleReturnValue($"{LeftText}.{OperatorText}({RightText})");
@@ -244,7 +243,7 @@
 
                 string LeftText = NestedExpressionText(writer, LeftExpression);
 
-                CSharpArgument.CSharpArgumentList(writer, expressionContext, isNeverSimple, isDeclaredInPlace, FeatureCall, ReturnValueIndex, false, out string ArgumentListText, out IList<string> OutgoingResultList);
+                CSharpArgument.CSharpArgumentList(writer, expressionContext, isDeclaredInPlace, FeatureCall, ReturnValueIndex, false, out string ArgumentListText, out IList<string> OutgoingResultList);
 
                 Debug.Assert(OutgoingParameterCount > 1);
 
@@ -311,7 +310,7 @@
         private string NestedExpressionText(ICSharpWriter writer, ICSharpExpression expression)
         {
             ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
-            expression.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
+            expression.WriteCSharp(writer, SourceExpressionContext, false, -1);
 
             string Result = SourceExpressionContext.ReturnValue;
 

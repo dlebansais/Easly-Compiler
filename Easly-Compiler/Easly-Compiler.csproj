@@ -642,7 +642,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringValidation.cs" />
     <Compile Include="FeatureName.cs" />
-    <Compile Include="TargetLanguages\CSharp\CSharpAssignment.cs" />
     <Compile Include="TargetLanguages\CSharp\CSharpContractLocations.cs" />
     <Compile Include="TargetLanguages\CSharp\CSharpCurlyBracketsInsertions.cs" />
     <Compile Include="TargetLanguages\CSharp\CSharpBodyFlags.cs" />

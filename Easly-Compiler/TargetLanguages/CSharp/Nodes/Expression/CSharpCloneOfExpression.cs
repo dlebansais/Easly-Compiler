@@ -86,17 +86,16 @@
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
         /// <param name="expressionContext">The context.</param>
-        /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
+        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isDeclaredInPlace, int skippedIndex)
         {
             // TODO clone of multiple result
 
             ICSharpType ClonedType = TypeList[0];
             string SourceTypeText = ClonedType.Type2CSharpString(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
             ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
-            SourceExpression.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
+            SourceExpression.WriteCSharp(writer, SourceExpressionContext, false, -1);
 
             string SourceText = SourceExpressionContext.ReturnValue;
 

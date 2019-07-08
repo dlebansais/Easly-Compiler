@@ -77,7 +77,7 @@
         public virtual void WriteCSharp(ICSharpWriter writer)
         {
             ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
-            BooleanExpression.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
+            BooleanExpression.WriteCSharp(writer, SourceExpressionContext, false, -1);
 
             string AssertionString = SourceExpressionContext.ReturnValue;
             Debug.Assert(AssertionString != null);

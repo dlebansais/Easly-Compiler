@@ -128,7 +128,7 @@
         public override void WriteCSharp(ICSharpWriter writer)
         {
             ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
-            OverList.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
+            OverList.WriteCSharp(writer, SourceExpressionContext, false, -1);
 
             string OverListString = SourceExpressionContext.ReturnValue;
 

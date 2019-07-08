@@ -90,7 +90,7 @@
         public virtual void WriteCSharp(ICSharpWriter writer, bool isElseIf)
         {
             ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
-            BooleanExpression.WriteCSharp(writer, ExpressionContext, false, false, -1);
+            BooleanExpression.WriteCSharp(writer, ExpressionContext, false, -1);
 
             string ExpressionString = ExpressionContext.ReturnValue;
             Debug.Assert(ExpressionString != null);

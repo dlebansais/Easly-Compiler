@@ -210,7 +210,7 @@
                 writer.WriteEmptyLine();
 
             ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
-            WhileCondition.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
+            WhileCondition.WriteCSharp(writer, SourceExpressionContext, false, -1);
 
             string WhileString = SourceExpressionContext.ReturnValue;
 
@@ -230,7 +230,7 @@
             if (VariantExpression != null)
             {
                 ICSharpExpressionContext VariantExpressionContext = new CSharpExpressionContext();
-                VariantExpression.WriteCSharp(writer, VariantExpressionContext, false, false, -1);
+                VariantExpression.WriteCSharp(writer, VariantExpressionContext, false, -1);
 
                 string ExpressionText = VariantExpressionContext.ReturnValue;
 

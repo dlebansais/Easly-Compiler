@@ -185,17 +185,16 @@
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
         /// <param name="expressionContext">The context.</param>
-        /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
+        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isDeclaredInPlace, int skippedIndex)
         {
             if (IsAgent)
-                WriteCSharpAgentCall(writer, expressionContext, isNeverSimple, isDeclaredInPlace, skippedIndex);
+                WriteCSharpAgentCall(writer, expressionContext, isDeclaredInPlace, skippedIndex);
             else if (Discrete != null)
-                WriteCSharpDiscreteCall(writer, expressionContext, isNeverSimple, isDeclaredInPlace, skippedIndex);
+                WriteCSharpDiscreteCall(writer, expressionContext, isDeclaredInPlace, skippedIndex);
             else
-                WriteCSharpFeatureCall(writer, expressionContext, isNeverSimple, isDeclaredInPlace, skippedIndex);
+                WriteCSharpFeatureCall(writer, expressionContext, isDeclaredInPlace, skippedIndex);
 
             /*
             else
@@ -232,9 +231,9 @@
             }*/
         }
 
-        private void WriteCSharpAgentCall(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
+        private void WriteCSharpAgentCall(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isDeclaredInPlace, int skippedIndex)
         {
-            CSharpArgument.CSharpArgumentList(writer, expressionContext, isNeverSimple, isDeclaredInPlace, FeatureCall, skippedIndex, true, out string ArgumentListText, out IList<string> OutgoingResultList);
+            CSharpArgument.CSharpArgumentList(writer, expressionContext, isDeclaredInPlace, FeatureCall, skippedIndex, true, out string ArgumentListText, out IList<string> OutgoingResultList);
             string QueryText = Query.CSharpText(writer, 0);
 
             IIdentifier AgentIdentifier = (IIdentifier)Source.Query.Path[Source.Query.Path.Count - 1];
@@ -251,7 +250,7 @@
                 expressionContext.SetSingleReturnValue($"{AgentIdentifierText}({QueryText})");
         }
 
-        private void WriteCSharpDiscreteCall(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
+        private void WriteCSharpDiscreteCall(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isDeclaredInPlace, int skippedIndex)
         {
             Debug.Assert(FeatureCall.ParameterList.Count == 0);
             Debug.Assert(FeatureCall.ResultList.Count == 0);
@@ -259,11 +258,11 @@
             expressionContext.SetSingleReturnValue(Query.CSharpText(writer, 0));
         }
 
-        private void WriteCSharpFeatureCall(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
+        private void WriteCSharpFeatureCall(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isDeclaredInPlace, int skippedIndex)
         {
             Feature.GetOutputFormat(SelectedOverloadType, out int OutgoingParameterCount, out int ReturnValueIndex);
 
-            CSharpArgument.CSharpArgumentList(writer, expressionContext, isNeverSimple, isDeclaredInPlace, FeatureCall, ReturnValueIndex, false, out string ArgumentListText, out IList<string> OutgoingResultList);
+            CSharpArgument.CSharpArgumentList(writer, expressionContext, isDeclaredInPlace, FeatureCall, ReturnValueIndex, false, out string ArgumentListText, out IList<string> OutgoingResultList);
             string QueryText = Query.CSharpText(writer, 0);
 
             Debug.Assert(OutgoingParameterCount > 0);

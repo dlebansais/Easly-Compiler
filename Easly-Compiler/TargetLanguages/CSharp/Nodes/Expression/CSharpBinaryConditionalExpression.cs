@@ -77,10 +77,9 @@
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
         /// <param name="expressionContext">The context.</param>
-        /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, int skippedIndex)
+        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isDeclaredInPlace, int skippedIndex)
         {
             if (IsEventExpression)
                 expressionContext.SetSingleReturnValue(CSharpTextEvent(writer, expressionContext));
@@ -162,7 +161,7 @@
         private string NestedExpressionText(ICSharpWriter writer, ICSharpExpression expression)
         {
             ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
-            expression.WriteCSharp(writer, ExpressionContext, false, false, -1);
+            expression.WriteCSharp(writer, ExpressionContext, false, -1);
 
             string ExpressionString = ExpressionContext.ReturnValue;
             Debug.Assert(ExpressionString != null);

@@ -85,7 +85,7 @@
         /// <param name="featureCall">Details of the call.</param>
         public static string CSharpArgumentList(ICSharpWriter writer, ICSharpExpressionContext expressionContext, ICSharpFeatureCall featureCall)
         {
-            CSharpArgumentList(writer, expressionContext, false, false, featureCall, -1, false, out string callText, out IList<string> OutgoingResultList);
+            CSharpArgumentList(writer, expressionContext, false, featureCall, -1, false, out string callText, out IList<string> OutgoingResultList);
             return callText;
         }
 
@@ -94,14 +94,13 @@
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
         /// <param name="expressionContext">The context.</param>
-        /// <param name="isNeverSimple">True if the assignment must not consider an 'out' variable as simple.</param>
         /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         /// <param name="featureCall">Details of the call.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
         /// <param name="isAgentCall">True if the call is for an agent.</param>
         /// <param name="callText">The string to use for a call upon return.</param>
         /// <param name="outgoingResultList">The list of results.</param>
-        public static void CSharpArgumentList(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, int skippedIndex, bool isAgentCall, out string callText, out IList<string> outgoingResultList)
+        public static void CSharpArgumentList(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, int skippedIndex, bool isAgentCall, out string callText, out IList<string> outgoingResultList)
         {
             /*if (featureCall.Count == 0 && expressionContext.DestinationNameList.Count == 0)
             {
@@ -117,11 +116,11 @@
                 {
                     case TypeArgumentStyles.None:
                     case TypeArgumentStyles.Positional:
-                        CSharpPositionalArgumentList(writer, expressionContext, isNeverSimple, isDeclaredInPlace, featureCall, skippedIndex, isAgentCall, out callText, out outgoingResultList);
+                        CSharpPositionalArgumentList(writer, expressionContext, isDeclaredInPlace, featureCall, skippedIndex, isAgentCall, out callText, out outgoingResultList);
                         break;
 
                     case TypeArgumentStyles.Assignment:
-                        CSharpAssignmentArgumentList(writer, expressionContext, isNeverSimple, isDeclaredInPlace, featureCall, skippedIndex, isAgentCall, out callText, out outgoingResultList);
+                        CSharpAssignmentArgumentList(writer, expressionContext, isDeclaredInPlace, featureCall, skippedIndex, isAgentCall, out callText, out outgoingResultList);
                         break;
                 }
 
@@ -130,7 +129,7 @@
             }
         }
 
-        private static void CSharpPositionalArgumentList(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, int skippedIndex, bool isAgentCall, out string callText, out IList<string> outgoingResultList)
+        private static void CSharpPositionalArgumentList(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, int skippedIndex, bool isAgentCall, out string callText, out IList<string> outgoingResultList)
         {
             IList<ICSharpParameter> ParameterList = featureCall.ParameterList;
             IList<ICSharpParameter> ResultList = featureCall.ResultList;
@@ -152,7 +151,7 @@
                 ICSharpExpression SourceExpression = Argument.SourceExpression;
                 ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
 
-                SourceExpression.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
+                SourceExpression.WriteCSharp(writer, SourceExpressionContext, false, -1);
 
                 callText += SourceExpressionContext.ResultListAsArgument;
 
@@ -174,15 +173,15 @@
                 Debug.Assert(DefaultValue != null);
 
                 ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
-                DefaultValue.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
+                DefaultValue.WriteCSharp(writer, SourceExpressionContext, false, -1);
 
                 callText += SourceExpressionContext.ResultListAsArgument;
             }
 
-            CSharpAssignmentResultList(writer, expressionContext, isNeverSimple, featureCall, skippedIndex, isAgentCall, ref callText, out outgoingResultList);
+            CSharpAssignmentResultList(writer, expressionContext, featureCall, skippedIndex, isAgentCall, ref callText, out outgoingResultList);
         }
 
-        private static void CSharpAssignmentArgumentList(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, int skippedIndex, bool isAgentCall, out string callText, out IList<string> outgoingResultList)
+        private static void CSharpAssignmentArgumentList(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isDeclaredInPlace, ICSharpFeatureCall featureCall, int skippedIndex, bool isAgentCall, out string callText, out IList<string> outgoingResultList)
         {
             IList<ICSharpParameter> ParameterList = featureCall.ParameterList;
             IList<ICSharpParameter> ResultList = featureCall.ResultList;
@@ -213,7 +212,7 @@
                 {
                     ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
 
-                    SourceExpression.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
+                    SourceExpression.WriteCSharp(writer, SourceExpressionContext, false, -1);
 
                     callText += SourceExpressionContext.ResultListAsArgument;
                 }
@@ -225,16 +224,16 @@
                     Debug.Assert(DefaultValue != null);
 
                     ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
-                    DefaultValue.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
+                    DefaultValue.WriteCSharp(writer, SourceExpressionContext, false, -1);
 
                     callText += SourceExpressionContext.ResultListAsArgument;
                 }
             }
 
-            CSharpAssignmentResultList(writer, expressionContext, isNeverSimple, featureCall, skippedIndex, isAgentCall, ref callText, out outgoingResultList);
+            CSharpAssignmentResultList(writer, expressionContext, featureCall, skippedIndex, isAgentCall, ref callText, out outgoingResultList);
         }
 
-        private static void CSharpAssignmentResultList(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isNeverSimple, ICSharpFeatureCall featureCall, int skippedIndex, bool isAgentCall, ref string callText, out IList<string> outgoingResultList)
+        private static void CSharpAssignmentResultList(ICSharpWriter writer, ICSharpExpressionContext expressionContext, ICSharpFeatureCall featureCall, int skippedIndex, bool isAgentCall, ref string callText, out IList<string> outgoingResultList)
         {
             IList<ICSharpParameter> ResultList = featureCall.ResultList;
 
@@ -251,7 +250,7 @@
                 ICSharpVariableContext Destination = i < expressionContext.DestinationNameList.Count ? expressionContext.DestinationNameList[i] : null;
                 string ResultText;
 
-                if (Destination == null /*|| !Destination.IsSimple*/ || isNeverSimple || !Destination.IsDeclared)
+                if (Destination == null || !Destination.IsDeclared)
                 {
                     Debug.Assert(i < ResultList.Count);
                     ICSharpParameter callTextParameter = ResultList[i];
