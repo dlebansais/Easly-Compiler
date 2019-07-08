@@ -121,7 +121,7 @@
 
             ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext(DestinationNameList);
 
-            SourceExpression.WriteCSharp(writer, ExpressionContext, false, -1);
+            SourceExpression.WriteCSharp(writer, ExpressionContext, -1);
 
             IDictionary<string, string> FilledDestinationTable = ExpressionContext.FilledDestinationTable;
 

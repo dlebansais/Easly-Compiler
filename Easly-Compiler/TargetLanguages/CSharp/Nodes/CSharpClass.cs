@@ -1189,7 +1189,7 @@
                 {
                     ICSharpExpression ExplicitValue = Item.ExplicitValue;
                     ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
-                    ExplicitValue.WriteCSharp(writer, ExpressionContext, false, -1);
+                    ExplicitValue.WriteCSharp(writer, ExpressionContext, -1);
 
                     string ExplicitValueText = ExpressionContext.ReturnValue;
                     Debug.Assert(ExplicitValueText != null);

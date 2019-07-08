@@ -127,7 +127,7 @@
         private void WriteCSharpSwitch(ICSharpWriter writer)
         {
             ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext(EntityNameList);
-            SourceExpression.WriteCSharp(writer, ExpressionContext, true, -1);
+            SourceExpression.WriteCSharp(writer, ExpressionContext, -1);
 
             Debug.Assert(ExpressionContext.FilledDestinationTable.Count == 1);
             string EntityName = EntityNameList[0].Name;
@@ -152,7 +152,7 @@
         private void WriteCSharpIf(ICSharpWriter writer)
         {
             ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
-            SourceExpression.WriteCSharp(writer, ExpressionContext, true, -1);
+            SourceExpression.WriteCSharp(writer, ExpressionContext, -1);
 
             for (int i = 0; i < AttachmentList.Count; i++)
             {

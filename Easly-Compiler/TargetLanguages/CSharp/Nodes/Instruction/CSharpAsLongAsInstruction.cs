@@ -158,7 +158,7 @@
         private void WriteCSharpContinueCondition(ICSharpWriter writer, out string continueExpressionText)
         {
             ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
-            ContinueCondition.WriteCSharp(writer, ExpressionContext, false, -1);
+            ContinueCondition.WriteCSharp(writer, ExpressionContext, -1);
 
             if (ExpressionContext.CompleteDestinationNameList.Count > 1)
             {

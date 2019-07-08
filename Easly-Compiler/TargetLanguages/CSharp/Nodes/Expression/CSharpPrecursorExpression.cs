@@ -107,9 +107,8 @@
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
         /// <param name="expressionContext">The context.</param>
-        /// <param name="isDeclaredInPlace">True if variables must be declared with their type.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
-        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, bool isDeclaredInPlace, int skippedIndex)
+        public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, int skippedIndex)
         {
             string CoexistingPrecursorName = string.Empty;
             string CoexistingPrecursorRootName = ParentFeature.CoexistingPrecursorName;
@@ -119,7 +118,7 @@
 
             PrecursorFeature.GetOutputFormat(SelectedOverloadType, out int OutgoingParameterCount, out int ReturnValueIndex);
 
-            CSharpArgument.CSharpArgumentList(writer, expressionContext, isDeclaredInPlace, FeatureCall, ReturnValueIndex, false, out string ArgumentListText, out IList<string> OutgoingResultList);
+            CSharpArgument.CSharpArgumentList(writer, expressionContext, FeatureCall, ReturnValueIndex, false, out string ArgumentListText, out IList<string> OutgoingResultList);
             Debug.Assert(OutgoingParameterCount > 0);
 
             bool HasArguments = (ParentFeature is ICSharpFunctionFeature) || FeatureCall.ArgumentList.Count > 0;

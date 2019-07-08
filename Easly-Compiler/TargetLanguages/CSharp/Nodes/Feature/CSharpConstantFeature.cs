@@ -153,7 +153,7 @@
             string AttributeString = CSharpNames.ToCSharpIdentifier(Name);
 
             ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
-            ConstantExpression.WriteCSharp(writer, SourceExpressionContext, false, -1);
+            ConstantExpression.WriteCSharp(writer, SourceExpressionContext, -1);
 
             string ValueString = SourceExpressionContext.ReturnValue;
 

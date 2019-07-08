@@ -93,7 +93,7 @@
             string DestinationString = Destination.CSharpText(writer, 0);
 
             ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
-            SourceExpression.WriteCSharp(writer, SourceExpressionContext, false, -1);
+            SourceExpression.WriteCSharp(writer, SourceExpressionContext, -1);
 
             string SourceString = SourceExpressionContext.ReturnValue;
 

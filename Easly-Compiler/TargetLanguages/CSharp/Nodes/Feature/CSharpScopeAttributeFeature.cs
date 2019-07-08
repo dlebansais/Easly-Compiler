@@ -166,7 +166,7 @@
             if (DefaultValue != null)
             {
                 ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
-                DefaultValue.WriteCSharp(writer, ExpressionContext, false, -1);
+                DefaultValue.WriteCSharp(writer, ExpressionContext, -1);
 
                 DefaultValueText = ExpressionContext.ReturnValue;
 

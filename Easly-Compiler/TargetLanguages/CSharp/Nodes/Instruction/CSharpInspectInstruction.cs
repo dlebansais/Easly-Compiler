@@ -98,7 +98,7 @@
         public override void WriteCSharp(ICSharpWriter writer)
         {
             ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
-            SourceExpression.WriteCSharp(writer, SourceExpressionContext, false, -1);
+            SourceExpression.WriteCSharp(writer, SourceExpressionContext, -1);
 
             string SourceString = SourceExpressionContext.ReturnValue;
 
