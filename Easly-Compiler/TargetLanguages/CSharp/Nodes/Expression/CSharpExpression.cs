@@ -202,6 +202,25 @@
         /// <param name="expressionContext">The context.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
         public abstract void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, int skippedIndex);
+
+        /// <summary>
+        /// Gets the return value of an expression.
+        /// </summary>
+        /// <param name="writer">The stream on which to write.</param>
+        /// <param name="expression">The expression.</param>
+        public static string SingleResultExpressionText(ICSharpWriter writer, ICSharpExpression expression)
+        {
+            ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
+            expression.WriteCSharp(writer, SourceExpressionContext, -1);
+
+            Debug.Assert(SourceExpressionContext.ReturnValue != null);
+            string Result = SourceExpressionContext.ReturnValue;
+
+            if (expression.IsComplex)
+                Result = $"({Result})";
+
+            return Result;
+        }
         #endregion
     }
 }

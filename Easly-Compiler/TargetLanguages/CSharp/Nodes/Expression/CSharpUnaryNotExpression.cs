@@ -74,23 +74,10 @@
 
         private void CSharpTextBoolean(ICSharpWriter writer, ICSharpExpressionContext expressionContext)
         {
-            string RightText = NestedExpressionText(writer, RightExpression);
+            string RightText = SingleResultExpressionText(writer, RightExpression);
             string OperatorName = "!";
 
             expressionContext.SetSingleReturnValue($"{OperatorName}{RightText}");
-        }
-
-        private string NestedExpressionText(ICSharpWriter writer, ICSharpExpression expression)
-        {
-            ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
-            expression.WriteCSharp(writer, SourceExpressionContext, -1);
-
-            string Result = SourceExpressionContext.ReturnValue;
-
-            if (expression.IsComplex)
-                Result = $"({Result})";
-
-            return Result;
         }
         #endregion
     }

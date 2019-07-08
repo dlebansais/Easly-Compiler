@@ -93,7 +93,7 @@
                     AssignmentText += ", ";
 
                 ICSharpExpression SourceExpression = Assignment.SourceExpression;
-                string ExpressionText = NestedExpressionText(writer, SourceExpression);
+                string ExpressionText = SingleResultExpressionText(writer, SourceExpression);
 
                 //TODO: handle more than one parameter name
                 string AssignedField = Assignment.ParameterNameList[0];
@@ -103,19 +103,6 @@
             }
 
             expressionContext.SetSingleReturnValue($"new {ClassNameText}() {{ {AssignmentText} }}");
-        }
-
-        private string NestedExpressionText(ICSharpWriter writer, ICSharpExpression expression)
-        {
-            ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
-            expression.WriteCSharp(writer, SourceExpressionContext, -1);
-
-            string Result = SourceExpressionContext.ReturnValue;
-
-            if (expression.IsComplex)
-                Result = $"({Result})";
-
-            return Result;
         }
         #endregion
     }

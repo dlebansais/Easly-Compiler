@@ -82,23 +82,10 @@
         /// <param name="skippedIndex">Index of a destination to skip.</param>
         public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, int skippedIndex)
         {
-            string RightText = NestedExpressionText(writer, RightExpression);
+            string RightText = SingleResultExpressionText(writer, RightExpression);
             string OperatorText = Operator.Name;
 
             expressionContext.SetSingleReturnValue($"{OperatorText} {RightText}");
-        }
-
-        private string NestedExpressionText(ICSharpWriter writer, ICSharpExpression expression)
-        {
-            ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
-            expression.WriteCSharp(writer, SourceExpressionContext, -1);
-
-            string Result = SourceExpressionContext.ReturnValue;
-
-            if (expression.IsComplex)
-                Result = $"({Result})";
-
-            return Result;
         }
         #endregion
     }

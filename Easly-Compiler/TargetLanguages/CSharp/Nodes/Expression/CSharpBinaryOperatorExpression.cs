@@ -216,8 +216,8 @@
                     break;
             }
 
-            string LeftText = NestedExpressionText(writer, LeftExpression);
-            string RightText = NestedExpressionText(writer, RightExpression);
+            string LeftText = SingleResultExpressionText(writer, LeftExpression);
+            string RightText = SingleResultExpressionText(writer, RightExpression);
 
             expressionContext.SetSingleReturnValue($"{LeftText} {OperatorText} {RightText}");
         }
@@ -228,7 +228,7 @@
 
             if (LeftExpression.IsSingleResult && RightExpression.IsSingleResult)
             {
-                string LeftText = NestedExpressionText(writer, LeftExpression);
+                string LeftText = SingleResultExpressionText(writer, LeftExpression);
 
                 ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
                 RightExpression.WriteCSharp(writer, SourceExpressionContext, -1);
@@ -240,7 +240,7 @@
             {
                 Operator.GetOutputFormat(SelectedOverloadType, out int OutgoingParameterCount, out int ReturnValueIndex);
 
-                string LeftText = NestedExpressionText(writer, LeftExpression);
+                string LeftText = SingleResultExpressionText(writer, LeftExpression);
 
                 CSharpArgument.CSharpArgumentList(writer, expressionContext, FeatureCall, ReturnValueIndex, false, out string ArgumentListText, out IList<string> OutgoingResultList);
 
@@ -257,66 +257,7 @@
                     writer.WriteIndentedLine($"{LeftText}.{OperatorText}({ArgumentListText});");
 
                 expressionContext.SetMultipleResult(OutgoingResultList, ReturnValueIndex);
-
-                /*
-                if (LeftExpression.IsSingleResult)
-                {
-                    Debug.Assert(RightNameList != null);
-
-                    string LeftText = NestedExpressionText(writer, LeftExpression);
-
-                    ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
-                    RightExpression.WriteCSharp(writer, ExpressionContext, true, true, -1);
-                    string RightText = ExpressionContext.ResultListAsArgument;
-
-                    expressionContext.SetSingleReturnValue($"{LeftText}.{OperatorText}({RightText})");
-                }
-                else if (RightExpression.IsSingleResult)
-                {
-                    Debug.Assert(LeftNameList != null);
-
-                    ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
-                    LeftExpression.WriteCSharp(writer, ExpressionContext, true, true, LeftResultNameIndex);
-
-                    string LeftExpressionText = ExpressionContext.ResultListAsArgument;
-
-                    ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
-                    RightExpression.WriteCSharp(writer, SourceExpressionContext, false, false, -1);
-
-                    string RightText = SourceExpressionContext.ReturnValue;
-
-                    expressionContext.SetSingleReturnValue($"{LeftExpressionText}.{OperatorText}({RightText})");
-                }
-                else
-                {
-                    Debug.Assert(LeftNameList != null);
-                    Debug.Assert(RightNameList != null);
-
-                    ICSharpExpressionContext LeftExpressionContext = new CSharpExpressionContext();
-                    LeftExpression.WriteCSharp(writer, LeftExpressionContext, true, true, LeftResultNameIndex);
-                    string LeftExpressionText = LeftExpressionContext.ResultListAsArgument;
-
-                    ICSharpExpressionContext RightExpressionContext = new CSharpExpressionContext();
-                    RightExpression.WriteCSharp(writer, RightExpressionContext, true, true, RightResultNameIndex);
-                    string RightExpressionText = RightExpressionContext.ResultListAsArgument;
-
-                    expressionContext.SetSingleReturnValue($"{LeftExpressionText}.{OperatorText}({RightExpressionText})");
-                }
-                */
             }
-        }
-
-        private string NestedExpressionText(ICSharpWriter writer, ICSharpExpression expression)
-        {
-            ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
-            expression.WriteCSharp(writer, SourceExpressionContext, -1);
-
-            string Result = SourceExpressionContext.ReturnValue;
-
-            if (expression.IsComplex)
-                Result = $"({Result})";
-
-            return Result;
         }
         #endregion
     }

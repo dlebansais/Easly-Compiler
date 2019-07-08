@@ -88,8 +88,8 @@
 
         private string CSharpTextEvent(ICSharpWriter writer, ICSharpExpressionContext expressionContext)
         {
-            string LeftText = NestedExpressionText(writer, LeftExpression);
-            string RightText = NestedExpressionText(writer, RightExpression);
+            string LeftText = SingleResultExpressionText(writer, LeftExpression);
+            string RightText = SingleResultExpressionText(writer, RightExpression);
 
             string OperatorName = null;
 
@@ -121,8 +121,8 @@
         {
             if (LeftExpression.IsSingleResult && RightExpression.IsSingleResult)
             {
-                string LeftText = NestedExpressionText(writer, LeftExpression);
-                string RightText = NestedExpressionText(writer, RightExpression);
+                string LeftText = SingleResultExpressionText(writer, LeftExpression);
+                string RightText = SingleResultExpressionText(writer, RightExpression);
 
                 if (Source.Conditional == BaseNode.ConditionalTypes.Implies)
                     expressionContext.SetSingleReturnValue($"!{LeftText} || {RightText}");
@@ -155,19 +155,6 @@
                 //TODO
                 expressionContext.SetSingleReturnValue("TODO");
             }
-        }
-
-        private string NestedExpressionText(ICSharpWriter writer, ICSharpExpression expression)
-        {
-            ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
-            expression.WriteCSharp(writer, ExpressionContext, -1);
-
-            string ExpressionString = ExpressionContext.ReturnValue;
-            Debug.Assert(ExpressionString != null);
-
-            string Result = expression.IsComplex ? ExpressionString : $"({ExpressionString})";
-
-            return Result;
         }
         #endregion
     }
