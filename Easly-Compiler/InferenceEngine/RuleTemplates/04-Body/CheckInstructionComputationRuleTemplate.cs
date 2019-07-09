@@ -65,8 +65,9 @@
                 }
                 else
                 {
-                    IExpressionType ContractType = ResolvedResult.At(0);
-                    if (ContractType.ValueType != BooleanType && ContractType.ValueType != EventType)
+                    ICompiledType ContractType = ResolvedResult.At(0).ValueType;
+
+                    if (!IsValidType(ContractType, IsBooleanTypeAvailable, BooleanType) && !IsValidType(ContractType, IsEventTypeAvailable, EventType))
                     {
                         AddSourceError(new ErrorInvalidExpression(BooleanExpression));
                         Success = false;
@@ -77,6 +78,11 @@
             }
 
             return Success;
+        }
+
+        private bool IsValidType(ICompiledType contractType, bool isExisting, ICompiledType type)
+        {
+            return isExisting && ObjectType.TypeConformToBase(contractType, type, isConversionAllowed: true);
         }
 
         /// <summary>
