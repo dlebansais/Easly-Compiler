@@ -61,6 +61,8 @@
                 Discrete = CSharpDiscrete.Create(context, source.ResolvedFinalDiscrete.Item);
 
             Debug.Assert((Feature != null && Discrete == null) || (Feature == null && Discrete != null));
+
+            Class = context.GetClass(source.ResolvedClassType.Item.BaseClass);
         }
         #endregion
 
@@ -83,7 +85,7 @@
         /// <summary>
         /// The feature class.
         /// </summary>
-        public ICSharpClass Class { get { return Feature?.Owner; } }
+        public ICSharpClass Class { get; }
         #endregion
 
         #region Client Interface
@@ -95,13 +97,38 @@
         /// <param name="skippedIndex">Index of a destination to skip.</param>
         public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, int skippedIndex)
         {
+            string TypeText;
+            string ClassName;
+            string ConstantName;
+
             if (Feature != null)
+            {
+                TypeText = string.Empty;
+
                 if (Class.ValidSourceName == "Microsoft .NET")
-                    expressionContext.SetSingleReturnValue(CSharpNames.ToDotNetIdentifier(Class.ValidClassName) + "." + CSharpNames.ToDotNetIdentifier(Feature.Name));
+                {
+                    ClassName = CSharpNames.ToDotNetIdentifier(Class.ValidClassName);
+                    ConstantName = CSharpNames.ToDotNetIdentifier(Feature.Name);
+                }
                 else
-                    expressionContext.SetSingleReturnValue(CSharpNames.ToCSharpIdentifier(Class.ValidClassName) + "." + CSharpNames.ToCSharpIdentifier(Feature.Name));
+                {
+                    ClassName = CSharpNames.ToCSharpIdentifier(Class.ValidClassName);
+                    ConstantName = CSharpNames.ToCSharpIdentifier(Feature.Name);
+                }
+            }
             else
-                expressionContext.SetSingleReturnValue(CSharpNames.ToCSharpIdentifier(Discrete.Name));
+            {
+                TypeText = "(int)";
+
+                if (Class.HasDiscreteWithUnkownValue)
+                    ClassName = CSharpNames.ToCSharpIdentifier(Class.ValidClassName) + "_Enum";
+                else
+                    ClassName = CSharpNames.ToCSharpIdentifier(Class.ValidClassName);
+
+                ConstantName = CSharpNames.ToCSharpIdentifier(Discrete.Name);
+            }
+
+            expressionContext.SetSingleReturnValue($"{TypeText}{ClassName}.{ConstantName}");
         }
         #endregion
     }

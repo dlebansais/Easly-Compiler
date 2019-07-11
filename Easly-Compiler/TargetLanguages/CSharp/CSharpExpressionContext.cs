@@ -29,6 +29,11 @@
         string ReturnValue { get; }
 
         /// <summary>
+        /// Index of the value returned directly. -1 if none.
+        /// </summary>
+        int ReturnValueIndex { get; }
+
+        /// <summary>
         /// All returned results, presented as argument for a call.
         /// </summary>
         string ResultListAsArgument { get; }

@@ -89,16 +89,53 @@
         /// <param name="skippedIndex">Index of a destination to skip.</param>
         public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, int skippedIndex)
         {
-            // TODO clone of multiple result
+            Debug.Assert(TypeList.Count > 0);
 
-            ICSharpType ClonedType = TypeList[0];
-            string SourceTypeText = ClonedType.Type2CSharpString(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
             ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
             SourceExpression.WriteCSharp(writer, SourceExpressionContext, -1);
 
-            string SourceText = SourceExpressionContext.ReturnValue;
+            IList<string> ResultList = new List<string>();
+            int ReturnValueIndex = SourceExpressionContext.ReturnValueIndex;
+            string ReturnValue = SourceExpressionContext.ReturnValue;
 
-            expressionContext.SetSingleReturnValue($"({SourceTypeText})({SourceText}).Clone()");
+            for (int i = 0; i < SourceExpressionContext.CompleteDestinationNameList.Count; i++)
+            {
+                if (i == ReturnValueIndex)
+                {
+                    Debug.Assert(ReturnValue != null);
+                    ResultList.Add(ReturnValue);
+                }
+                else
+                    ResultList.Add(SourceExpressionContext.CompleteDestinationNameList[i]);
+            }
+
+            if (TypeList.Count == 1)
+            {
+                ICSharpType ClonedType = TypeList[0];
+                string SourceTypeText = ClonedType.Type2CSharpString(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+
+                string SourceText = SourceExpressionContext.ReturnValue;
+                Debug.Assert(SourceText != null);
+
+                expressionContext.SetSingleReturnValue($"({SourceTypeText})({SourceText}).Clone()");
+            }
+            else
+            {
+                Debug.Assert(TypeList.Count == ResultList.Count);
+
+                IList<string> OutgoingResultList = new List<string>();
+
+                for (int i = 0; i < TypeList.Count; i++)
+                {
+                    ICSharpType ClonedType = TypeList[i];
+                    string SourceTypeText = ClonedType.Type2CSharpString(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+                    string SourceText = ResultList[i];
+
+                    OutgoingResultList.Add($"({SourceTypeText})({SourceText}).Clone()");
+                }
+
+                expressionContext.SetMultipleResult(OutgoingResultList, ReturnValueIndex);
+            }
         }
         #endregion
     }

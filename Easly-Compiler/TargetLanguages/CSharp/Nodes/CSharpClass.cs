@@ -126,6 +126,16 @@
         bool InheritFromDotNetEvent { get; }
 
         /// <summary>
+        /// True if the class has some discrete, and all of them have explicit values.
+        /// </summary>
+        bool HasDiscreteConstants { get; }
+
+        /// <summary>
+        /// True if the class has some discrete, and some of them don't have an explicit value.
+        /// </summary>
+        bool HasDiscreteWithUnkownValue { get; }
+
+        /// <summary>
         /// Sets the base class.
         /// </summary>
         /// <param name="baseClass">The base class.</param>
@@ -374,6 +384,42 @@
                             return true;
 
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// True if the class has some discrete, and all of them have explicit values.
+        /// </summary>
+        public bool HasDiscreteConstants
+        {
+            get
+            {
+                if (DiscreteList.Count == 0)
+                    return false;
+
+                bool Result = true;
+                foreach (ICSharpDiscrete Discrete in DiscreteList)
+                    Result &= Discrete.ExplicitValue != null;
+
+                return Result;
+            }
+        }
+
+        /// <summary>
+        /// True if the class has some discrete, and some of them don't have an explicit value.
+        /// </summary>
+        public bool HasDiscreteWithUnkownValue
+        {
+            get
+            {
+                if (DiscreteList.Count == 0)
+                    return false;
+
+                bool Result = false;
+                foreach (ICSharpDiscrete Discrete in DiscreteList)
+                    Result |= Discrete.ExplicitValue == null;
+
+                return Result;
             }
         }
         #endregion
@@ -1017,6 +1063,9 @@
                     sw.WriteLine("    <LangVersion>7.2</LangVersion>");
                     sw.WriteLine("  </PropertyGroup>");
                     sw.WriteLine("  <ItemGroup>");
+                    sw.WriteLine("    <Reference Include=\"PolySerializer\">");
+                    sw.WriteLine("      <HintPath>.\\PolySerializer\\$(Platform)\\$(Configuration)\\PolySerializer.dll</HintPath>");
+                    sw.WriteLine("    </Reference>");
                     sw.WriteLine("    <Reference Include=\"PolySerializer-Attributes\">");
                     sw.WriteLine("      <HintPath>.\\PolySerializer\\$(Platform)\\$(Configuration)\\PolySerializer-Attributes.dll</HintPath>");
                     sw.WriteLine("    </Reference>");
@@ -1178,12 +1227,22 @@
             writer.WriteIndentedLine("{");
             writer.IncreaseIndent();
 
+            WriteDiscreteList(writer, false);
+
+            writer.DecreaseIndent();
+            writer.WriteIndentedLine("}");
+
+            writer.DecreaseIndent();
+            writer.WriteIndentedLine("}");
+        }
+
+        private void WriteDiscreteList(ICSharpWriter writer, bool writeAsConstant)
+        {
             for (int i = 0; i < DiscreteList.Count; i++)
             {
                 ICSharpDiscrete Item = DiscreteList[i];
                 string Line = string.Empty;
-
-                Line += CSharpNames.ToCSharpIdentifier(Item.Name);
+                string ExplicitValueText;
 
                 if (Item.ExplicitValue != null)
                 {
@@ -1191,23 +1250,30 @@
                     ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
                     ExplicitValue.WriteCSharp(writer, ExpressionContext, -1);
 
-                    string ExplicitValueText = ExpressionContext.ReturnValue;
+                    ExplicitValueText = ExpressionContext.ReturnValue;
                     Debug.Assert(ExplicitValueText != null);
-
-                    Line += $" = {ExplicitValueText}";
                 }
+                else
+                    ExplicitValueText = null;
 
-                if (i + 1 < DiscreteList.Count)
-                    Line += ",";
+                if (writeAsConstant)
+                {
+                    Debug.Assert(Item.ExplicitValue != null);
+                    Line += $"public const int {CSharpNames.ToCSharpIdentifier(Item.Name)} = {ExplicitValueText};";
+                }
+                else
+                {
+                    Line += CSharpNames.ToCSharpIdentifier(Item.Name);
+
+                    if (ExplicitValueText != null)
+                        Line += $" = {ExplicitValueText}";
+
+                    if (i + 1 < DiscreteList.Count)
+                        Line += ",";
+                }
 
                 writer.WriteIndentedLine(Line);
             }
-
-            writer.DecreaseIndent();
-            writer.WriteIndentedLine("}");
-
-            writer.DecreaseIndent();
-            writer.WriteIndentedLine("}");
         }
 
         private void WriteClass(ICSharpWriter writer)
@@ -1229,6 +1295,9 @@
                 WriteClassContract(writer);
 
             WriteClassImplementation(writer);
+
+            if (HasDiscreteWithUnkownValue)
+                WriteClassEnumCompanion(writer);
 
             writer.DecreaseIndent();
             writer.WriteIndentedLine("}");
@@ -1275,11 +1344,10 @@
                     InterfaceList.Add(AncestorClass);
             }
 
-            string InterfaceDeclarationLine = $"public interface {InterfaceName}";
+            string OtherInterfaceNames = string.Empty;
 
             if (InterfaceList.Count > 0)
             {
-                string OtherInterfaceNames = string.Empty;
                 foreach (ICSharpClass OtherInterface in InterfaceList)
                 {
                     if (OtherInterfaceNames.Length > 0)
@@ -1287,9 +1355,24 @@
 
                     OtherInterfaceNames += OtherInterface.FullClassName2CSharpClassName(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
                 }
-
-                InterfaceDeclarationLine += $" : {OtherInterfaceNames}";
             }
+
+            if (Type.Source.IsUsedInCloneOf)
+            {
+                if (OtherInterfaceNames.Length > 0)
+                    OtherInterfaceNames += ", ";
+
+                OtherInterfaceNames += "ICloneable";
+
+                writer.AddUsing("System");
+                writer.AddUsing("System.IO");
+                writer.AddUsing("PolySerializer");
+            }
+
+            string InterfaceDeclarationLine = $"public interface {InterfaceName}";
+
+            if (OtherInterfaceNames.Length > 0)
+                InterfaceDeclarationLine += $" : {OtherInterfaceNames}";
 
             writer.WriteIndentedLine(InterfaceDeclarationLine);
 
@@ -1440,9 +1523,6 @@
             if (Source.Cloneable != BaseNode.CloneableStatus.Single)
                 InheritanceLineList.Add(InterfaceName);
 
-            if (Type.Source.IsUsedInCloneOf)
-                InheritanceLineList.Add("ICloneable");
-
             string InheritanceLineString = string.Empty;
             foreach (string s in InheritanceLineList)
             {
@@ -1460,6 +1540,7 @@
             foreach (ICSharpGeneric Generic in GenericList)
                 WriteGenericWhereClause(writer, Generic);
 
+            string ConstantRegion = "Constants";
             string InitRegion = "Init";
             string PropertiesRegion = "Properties";
             string ClientInterfaceRegion = "Client Interface";
@@ -1467,6 +1548,7 @@
             string ImplementationRegion = "Implementation";
 
             List<string> OrderedRegionList = new List<string>();
+            OrderedRegionList.Add(ConstantRegion);
             OrderedRegionList.Add(InitRegion);
             OrderedRegionList.Add(PropertiesRegion);
             OrderedRegionList.Add(ClientInterfaceRegion);
@@ -1505,7 +1587,10 @@
                 string BelongingRegion;
                 if (IsLocal)
                 {
-                    if (Feature is ICSharpCreationFeature)
+                    if (Feature is ICSharpConstantFeature)
+                        BelongingRegion = ConstantRegion;
+
+                    else if (Feature is ICSharpCreationFeature)
                         BelongingRegion = InitRegion;
 
                     else if (Feature is ICSharpPropertyFeature)
@@ -1635,7 +1720,12 @@
                     }
                 }
 
-                if (BelongingRegion == InitRegion)
+                if (BelongingRegion == ConstantRegion)
+                {
+                    if (HasDiscreteConstants)
+                        WriteDiscreteList(writer, true);
+                }
+                else if (BelongingRegion == InitRegion)
                 {
                     if (IsParameterizedSingleton)
                     {
@@ -1739,10 +1829,18 @@
             isMultiline = true;
 
             writer.WriteIndentedLine("#region Implementation of ICloneable");
-            writer.WriteIndentedLine("object Clone()");
+            writer.WriteIndentedLine("public object Clone()");
             writer.WriteIndentedLine("{");
             writer.IncreaseIndent();
-            writer.WriteIndentedLine("return Easly.DeepCopy(this);");
+            writer.WriteIndentedLine("using (MemoryStream ms = new MemoryStream())");
+            writer.WriteIndentedLine("{");
+            writer.IncreaseIndent();
+            writer.WriteIndentedLine("ISerializer s = new Serializer();");
+            writer.WriteIndentedLine("s.Serialize(ms, this);");
+            writer.WriteIndentedLine("ms.Seek(0, SeekOrigin.Begin);");
+            writer.WriteIndentedLine("return s.Deserialize(ms);");
+            writer.DecreaseIndent();
+            writer.WriteIndentedLine("}");
             writer.DecreaseIndent();
             writer.WriteIndentedLine("}");
             writer.WriteIndentedLine("#endregion");
@@ -1772,6 +1870,22 @@
             writer.DecreaseIndent();
             writer.WriteIndentedLine("}");
             writer.WriteIndentedLine("#endregion");
+        }
+
+        private void WriteClassEnumCompanion(ICSharpWriter writer)
+        {
+            string ClassName = FullClassName2CSharpClassName(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+            string InterfaceDeclarationLine = $"public enum {ClassName}_Enum";
+
+            writer.WriteEmptyLine();
+            writer.WriteIndentedLine(InterfaceDeclarationLine);
+            writer.WriteIndentedLine("{");
+            writer.IncreaseIndent();
+
+            WriteDiscreteList(writer, false);
+
+            writer.DecreaseIndent();
+            writer.WriteIndentedLine("}");
         }
         #endregion
 

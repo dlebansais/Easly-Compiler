@@ -197,15 +197,23 @@ namespace CompilerNode
             IResultType ResolvedSourceResult = Source.ResolvedResult.Item;
 
             foreach (IExpressionType Item in ResolvedSourceResult)
-            {
                 if (Item.ValueType is IClassType AsClassType)
-                    AsClassType.MarkAsUsedInCloneOf();
+                {
+                    IClass BaseClass = AsClassType.BaseClass;
+
+                    if (BaseClass.Cloneable == BaseNode.CloneableStatus.Cloneable)
+                        AsClassType.MarkAsUsedInCloneOf();
+                    else
+                    {
+                        errorList.AddError(new ErrorCloningNotAllowed(node, BaseClass.ValidClassName));
+                        return false;
+                    }
+                }
                 else
                 {
                     errorList.AddError(new ErrorClassTypeRequired(node));
                     return false;
                 }
-            }
 
             resolvedResult = ResolvedSourceResult;
             ResultException.Propagate(Source.ResolvedException, out resolvedException);

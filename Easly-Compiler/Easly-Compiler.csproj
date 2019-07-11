@@ -75,6 +75,7 @@
     <Compile Include="CompilerNodes\Feature\FeatureWithPrecursor.cs" />
     <Compile Include="CompiledTypeWithFeature.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorInvalidConversionFeature.cs" />
+    <Compile Include="Errors\Inference\03-Contract\ErrorCloningNotAllowed.cs" />
     <Compile Include="Errors\Inference\03-Contract\ErrorMissingOverSourceAndIndexer.cs" />
     <Compile Include="Errors\Inference\04-Body\ErrorCreatedFeatureNotAttributeOrProperty.cs" />
     <Compile Include="Errors\Inference\04-Body\ErrorCreationFeatureRequired.cs" />
