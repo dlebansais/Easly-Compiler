@@ -1397,6 +1397,11 @@
                 Feature.WriteCSharp(writer, CSharpFeatureTextTypes.Interface, CSharpExports.None, IsLocal, ref IsFirstFeature, ref IsMultiline);
             }
 
+            if (Type.Source.IsUsedInCloneOf)
+            {
+                writer.WriteIndentedLine("object CloneShallow();");
+            }
+
             writer.DecreaseIndent();
             writer.WriteIndentedLine("}");
             writer.WriteEmptyLine();
@@ -1829,6 +1834,9 @@
             isMultiline = true;
 
             writer.WriteIndentedLine("#region Implementation of ICloneable");
+            writer.WriteIndentedLine("/// <summary>");
+            writer.WriteIndentedLine("/// Returns a deep clone of the current object.");
+            writer.WriteIndentedLine("/// </summary>");
             writer.WriteIndentedLine("public object Clone()");
             writer.WriteIndentedLine("{");
             writer.IncreaseIndent();
@@ -1841,6 +1849,16 @@
             writer.WriteIndentedLine("return s.Deserialize(ms);");
             writer.DecreaseIndent();
             writer.WriteIndentedLine("}");
+            writer.DecreaseIndent();
+            writer.WriteIndentedLine("}");
+            writer.WriteEmptyLine();
+            writer.WriteIndentedLine("/// <summary>");
+            writer.WriteIndentedLine("/// Returns a shallow clone of the current object.");
+            writer.WriteIndentedLine("/// </summary>");
+            writer.WriteIndentedLine("public object CloneShallow()");
+            writer.WriteIndentedLine("{");
+            writer.IncreaseIndent();
+            writer.WriteIndentedLine("return MemberwiseClone();");
             writer.DecreaseIndent();
             writer.WriteIndentedLine("}");
             writer.WriteIndentedLine("#endregion");
