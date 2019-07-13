@@ -91,11 +91,6 @@
         public new IEntityExpression Source { get { return (IEntityExpression)base.Source; } }
 
         /// <summary>
-        /// True if the expression can provide its constant value directly.
-        /// </summary>
-        public bool IsDirectConstant { get { return true; } }
-
-        /// <summary>
         /// The source feature for which an entity object is obtained. Can be null.
         /// </summary>
         public ICSharpFeature Feature { get; }
@@ -182,6 +177,13 @@
 
             expressionContext.SetSingleReturnValue(Result);
         }
+        #endregion
+
+        #region Implementation of ICSharpExpressionAsConstant
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant { get { return true; } }
         #endregion
     }
 }

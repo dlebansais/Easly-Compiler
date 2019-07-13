@@ -164,10 +164,15 @@
                 ConstantExpression.WriteCSharp(writer, SourceExpressionContext, -1);
 
                 ValueString = SourceExpressionContext.ReturnValue;
+                Debug.Assert(ValueString != null);
             }
             else
             {
-                ValueString = "TODO";
+                ICSharpCompilableExpression CompilableExpression = ConstantExpression as ICSharpCompilableExpression;
+                Debug.Assert(CompilableExpression != null);
+
+                ValueString = CompilableExpression.CompiledValue;
+                writer.WriteIndentedLine($"// {ValueString} = {ConstantExpression.Source.ExpressionToString}");
             }
 
             string ExportStatusText = CSharpNames.ComposedExportStatus(false, false, true, exportStatus);

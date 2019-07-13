@@ -65,11 +65,6 @@
         public new IInitializedObjectExpression Source { get { return (IInitializedObjectExpression)base.Source; } }
 
         /// <summary>
-        /// True if the expression can provide its constant value directly.
-        /// </summary>
-        public bool IsDirectConstant { get { return true; } }
-
-        /// <summary>
         /// Class of the initialized object.
         /// </summary>
         public ICSharpClass Class { get; }
@@ -109,6 +104,13 @@
 
             expressionContext.SetSingleReturnValue($"new {ClassNameText}() {{ {AssignmentText} }}");
         }
+        #endregion
+
+        #region Implementation of ICSharpExpressionAsConstant
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant { get { return true; } }
         #endregion
     }
 }

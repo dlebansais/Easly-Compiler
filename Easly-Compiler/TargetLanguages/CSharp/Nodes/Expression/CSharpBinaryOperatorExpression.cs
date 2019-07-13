@@ -7,7 +7,7 @@
     /// <summary>
     /// A C# expression.
     /// </summary>
-    public interface ICSharpBinaryOperatorExpression : ICSharpExpression, ICSharpExpressionAsConstant
+    public interface ICSharpBinaryOperatorExpression : ICSharpExpression, ICSharpExpressionAsConstant, ICSharpCompilableExpression
     {
         /// <summary>
         /// The Easly expression from which the C# expression is created.
@@ -136,11 +136,6 @@
         public new IBinaryOperatorExpression Source { get { return (IBinaryOperatorExpression)base.Source; } }
 
         /// <summary>
-        /// True if the expression can provide its constant value directly.
-        /// </summary>
-        public bool IsDirectConstant { get { return false; } }
-
-        /// <summary>
         /// The left expression.
         /// </summary>
         public ICSharpExpression LeftExpression { get; }
@@ -264,6 +259,20 @@
                 expressionContext.SetMultipleResult(OutgoingResultList, ReturnValueIndex);
             }
         }
+        #endregion
+
+        #region Implementation of ICSharpExpressionAsConstant
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant { get { return false; } }
+        #endregion
+
+        #region Implementation of ICSharpCompilableExpression
+        /// <summary>
+        /// The expression compiled constant value.
+        /// </summary>
+        public string CompiledValue { get { return "TODO"; } }
         #endregion
     }
 }

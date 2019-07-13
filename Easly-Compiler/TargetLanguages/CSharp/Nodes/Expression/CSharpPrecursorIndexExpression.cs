@@ -7,7 +7,7 @@
     /// <summary>
     /// A C# expression.
     /// </summary>
-    public interface ICSharpPrecursorIndexExpression : ICSharpExpression, ICSharpExpressionAsConstant
+    public interface ICSharpPrecursorIndexExpression : ICSharpExpression, ICSharpExpressionAsConstant, ICSharpCompilableExpression
     {
         /// <summary>
         /// The Easly expression from which the C# expression is created.
@@ -63,11 +63,6 @@
         public new IPrecursorIndexExpression Source { get { return (IPrecursorIndexExpression)base.Source; } }
 
         /// <summary>
-        /// True if the expression can provide its constant value directly.
-        /// </summary>
-        public bool IsDirectConstant { get { return false; } }
-
-        /// <summary>
         /// The feature whose precursor is being called.
         /// </summary>
         public ICSharpIndexerFeature Feature { get; }
@@ -91,6 +86,20 @@
 
             expressionContext.SetSingleReturnValue($"base[{ArgumentListText}]");
         }
+        #endregion
+
+        #region Implementation of ICSharpExpressionAsConstant
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant { get { return false; } }
+        #endregion
+
+        #region Implementation of ICSharpCompilableExpression
+        /// <summary>
+        /// The expression compiled constant value.
+        /// </summary>
+        public string CompiledValue { get { return "TODO"; } }
         #endregion
     }
 }

@@ -7,7 +7,7 @@
     /// <summary>
     /// A C# expression.
     /// </summary>
-    public interface ICSharpBinaryConditionalExpression : ICSharpExpression, ICSharpExpressionAsConstant
+    public interface ICSharpBinaryConditionalExpression : ICSharpExpression, ICSharpExpressionAsConstant, ICSharpCompilableExpression
     {
         /// <summary>
         /// The Easly expression from which the C# expression is created.
@@ -59,19 +59,6 @@
         /// The Easly expression from which the C# expression is created.
         /// </summary>
         public new IBinaryConditionalExpression Source { get { return (IBinaryConditionalExpression)base.Source; } }
-
-        /// <summary>
-        /// True if the expression can provide its constant value directly.
-        /// </summary>
-        public bool IsDirectConstant
-        {
-            get
-            {
-                return LeftExpression is ICSharpExpressionAsConstant LeftExpressionAsConstant &&
-                       RightExpression is ICSharpExpressionAsConstant RightExpressionAsConstant &&
-                       LeftExpressionAsConstant.IsDirectConstant && RightExpressionAsConstant.IsDirectConstant;
-            }
-        }
 
         /// <summary>
         /// The left expression.
@@ -167,6 +154,34 @@
             {
                 //TODO
                 expressionContext.SetSingleReturnValue("TODO");
+            }
+        }
+        #endregion
+
+        #region Implementation of ICSharpExpressionAsConstant
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant
+        {
+            get
+            {
+                return LeftExpression is ICSharpExpressionAsConstant LeftExpressionAsConstant &&
+                       RightExpression is ICSharpExpressionAsConstant RightExpressionAsConstant &&
+                       LeftExpressionAsConstant.IsDirectConstant && RightExpressionAsConstant.IsDirectConstant;
+            }
+        }
+        #endregion
+
+        #region Implementation of ICSharpCompilableExpression
+        /// <summary>
+        /// The expression compiled constant value.
+        /// </summary>
+        public string CompiledValue
+        {
+            get
+            {
+                return "TODO";
             }
         }
         #endregion

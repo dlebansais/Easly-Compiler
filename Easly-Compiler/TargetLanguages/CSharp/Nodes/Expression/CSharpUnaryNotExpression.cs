@@ -6,7 +6,7 @@
     /// <summary>
     /// A C# expression.
     /// </summary>
-    public interface ICSharpUnaryNotExpression : ICSharpExpression, ICSharpExpressionAsConstant
+    public interface ICSharpUnaryNotExpression : ICSharpExpression, ICSharpExpressionAsConstant, ICSharpCompilableExpression
     {
         /// <summary>
         /// The Easly expression from which the C# expression is created.
@@ -57,11 +57,6 @@
         /// The right expression.
         /// </summary>
         public ICSharpExpression RightExpression { get; }
-
-        /// <summary>
-        /// True if the expression can provide its constant value directly.
-        /// </summary>
-        public bool IsDirectConstant { get { return false; } }
         #endregion
 
         #region Client Interface
@@ -84,6 +79,20 @@
 
             expressionContext.SetSingleReturnValue($"{OperatorName}{RightText}");
         }
+        #endregion
+
+        #region Implementation of ICSharpExpressionAsConstant
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant { get { return false; } }
+        #endregion
+
+        #region Implementation of ICSharpCompilableExpression
+        /// <summary>
+        /// The expression compiled constant value.
+        /// </summary>
+        public string CompiledValue { get { return "TODO"; } }
         #endregion
     }
 }

@@ -47,11 +47,6 @@
         /// The Easly expression from which the C# expression is created.
         /// </summary>
         public new IKeywordExpression Source { get { return (IKeywordExpression)base.Source; } }
-
-        /// <summary>
-        /// True if the expression can provide its constant value directly.
-        /// </summary>
-        public bool IsDirectConstant { get { return true; } }
         #endregion
 
         #region Client Interface
@@ -104,6 +99,13 @@
 
             expressionContext.SetSingleReturnValue(Result);
         }
+        #endregion
+
+        #region Implementation of ICSharpExpressionAsConstant
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant { get { return true; } }
         #endregion
     }
 }

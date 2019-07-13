@@ -7,7 +7,7 @@
     /// <summary>
     /// A C# expression.
     /// </summary>
-    public interface ICSharpClassConstantExpression : ICSharpExpression, ICSharpExpressionAsConstant
+    public interface ICSharpClassConstantExpression : ICSharpExpression, ICSharpExpressionAsConstant, ICSharpCompilableExpression
     {
         /// <summary>
         /// The Easly expression from which the C# expression is created.
@@ -73,11 +73,6 @@
         public new IClassConstantExpression Source { get { return (IClassConstantExpression)base.Source; } }
 
         /// <summary>
-        /// True if the expression can provide its constant value directly.
-        /// </summary>
-        public bool IsDirectConstant { get { return false; } }
-
-        /// <summary>
         /// The constant feature.
         /// </summary>
         public ICSharpConstantFeature Feature { get; }
@@ -135,6 +130,20 @@
 
             expressionContext.SetSingleReturnValue($"{TypeText}{ClassName}.{ConstantName}");
         }
+        #endregion
+
+        #region Implementation of ICSharpExpressionAsConstant
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant { get { return false; } }
+        #endregion
+
+        #region Implementation of ICSharpCompilableExpression
+        /// <summary>
+        /// The expression compiled constant value.
+        /// </summary>
+        public string CompiledValue { get { return "TODO"; } }
         #endregion
     }
 }

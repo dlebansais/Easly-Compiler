@@ -98,11 +98,6 @@
         public new IAgentExpression Source { get { return (IAgentExpression)base.Source; } }
 
         /// <summary>
-        /// True if the expression can provide its constant value directly.
-        /// </summary>
-        public bool IsDirectConstant { get { return true; } }
-
-        /// <summary>
         /// The base type. Can be null.
         /// </summary>
         public ICSharpTypeWithFeature BaseType { get; }
@@ -276,6 +271,13 @@
 
             return Result;
         }
+        #endregion
+
+        #region Implementation of ICSharpExpressionAsConstant
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant { get { return true; } }
         #endregion
     }
 }

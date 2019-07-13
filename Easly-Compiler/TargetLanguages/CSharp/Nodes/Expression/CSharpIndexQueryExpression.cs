@@ -6,7 +6,7 @@
     /// <summary>
     /// A C# expression.
     /// </summary>
-    public interface ICSharpIndexQueryExpression : ICSharpExpression, ICSharpExpressionAsConstant
+    public interface ICSharpIndexQueryExpression : ICSharpExpression, ICSharpExpressionAsConstant, ICSharpCompilableExpression
     {
         /// <summary>
         /// The Easly expression from which the C# expression is created.
@@ -60,11 +60,6 @@
         public new IIndexQueryExpression Source { get { return (IIndexQueryExpression)base.Source; } }
 
         /// <summary>
-        /// True if the expression can provide its constant value directly.
-        /// </summary>
-        public bool IsDirectConstant { get { return false; } }
-
-        /// <summary>
         /// The indexed expression.
         /// </summary>
         public ICSharpExpression IndexedExpression { get; }
@@ -93,6 +88,20 @@
 
             expressionContext.SetSingleReturnValue($"{IndexedText}[{ArgumentListText}]");
         }
+        #endregion
+
+        #region Implementation of ICSharpExpressionAsConstant
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant { get { return false; } }
+        #endregion
+
+        #region Implementation of ICSharpCompilableExpression
+        /// <summary>
+        /// The expression compiled constant value.
+        /// </summary>
+        public string CompiledValue { get { return "TODO"; } }
         #endregion
     }
 }

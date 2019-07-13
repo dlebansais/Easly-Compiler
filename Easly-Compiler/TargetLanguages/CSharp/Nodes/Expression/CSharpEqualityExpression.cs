@@ -7,7 +7,7 @@
     /// <summary>
     /// A C# expression.
     /// </summary>
-    public interface ICSharpEqualityExpression : ICSharpExpression, ICSharpExpressionAsConstant
+    public interface ICSharpEqualityExpression : ICSharpExpression, ICSharpExpressionAsConstant, ICSharpCompilableExpression
     {
         /// <summary>
         /// The Easly expression from which the C# expression is created.
@@ -61,19 +61,6 @@
         public new IEqualityExpression Source { get { return (IEqualityExpression)base.Source; } }
 
         /// <summary>
-        /// True if the expression can provide its constant value directly.
-        /// </summary>
-        public bool IsDirectConstant
-        {
-            get
-            {
-                return LeftExpression is ICSharpExpressionAsConstant LeftExpressionAsConstant &&
-                       RightExpression is ICSharpExpressionAsConstant RightExpressionAsConstant &&
-                       LeftExpressionAsConstant.IsDirectConstant && RightExpressionAsConstant.IsDirectConstant;
-            }
-        }
-
-        /// <summary>
         /// The left expression.
         /// </summary>
         public ICSharpExpression LeftExpression { get; }
@@ -113,6 +100,28 @@
 
             expressionContext.SetSingleReturnValue($"{LeftText} {EqualitySign} {RightText}");
         }
+        #endregion
+
+        #region Implementation of ICSharpExpressionAsConstant
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant
+        {
+            get
+            {
+                return LeftExpression is ICSharpExpressionAsConstant LeftExpressionAsConstant &&
+                       RightExpression is ICSharpExpressionAsConstant RightExpressionAsConstant &&
+                       LeftExpressionAsConstant.IsDirectConstant && RightExpressionAsConstant.IsDirectConstant;
+            }
+        }
+        #endregion
+
+        #region Implementation of ICSharpCompilableExpression
+        /// <summary>
+        /// The expression compiled constant value.
+        /// </summary>
+        public string CompiledValue { get { return "TODO"; } }
         #endregion
     }
 }

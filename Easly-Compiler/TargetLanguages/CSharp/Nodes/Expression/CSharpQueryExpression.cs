@@ -7,7 +7,7 @@
     /// <summary>
     /// A C# expression.
     /// </summary>
-    public interface ICSharpQueryExpression : ICSharpExpression, ICSharpExpressionAsConstant
+    public interface ICSharpQueryExpression : ICSharpExpression, ICSharpExpressionAsConstant, ICSharpCompilableExpression
     {
         /// <summary>
         /// The Easly expression from which the C# expression is created.
@@ -110,11 +110,6 @@
         /// The Easly expression from which the C# expression is created.
         /// </summary>
         public new IQueryExpression Source { get { return (IQueryExpression)base.Source; } }
-
-        /// <summary>
-        /// True if the expression can provide its constant value directly.
-        /// </summary>
-        public bool IsDirectConstant { get { return false; } }
 
         /// <summary>
         /// The feature call.
@@ -300,6 +295,20 @@
                 expressionContext.SetMultipleResult(OutgoingResultList, ReturnValueIndex);
             }
         }
+        #endregion
+
+        #region Implementation of ICSharpExpressionAsConstant
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant { get { return false; } }
+        #endregion
+
+        #region Implementation of ICSharpCompilableExpression
+        /// <summary>
+        /// The expression compiled constant value.
+        /// </summary>
+        public string CompiledValue { get { return "TODO"; } }
         #endregion
     }
 }
