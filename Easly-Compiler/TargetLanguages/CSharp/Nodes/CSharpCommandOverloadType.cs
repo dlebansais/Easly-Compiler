@@ -58,7 +58,7 @@
         #endregion
 
         #region Client Interface
-        /// <summary>
+        /*/// <summary>
         /// Writes down the C# overload of a feature.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
@@ -72,7 +72,7 @@
         public void WriteCSharp(ICSharpWriter writer, CSharpFeatureTextTypes featureTextType, bool isOverride, string nameString, CSharpExports exportStatus, bool isConstructor, ref bool isFirstFeature, ref bool isMultiline)
         {
             //TODO
-        }
+        }*/
         #endregion
     }
 }

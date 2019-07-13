@@ -7,7 +7,7 @@
     /// <summary>
     /// A C# expression.
     /// </summary>
-    public interface ICSharpEntityExpression : ICSharpExpression
+    public interface ICSharpEntityExpression : ICSharpExpression, ICSharpExpressionAsConstant
     {
         /// <summary>
         /// The Easly expression from which the C# expression is created.
@@ -89,6 +89,11 @@
         /// The Easly expression from which the C# expression is created.
         /// </summary>
         public new IEntityExpression Source { get { return (IEntityExpression)base.Source; } }
+
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant { get { return true; } }
 
         /// <summary>
         /// The source feature for which an entity object is obtained. Can be null.

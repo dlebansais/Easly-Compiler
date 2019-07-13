@@ -6,7 +6,7 @@
     /// <summary>
     /// A C# expression.
     /// </summary>
-    public interface ICSharpInitializedObjectExpression : ICSharpExpression
+    public interface ICSharpInitializedObjectExpression : ICSharpExpression, ICSharpExpressionAsConstant
     {
         /// <summary>
         /// The Easly expression from which the C# expression is created.
@@ -63,6 +63,11 @@
         /// The Easly expression from which the C# expression is created.
         /// </summary>
         public new IInitializedObjectExpression Source { get { return (IInitializedObjectExpression)base.Source; } }
+
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant { get { return true; } }
 
         /// <summary>
         /// Class of the initialized object.

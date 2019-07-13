@@ -6,7 +6,7 @@
     /// <summary>
     /// A C# expression.
     /// </summary>
-    public interface ICSharpUnaryNotExpression : ICSharpExpression
+    public interface ICSharpUnaryNotExpression : ICSharpExpression, ICSharpExpressionAsConstant
     {
         /// <summary>
         /// The Easly expression from which the C# expression is created.
@@ -57,6 +57,11 @@
         /// The right expression.
         /// </summary>
         public ICSharpExpression RightExpression { get; }
+
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant { get { return false; } }
         #endregion
 
         #region Client Interface

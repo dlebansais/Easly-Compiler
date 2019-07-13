@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System;
     using System.Diagnostics;
     using CompilerNode;
 
@@ -152,14 +153,37 @@
             string TypeString = Type.Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
             string AttributeString = CSharpNames.ToCSharpIdentifier(Name);
 
-            ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
-            ConstantExpression.WriteCSharp(writer, SourceExpressionContext, -1);
+            ICSharpExpressionAsConstant ExpressionAsConstant = ConstantExpression as ICSharpExpressionAsConstant;
+            Debug.Assert(ExpressionAsConstant != null);
 
-            string ValueString = SourceExpressionContext.ReturnValue;
+            string ValueString;
+
+            if (ExpressionAsConstant.IsDirectConstant)
+            {
+                ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
+                ConstantExpression.WriteCSharp(writer, SourceExpressionContext, -1);
+
+                ValueString = SourceExpressionContext.ReturnValue;
+            }
+            else
+            {
+                ValueString = "TODO";
+            }
 
             string ExportStatusText = CSharpNames.ComposedExportStatus(false, false, true, exportStatus);
 
-            writer.WriteIndentedLine($"{ExportStatusText} const {TypeString} {AttributeString} = {ValueString};");
+            bool IsReadOnlyObject;
+            if (Type is ICSharpClassType AsClassType)
+            {
+                Guid ClassGuid = AsClassType.Source.BaseClass.ClassGuid;
+                IsReadOnlyObject = ClassGuid != LanguageClasses.Number.Guid && ClassGuid != LanguageClasses.Boolean.Guid && ClassGuid != LanguageClasses.String.Guid && ClassGuid != LanguageClasses.Character.Guid;
+            }
+            else
+                IsReadOnlyObject = true;
+
+            string ConstString = IsReadOnlyObject ? "static readonly" : "const";
+
+            writer.WriteIndentedLine($"{ExportStatusText} {ConstString} {TypeString} {AttributeString} = {ValueString};");
         }
         #endregion
     }

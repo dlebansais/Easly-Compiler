@@ -7,7 +7,7 @@
     /// <summary>
     /// A C# expression.
     /// </summary>
-    public interface ICSharpUnaryOperatorExpression : ICSharpExpression
+    public interface ICSharpUnaryOperatorExpression : ICSharpExpression, ICSharpExpressionAsConstant
     {
         /// <summary>
         /// The Easly expression from which the C# expression is created.
@@ -61,6 +61,11 @@
         /// The Easly expression from which the C# expression is created.
         /// </summary>
         public new IUnaryOperatorExpression Source { get { return (IUnaryOperatorExpression)base.Source; } }
+
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant { get { return false; } }
 
         /// <summary>
         /// The right expression.

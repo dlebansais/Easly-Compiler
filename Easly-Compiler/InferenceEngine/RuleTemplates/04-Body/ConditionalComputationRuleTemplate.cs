@@ -57,29 +57,41 @@
             }
             else
             {
-                IExpressionType ContractType = ResolvedResult.At(0);
-                ICompiledType ConditionalType = ContractType.ValueType;
-
                 bool IsBooleanTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Boolean.Guid, node, out ITypeName BooleanTypeName, out ICompiledType BooleanType);
                 bool IsEventTypeAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Event.Guid, node, out ITypeName EventTypeName, out ICompiledType EventType);
 
-                if (!(IsBooleanTypeAvailable && ConditionalType == BooleanType) && !(IsEventTypeAvailable && ConditionalType == EventType))
+                if (!IsBooleanTypeAvailable && !IsEventTypeAvailable)
                 {
                     AddSourceError(new ErrorBooleanTypeMissing(node));
                     Success = false;
                 }
                 else
                 {
-                    IResultException ResolvedException = new ResultException();
+                    ICompiledType ContractType = ResolvedResult.At(0).ValueType;
 
-                    ResultException.Merge(ResolvedException, BooleanExpression.ResolvedException.Item);
-                    ResultException.Merge(ResolvedException, Instructions.ResolvedException.Item);
+                    if (!IsValidType(ContractType, IsBooleanTypeAvailable, BooleanType) && !IsValidType(ContractType, IsEventTypeAvailable, EventType))
+                    {
+                        AddSourceError(new ErrorInvalidExpression(BooleanExpression));
+                        Success = false;
+                    }
+                    else
+                    {
+                        IResultException ResolvedException = new ResultException();
 
-                    data = ResolvedException;
+                        ResultException.Merge(ResolvedException, BooleanExpression.ResolvedException.Item);
+                        ResultException.Merge(ResolvedException, Instructions.ResolvedException.Item);
+
+                        data = ResolvedException;
+                    }
                 }
             }
 
             return Success;
+        }
+
+        private bool IsValidType(ICompiledType contractType, bool isExisting, ICompiledType type)
+        {
+            return isExisting && ObjectType.TypeConformToBase(contractType, type, isConversionAllowed: true);
         }
 
         /// <summary>

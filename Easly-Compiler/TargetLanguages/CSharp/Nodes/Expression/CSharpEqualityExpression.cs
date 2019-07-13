@@ -7,7 +7,7 @@
     /// <summary>
     /// A C# expression.
     /// </summary>
-    public interface ICSharpEqualityExpression : ICSharpExpression
+    public interface ICSharpEqualityExpression : ICSharpExpression, ICSharpExpressionAsConstant
     {
         /// <summary>
         /// The Easly expression from which the C# expression is created.
@@ -59,6 +59,19 @@
         /// The Easly expression from which the C# expression is created.
         /// </summary>
         public new IEqualityExpression Source { get { return (IEqualityExpression)base.Source; } }
+
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant
+        {
+            get
+            {
+                return LeftExpression is ICSharpExpressionAsConstant LeftExpressionAsConstant &&
+                       RightExpression is ICSharpExpressionAsConstant RightExpressionAsConstant &&
+                       LeftExpressionAsConstant.IsDirectConstant && RightExpressionAsConstant.IsDirectConstant;
+            }
+        }
 
         /// <summary>
         /// The left expression.

@@ -7,7 +7,7 @@
     /// <summary>
     /// A C# expression.
     /// </summary>
-    public interface ICSharpClassConstantExpression : ICSharpExpression
+    public interface ICSharpClassConstantExpression : ICSharpExpression, ICSharpExpressionAsConstant
     {
         /// <summary>
         /// The Easly expression from which the C# expression is created.
@@ -71,6 +71,11 @@
         /// The Easly expression from which the C# expression is created.
         /// </summary>
         public new IClassConstantExpression Source { get { return (IClassConstantExpression)base.Source; } }
+
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant { get { return false; } }
 
         /// <summary>
         /// The constant feature.

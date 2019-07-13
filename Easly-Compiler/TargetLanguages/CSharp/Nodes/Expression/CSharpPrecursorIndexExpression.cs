@@ -7,7 +7,7 @@
     /// <summary>
     /// A C# expression.
     /// </summary>
-    public interface ICSharpPrecursorIndexExpression : ICSharpExpression
+    public interface ICSharpPrecursorIndexExpression : ICSharpExpression, ICSharpExpressionAsConstant
     {
         /// <summary>
         /// The Easly expression from which the C# expression is created.
@@ -61,6 +61,11 @@
         /// The Easly expression from which the C# expression is created.
         /// </summary>
         public new IPrecursorIndexExpression Source { get { return (IPrecursorIndexExpression)base.Source; } }
+
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant { get { return false; } }
 
         /// <summary>
         /// The feature whose precursor is being called.

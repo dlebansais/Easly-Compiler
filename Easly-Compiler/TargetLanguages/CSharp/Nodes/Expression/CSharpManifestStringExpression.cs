@@ -6,7 +6,7 @@
     /// <summary>
     /// A C# expression.
     /// </summary>
-    public interface ICSharpManifestStringExpression : ICSharpExpression
+    public interface ICSharpManifestStringExpression : ICSharpExpression, ICSharpExpressionAsConstant
     {
         /// <summary>
         /// The Easly expression from which the C# expression is created.
@@ -46,6 +46,11 @@
         /// The Easly expression from which the C# expression is created.
         /// </summary>
         public new IManifestStringExpression Source { get { return (IManifestStringExpression)base.Source; } }
+
+        /// <summary>
+        /// True if the expression can provide its constant value directly.
+        /// </summary>
+        public bool IsDirectConstant { get { return true; } }
         #endregion
 
         #region Client Interface
