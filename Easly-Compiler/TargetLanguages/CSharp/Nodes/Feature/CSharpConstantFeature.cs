@@ -168,10 +168,13 @@
             }
             else
             {
-                ICSharpCompilableExpression CompilableExpression = ConstantExpression as ICSharpCompilableExpression;
+                ICSharpComputableExpression CompilableExpression = ConstantExpression as ICSharpComputableExpression;
                 Debug.Assert(CompilableExpression != null);
 
-                ValueString = CompilableExpression.CompiledValue;
+                CompilableExpression.Compute();
+                ValueString = CompilableExpression.ComputedValue;
+                Debug.Assert(ValueString != null);
+
                 writer.WriteIndentedLine($"// {ValueString} = {ConstantExpression.Source.ExpressionToString}");
             }
 

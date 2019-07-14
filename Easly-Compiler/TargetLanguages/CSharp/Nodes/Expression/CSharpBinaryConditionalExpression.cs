@@ -7,7 +7,7 @@
     /// <summary>
     /// A C# expression.
     /// </summary>
-    public interface ICSharpBinaryConditionalExpression : ICSharpExpression, ICSharpExpressionAsConstant, ICSharpCompilableExpression
+    public interface ICSharpBinaryConditionalExpression : ICSharpExpression, ICSharpExpressionAsConstant, ICSharpComputableExpression
     {
         /// <summary>
         /// The Easly expression from which the C# expression is created.
@@ -173,16 +173,18 @@
         }
         #endregion
 
-        #region Implementation of ICSharpCompilableExpression
+        #region Implementation of ICSharpComputableExpression
         /// <summary>
-        /// The expression compiled constant value.
+        /// The expression computed constant value.
         /// </summary>
-        public string CompiledValue
+        public string ComputedValue { get; private set; }
+
+        /// <summary>
+        /// Runs the compiler to compute the value as a string.
+        /// </summary>
+        public void Compute()
         {
-            get
-            {
-                return "TODO";
-            }
+            //TODO
         }
         #endregion
     }

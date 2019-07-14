@@ -7,7 +7,7 @@
     /// <summary>
     /// A C# expression.
     /// </summary>
-    public interface ICSharpPrecursorIndexExpression : ICSharpExpression, ICSharpExpressionAsConstant, ICSharpCompilableExpression
+    public interface ICSharpPrecursorIndexExpression : ICSharpExpression, ICSharpExpressionAsConstant, ICSharpComputableExpression
     {
         /// <summary>
         /// The Easly expression from which the C# expression is created.
@@ -95,11 +95,19 @@
         public bool IsDirectConstant { get { return false; } }
         #endregion
 
-        #region Implementation of ICSharpCompilableExpression
+        #region Implementation of ICSharpComputableExpression
         /// <summary>
-        /// The expression compiled constant value.
+        /// The expression computed constant value.
         /// </summary>
-        public string CompiledValue { get { return "TODO"; } }
+        public string ComputedValue { get; private set; }
+
+        /// <summary>
+        /// Runs the compiler to compute the value as a string.
+        /// </summary>
+        public void Compute()
+        {
+            //TODO
+        }
         #endregion
     }
 }
