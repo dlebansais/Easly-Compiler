@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Diagnostics;
+    using BaseNodeHelper;
     using CompilerNode;
 
     /// <summary>
@@ -277,7 +278,64 @@
         /// <summary>
         /// Runs the compiler to compute the value as a string.
         /// </summary>
-        public void Compute()
+        /// <param name="writer">The stream on which to write.</param>
+        public void Compute(ICSharpWriter writer)
+        {
+            if (IsCallingNumberFeature)
+                ComputeNumberOperator(writer);
+            else
+                ComputeCustomOperator(writer);
+        }
+
+        private void ComputeNumberOperator(ICSharpWriter writer)
+        {
+            ICanonicalNumber LeftNumber = ComputeSide(writer, LeftExpression);
+            ICanonicalNumber RightNumber = ComputeSide(writer, LeftExpression);
+
+            bool IsHandled = false;
+
+            //TODO
+            switch (Operator.Name)
+            {
+                case "≥":
+                    IsHandled = true;
+                    break;
+                case "≤":
+                    IsHandled = true;
+                    break;
+                case "shift right":
+                    IsHandled = true;
+                    break;
+                case "shift left":
+                    IsHandled = true;
+                    break;
+                case "modulo":
+                    IsHandled = true;
+                    break;
+                case "bitwise and":
+                    IsHandled = true;
+                    break;
+                case "bitwise or":
+                    IsHandled = true;
+                    break;
+                case "bitwise xor":
+                    IsHandled = true;
+                    break;
+                default:
+                    IsHandled = true;
+                    break;
+            }
+
+            Debug.Assert(IsHandled);
+        }
+
+        private ICanonicalNumber ComputeSide(ICSharpWriter writer, ICSharpExpression expression)
+        {
+            //TODO
+            return null;
+        }
+
+        private void ComputeCustomOperator(ICSharpWriter writer)
         {
             //TODO
         }

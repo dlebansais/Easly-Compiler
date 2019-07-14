@@ -13,6 +13,7 @@
         /// <summary>
         /// Runs the compiler to compute the value as a string.
         /// </summary>
-        void Compute();
+        /// <param name="writer">The stream on which to write.</param>
+        void Compute(ICSharpWriter writer);
     }
 }

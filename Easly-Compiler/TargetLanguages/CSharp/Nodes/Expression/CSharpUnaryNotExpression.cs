@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -97,9 +98,44 @@
         /// <summary>
         /// Runs the compiler to compute the value as a string.
         /// </summary>
-        public void Compute()
+        /// <param name="writer">The stream on which to write.</param>
+        public void Compute(ICSharpWriter writer)
         {
-            //TODO
+            bool RightValue = ComputeSideExpression(writer, RightExpression);
+            ComputedValue = ToComputedValue(!RightValue);
+        }
+
+        private bool ComputeSideExpression(ICSharpWriter writer, ICSharpExpression expression)
+        {
+            string ValueString;
+
+            ICSharpExpressionAsConstant ExpressionAsConstant = expression as ICSharpExpressionAsConstant;
+            Debug.Assert(ExpressionAsConstant != null);
+
+            if (ExpressionAsConstant.IsDirectConstant)
+            {
+                ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
+                expression.WriteCSharp(writer, SourceExpressionContext, -1);
+
+                ValueString = SourceExpressionContext.ReturnValue;
+            }
+            else
+            {
+                ICSharpComputableExpression ComputableExpression = ExpressionAsConstant as ICSharpComputableExpression;
+                Debug.Assert(ComputableExpression != null);
+
+                ComputableExpression.Compute(writer);
+                ValueString = ComputableExpression.ComputedValue;
+            }
+
+            Debug.Assert(ValueString == ToComputedValue(true) || ValueString == ToComputedValue(false));
+
+            return ValueString == ToComputedValue(true);
+        }
+
+        private string ToComputedValue(bool value)
+        {
+            return value ? "true" : "false";
         }
         #endregion
     }

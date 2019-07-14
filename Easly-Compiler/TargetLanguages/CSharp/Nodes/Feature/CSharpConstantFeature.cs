@@ -171,7 +171,7 @@
                 ICSharpComputableExpression CompilableExpression = ConstantExpression as ICSharpComputableExpression;
                 Debug.Assert(CompilableExpression != null);
 
-                CompilableExpression.Compute();
+                CompilableExpression.Compute(writer);
                 ValueString = CompilableExpression.ComputedValue;
                 Debug.Assert(ValueString != null);
 

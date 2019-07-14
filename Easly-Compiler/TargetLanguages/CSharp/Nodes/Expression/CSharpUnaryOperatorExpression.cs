@@ -105,7 +105,8 @@
         /// <summary>
         /// Runs the compiler to compute the value as a string.
         /// </summary>
-        public void Compute()
+        /// <param name="writer">The stream on which to write.</param>
+        public void Compute(ICSharpWriter writer)
         {
             //TODO
         }
