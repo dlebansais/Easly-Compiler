@@ -2,8 +2,8 @@
 {
     using System.Collections.Generic;
     using System.Diagnostics;
-    using BaseNodeHelper;
     using CompilerNode;
+    using FormattedNumber;
 
     /// <summary>
     /// A rule to process <see cref="IManifestNumberExpression"/>.
@@ -48,7 +48,7 @@
                 Success = false;
             else
             {
-                IFormattedNumber fn = FormattedNumber.Parse(ValidText, false);
+                FormattedNumber fn = Parser.Parse(ValidText);
                 if (!string.IsNullOrEmpty(fn.InvalidText))
                     Success = false;
             }
@@ -70,7 +70,7 @@
         {
             string ValidText = data as string;
             Debug.Assert(StringValidation.IsValidIdentifier(ValidText));
-            Debug.Assert(string.IsNullOrEmpty(FormattedNumber.Parse(ValidText, true).InvalidText));
+            Debug.Assert(string.IsNullOrEmpty(Parser.Parse(ValidText).InvalidText));
 
             node.ValidText.Item = ValidText;
         }

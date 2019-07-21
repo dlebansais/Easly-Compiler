@@ -1,9 +1,9 @@
 ﻿namespace CompilerNode
 {
-    using System.Collections.Generic;
     using System.Diagnostics;
     using Easly;
     using EaslyCompiler;
+    using FormattedNumber;
 
     /// <summary>
     /// Compiler IManifestNumberExpression.

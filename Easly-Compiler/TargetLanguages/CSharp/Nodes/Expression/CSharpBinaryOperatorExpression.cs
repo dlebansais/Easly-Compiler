@@ -2,8 +2,8 @@
 {
     using System.Collections.Generic;
     using System.Diagnostics;
-    using BaseNodeHelper;
     using CompilerNode;
+    using FormattedNumber;
 
     /// <summary>
     /// A C# expression.
@@ -298,8 +298,8 @@
 
         private void ComputeNumberOperator(ICSharpWriter writer)
         {
-            ICanonicalNumber LeftNumber = ComputeSide(writer, LeftExpression);
-            ICanonicalNumber RightNumber = ComputeSide(writer, LeftExpression);
+            CanonicalNumber LeftNumber = ComputeSide(writer, LeftExpression);
+            CanonicalNumber RightNumber = ComputeSide(writer, LeftExpression);
 
             bool IsHandled = false;
             int LeftOperand, RightOperand;
@@ -378,7 +378,7 @@
             Debug.Assert(IsHandled);
         }
 
-        private ICanonicalNumber ComputeSide(ICSharpWriter writer, ICSharpExpression expression)
+        private CanonicalNumber ComputeSide(ICSharpWriter writer, ICSharpExpression expression)
         {
             //TODO
             return null;
@@ -394,7 +394,7 @@
             return value.ToString();
         }
 
-        private string ToComputedValue(ICanonicalNumber value)
+        private string ToComputedValue(CanonicalNumber value)
         {
             return value.ToString();
         }

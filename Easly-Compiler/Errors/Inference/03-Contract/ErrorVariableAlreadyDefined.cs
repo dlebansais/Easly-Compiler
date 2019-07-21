@@ -24,7 +24,7 @@
         /// </summary>
         /// <param name="source">The error location.</param>
         /// <param name="number">The shared number.</param>
-        public ErrorMultipleIdenticalDiscrete(ISource source, ICanonicalNumber number)
+        public ErrorMultipleIdenticalDiscrete(ISource source, CanonicalNumber number)
             : base(source)
         {
             Number = number;
@@ -35,7 +35,7 @@
         /// <summary>
         /// The shared number.
         /// </summary>
-        public ICanonicalNumber Number { get; }
+        public CanonicalNumber Number { get; }
 
         /// <summary>
         /// The error message.

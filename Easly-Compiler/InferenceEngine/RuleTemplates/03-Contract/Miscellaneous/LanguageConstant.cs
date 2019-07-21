@@ -1,7 +1,7 @@
 ﻿namespace EaslyCompiler
 {
-    using BaseNodeHelper;
     using CompilerNode;
+    using FormattedNumber;
 
     /// <summary>
     /// Represents a specific type of constant number.
@@ -64,7 +64,7 @@
 
             if (constant is INumberLanguageConstant AsNumberLanguageConstant)
             {
-                ICanonicalNumber Value = AsNumberLanguageConstant.Value;
+                CanonicalNumber Value = AsNumberLanguageConstant.Value;
                 Result = Value.TryParseInt(out value);
             }
 

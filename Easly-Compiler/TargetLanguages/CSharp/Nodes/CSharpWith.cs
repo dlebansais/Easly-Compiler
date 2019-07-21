@@ -2,8 +2,8 @@
 {
     using System.Collections.Generic;
     using System.Diagnostics;
-    using BaseNodeHelper;
     using CompilerNode;
+    using FormattedNumber;
 
     /// <summary>
     /// A C# case node.
@@ -98,7 +98,7 @@
                 switch (Constant)
                 {
                     case INumberLanguageConstant AsManifestConstant:
-                        ICanonicalNumber AsNumber = AsManifestConstant.Value;
+                        CanonicalNumber AsNumber = AsManifestConstant.Value;
                         if (AsNumber.TryParseInt(out int IntValue))
                         {
                             writer.WriteIndentedLine($"case {IntValue}:");

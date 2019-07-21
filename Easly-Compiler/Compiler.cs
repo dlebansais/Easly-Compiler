@@ -10,6 +10,7 @@
     using BaseNodeHelper;
     using CompilerNode;
     using Easly;
+    using FormattedNumber;
     using PolySerializer;
 
     /// <summary>

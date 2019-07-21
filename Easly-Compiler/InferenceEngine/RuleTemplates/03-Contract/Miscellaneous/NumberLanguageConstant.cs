@@ -1,7 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Diagnostics;
-    using BaseNodeHelper;
+    using FormattedNumber;
 
     /// <summary>
     /// Represents a number constant.
@@ -11,7 +11,7 @@
         /// <summary>
         /// The constant value, if known.
         /// </summary>
-        ICanonicalNumber Value { get; }
+        CanonicalNumber Value { get; }
     }
 
     /// <summary>
@@ -30,7 +30,7 @@
         /// Initializes a new instance of the <see cref="NumberLanguageConstant"/> class.
         /// </summary>
         /// <param name="value">The constant value.</param>
-        public NumberLanguageConstant(ICanonicalNumber value)
+        public NumberLanguageConstant(CanonicalNumber value)
         {
             Value = value;
         }
@@ -43,7 +43,7 @@
         /// <summary>
         /// The constant value, if known.
         /// </summary>
-        public ICanonicalNumber Value { get; }
+        public CanonicalNumber Value { get; }
 
         /// <summary>
         /// Checks if another constant can be compared with this instance.
