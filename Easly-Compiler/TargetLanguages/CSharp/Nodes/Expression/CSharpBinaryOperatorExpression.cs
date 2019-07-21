@@ -362,7 +362,7 @@
                     IsHandled = true;
                     break;
                 case "-":
-                    ComputedValue = ToComputedValue(LeftNumber.Substract(RightNumber));
+                    ComputedValue = ToComputedValue(LeftNumber.Subtract(RightNumber));
                     IsHandled = true;
                     break;
                 case "*":
