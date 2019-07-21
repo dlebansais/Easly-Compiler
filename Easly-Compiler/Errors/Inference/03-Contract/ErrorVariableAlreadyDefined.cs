@@ -1,6 +1,6 @@
 ﻿namespace EaslyCompiler
 {
-    using BaseNodeHelper;
+    using FormattedNumber;
 
     /// <summary>
     /// Discretes with the same value.
@@ -10,7 +10,7 @@
         /// <summary>
         /// The shared number.
         /// </summary>
-        ICanonicalNumber Number { get; }
+        CanonicalNumber Number { get; }
     }
 
     /// <summary>

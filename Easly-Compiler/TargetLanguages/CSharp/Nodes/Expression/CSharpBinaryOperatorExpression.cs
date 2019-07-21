@@ -46,6 +46,10 @@
     /// </summary>
     public class CSharpBinaryOperatorExpression : CSharpExpression, ICSharpBinaryOperatorExpression
     {
+        #region Constants
+        private const string ComputedNaNValue = "Nan";
+        #endregion
+
         #region Init
         /// <summary>
         /// Creates a new C# expression.
@@ -212,10 +216,15 @@
                 case "bitwise xor":
                     OperatorText = "^";
                     break;
-                default:
+                case "+":
+                case "-":
+                case "*":
+                case "/":
                     OperatorText = Operator.Name;
                     break;
             }
+
+            Debug.Assert(OperatorText != null);
 
             string LeftText = SingleResultExpressionText(writer, LeftExpression);
             string RightText = SingleResultExpressionText(writer, RightExpression);
@@ -293,35 +302,75 @@
             ICanonicalNumber RightNumber = ComputeSide(writer, LeftExpression);
 
             bool IsHandled = false;
+            int LeftOperand, RightOperand;
 
             //TODO
             switch (Operator.Name)
             {
                 case "≥":
+                    ComputedValue = ToComputedValue(LeftNumber.IsGreater(RightNumber) || LeftNumber.IsEqual(RightNumber));
                     IsHandled = true;
                     break;
                 case "≤":
+                    ComputedValue = ToComputedValue(RightNumber.IsGreater(LeftNumber) || RightNumber.IsEqual(LeftNumber));
                     IsHandled = true;
                     break;
                 case "shift right":
+                    if (LeftNumber.TryParseInt(out LeftOperand) && RightNumber.TryParseInt(out RightOperand))
+                        ComputedValue = ToComputedValue(LeftOperand >> RightOperand);
+                    else
+                        ComputedValue = ComputedNaNValue;
                     IsHandled = true;
                     break;
                 case "shift left":
+                    if (LeftNumber.TryParseInt(out LeftOperand) && RightNumber.TryParseInt(out RightOperand))
+                        ComputedValue = ToComputedValue(LeftOperand << RightOperand);
+                    else
+                        ComputedValue = ComputedNaNValue;
                     IsHandled = true;
                     break;
                 case "modulo":
+                    if (LeftNumber.TryParseInt(out LeftOperand) && RightNumber.TryParseInt(out RightOperand))
+                        ComputedValue = ToComputedValue(LeftOperand % RightOperand);
+                    else
+                        ComputedValue = ComputedNaNValue;
                     IsHandled = true;
                     break;
                 case "bitwise and":
+                    if (LeftNumber.TryParseInt(out LeftOperand) && RightNumber.TryParseInt(out RightOperand))
+                        ComputedValue = ToComputedValue(LeftOperand & RightOperand);
+                    else
+                        ComputedValue = ComputedNaNValue;
                     IsHandled = true;
                     break;
                 case "bitwise or":
+                    if (LeftNumber.TryParseInt(out LeftOperand) && RightNumber.TryParseInt(out RightOperand))
+                        ComputedValue = ToComputedValue(LeftOperand | RightOperand);
+                    else
+                        ComputedValue = ComputedNaNValue;
                     IsHandled = true;
                     break;
                 case "bitwise xor":
+                    if (LeftNumber.TryParseInt(out LeftOperand) && RightNumber.TryParseInt(out RightOperand))
+                        ComputedValue = ToComputedValue(LeftOperand ^ RightOperand);
+                    else
+                        ComputedValue = ComputedNaNValue;
                     IsHandled = true;
                     break;
-                default:
+                case "+":
+                    ComputedValue = ToComputedValue(LeftNumber.Add(RightNumber));
+                    IsHandled = true;
+                    break;
+                case "-":
+                    ComputedValue = ToComputedValue(LeftNumber.Substract(RightNumber));
+                    IsHandled = true;
+                    break;
+                case "*":
+                    ComputedValue = ToComputedValue(LeftNumber.Multiply(RightNumber));
+                    IsHandled = true;
+                    break;
+                case "/":
+                    ComputedValue = ToComputedValue(LeftNumber.Divide(RightNumber));
                     IsHandled = true;
                     break;
             }
@@ -333,6 +382,21 @@
         {
             //TODO
             return null;
+        }
+
+        private string ToComputedValue(bool value)
+        {
+            return value ? "true" : "false";
+        }
+
+        private string ToComputedValue(int value)
+        {
+            return value.ToString();
+        }
+
+        private string ToComputedValue(ICanonicalNumber value)
+        {
+            return value.ToString();
         }
 
         private void ComputeCustomOperator(ICSharpWriter writer)

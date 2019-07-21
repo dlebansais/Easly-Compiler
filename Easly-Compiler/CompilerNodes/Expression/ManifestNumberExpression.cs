@@ -255,7 +255,7 @@
             resolvedResult = new ResultType(NumberTypeName, NumberType, string.Empty);
             resolvedException = new ResultException();
 
-            BaseNodeHelper.IFormattedNumber FormattedNumber = BaseNodeHelper.FormattedNumber.Parse(NumberText, false);
+            FormattedNumber FormattedNumber = Parser.Parse(NumberText);
             Debug.Assert(string.IsNullOrEmpty(FormattedNumber.InvalidText));
 
             expressionConstant = new NumberLanguageConstant(FormattedNumber.Canonical);

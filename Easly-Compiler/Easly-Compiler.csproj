@@ -51,6 +51,10 @@
     <Reference Include="Easly-Language-Helper">
       <HintPath>..\Easly-Language\$(Platform)\$(Configuration)\Easly-Language-Helper.dll</HintPath>
     </Reference>
+    <Reference Include="FormattedNumber">
+      <HintPath>..\FormattedNumber\$(Platform)\$(Configuration)\FormattedNumber.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="PolySerializer">
       <HintPath>..\PolySerializer\$(Platform)\$(Configuration)\PolySerializer.dll</HintPath>
     </Reference>

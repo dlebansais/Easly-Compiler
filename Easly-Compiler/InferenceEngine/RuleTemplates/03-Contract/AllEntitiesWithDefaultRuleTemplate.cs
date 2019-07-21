@@ -4,6 +4,7 @@
     using System.Diagnostics;
     using BaseNodeHelper;
     using CompilerNode;
+    using FormattedNumber;
 
     /// <summary>
     /// A rule to process <see cref="IClass"/>.
@@ -49,7 +50,7 @@
             bool Success = true;
 
             Success &= AreAllConstantsValid(node);
-            Success &= CheckNoCycle(node, out IDictionary<ICanonicalNumber, IDiscrete> CombinedDiscreteNumericValueList);
+            Success &= CheckNoCycle(node, out IDictionary<CanonicalNumber, IDiscrete> CombinedDiscreteNumericValueList);
             Success &= CheckNoIdenticalConstants(node, CombinedDiscreteNumericValueList);
 
             return Success;
@@ -77,10 +78,10 @@
             return Success;
         }
 
-        private bool CheckNoCycle(IClass node, out IDictionary<ICanonicalNumber, IDiscrete> combinedDiscreteNumericValueList)
+        private bool CheckNoCycle(IClass node, out IDictionary<CanonicalNumber, IDiscrete> combinedDiscreteNumericValueList)
         {
             bool Success = true;
-            combinedDiscreteNumericValueList = new Dictionary<ICanonicalNumber, IDiscrete>();
+            combinedDiscreteNumericValueList = new Dictionary<CanonicalNumber, IDiscrete>();
 
             foreach (KeyValuePair<IFeatureName, IExpression> Entry in node.DiscreteWithValueTable)
             {
@@ -92,7 +93,7 @@
 
                 if (ExpressionConstant is INumberLanguageConstant AsNumberLanguageConstant && AsNumberLanguageConstant.IsValueKnown)
                 {
-                    ICanonicalNumber NumberConstant = AsNumberLanguageConstant.Value;
+                    CanonicalNumber NumberConstant = AsNumberLanguageConstant.Value;
 
                     if (combinedDiscreteNumericValueList.ContainsKey(NumberConstant))
                     {
@@ -112,17 +113,17 @@
             return Success;
         }
 
-        private bool CheckNoIdenticalConstants(IClass node, IDictionary<ICanonicalNumber, IDiscrete> combinedDiscreteNumericValueList)
+        private bool CheckNoIdenticalConstants(IClass node, IDictionary<CanonicalNumber, IDiscrete> combinedDiscreteNumericValueList)
         {
             bool Success = true;
-            IList<ICanonicalNumber> ErroneousConstantList = new List<ICanonicalNumber>();
+            IList<CanonicalNumber> ErroneousConstantList = new List<CanonicalNumber>();
 
-            foreach (KeyValuePair<ICanonicalNumber, IDiscrete> Entry1 in combinedDiscreteNumericValueList)
+            foreach (KeyValuePair<CanonicalNumber, IDiscrete> Entry1 in combinedDiscreteNumericValueList)
             {
-                foreach (KeyValuePair<ICanonicalNumber, IDiscrete> Entry2 in combinedDiscreteNumericValueList)
+                foreach (KeyValuePair<CanonicalNumber, IDiscrete> Entry2 in combinedDiscreteNumericValueList)
                 {
-                    ICanonicalNumber Number1 = Entry1.Key;
-                    ICanonicalNumber Number2 = Entry2.Key;
+                    CanonicalNumber Number1 = Entry1.Key;
+                    CanonicalNumber Number2 = Entry2.Key;
 
                     if (Number1 != Number2 && !ErroneousConstantList.Contains(Number1) && !ErroneousConstantList.Contains(Number2) && Number1.IsEqual(Number2))
                     {
