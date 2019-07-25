@@ -91,7 +91,7 @@
         {
             Debug.Assert(other != null && Value != null && other.Value != null);
 
-            return Value.IsGreater(other.Value);
+            return Value > other.Value;
         }
     }
 }

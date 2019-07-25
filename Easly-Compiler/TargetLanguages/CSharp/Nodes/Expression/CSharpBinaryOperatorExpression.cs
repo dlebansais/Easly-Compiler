@@ -308,11 +308,11 @@
             switch (Operator.Name)
             {
                 case "≥":
-                    ComputedValue = ToComputedValue(LeftNumber.IsGreater(RightNumber) || LeftNumber.IsEqual(RightNumber));
+                    ComputedValue = ToComputedValue(LeftNumber > RightNumber || LeftNumber.IsEqual(RightNumber));
                     IsHandled = true;
                     break;
                 case "≤":
-                    ComputedValue = ToComputedValue(RightNumber.IsGreater(LeftNumber) || RightNumber.IsEqual(LeftNumber));
+                    ComputedValue = ToComputedValue(RightNumber > LeftNumber || RightNumber.IsEqual(LeftNumber));
                     IsHandled = true;
                     break;
                 case "shift right":
