@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -109,7 +110,35 @@
         /// <param name="writer">The stream on which to write.</param>
         public void Compute(ICSharpWriter writer)
         {
+            string IndexedValue = ComputeSideExpression(writer, IndexedExpression);
+
             //TODO
+        }
+
+        private string ComputeSideExpression(ICSharpWriter writer, ICSharpExpression expression)
+        {
+            string ValueString;
+
+            ICSharpExpressionAsConstant ExpressionAsConstant = expression as ICSharpExpressionAsConstant;
+            Debug.Assert(ExpressionAsConstant != null);
+
+            if (ExpressionAsConstant.IsDirectConstant)
+            {
+                ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
+                expression.WriteCSharp(writer, SourceExpressionContext, -1);
+
+                ValueString = SourceExpressionContext.ReturnValue;
+            }
+            else
+            {
+                ICSharpComputableExpression ComputableExpression = ExpressionAsConstant as ICSharpComputableExpression;
+                Debug.Assert(ComputableExpression != null);
+
+                ComputableExpression.Compute(writer);
+                ValueString = ComputableExpression.ComputedValue;
+            }
+
+            return ValueString;
         }
         #endregion
     }

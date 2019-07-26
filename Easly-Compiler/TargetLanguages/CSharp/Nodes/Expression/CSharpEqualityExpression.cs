@@ -129,7 +129,57 @@
         /// <param name="writer">The stream on which to write.</param>
         public void Compute(ICSharpWriter writer)
         {
-            //TODO
+            string LeftValue = ComputeSideExpression(writer, LeftExpression);
+            string RightValue = ComputeSideExpression(writer, RightExpression);
+
+            bool IsHandled = false;
+
+            switch (Source.Comparison)
+            {
+                case BaseNode.ComparisonType.Equal:
+                    ComputedValue = ToComputedValue(LeftValue == RightValue);
+                    IsHandled = true;
+                    break;
+                case BaseNode.ComparisonType.Different:
+                    ComputedValue = ToComputedValue(LeftValue != RightValue);
+                    IsHandled = true;
+                    break;
+            }
+
+            Debug.Assert(IsHandled);
+        }
+
+        private string ComputeSideExpression(ICSharpWriter writer, ICSharpExpression expression)
+        {
+            string ValueString;
+
+            ICSharpExpressionAsConstant ExpressionAsConstant = expression as ICSharpExpressionAsConstant;
+            Debug.Assert(ExpressionAsConstant != null);
+
+            if (ExpressionAsConstant.IsDirectConstant)
+            {
+                ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
+                expression.WriteCSharp(writer, SourceExpressionContext, -1);
+
+                ValueString = SourceExpressionContext.ReturnValue;
+            }
+            else
+            {
+                ICSharpComputableExpression ComputableExpression = ExpressionAsConstant as ICSharpComputableExpression;
+                Debug.Assert(ComputableExpression != null);
+
+                ComputableExpression.Compute(writer);
+                ValueString = ComputableExpression.ComputedValue;
+            }
+
+            Debug.Assert(ValueString == ToComputedValue(true) || ValueString == ToComputedValue(false));
+
+            return ValueString;
+        }
+
+        private string ToComputedValue(bool value)
+        {
+            return value ? "true" : "false";
         }
         #endregion
     }
