@@ -198,12 +198,17 @@
                 case "≤":
                     OperatorText = "<=";
                     break;
+
+                /* TODO: make up our mind: 'shift right' or '>>' ?!
+                 *
                 case "shift right":
                     OperatorText = ">>";
                     break;
                 case "shift left":
                     OperatorText = "<<";
                     break;
+                */
+
                 case "modulo":
                     OperatorText = "%";
                     break;
@@ -216,6 +221,10 @@
                 case "bitwise xor":
                     OperatorText = "^";
                     break;
+                case ">":
+                case "<":
+                case ">>":
+                case "<<":
                 case "+":
                 case "-":
                 case "*":
@@ -321,11 +330,22 @@
                     ComputedValue = ToComputedValue(LeftNumber < RightNumber);
                     IsHandled = true;
                     break;
+
+                /* TODO: make up our mind: 'shift right' or '>>' ?!
+                 *
                 case "shift right":
+                    ComputedValue = ToComputedValue(LeftNumber.ShiftRight(RightNumber));
+                    break;
+                case "shift left":
+                    ComputedValue = ToComputedValue(LeftNumber.ShiftLeft(RightNumber));
+                    break;
+                */
+
+                case ">>":
                     ComputedValue = ToComputedValue(LeftNumber.ShiftRight(RightNumber));
                     IsHandled = true;
                     break;
-                case "shift left":
+                case "<<":
                     ComputedValue = ToComputedValue(LeftNumber.ShiftLeft(RightNumber));
                     IsHandled = true;
                     break;

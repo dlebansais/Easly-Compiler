@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
+    using Easly;
 
     /// <summary>
     /// A C# expression.
@@ -198,7 +199,13 @@
 
         private void ComputeDiscrete(ICSharpWriter writer)
         {
-            //TODO
+            Debug.Assert(Discrete != null);
+
+            ISealableDictionary<IDiscrete, string> AssignedDiscreteTable = Class.Source.AssignedDiscreteTable;
+
+            Debug.Assert(AssignedDiscreteTable.ContainsKey(Discrete.Source));
+
+            ComputedValue = AssignedDiscreteTable[Discrete.Source];
         }
         #endregion
     }

@@ -95,6 +95,11 @@ namespace CompilerNode
         /// Bodies inherited from the parent.
         /// </summary>
         OnceReference<IList<IBody>> ResolvedBodyTagList { get; }
+
+        /// <summary>
+        /// Table of computer-assigned discrete values.
+        /// </summary>
+        ISealableDictionary<IDiscrete, string> AssignedDiscreteTable { get; }
     }
 
     /// <summary>
@@ -222,10 +227,8 @@ namespace CompilerNode
         {
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Body)
-            {
+            if (ruleTemplateList == RuleTemplateSet.Identifiers)
                 IsHandled = true;
-            }
             else if (ruleTemplateList == RuleTemplateSet.Types)
             {
                 ResolvedTypeName = new OnceReference<ITypeName>();
@@ -246,6 +249,11 @@ namespace CompilerNode
                 ResolvedBodyTagList = new OnceReference<IList<IBody>>();
                 IsHandled = true;
             }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                AssignedDiscreteTable = new SealableDictionary<IDiscrete, string>();
+                IsHandled = true;
+            }
 
             Debug.Assert(IsHandled);
         }
@@ -260,7 +268,7 @@ namespace CompilerNode
 
             bool IsHandled = false;
 
-            if (ruleTemplateList == RuleTemplateSet.Identifiers || ruleTemplateList == RuleTemplateSet.Body)
+            if (ruleTemplateList == RuleTemplateSet.Identifiers)
             {
                 IsResolved = false;
                 IsHandled = true;
@@ -278,6 +286,11 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Contract)
             {
                 IsResolved = ResolvedBodyTagList.IsAssigned;
+                IsHandled = true;
+            }
+            else if (ruleTemplateList == RuleTemplateSet.Body)
+            {
+                IsResolved = AssignedDiscreteTable.IsSealed;
                 IsHandled = true;
             }
 
@@ -346,6 +359,11 @@ namespace CompilerNode
         /// Bodies inherited from the parent.
         /// </summary>
         public OnceReference<IList<IBody>> ResolvedBodyTagList { get; private set; } = new OnceReference<IList<IBody>>();
+
+        /// <summary>
+        /// Table of computer-assigned discrete values.
+        /// </summary>
+        public ISealableDictionary<IDiscrete, string> AssignedDiscreteTable { get; private set; } = new SealableDictionary<IDiscrete, string>();
         #endregion
     }
 }

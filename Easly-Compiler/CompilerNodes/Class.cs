@@ -323,6 +323,11 @@ namespace CompilerNode
         OnceReference<IList<IBody>> ResolvedBodyList { get; }
 
         /// <summary>
+        /// Table of computer-assigned discrete values.
+        /// </summary>
+        ISealableDictionary<IDiscrete, string> AssignedDiscreteTable { get; }
+
+        /// <summary>
         /// True if the class contains at least one extern body.
         /// </summary>
         bool HasExternBody { get; }
@@ -682,6 +687,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
                 ResolvedBodyList = new OnceReference<IList<IBody>>();
+                AssignedDiscreteTable = new SealableDictionary<IDiscrete, string>();
                 IsHandled = true;
             }
 
@@ -715,7 +721,7 @@ namespace CompilerNode
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
-                IsResolved = ResolvedBodyList.IsAssigned;
+                IsResolved = ResolvedBodyList.IsAssigned && AssignedDiscreteTable.IsSealed;
                 IsHandled = true;
             }
 
@@ -1216,6 +1222,11 @@ namespace CompilerNode
         /// List of bodies with resolved instructions
         /// </summary>
         public OnceReference<IList<IBody>> ResolvedBodyList { get; private set; } = new OnceReference<IList<IBody>>();
+
+        /// <summary>
+        /// Table of computer-assigned discrete values.
+        /// </summary>
+        public ISealableDictionary<IDiscrete, string> AssignedDiscreteTable { get; private set; } = new SealableDictionary<IDiscrete, string>();
 
         /// <summary>
         /// True if the class contains at least one extern body.

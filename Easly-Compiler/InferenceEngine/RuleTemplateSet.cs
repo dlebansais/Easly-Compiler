@@ -264,6 +264,8 @@
         {
             new AgentExpressionComputationRuleTemplate(),
             new AllBodiesComputationRuleTemplate(),
+            new AllClassDiscreteComputationRuleTemplate(),
+            new AllInheritanceDiscreteComputationRuleTemplate(),
             new AsLongAsInstructionComputationRuleTemplate(),
             new AssertionComputationRuleTemplate(),
             new AssertionTagExpressionComputationRuleTemplate(),

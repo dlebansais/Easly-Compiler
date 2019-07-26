@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
+    using Easly;
 
     /// <summary>
     /// A C# expression.
@@ -28,6 +29,11 @@
         /// The discrete read. Can be null.
         /// </summary>
         ICSharpDiscrete Discrete { get; }
+
+        /// <summary>
+        /// The class where the discrete is defined. Can be null.
+        /// </summary>
+        ICSharpClass DiscreteOwner { get; }
 
         /// <summary>
         /// The query.
@@ -80,9 +86,9 @@
 
             if (Source.ResolvedFinalDiscrete.IsAssigned)
             {
-                ICSharpClass Class = context.GetClass(Source.ResolvedFinalDiscrete.Item.EmbeddingClass);
+                DiscreteOwner = context.GetClass(Source.ResolvedFinalDiscrete.Item.EmbeddingClass);
 
-                foreach (ICSharpDiscrete Item in Class.DiscreteList)
+                foreach (ICSharpDiscrete Item in DiscreteOwner.DiscreteList)
                     if (Item.Source == Source.ResolvedFinalDiscrete.Item)
                     {
                         Debug.Assert(Discrete == null);
@@ -125,6 +131,11 @@
         /// The discrete read. Can be null.
         /// </summary>
         public ICSharpDiscrete Discrete { get; }
+
+        /// <summary>
+        /// The class where the discrete is defined. Can be null.
+        /// </summary>
+        public ICSharpClass DiscreteOwner { get; }
 
         /// <summary>
         /// The query.
@@ -329,13 +340,19 @@
 
         private void ComputeDiscrete(ICSharpWriter writer)
         {
-            //TODO
+            Debug.Assert(Discrete != null);
+
+            ISealableDictionary<IDiscrete, string> AssignedDiscreteTable = DiscreteOwner.Source.AssignedDiscreteTable;
+
+            Debug.Assert(AssignedDiscreteTable.ContainsKey(Discrete.Source));
+
+            ComputedValue = AssignedDiscreteTable[Discrete.Source];
         }
 
         public static string ComputeQueryResult(ICSharpWriter writer, ICSharpFeature feature, ICSharpFeatureCall featureCall)
         {
             //TODO
-            return null;
+            return "TODO";
         }
         #endregion
     }
