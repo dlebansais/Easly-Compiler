@@ -316,7 +316,26 @@
         /// <param name="writer">The stream on which to write.</param>
         public void Compute(ICSharpWriter writer)
         {
+            if (Feature != null)
+                ComputeFeature(writer);
+            else
+                ComputeDiscrete(writer);
+        }
+
+        private void ComputeFeature(ICSharpWriter writer)
+        {
+            ComputedValue = ComputeQueryResult(writer, Feature, FeatureCall);
+        }
+
+        private void ComputeDiscrete(ICSharpWriter writer)
+        {
             //TODO
+        }
+
+        public static string ComputeQueryResult(ICSharpWriter writer, ICSharpFeature feature, ICSharpFeatureCall featureCall)
+        {
+            //TODO
+            return null;
         }
         #endregion
     }

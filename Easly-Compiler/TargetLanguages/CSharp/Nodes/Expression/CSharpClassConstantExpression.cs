@@ -15,12 +15,17 @@
         new IClassConstantExpression Source { get; }
 
         /// <summary>
-        /// The constant feature.
+        /// The constant feature. Can be null.
         /// </summary>
         ICSharpConstantFeature Feature { get; }
 
         /// <summary>
-        /// The constant discrete.
+        /// The constant value as an expression. Can be null.
+        /// </summary>
+        ICSharpExpression ConstantExpression { get; }
+
+        /// <summary>
+        /// The constant discrete. Can be null.
         /// </summary>
         ICSharpDiscrete Discrete { get; }
 
@@ -55,7 +60,10 @@
             : base(context, source)
         {
             if (source.ResolvedFinalFeature.IsAssigned)
+            {
                 Feature = context.GetFeature(source.ResolvedFinalFeature.Item) as ICSharpConstantFeature;
+                ConstantExpression = Feature.ConstantExpression;
+            }
 
             if (source.ResolvedFinalDiscrete.IsAssigned)
                 Discrete = CSharpDiscrete.Create(context, source.ResolvedFinalDiscrete.Item);
@@ -73,12 +81,17 @@
         public new IClassConstantExpression Source { get { return (IClassConstantExpression)base.Source; } }
 
         /// <summary>
-        /// The constant feature.
+        /// The constant feature. Can be null.
         /// </summary>
         public ICSharpConstantFeature Feature { get; }
 
         /// <summary>
-        /// The constant discrete.
+        /// The constant value as an expression. Can be null.
+        /// </summary>
+        public ICSharpExpression ConstantExpression { get; }
+
+        /// <summary>
+        /// The constant discrete. Can be null.
         /// </summary>
         public ICSharpDiscrete Discrete { get; }
 
@@ -150,6 +163,40 @@
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
         public void Compute(ICSharpWriter writer)
+        {
+            if (Feature != null)
+                ComputeFeature(writer);
+            else
+                ComputeDiscrete(writer);
+        }
+
+        private void ComputeFeature(ICSharpWriter writer)
+        {
+            string ValueString;
+
+            ICSharpExpressionAsConstant ExpressionAsConstant = ConstantExpression as ICSharpExpressionAsConstant;
+            Debug.Assert(ExpressionAsConstant != null);
+
+            if (ExpressionAsConstant.IsDirectConstant)
+            {
+                ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
+                ConstantExpression.WriteCSharp(writer, SourceExpressionContext, -1);
+
+                ValueString = SourceExpressionContext.ReturnValue;
+            }
+            else
+            {
+                ICSharpComputableExpression ComputableExpression = ExpressionAsConstant as ICSharpComputableExpression;
+                Debug.Assert(ComputableExpression != null);
+
+                ComputableExpression.Compute(writer);
+                ValueString = ComputableExpression.ComputedValue;
+            }
+
+            ComputedValue = ValueString;
+        }
+
+        private void ComputeDiscrete(ICSharpWriter writer)
         {
             //TODO
         }

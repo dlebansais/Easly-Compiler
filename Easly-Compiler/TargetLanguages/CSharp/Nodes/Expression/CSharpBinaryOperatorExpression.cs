@@ -302,9 +302,7 @@
             CanonicalNumber RightNumber = ComputeSide(writer, LeftExpression);
 
             bool IsHandled = false;
-            int LeftOperand, RightOperand;
 
-            //TODO
             switch (Operator.Name)
             {
                 case "≥":
@@ -312,49 +310,39 @@
                     IsHandled = true;
                     break;
                 case "≤":
-                    ComputedValue = ToComputedValue(RightNumber > LeftNumber || RightNumber.IsEqual(LeftNumber));
+                    ComputedValue = ToComputedValue(LeftNumber < RightNumber || LeftNumber.IsEqual(RightNumber));
+                    IsHandled = true;
+                    break;
+                case ">":
+                    ComputedValue = ToComputedValue(LeftNumber > RightNumber);
+                    IsHandled = true;
+                    break;
+                case "<":
+                    ComputedValue = ToComputedValue(LeftNumber < RightNumber);
                     IsHandled = true;
                     break;
                 case "shift right":
-                    if (LeftNumber.TryParseInt(out LeftOperand) && RightNumber.TryParseInt(out RightOperand))
-                        ComputedValue = ToComputedValue(LeftOperand >> RightOperand);
-                    else
-                        ComputedValue = ComputedNaNValue;
+                    ComputedValue = ToComputedValue(LeftNumber.ShiftRight(RightNumber));
                     IsHandled = true;
                     break;
                 case "shift left":
-                    if (LeftNumber.TryParseInt(out LeftOperand) && RightNumber.TryParseInt(out RightOperand))
-                        ComputedValue = ToComputedValue(LeftOperand << RightOperand);
-                    else
-                        ComputedValue = ComputedNaNValue;
+                    ComputedValue = ToComputedValue(LeftNumber.ShiftLeft(RightNumber));
                     IsHandled = true;
                     break;
                 case "modulo":
-                    if (LeftNumber.TryParseInt(out LeftOperand) && RightNumber.TryParseInt(out RightOperand))
-                        ComputedValue = ToComputedValue(LeftOperand % RightOperand);
-                    else
-                        ComputedValue = ComputedNaNValue;
+                    ComputedValue = ToComputedValue(LeftNumber.Remainder(RightNumber));
                     IsHandled = true;
                     break;
                 case "bitwise and":
-                    if (LeftNumber.TryParseInt(out LeftOperand) && RightNumber.TryParseInt(out RightOperand))
-                        ComputedValue = ToComputedValue(LeftOperand & RightOperand);
-                    else
-                        ComputedValue = ComputedNaNValue;
+                    ComputedValue = ToComputedValue(LeftNumber.BitwiseAnd(RightNumber));
                     IsHandled = true;
                     break;
                 case "bitwise or":
-                    if (LeftNumber.TryParseInt(out LeftOperand) && RightNumber.TryParseInt(out RightOperand))
-                        ComputedValue = ToComputedValue(LeftOperand | RightOperand);
-                    else
-                        ComputedValue = ComputedNaNValue;
+                    ComputedValue = ToComputedValue(LeftNumber.BitwiseOr(RightNumber));
                     IsHandled = true;
                     break;
                 case "bitwise xor":
-                    if (LeftNumber.TryParseInt(out LeftOperand) && RightNumber.TryParseInt(out RightOperand))
-                        ComputedValue = ToComputedValue(LeftOperand ^ RightOperand);
-                    else
-                        ComputedValue = ComputedNaNValue;
+                    ComputedValue = ToComputedValue(LeftNumber.BitwiseXor(RightNumber));
                     IsHandled = true;
                     break;
                 case "+":
@@ -380,18 +368,35 @@
 
         private CanonicalNumber ComputeSide(ICSharpWriter writer, ICSharpExpression expression)
         {
-            //TODO
-            return null;
+            string ValueString;
+
+            ICSharpExpressionAsConstant ExpressionAsConstant = expression as ICSharpExpressionAsConstant;
+            Debug.Assert(ExpressionAsConstant != null);
+
+            if (ExpressionAsConstant.IsDirectConstant)
+            {
+                ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
+                expression.WriteCSharp(writer, SourceExpressionContext, -1);
+
+                ValueString = SourceExpressionContext.ReturnValue;
+            }
+            else
+            {
+                ICSharpComputableExpression ComputableExpression = ExpressionAsConstant as ICSharpComputableExpression;
+                Debug.Assert(ComputableExpression != null);
+
+                ComputableExpression.Compute(writer);
+                ValueString = ComputableExpression.ComputedValue;
+            }
+
+            FormattedNumber Result = Parser.Parse(ValueString);
+
+            return Result.Canonical;
         }
 
         private string ToComputedValue(bool value)
         {
             return value ? "true" : "false";
-        }
-
-        private string ToComputedValue(int value)
-        {
-            return value.ToString();
         }
 
         private string ToComputedValue(CanonicalNumber value)
@@ -401,7 +406,7 @@
 
         private void ComputeCustomOperator(ICSharpWriter writer)
         {
-            //TODO
+            ComputedValue = CSharpQueryExpression.ComputeQueryResult(writer, Operator, FeatureCall);
         }
         #endregion
     }
