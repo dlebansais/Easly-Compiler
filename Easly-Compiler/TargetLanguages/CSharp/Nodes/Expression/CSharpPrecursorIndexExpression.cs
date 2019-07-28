@@ -17,7 +17,7 @@
         /// <summary>
         /// The feature whose precursor is being called.
         /// </summary>
-        ICSharpIndexerFeature Feature { get; }
+        ICSharpIndexerFeature ParentFeature { get; }
 
         /// <summary>
         /// The feature call.
@@ -49,8 +49,8 @@
         protected CSharpPrecursorIndexExpression(ICSharpContext context, IPrecursorIndexExpression source)
             : base(context, source)
         {
-            Feature = context.GetFeature((ICompiledFeature)source.EmbeddingFeature) as ICSharpIndexerFeature;
-            Debug.Assert(Feature != null);
+            ParentFeature = context.GetFeature((ICompiledFeature)source.EmbeddingFeature) as ICSharpIndexerFeature;
+            Debug.Assert(ParentFeature != null);
 
             FeatureCall = new CSharpFeatureCall(context, source.FeatureCall.Item);
         }
@@ -65,7 +65,7 @@
         /// <summary>
         /// The feature whose precursor is being called.
         /// </summary>
-        public ICSharpIndexerFeature Feature { get; }
+        public ICSharpIndexerFeature ParentFeature { get; }
 
         /// <summary>
         /// The feature call.
@@ -107,7 +107,8 @@
         /// <param name="writer">The stream on which to write.</param>
         public void Compute(ICSharpWriter writer)
         {
-            //TODO
+            //TODO use the precusor instead
+            ComputedValue = CSharpQueryExpression.ComputeQueryResult(writer, ParentFeature, FeatureCall);
         }
         #endregion
     }

@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -91,7 +92,9 @@
         /// <param name="writer">The stream on which to write.</param>
         public void Compute(ICSharpWriter writer)
         {
-            //TODO
+            string ResultValue = ComputeNestedExpression(writer, SourceExpression);
+
+            ComputedValue = ResultValue;
         }
         #endregion
     }

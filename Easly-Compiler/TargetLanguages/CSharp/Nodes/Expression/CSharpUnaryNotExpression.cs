@@ -101,33 +101,13 @@
         /// <param name="writer">The stream on which to write.</param>
         public void Compute(ICSharpWriter writer)
         {
-            bool RightValue = ComputeSideExpression(writer, RightExpression);
+            bool RightValue = ComputeBooleanSideExpression(writer, RightExpression);
             ComputedValue = ToComputedValue(!RightValue);
         }
 
-        private bool ComputeSideExpression(ICSharpWriter writer, ICSharpExpression expression)
+        private bool ComputeBooleanSideExpression(ICSharpWriter writer, ICSharpExpression expression)
         {
-            string ValueString;
-
-            ICSharpExpressionAsConstant ExpressionAsConstant = expression as ICSharpExpressionAsConstant;
-            Debug.Assert(ExpressionAsConstant != null);
-
-            if (ExpressionAsConstant.IsDirectConstant)
-            {
-                ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
-                expression.WriteCSharp(writer, SourceExpressionContext, -1);
-
-                ValueString = SourceExpressionContext.ReturnValue;
-            }
-            else
-            {
-                ICSharpComputableExpression ComputableExpression = ExpressionAsConstant as ICSharpComputableExpression;
-                Debug.Assert(ComputableExpression != null);
-
-                ComputableExpression.Compute(writer);
-                ValueString = ComputableExpression.ComputedValue;
-            }
-
+            string ValueString = ComputeNestedExpression(writer, expression);
             Debug.Assert(ValueString == ToComputedValue(true) || ValueString == ToComputedValue(false));
 
             return ValueString == ToComputedValue(true);

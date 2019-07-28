@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
+    using FormattedNumber;
 
     /// <summary>
     /// A C# expression.
@@ -23,6 +24,11 @@
         /// The operator.
         /// </summary>
         ICSharpFunctionFeature Operator { get; }
+
+        /// <summary>
+        /// The feature call.
+        /// </summary>
+        ICSharpFeatureCall FeatureCall { get; }
     }
 
     /// <summary>
@@ -53,6 +59,21 @@
 
             Operator = context.GetFeature(source.SelectedFeature.Item) as ICSharpFunctionFeature;
             Debug.Assert(Operator != null);
+
+            FeatureCall = new CSharpFeatureCall(context, new FeatureCall());
+
+            IResultType ResolvedRightResult = RightExpression.Source.ResolvedResult.Item;
+            IExpressionType PreferredRightResult = ResolvedRightResult.Preferred;
+            Debug.Assert(PreferredRightResult != null);
+
+            if (PreferredRightResult.ValueType is IClassType AsClassType)
+                if (AsClassType.BaseClass.ClassGuid == LanguageClasses.Number.Guid)
+                    IsCallingNumberFeature = true;
+
+            if (IsCallingNumberFeature)
+            {
+                Debug.Assert(ResolvedRightResult.Count == 1);
+            }
         }
         #endregion
 
@@ -71,6 +92,16 @@
         /// The operator.
         /// </summary>
         public ICSharpFunctionFeature Operator { get; }
+
+        /// <summary>
+        /// The feature call.
+        /// </summary>
+        public ICSharpFeatureCall FeatureCall { get; }
+
+        /// <summary>
+        /// True if calling a feature of the Number class.
+        /// </summary>
+        public bool IsCallingNumberFeature { get; }
         #endregion
 
         #region Client Interface
@@ -81,6 +112,22 @@
         /// <param name="expressionContext">The context.</param>
         /// <param name="skippedIndex">Index of a destination to skip.</param>
         public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, int skippedIndex)
+        {
+            if (IsCallingNumberFeature)
+                WriteCSharpNumberOperator(writer, expressionContext, skippedIndex);
+            else
+                WriteCSharpCustomOperator(writer, expressionContext, skippedIndex);
+        }
+
+        private void WriteCSharpNumberOperator(ICSharpWriter writer, ICSharpExpressionContext expressionContext, int skippedIndex)
+        {
+            string RightText = SingleResultExpressionText(writer, RightExpression);
+            string OperatorText = Operator.Name;
+
+            expressionContext.SetSingleReturnValue($"{OperatorText}{RightText}");
+        }
+
+        private void WriteCSharpCustomOperator(ICSharpWriter writer, ICSharpExpressionContext expressionContext, int skippedIndex)
         {
             string RightText = SingleResultExpressionText(writer, RightExpression);
             string OperatorText = Operator.Name;
@@ -108,7 +155,65 @@
         /// <param name="writer">The stream on which to write.</param>
         public void Compute(ICSharpWriter writer)
         {
-            //TODO
+            if (IsCallingNumberFeature)
+                ComputeNumberOperator(writer);
+            else
+                ComputeCustomOperator(writer);
+        }
+
+        private void ComputeNumberOperator(ICSharpWriter writer)
+        {
+            CanonicalNumber RightNumber = ComputeSide(writer, RightExpression);
+
+            bool IsHandled = false;
+
+            switch (Operator.Name)
+            {
+                case "-":
+                    ComputedValue = ToComputedValue(RightNumber.Negate());
+                    IsHandled = true;
+                    break;
+            }
+
+            Debug.Assert(IsHandled);
+        }
+
+        private CanonicalNumber ComputeSide(ICSharpWriter writer, ICSharpExpression expression)
+        {
+            string ValueString;
+
+            ICSharpExpressionAsConstant ExpressionAsConstant = expression as ICSharpExpressionAsConstant;
+            Debug.Assert(ExpressionAsConstant != null);
+
+            if (ExpressionAsConstant.IsDirectConstant)
+            {
+                ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
+                expression.WriteCSharp(writer, SourceExpressionContext, -1);
+
+                ValueString = SourceExpressionContext.ReturnValue;
+            }
+            else
+            {
+                ICSharpComputableExpression ComputableExpression = ExpressionAsConstant as ICSharpComputableExpression;
+                Debug.Assert(ComputableExpression != null);
+
+                ComputableExpression.Compute(writer);
+                ValueString = ComputableExpression.ComputedValue;
+            }
+
+            FormattedNumber Result = Parser.Parse(ValueString);
+
+            return Result.Canonical;
+        }
+
+        private string ToComputedValue(CanonicalNumber value)
+        {
+            return value.ToString();
+        }
+
+        private void ComputeCustomOperator(ICSharpWriter writer)
+        {
+            ComputedValue = CSharpQueryExpression.ComputeQueryResult(writer, Operator, FeatureCall);
         }
         #endregion
     }

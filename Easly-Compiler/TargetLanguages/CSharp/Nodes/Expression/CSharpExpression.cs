@@ -222,5 +222,38 @@
             return Result;
         }
         #endregion
+
+        #region Descendant Interface
+        /// <summary>
+        /// Computes the constant value of a nested expression.
+        /// </summary>
+        /// <param name="writer">The stream on which to write.</param>
+        /// <param name="expression">The expression to compute.</param>
+        protected virtual string ComputeNestedExpression(ICSharpWriter writer, ICSharpExpression expression)
+        {
+            string ValueString;
+
+            ICSharpExpressionAsConstant ExpressionAsConstant = expression as ICSharpExpressionAsConstant;
+            Debug.Assert(ExpressionAsConstant != null);
+
+            if (ExpressionAsConstant.IsDirectConstant)
+            {
+                ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
+                expression.WriteCSharp(writer, SourceExpressionContext, -1);
+
+                ValueString = SourceExpressionContext.ReturnValue;
+            }
+            else
+            {
+                ICSharpComputableExpression ComputableExpression = ExpressionAsConstant as ICSharpComputableExpression;
+                Debug.Assert(ComputableExpression != null);
+
+                ComputableExpression.Compute(writer);
+                ValueString = ComputableExpression.ComputedValue;
+            }
+
+            return ValueString;
+        }
+        #endregion
     }
 }

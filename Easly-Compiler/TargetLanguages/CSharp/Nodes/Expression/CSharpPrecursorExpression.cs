@@ -177,7 +177,8 @@
         /// <param name="writer">The stream on which to write.</param>
         public void Compute(ICSharpWriter writer)
         {
-            //TODO
+            //TODO use the precusor instead
+            ComputedValue = CSharpQueryExpression.ComputeQueryResult(writer, ParentFeature, FeatureCall);
         }
         #endregion
     }
