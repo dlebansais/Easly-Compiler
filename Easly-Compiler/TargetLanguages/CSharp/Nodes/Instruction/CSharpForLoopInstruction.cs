@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -161,6 +162,8 @@
         /// <param name="writer">The stream on which to write.</param>
         public override void WriteCSharp(ICSharpWriter writer)
         {
+            Debug.Assert(WriteDown);
+
             bool UseCurlyBrackets = false;
 
             /*TODO
@@ -266,6 +269,39 @@
 
             foreach (ICSharpAssertion Assertion in InvariantList)
                 Assertion.WriteCSharp(writer);
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// Sets the <see cref="ICSharpOutputNode.WriteDown"/> flag.
+        /// </summary>
+        public override void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            foreach (ICSharpInstruction Instruction in InitInstructionList)
+                Instruction.SetWriteDown();
+
+            WhileCondition.SetWriteDown();
+
+            foreach (ICSharpScopeAttributeFeature Item in EntityDeclarationList)
+                Item.SetWriteDown();
+
+            foreach (ICSharpInstruction Instruction in LoopInstructionList)
+                Instruction.SetWriteDown();
+
+            foreach (ICSharpInstruction Instruction in IterationInstructionList)
+                Instruction.SetWriteDown();
+
+            foreach (ICSharpAssertion Assertion in InvariantList)
+                Assertion.SetWriteDown();
+
+            if (VariantExpression != null)
+                VariantExpression.SetWriteDown();
         }
         #endregion
     }

@@ -7,7 +7,7 @@
     /// <summary>
     /// A C# argument.
     /// </summary>
-    public interface ICSharpArgument
+    public interface ICSharpArgument : ICSharpOutputNode
     {
         /// <summary>
         /// The Easly argument from which the C# argument is created.
@@ -437,6 +437,26 @@
             }
 
             Debug.Assert(resultTypeText != null);
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// True if the node should be produced.
+        /// </summary>
+        public bool WriteDown { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="WriteDown"/> flag.
+        /// </summary>
+        public void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            SourceExpression.SetWriteDown();
         }
         #endregion
     }

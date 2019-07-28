@@ -123,6 +123,8 @@
         /// <param name="skippedIndex">Index of a destination to skip.</param>
         public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, int skippedIndex)
         {
+            Debug.Assert(WriteDown);
+
             string QueryText = Query.CSharpText(writer, 0);
             string Result = null;
 
@@ -192,6 +194,16 @@
         /// True if the expression can provide its constant value directly.
         /// </summary>
         public bool IsDirectConstant { get { return true; } }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// Sets the <see cref="ICSharpOutputNode.WriteDown"/> flag.
+        /// </summary>
+        public override void SetWriteDown()
+        {
+            WriteDown = true;
+        }
         #endregion
     }
 }

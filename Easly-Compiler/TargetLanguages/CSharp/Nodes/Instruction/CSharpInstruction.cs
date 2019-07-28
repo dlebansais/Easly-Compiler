@@ -6,7 +6,7 @@
     /// <summary>
     /// A C# instruction.
     /// </summary>
-    public interface ICSharpInstruction
+    public interface ICSharpInstruction : ICSharpOutputNode
     {
         /// <summary>
         /// The parent feature.
@@ -154,6 +154,18 @@
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
         public abstract void WriteCSharp(ICSharpWriter writer);
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// True if the node should be produced.
+        /// </summary>
+        public bool WriteDown { get; protected set; }
+
+        /// <summary>
+        /// Sets the <see cref="WriteDown"/> flag.
+        /// </summary>
+        public abstract void SetWriteDown();
         #endregion
     }
 }

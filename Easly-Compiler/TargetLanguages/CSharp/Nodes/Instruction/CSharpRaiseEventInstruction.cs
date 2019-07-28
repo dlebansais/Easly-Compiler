@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using CompilerNode;
+    using System.Diagnostics;
 
     /// <summary>
     /// A C# instruction.
@@ -56,12 +57,24 @@
         /// <param name="writer">The stream on which to write.</param>
         public override void WriteCSharp(ICSharpWriter writer)
         {
+            Debug.Assert(WriteDown);
+
             // TODO: declare the event
 
             IIdentifier QueryIdentifierItem = (IIdentifier)Source.QueryIdentifier;
             string QueryIdentifierItemString = CSharpNames.ToCSharpIdentifier(QueryIdentifierItem.ValidText.Item);
 
             writer.WriteIndentedLine($"{QueryIdentifierItemString}.set();");
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// Sets the <see cref="ICSharpOutputNode.WriteDown"/> flag.
+        /// </summary>
+        public override void SetWriteDown()
+        {
+            WriteDown = true;
         }
         #endregion
     }

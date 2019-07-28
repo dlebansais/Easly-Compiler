@@ -90,6 +90,8 @@
         /// <param name="skippedIndex">Index of a destination to skip.</param>
         public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, int skippedIndex)
         {
+            Debug.Assert(WriteDown);
+
             CSharpArgument.CSharpArgumentList(writer, expressionContext, FeatureCall, skippedIndex, false, out string ArgumentListText, out IList<string> OutgoingResultList);
 
             expressionContext.SetSingleReturnValue($"base[{ArgumentListText}]");
@@ -117,6 +119,22 @@
         {
             //TODO use the precusor instead
             ComputedValue = CSharpQueryExpression.ComputeQueryResult(writer, ParentFeature, FeatureCall);
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// Sets the <see cref="ICSharpOutputNode.WriteDown"/> flag.
+        /// </summary>
+        public override void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            foreach (ICSharpArgument Argument in FeatureCall.ArgumentList)
+                Argument.SetWriteDown();
         }
         #endregion
     }

@@ -7,7 +7,7 @@
     /// <summary>
     /// A C# attachment node.
     /// </summary>
-    public interface ICSharpAttachment : ICSharpSource<IAttachment>
+    public interface ICSharpAttachment : ICSharpSource<IAttachment>, ICSharpOutputNode
     {
         /// <summary>
         /// The parent instruction.
@@ -158,6 +158,26 @@
             writer.AddAttachment(destinationEntity, NameAttached);
             Instructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.AlreadyInserted, true);
             writer.RemoveAttachment(destinationEntity);
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// True if the node should be produced.
+        /// </summary>
+        public bool WriteDown { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="WriteDown"/> flag.
+        /// </summary>
+        public void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            Instructions.SetWriteDown();
         }
         #endregion
     }

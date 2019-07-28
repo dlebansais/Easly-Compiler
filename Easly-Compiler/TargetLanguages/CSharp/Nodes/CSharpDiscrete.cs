@@ -5,7 +5,7 @@
     /// <summary>
     /// A C# discrete node.
     /// </summary>
-    public interface ICSharpDiscrete : ICSharpSource<IDiscrete>
+    public interface ICSharpDiscrete : ICSharpSource<IDiscrete>, ICSharpOutputNode
     {
         /// <summary>
         /// The discrete name.
@@ -59,6 +59,27 @@
         /// The explicit value. Can be null.
         /// </summary>
         public ICSharpExpression ExplicitValue { get; }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// True if the node should be produced.
+        /// </summary>
+        public bool WriteDown { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="WriteDown"/> flag.
+        /// </summary>
+        public void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            if (ExplicitValue != null)
+                ExplicitValue.SetWriteDown();
+        }
         #endregion
     }
 }

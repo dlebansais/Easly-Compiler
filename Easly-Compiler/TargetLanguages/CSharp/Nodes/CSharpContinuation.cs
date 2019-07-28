@@ -6,7 +6,7 @@
     /// <summary>
     /// A C# continuation node.
     /// </summary>
-    public interface ICSharpContinuation : ICSharpSource<IContinuation>
+    public interface ICSharpContinuation : ICSharpSource<IContinuation>, ICSharpOutputNode
     {
         /// <summary>
         /// The parent feature.
@@ -109,6 +109,29 @@
         {
             foreach (ICSharpInstruction Item in CleanupList)
                 Item.WriteCSharp(writer);
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// True if the node should be produced.
+        /// </summary>
+        public bool WriteDown { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="WriteDown"/> flag.
+        /// </summary>
+        public void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            Instructions.SetWriteDown();
+
+            foreach (ICSharpInstruction Instruction in CleanupList)
+                Instruction.SetWriteDown();
         }
         #endregion
     }

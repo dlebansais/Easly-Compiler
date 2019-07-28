@@ -7,7 +7,7 @@
     /// <summary>
     /// A C# assertion node.
     /// </summary>
-    public interface ICSharpAssertion : ICSharpSource<IAssertion>
+    public interface ICSharpAssertion : ICSharpSource<IAssertion>, ICSharpOutputNode
     {
         /// <summary>
         /// The assertion tag. Can be null.
@@ -76,6 +76,8 @@
         /// <param name="writer">The stream on which to write.</param>
         public virtual void WriteCSharp(ICSharpWriter writer)
         {
+            Debug.Assert(WriteDown);
+
             ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
             BooleanExpression.WriteCSharp(writer, SourceExpressionContext, -1);
 
@@ -158,6 +160,26 @@
                 string Line = Assertion.BooleanExpression.Source.ExpressionToString;
                 writer.WriteIndentedLine($"//   {Tag}{Line}");
             }
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// True if the node should be produced.
+        /// </summary>
+        public bool WriteDown { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="WriteDown"/> flag.
+        /// </summary>
+        public void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            BooleanExpression.SetWriteDown();
         }
         #endregion
     }

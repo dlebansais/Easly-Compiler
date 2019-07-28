@@ -98,6 +98,8 @@
         /// <param name="writer">The stream on which to write.</param>
         public override void WriteCSharp(ICSharpWriter writer)
         {
+            Debug.Assert(WriteDown);
+
             string ContinueExpressionText;
 
             for (int i = 0; i < ContinuationList.Count; i++)
@@ -177,6 +179,27 @@
                 Debug.Assert(ExpressionContext.ReturnValue != null);
                 continueExpressionText = ExpressionContext.ReturnValue;
             }
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// Sets the <see cref="ICSharpOutputNode.WriteDown"/> flag.
+        /// </summary>
+        public override void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            ContinueCondition.SetWriteDown();
+
+            foreach (ICSharpContinuation Continuation in ContinuationList)
+                Continuation.SetWriteDown();
+
+            if (ElseInstructions != null)
+                ElseInstructions.SetWriteDown();
         }
         #endregion
     }

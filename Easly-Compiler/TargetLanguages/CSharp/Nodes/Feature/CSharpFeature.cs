@@ -7,7 +7,7 @@
     /// <summary>
     /// A C# feature.
     /// </summary>
-    public interface ICSharpFeature
+    public interface ICSharpFeature : ICSharpOutputNode
     {
         /// <summary>
         /// The Easly node from which the C# node is created.
@@ -93,7 +93,7 @@
     /// A C# feature.
     /// </summary>
     /// <typeparam name="T">The corresponding compiler node.</typeparam>
-    public interface ICSharpFeature<T> : ICSharpSource<T>
+    public interface ICSharpFeature<T> : ICSharpSource<T>, ICSharpOutputNode
         where T : class, ICompiledFeature
     {
         /// <summary>
@@ -319,6 +319,18 @@
             else
                 return CSharpExports.Private;
         }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// True if the node should be produced.
+        /// </summary>
+        public bool WriteDown { get; protected set; }
+
+        /// <summary>
+        /// Sets the <see cref="WriteDown"/> flag.
+        /// </summary>
+        public abstract void SetWriteDown();
         #endregion
 
         #region Debugging

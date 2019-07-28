@@ -77,6 +77,8 @@
         /// <param name="skippedIndex">Index of a destination to skip.</param>
         public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, int skippedIndex)
         {
+            Debug.Assert(WriteDown);
+
             SourceExpression.WriteCSharp(writer, expressionContext, skippedIndex);
         }
         #endregion
@@ -103,6 +105,21 @@
             string ResultValue = ComputeNestedExpression(writer, SourceExpression);
 
             ComputedValue = ResultValue;
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// Sets the <see cref="ICSharpOutputNode.WriteDown"/> flag.
+        /// </summary>
+        public override void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            SourceExpression.SetWriteDown();
         }
         #endregion
     }

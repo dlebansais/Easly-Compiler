@@ -662,6 +662,7 @@
     <Compile Include="TargetLanguages\CSharp\CSharpFeatureTextTypes.cs" />
     <Compile Include="TargetLanguages\CSharp\CSharpLanguageClasses.cs" />
     <Compile Include="TargetLanguages\CSharp\CSharpNumberTypes.cs" />
+    <Compile Include="TargetLanguages\CSharp\CSharpOutputNode.cs" />
     <Compile Include="TargetLanguages\CSharp\CSharpTypeWithFeature.cs" />
     <Compile Include="TargetLanguages\CSharp\CSharpUsingCollection.cs" />
     <Compile Include="TargetLanguages\CSharp\CSharpVariableContext.cs" />

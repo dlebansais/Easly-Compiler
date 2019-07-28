@@ -97,6 +97,8 @@
         /// <param name="skippedIndex">Index of a destination to skip.</param>
         public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, int skippedIndex)
         {
+            Debug.Assert(WriteDown);
+
             Debug.Assert(TypeList.Count > 0);
 
             string CloneMethod = Source.Type == BaseNode.CloneType.Shallow ? "CloneShallow" : "Clone";
@@ -146,6 +148,21 @@
 
                 expressionContext.SetMultipleResult(OutgoingResultList, ReturnValueIndex);
             }
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// Sets the <see cref="ICSharpOutputNode.WriteDown"/> flag.
+        /// </summary>
+        public override void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            SourceExpression.SetWriteDown();
         }
         #endregion
     }

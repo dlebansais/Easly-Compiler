@@ -1,13 +1,12 @@
 ﻿namespace EaslyCompiler
 {
-    using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
     /// A C# expression.
     /// </summary>
-    public interface ICSharpExpression
+    public interface ICSharpExpression : ICSharpOutputNode
     {
         /// <summary>
         /// The Easly expression from which the C# expression is created.
@@ -277,6 +276,18 @@
 
             return ValueString;
         }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// True if the node should be produced.
+        /// </summary>
+        public bool WriteDown { get; protected set; }
+
+        /// <summary>
+        /// Sets the <see cref="WriteDown"/> flag.
+        /// </summary>
+        public abstract void SetWriteDown();
         #endregion
     }
 }

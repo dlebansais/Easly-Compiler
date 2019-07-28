@@ -156,6 +156,17 @@
             }
             while (Continue);
 
+            foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
+            {
+                ICSharpClass Class = Entry.Value;
+
+                foreach (ICSharpFeature Feature in Class.FeatureList)
+                    Feature.SetWriteDown();
+
+                foreach (ICSharpAssertion Invariant in Class.InvariantList)
+                    Invariant.SetWriteDown();
+            }
+
             if (!Directory.Exists(OutputRootFolder))
                 Directory.CreateDirectory(OutputRootFolder);
 

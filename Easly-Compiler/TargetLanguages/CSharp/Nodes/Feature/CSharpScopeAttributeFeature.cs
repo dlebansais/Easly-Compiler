@@ -167,6 +167,8 @@
         /// <param name="writer">The stream on which to write.</param>
         public void WriteCSharp(ICSharpWriter writer)
         {
+            Debug.Assert(WriteDown);
+
             string NameString = CSharpNames.ToCSharpIdentifier(Name);
             string TypeString = Type.Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
             string DefaultValueText = string.Empty;
@@ -208,6 +210,16 @@
         public override void WriteCSharp(ICSharpWriter writer, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
         {
             WriteCSharp(writer);
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// Sets the <see cref="ICSharpOutputNode.WriteDown"/> flag.
+        /// </summary>
+        public override void SetWriteDown()
+        {
+            WriteDown = true;
         }
         #endregion
     }

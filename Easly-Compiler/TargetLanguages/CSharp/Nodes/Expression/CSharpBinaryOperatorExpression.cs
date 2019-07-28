@@ -188,6 +188,8 @@
         /// <param name="skippedIndex">Index of a destination to skip.</param>
         public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, int skippedIndex)
         {
+            Debug.Assert(WriteDown);
+
             if (IsCallingNumberFeature)
                 WriteCSharpNumberOperator(writer, expressionContext, skippedIndex);
             else
@@ -435,6 +437,22 @@
         private void ComputeCustomOperator(ICSharpWriter writer)
         {
             ComputedValue = CSharpQueryExpression.ComputeQueryResult(writer, Operator, FeatureCall);
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// Sets the <see cref="ICSharpOutputNode.WriteDown"/> flag.
+        /// </summary>
+        public override void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            LeftExpression.SetWriteDown();
+            RightExpression.SetWriteDown();
         }
         #endregion
     }

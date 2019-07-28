@@ -7,7 +7,7 @@
     /// <summary>
     /// A C# body.
     /// </summary>
-    public interface ICSharpEffectiveBody : ICSharpBody
+    public interface ICSharpEffectiveBody : ICSharpBody, ICSharpOutputNode
     {
         /// <summary>
         /// The Easly body from which the C# body is created.
@@ -105,6 +105,8 @@
         /// <param name="initialisationStringList">List of initializations.</param>
         public virtual void WriteCSharp(ICSharpWriter writer, CSharpBodyFlags flags, string resultType, bool skipFirstInstruction, IList<string> initialisationStringList)
         {
+            Debug.Assert(WriteDown);
+
             writer.WriteIndentedLine("{");
             writer.IncreaseIndent();
 
@@ -286,6 +288,36 @@
 
             writer.DecreaseIndent();
             writer.WriteIndentedLine("}");
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// True if the node should be produced.
+        /// </summary>
+        public bool WriteDown { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="WriteDown"/> flag.
+        /// </summary>
+        public void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            foreach (ICSharpAssertion Assertion in RequireList)
+                Assertion.SetWriteDown();
+
+            foreach (ICSharpScopeAttributeFeature Item in EntityDeclarationList)
+                Item.SetWriteDown();
+
+            foreach (ICSharpInstruction Instruction in BodyInstructionList)
+                Instruction.SetWriteDown();
+
+            foreach (ICSharpAssertion Assertion in EnsureList)
+                Assertion.SetWriteDown();
         }
         #endregion
     }

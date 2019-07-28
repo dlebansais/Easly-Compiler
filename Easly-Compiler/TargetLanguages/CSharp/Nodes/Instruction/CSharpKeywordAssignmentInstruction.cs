@@ -1,6 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using CompilerNode;
+    using System.Diagnostics;
 
     /// <summary>
     /// A C# instruction.
@@ -67,6 +68,8 @@
         /// <param name="writer">The stream on which to write.</param>
         public override void WriteCSharp(ICSharpWriter writer)
         {
+            Debug.Assert(WriteDown);
+
             string DestinationString = Source.Destination.ToString();
 
             ICSharpExpressionContext SourceExpressionContext = new CSharpExpressionContext();
@@ -75,6 +78,21 @@
             string SourceString = SourceExpressionContext.ReturnValue;
 
             writer.WriteIndentedLine($"{DestinationString} = {SourceString};");
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// Sets the <see cref="ICSharpOutputNode.WriteDown"/> flag.
+        /// </summary>
+        public override void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            SourceExpression.SetWriteDown();
         }
         #endregion
     }

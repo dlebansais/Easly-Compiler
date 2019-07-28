@@ -119,6 +119,8 @@
         /// <param name="skippedIndex">Index of a destination to skip.</param>
         public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, int skippedIndex)
         {
+            Debug.Assert(WriteDown);
+
             string TypeText;
             string ClassName;
             string ConstantName;
@@ -214,6 +216,25 @@
             Debug.Assert(AssignedDiscreteTable.ContainsKey(Discrete.Source));
 
             ComputedValue = AssignedDiscreteTable[Discrete.Source];
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// Sets the <see cref="ICSharpOutputNode.WriteDown"/> flag.
+        /// </summary>
+        public override void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            if (Feature != null)
+                ConstantExpression.SetWriteDown();
+
+            if (Discrete != null)
+                Discrete.SetWriteDown();
         }
         #endregion
     }

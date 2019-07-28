@@ -1,12 +1,13 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
     /// A C# scope node.
     /// </summary>
-    public interface ICSharpScope : ICSharpSource<IScope>
+    public interface ICSharpScope : ICSharpSource<IScope>, ICSharpOutputNode
     {
         /// <summary>
         /// The parent feature.
@@ -100,6 +101,8 @@
         /// <param name="endWithBreak">Add a break instruction at the end.</param>
         public virtual void WriteCSharp(ICSharpWriter writer, CSharpCurlyBracketsInsertions curlyBracketsInsertion, bool endWithBreak)
         {
+            Debug.Assert(WriteDown);
+
             bool UseCurlyBrackets = false;
 
             if (curlyBracketsInsertion.HasFlag(CSharpCurlyBracketsInsertions.Mandatory))
@@ -152,6 +155,30 @@
             writer.DecreaseIndent();
             if (UseCurlyBrackets)
                 writer.WriteIndentedLine("}");
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// True if the node should be produced.
+        /// </summary>
+        public bool WriteDown { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="WriteDown"/> flag.
+        /// </summary>
+        public void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            foreach (ICSharpScopeAttributeFeature Item in EntityDeclarationList)
+                Item.SetWriteDown();
+
+            foreach (ICSharpInstruction Instruction in InstructionList)
+                Instruction.SetWriteDown();
         }
         #endregion
     }

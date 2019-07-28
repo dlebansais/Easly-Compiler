@@ -13,7 +13,7 @@
     /// <summary>
     /// A C# class node.
     /// </summary>
-    public interface ICSharpClass : ICSharpSource<IClass>
+    public interface ICSharpClass : ICSharpSource<IClass>, ICSharpOutputNode
     {
         /// <summary>
         /// The valid class name.
@@ -1257,6 +1257,9 @@
             for (int i = 0; i < DiscreteList.Count; i++)
             {
                 ICSharpDiscrete Item = DiscreteList[i];
+                if (!Item.WriteDown)
+                    continue;
+
                 string Line = string.Empty;
                 string ExplicitValueText;
 
@@ -2031,6 +2034,21 @@
                 GenericNames = "<" + GenericNames + ">";
 
             return GenericNames;
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// True if the node should be produced.
+        /// </summary>
+        public bool WriteDown { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="WriteDown"/> flag.
+        /// </summary>
+        public void SetWriteDown()
+        {
+            WriteDown = true;
         }
         #endregion
 

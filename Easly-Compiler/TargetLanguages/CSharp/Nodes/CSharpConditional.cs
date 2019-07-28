@@ -6,7 +6,7 @@
     /// <summary>
     /// A C# conditional node.
     /// </summary>
-    public interface ICSharpConditional : ICSharpSource<IConditional>
+    public interface ICSharpConditional : ICSharpSource<IConditional>, ICSharpOutputNode
     {
         /// <summary>
         /// The parent feature.
@@ -89,6 +89,8 @@
         /// <param name="isElseIf">True if the conditional is not the first.</param>
         public virtual void WriteCSharp(ICSharpWriter writer, bool isElseIf)
         {
+            Debug.Assert(WriteDown);
+
             ICSharpExpressionContext ExpressionContext = new CSharpExpressionContext();
             BooleanExpression.WriteCSharp(writer, ExpressionContext, -1);
 
@@ -111,6 +113,27 @@
             writer.WriteIndentedLine(Condition);
 
             Instructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Mandatory, false);
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// True if the node should be produced.
+        /// </summary>
+        public bool WriteDown { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="WriteDown"/> flag.
+        /// </summary>
+        public void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            BooleanExpression.SetWriteDown();
+            Instructions.SetWriteDown();
         }
         #endregion
     }

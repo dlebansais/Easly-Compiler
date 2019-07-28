@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -67,9 +68,26 @@
         /// <param name="writer">The stream on which to write.</param>
         public override void WriteCSharp(ICSharpWriter writer)
         {
+            Debug.Assert(WriteDown);
+
             writer.WriteIndentedLine("#if DEBUG");
             Instructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Indifferent, false);
             writer.WriteIndentedLine("#endif");
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// Sets the <see cref="ICSharpOutputNode.WriteDown"/> flag.
+        /// </summary>
+        public override void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            Instructions.SetWriteDown();
         }
         #endregion
     }

@@ -153,6 +153,9 @@
         /// <param name="isMultiline">True if there is a separating line above.</param>
         public override void WriteCSharp(ICSharpWriter writer, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
         {
+            if (!WriteDown)
+                return;
+
             if (isMultiline)
                 writer.WriteEmptyLine();
 
@@ -209,6 +212,21 @@
             string ConstString = IsReadOnlyObject ? "static readonly" : "const";
 
             writer.WriteIndentedLine($"{ExportStatusText} {ConstString} {TypeString} {AttributeString} = {ValueString};");
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// Sets the <see cref="ICSharpOutputNode.WriteDown"/> flag.
+        /// </summary>
+        public override void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            ConstantExpression.SetWriteDown();
         }
         #endregion
     }

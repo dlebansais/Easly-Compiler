@@ -118,6 +118,8 @@
         /// <param name="writer">The stream on which to write.</param>
         public override void WriteCSharp(ICSharpWriter writer)
         {
+            Debug.Assert(WriteDown);
+
             if (EntityNameList.Count == 1)
                 WriteCSharpSwitch(writer);
             else
@@ -165,6 +167,27 @@
                 writer.WriteIndentedLine("else");
                 ElseInstructions.WriteCSharp(writer, CSharpCurlyBracketsInsertions.Mandatory, false);
             }
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// Sets the <see cref="ICSharpOutputNode.WriteDown"/> flag.
+        /// </summary>
+        public override void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            SourceExpression.SetWriteDown();
+
+            foreach (CSharpAttachment Attachment in AttachmentList)
+                Attachment.SetWriteDown();
+
+            if (ElseInstructions != null)
+                ElseInstructions.SetWriteDown();
         }
         #endregion
     }

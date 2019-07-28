@@ -5,7 +5,7 @@
     /// <summary>
     /// A C# overload (query or command).
     /// </summary>
-    public interface ICSharpOverload
+    public interface ICSharpOverload : ICSharpOutputNode
     {
         /// <summary>
         /// The parent feature.

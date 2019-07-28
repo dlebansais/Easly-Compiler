@@ -131,6 +131,8 @@
         /// <param name="isMultiline">True if there is a separating line above.</param>
         public void WriteCSharp(ICSharpWriter writer, CSharpFeatureTextTypes featureTextType, bool isOverride, string nameString, CSharpExports exportStatus, bool isConstructor, ref bool isFirstFeature, ref bool isMultiline)
         {
+            Debug.Assert(WriteDown);
+
             IList<ICSharpParameter> SelectedParameterList = ParameterList;
             IList<ICSharpParameter> SelectedResultList = ResultList;
 
@@ -246,6 +248,31 @@
                 writer.WriteIndentedLine($"{ResultType} {nameString}({ArgumentEntityList});");
                 isMultiline = false;
             }
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// True if the node should be produced.
+        /// </summary>
+        public bool WriteDown { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="ICSharpOutputNode.WriteDown"/> flag.
+        /// </summary>
+        public void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            foreach (ICSharpParameter Parameter in ParameterList)
+                if (Parameter.Feature.DefaultValue != null)
+                    Parameter.Feature.DefaultValue.SetWriteDown();
+
+            if (Body is ICSharpEffectiveBody AsEffectiveBody)
+                AsEffectiveBody.SetWriteDown();
         }
         #endregion
     }

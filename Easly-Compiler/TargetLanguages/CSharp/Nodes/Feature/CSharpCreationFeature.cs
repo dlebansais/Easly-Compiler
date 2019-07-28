@@ -132,6 +132,9 @@
         /// <param name="isMultiline">True if there is a separating line above.</param>
         public override void WriteCSharp(ICSharpWriter writer, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
         {
+            if (!WriteDown)
+                return;
+
             writer.WriteDocumentation(Source);
 
             bool ClassHasSingleConstructor = isLocal && Owner.ClassConstructorType == CSharpConstructorTypes.OneConstructor;
@@ -144,6 +147,22 @@
 
             foreach (ICSharpCommandOverload Overload in OverloadList)
                 Overload.WriteCSharp(writer, featureTextType, IsOverride, NameString, exportStatus, ClassHasSingleConstructor, ref isFirstFeature, ref isMultiline);
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// Sets the <see cref="ICSharpOutputNode.WriteDown"/> flag.
+        /// </summary>
+        public override void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            foreach (ICSharpOverload Overload in OverloadList)
+                Overload.SetWriteDown();
         }
         #endregion
     }

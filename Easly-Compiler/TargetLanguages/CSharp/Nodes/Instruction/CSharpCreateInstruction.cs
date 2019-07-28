@@ -102,6 +102,8 @@
         /// <param name="writer">The stream on which to write.</param>
         public override void WriteCSharp(ICSharpWriter writer)
         {
+            Debug.Assert(WriteDown);
+
             string EntityString = CSharpNames.ToCSharpIdentifier(CreatedObjectName);
             string EntityTypeString = EntityType.Type2CSharpString(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
 
@@ -154,6 +156,22 @@
             }
 
             Debug.Assert(IsHandled);
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// Sets the <see cref="ICSharpOutputNode.WriteDown"/> flag.
+        /// </summary>
+        public override void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            foreach (ICSharpArgument Argument in FeatureCall.ArgumentList)
+                Argument.SetWriteDown();
         }
         #endregion
     }

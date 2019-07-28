@@ -8,7 +8,7 @@
     /// <summary>
     /// A C# case node.
     /// </summary>
-    public interface ICSharpWith : ICSharpSource<IWith>
+    public interface ICSharpWith : ICSharpSource<IWith>, ICSharpOutputNode
     {
         /// <summary>
         /// The parent feature.
@@ -91,6 +91,8 @@
         /// <param name="writer">The stream on which to write.</param>
         public virtual void WriteCSharp(ICSharpWriter writer)
         {
+            Debug.Assert(WriteDown);
+
             foreach (ILanguageConstant Constant in ConstantList)
             {
                 bool IsHandled = false;
@@ -163,6 +165,26 @@
                     }
                 }
             }
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// True if the node should be produced.
+        /// </summary>
+        public bool WriteDown { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="WriteDown"/> flag.
+        /// </summary>
+        public void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            Instructions.SetWriteDown();
         }
         #endregion
     }
