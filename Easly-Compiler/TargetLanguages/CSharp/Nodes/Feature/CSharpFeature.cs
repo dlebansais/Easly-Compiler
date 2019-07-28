@@ -64,6 +64,12 @@
         void MarkPrecursorAsCoexisting(string coexistingPrecursorName);
 
         /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        void CheckNumberType(ref bool isChanged);
+
+        /// <summary>
         /// Gets the feature output format.
         /// </summary>
         /// <param name="selectedOverloadType">The selected overload type.</param>
@@ -138,6 +144,12 @@
         /// </summary>
         /// <param name="coexistingPrecursorName">The name of the precursor.</param>
         void MarkPrecursorAsCoexisting(string coexistingPrecursorName);
+
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        void CheckNumberType(ref bool isChanged);
     }
 
     /// <summary>
@@ -256,6 +268,12 @@
         {
             CoexistingPrecursorName = coexistingPrecursorName;
         }
+
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public abstract void CheckNumberType(ref bool isChanged);
 
         /// <summary>
         /// Gets the export status of a feature in the class that implements it.

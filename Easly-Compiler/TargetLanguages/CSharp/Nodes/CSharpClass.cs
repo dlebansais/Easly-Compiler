@@ -189,6 +189,12 @@
         void CreateDelegates();
 
         /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        void CheckNumberType(ref bool isChanged);
+
+        /// <summary>
         /// Writes down the class source code.
         /// </summary>
         /// <param name="folder">The output root folder.</param>
@@ -1203,6 +1209,16 @@
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public void CheckNumberType(ref bool isChanged)
+        {
+            foreach (ICSharpFeature Feature in FeatureList)
+                Feature.CheckNumberType(ref isChanged);
         }
         #endregion
 

@@ -144,6 +144,18 @@
                 Class.CreateDelegates();
             }
 
+            do
+            {
+                Continue = false;
+
+                foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
+                {
+                    ICSharpClass Class = Entry.Value;
+                    Class.CheckNumberType(ref Continue);
+                }
+            }
+            while (Continue);
+
             if (!Directory.Exists(OutputRootFolder))
                 Directory.CreateDirectory(OutputRootFolder);
 

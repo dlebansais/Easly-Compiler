@@ -112,6 +112,23 @@
         }
 
         /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public override void CheckNumberType(ref bool isChanged)
+        {
+            if (Type.IsNumberType && Type.NumberType == CSharpNumberTypes.Unknown)
+            {
+                ConstantExpression.CheckNumberType(ref isChanged);
+                if (ConstantExpression.NumberType == CSharpNumberTypes.Integer || ConstantExpression.NumberType == CSharpNumberTypes.Real)
+                {
+                    Type.NumberType = ConstantExpression.NumberType;
+                    isChanged = true;
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets the feature output format.
         /// </summary>
         /// <param name="selectedOverloadType">The selected overload type.</param>

@@ -30,6 +30,17 @@
         bool IsEventExpression { get; }
 
         /// <summary>
+        /// The number type if the result is a single number.
+        /// </summary>
+        CSharpNumberTypes NumberType { get; set; }
+
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        void CheckNumberType(ref bool isChanged);
+
+        /// <summary>
         /// Writes down the C# instruction.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
@@ -163,6 +174,7 @@
             Debug.Assert(source != null);
 
             Source = source;
+            NumberType = CSharpNumberTypes.NotApplicable;
         }
         #endregion
 
@@ -192,9 +204,20 @@
                 return Expression.IsLanguageTypeAvailable(LanguageClasses.Event.Guid, Source, out ITypeName EventTypeName, out ICompiledType EventType) && IsSingleResult && Source.ResolvedResult.Item.At(0).ValueType == EventType;
             }
         }
+
+        /// <summary>
+        /// The number type if the result is a single number.
+        /// </summary>
+        public CSharpNumberTypes NumberType { get; set; }
         #endregion
 
         #region Client Interface
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public abstract void CheckNumberType(ref bool isChanged);
+
         /// <summary>
         /// Writes down the C# instruction.
         /// </summary>

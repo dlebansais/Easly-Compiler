@@ -30,6 +30,16 @@
         bool HasInterfaceText { get; }
 
         /// <summary>
+        /// True if the type is a number.
+        /// </summary>
+        bool IsNumberType { get; }
+
+        /// <summary>
+        /// The number type if a number.
+        /// </summary>
+        CSharpNumberTypes NumberType { get; set; }
+
+        /// <summary>
         /// Sets the <see cref="IsUsedInCode"/> property.
         /// </summary>
         void SetUsedInCode();
@@ -160,6 +170,7 @@
             Debug.Assert(source != null);
 
             Source = source;
+            NumberType = IsNumberType ? CSharpNumberTypes.Unknown : CSharpNumberTypes.NotApplicable;
         }
 
         /// <summary>
@@ -175,6 +186,7 @@
 
             Source = source;
             OriginatingTypedef = originatingTypedef;
+            NumberType = IsNumberType ? CSharpNumberTypes.Unknown : CSharpNumberTypes.NotApplicable;
         }
         #endregion
 
@@ -198,6 +210,16 @@
         /// True if the type can be used in the interface 'I' text format.
         /// </summary>
         public abstract bool HasInterfaceText { get; }
+
+        /// <summary>
+        /// True if the type is a number.
+        /// </summary>
+        public bool IsNumberType { get { return this is ICSharpClassType AsClassType && AsClassType.Class.Source.ClassGuid == LanguageClasses.Number.Guid; } }
+
+        /// <summary>
+        /// The number type if a number.
+        /// </summary>
+        public CSharpNumberTypes NumberType { get; set; }
         #endregion
 
         #region Client Interface

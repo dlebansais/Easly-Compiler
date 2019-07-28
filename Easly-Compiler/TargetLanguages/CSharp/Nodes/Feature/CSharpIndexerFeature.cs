@@ -194,6 +194,14 @@
         }
 
         /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public override void CheckNumberType(ref bool isChanged)
+        {
+        }
+
+        /// <summary>
         /// Writes down the C# feature.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>

@@ -1,7 +1,9 @@
 ﻿namespace EaslyCompiler
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
+    using FormattedNumber;
 
     /// <summary>
     /// A C# expression.
@@ -38,6 +40,21 @@
         protected CSharpManifestNumberExpression(ICSharpContext context, IManifestNumberExpression source)
             : base(context, source)
         {
+            FormattedNumber FormattedNumber = Parser.Parse(Source.ValidText.Item);
+            Debug.Assert(FormattedNumber.IsValid);
+
+            switch (FormattedNumber)
+            {
+                case FormattedInteger AsInteger:
+                    NumberType = CSharpNumberTypes.Integer;
+                    break;
+
+                case FormattedReal AsReal:
+                    NumberType = CSharpNumberTypes.Real;
+                    break;
+            }
+
+            Debug.Assert(NumberType != CSharpNumberTypes.NotApplicable && NumberType != CSharpNumberTypes.Unknown);
         }
         #endregion
 
@@ -49,6 +66,14 @@
         #endregion
 
         #region Client Interface
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public override void CheckNumberType(ref bool isChanged)
+        {
+        }
+
         /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>

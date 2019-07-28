@@ -82,17 +82,17 @@
             IList<ICSharpClassType> ConformingClassTypeList = FinalType.ConformingClassTypeList;
 
             bool InheritFromDotNetEvent = false;
-            bool IsNumberGuid = false;
+            bool IsNumberType = false;
             foreach (ICSharpClassType Item in ConformingClassTypeList)
             {
                 ICSharpClass CallClass = Item.Class;
                 InheritFromDotNetEvent |= CallClass.InheritFromDotNetEvent;
 
-                IsNumberGuid = CallClass.Source.ClassGuid == LanguageClasses.Number.Guid;
+                IsNumberType = Item.IsNumberType;
             }
 
             SkipLastInPath = InheritFromDotNetEvent;
-            IsCallingNumberFeature = IsNumberGuid;
+            IsCallingNumberFeature = IsNumberType;
         }
         #endregion
 
