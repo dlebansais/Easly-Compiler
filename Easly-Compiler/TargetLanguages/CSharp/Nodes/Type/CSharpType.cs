@@ -170,7 +170,6 @@
             Debug.Assert(source != null);
 
             Source = source;
-            NumberType = IsNumberType ? CSharpNumberTypes.Unknown : CSharpNumberTypes.NotApplicable;
         }
 
         /// <summary>
@@ -186,7 +185,6 @@
 
             Source = source;
             OriginatingTypedef = originatingTypedef;
-            NumberType = IsNumberType ? CSharpNumberTypes.Unknown : CSharpNumberTypes.NotApplicable;
         }
         #endregion
 
@@ -214,7 +212,7 @@
         /// <summary>
         /// True if the type is a number.
         /// </summary>
-        public bool IsNumberType { get { return this is ICSharpClassType AsClassType && AsClassType.Class.Source.ClassGuid == LanguageClasses.Number.Guid; } }
+        public abstract bool IsNumberType { get; }
 
         /// <summary>
         /// The number type if a number.

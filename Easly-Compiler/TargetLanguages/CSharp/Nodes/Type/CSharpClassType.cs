@@ -64,6 +64,8 @@
             }
 
             ConformingClassTypeList.Add(this);
+
+            NumberType = IsNumberType ? CSharpNumberTypes.Unknown : CSharpNumberTypes.NotApplicable;
         }
         #endregion
 
@@ -87,6 +89,11 @@
         /// True if the type can be used in the interface 'I' text format.
         /// </summary>
         public override bool HasInterfaceText { get { return Class.Source.Cloneable != BaseNode.CloneableStatus.Single && Class.ValidSourceName != "Microsoft .NET"; } }
+
+        /// <summary>
+        /// True if the type is a number.
+        /// </summary>
+        public override bool IsNumberType { get { return Class.Source.ClassGuid == LanguageClasses.Number.Guid; } }
 
         /// <summary>
         /// The list of class types this type conforms to.
@@ -149,7 +156,19 @@
                 Result = "StableReference" + TypeArguments2CSharpName(usingCollection, TypeArgumentList, TypeArgumentsWithInterface, TypeArgumentsWithImplementation);
             else if (LanguageClasses.GuidToName.ContainsKey(BaseClassGuid))
             {
-                Result = CSharpLanguageClasses.GuidToName[BaseClassGuid];
+                Result = null;
+
+                if (BaseClassGuid == LanguageClasses.Number.Guid && IsNumberType)
+                {
+                    if (NumberType == CSharpNumberTypes.Integer)
+                        Result = "int";
+                    else if (NumberType == CSharpNumberTypes.Real)
+                        Result = "double";
+                }
+
+                if (Result == null)
+                    Result = CSharpLanguageClasses.GuidToName[BaseClassGuid];
+
                 if (CSharpLanguageClasses.NameUsingTable.ContainsKey(Result))
                 {
                     string UsingDirective = CSharpLanguageClasses.NameUsingTable[Result];

@@ -75,6 +75,11 @@
         /// True if the type can be used in the interface 'I' text format.
         /// </summary>
         public override bool HasInterfaceText { get { return false; } }
+
+        /// <summary>
+        /// True if the type is a number.
+        /// </summary>
+        public override bool IsNumberType { get { return false; } }
         #endregion
 
         #region Client Interface

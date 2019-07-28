@@ -45,6 +45,34 @@
             : base(context, source)
         {
             Generic = context.GetGeneric(Source.FormalGeneric);
+
+            NumberType = CSharpNumberTypes.NotApplicable;
+
+            foreach (ICSharpConstraint Constraint in Generic.ConstraintList)
+                if (Constraint.TypeWithRename is ICSharpClassType AsClassType)
+                    if (AsClassType.IsNumberType)
+                    {
+                        if (NumberType == CSharpNumberTypes.NotApplicable)
+                            NumberType = CSharpNumberTypes.Unknown;
+
+                        switch (AsClassType.NumberType)
+                        {
+                            case CSharpNumberTypes.Unknown:
+                                if (NumberType == CSharpNumberTypes.NotApplicable)
+                                    NumberType = CSharpNumberTypes.Unknown;
+                                break;
+
+                            case CSharpNumberTypes.Integer:
+                                Debug.Assert(NumberType != CSharpNumberTypes.Real);
+                                NumberType = CSharpNumberTypes.Integer;
+                                break;
+
+                            case CSharpNumberTypes.Real:
+                                Debug.Assert(NumberType != CSharpNumberTypes.Integer);
+                                NumberType = CSharpNumberTypes.Real;
+                                break;
+                        }
+                    }
         }
         #endregion
 
@@ -63,6 +91,23 @@
         /// True if the type can be used in the interface 'I' text format.
         /// </summary>
         public override bool HasInterfaceText { get { return false; } }
+
+        /// <summary>
+        /// True if the type is a number.
+        /// </summary>
+        public override bool IsNumberType
+        {
+            get
+            {
+                bool Result = false;
+
+                foreach (ICSharpConstraint Constraint in Generic.ConstraintList)
+                    if (Constraint.TypeWithRename is ICSharpClassType AsClassType)
+                        Result |= AsClassType.IsNumberType;
+
+                return Result;
+            }
+        }
 
         /// <summary>
         /// The list of class types this type conforms to.
