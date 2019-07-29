@@ -380,9 +380,7 @@
             if (Feature != null)
             {
                 Feature.SetWriteDown();
-
-                foreach (ICSharpArgument Argument in FeatureCall.ArgumentList)
-                    Argument.SetWriteDown();
+                FeatureCall.SetWriteDown();
             }
 
             if (Discrete != null)

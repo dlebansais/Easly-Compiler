@@ -453,6 +453,7 @@
 
             LeftExpression.SetWriteDown();
             RightExpression.SetWriteDown();
+            FeatureCall.SetWriteDown();
         }
         #endregion
     }

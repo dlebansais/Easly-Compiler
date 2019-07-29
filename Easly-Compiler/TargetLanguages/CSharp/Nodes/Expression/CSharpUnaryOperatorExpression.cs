@@ -239,6 +239,7 @@
             WriteDown = true;
 
             RightExpression.SetWriteDown();
+            FeatureCall.SetWriteDown();
         }
         #endregion
     }

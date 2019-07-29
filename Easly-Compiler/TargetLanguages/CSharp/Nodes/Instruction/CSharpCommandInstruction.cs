@@ -209,8 +209,7 @@
 
             WriteDown = true;
 
-            foreach (ICSharpArgument Argument in FeatureCall.ArgumentList)
-                Argument.SetWriteDown();
+            FeatureCall.SetWriteDown();
         }
         #endregion
     }

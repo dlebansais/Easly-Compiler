@@ -7,7 +7,7 @@
     /// <summary>
     /// Feature call information.
     /// </summary>
-    public interface ICSharpFeatureCall
+    public interface ICSharpFeatureCall : ICSharpOutputNode
     {
         /// <summary>
         /// The list of parameters for the selected overload.
@@ -106,6 +106,31 @@
         public virtual string CallText()
         {
             return string.Empty;
+        }
+        #endregion
+
+        #region Implementation of ICSharpOutputNode
+        /// <summary>
+        /// True if the node should be produced.
+        /// </summary>
+        public bool WriteDown { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="ICSharpOutputNode.WriteDown"/> flag.
+        /// </summary>
+        public void SetWriteDown()
+        {
+            if (WriteDown)
+                return;
+
+            WriteDown = true;
+
+            foreach (ICSharpArgument Argument in ArgumentList)
+                Argument.SetWriteDown();
+
+            foreach (ICSharpParameter Parameter in ParameterList)
+                if (Parameter.Feature.DefaultValue != null)
+                    Parameter.Feature.DefaultValue.SetWriteDown();
         }
         #endregion
     }

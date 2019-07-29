@@ -120,8 +120,7 @@
 
             SourceExpression.SetWriteDown();
 
-            foreach (ICSharpArgument Argument in FeatureCall.ArgumentList)
-                Argument.SetWriteDown();
+            FeatureCall.SetWriteDown();
         }
         #endregion
     }
