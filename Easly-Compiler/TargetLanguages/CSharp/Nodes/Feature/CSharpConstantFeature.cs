@@ -227,6 +227,8 @@
             WriteDown = true;
 
             ConstantExpression.SetWriteDown();
+
+            Owner.SetWriteDown();
         }
         #endregion
     }

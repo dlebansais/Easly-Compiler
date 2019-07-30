@@ -156,16 +156,44 @@
             }
             while (Continue);
 
-            foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
+            ICSharpFeature SingledClass = null;
+
+            if (SingledGuid != Guid.Empty || SingledGuid == Guid.Empty)
             {
-                ICSharpClass Class = Entry.Value;
+                foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
+                {
+                    ICSharpClass Class = Entry.Value;
+                    if (Class.Source.ClassGuid == SingledGuid || SingledGuid == Guid.Empty || SingledGuid != Guid.Empty)
+                    {
+                        foreach (ICSharpFeature Feature in Class.FeatureList)
+                            if (Feature is ICSharpFeatureWithName AsWithName && AsWithName.Name == SingledName)
+                            {
+                                SingledClass = Feature;
+                                break;
+                            }
+                    }
 
-                foreach (ICSharpFeature Feature in Class.FeatureList)
-                    Feature.SetWriteDown();
-
-                foreach (ICSharpAssertion Invariant in Class.InvariantList)
-                    Invariant.SetWriteDown();
+                    if (SingledClass != null)
+                        break;
+                }
             }
+
+            if (SingledClass == null)
+            {
+                foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
+                {
+                    ICSharpClass Class = Entry.Value;
+                    Class.SetWriteDown();
+
+                    foreach (ICSharpFeature Feature in Class.FeatureList)
+                        Feature.SetWriteDown();
+
+                    foreach (ICSharpAssertion Invariant in Class.InvariantList)
+                        Invariant.SetWriteDown();
+                }
+            }
+            else
+                SingledClass.SetWriteDown();
 
             if (!Directory.Exists(OutputRootFolder))
                 Directory.CreateDirectory(OutputRootFolder);
@@ -174,7 +202,8 @@
             {
                 ICSharpClass Class = Entry.Value;
                 if (!CSharpClass.IsLanguageClass(Class.Source) && !IsClassFromLibrary(Class.Source))
-                    Class.Write(OutputRootFolder, Namespace);
+                    if (Class.WriteDown)
+                        Class.Write(OutputRootFolder, Namespace);
             }
         }
 

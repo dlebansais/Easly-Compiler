@@ -215,6 +215,8 @@
 
             foreach (ICSharpAssertion Assertion in EnsureList)
                 Assertion.SetWriteDown();
+
+            Owner.SetWriteDown();
         }
         #endregion
     }

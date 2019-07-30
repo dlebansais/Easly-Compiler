@@ -163,6 +163,8 @@
 
             foreach (ICSharpOverload Overload in OverloadList)
                 Overload.SetWriteDown();
+
+            Owner.SetWriteDown();
         }
         #endregion
     }

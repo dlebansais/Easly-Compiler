@@ -14,6 +14,8 @@
             string ErrorFileName;
             string OutputRootFolder;
             bool ActivateVerification;
+            Guid SingledGuid;
+            string SingledName;
 
             try
             {
@@ -25,6 +27,13 @@
                 ErrorFileName = args[2];
                 OutputRootFolder = args[3];
                 ActivateVerification = args.Length > 4 && args[4] == "V";
+
+                if (args.Length > 5 && Guid.TryParse(args[5], out Guid Singled))
+                    SingledGuid = Singled;
+                else
+                    SingledGuid = Guid.Empty;
+
+                SingledName = args.Length > 6 ? args[6] : null;
 
                 if (string.IsNullOrEmpty(Namespace) || string.IsNullOrEmpty(SourceFileName) || string.IsNullOrEmpty(ErrorFileName) || string.IsNullOrEmpty(OutputRootFolder))
                     return -1;
@@ -40,7 +49,7 @@
 
             try
             {
-                return Compile(Namespace, SourceFileName, ErrorFileName, OutputRootFolder, ActivateVerification);
+                return Compile(Namespace, SourceFileName, ErrorFileName, OutputRootFolder, ActivateVerification, SingledGuid, SingledName);
             }
             catch (Exception e)
             {
@@ -49,7 +58,7 @@
             }
         }
 
-        private static int Compile(string Namespace, string SourceFileName, string ErrorFileName, string OutputRootFolder, bool ActivateVerification)
+        private static int Compile(string Namespace, string SourceFileName, string ErrorFileName, string OutputRootFolder, bool ActivateVerification, Guid singledGuid, string singledName)
         {
             Compiler c = new Compiler();
             c.Compile(SourceFileName);
@@ -59,6 +68,8 @@
             {
                 TargetCSharp t = new TargetCSharp(c, Namespace);
                 t.OutputRootFolder = OutputRootFolder;
+                t.SingledGuid = singledGuid;
+                t.SingledName = singledName;
                 t.Translate();
 
                 ErrorList = t.ErrorList;

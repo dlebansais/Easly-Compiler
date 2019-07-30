@@ -219,7 +219,13 @@
         /// </summary>
         public override void SetWriteDown()
         {
+            if (WriteDown)
+                return;
+
             WriteDown = true;
+
+            if (Owner != null)
+                Owner.SetWriteDown();
         }
         #endregion
     }

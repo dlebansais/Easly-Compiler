@@ -401,6 +401,8 @@
 
             if (SetterBody is ICSharpEffectiveBody AsEffectiveSetterBody)
                 AsEffectiveSetterBody.SetWriteDown();
+
+            Owner.SetWriteDown();
         }
         #endregion
     }
