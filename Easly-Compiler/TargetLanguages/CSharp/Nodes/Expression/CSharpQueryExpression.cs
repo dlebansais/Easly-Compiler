@@ -400,14 +400,7 @@
             {
             }
 
-            Process Compiler = new Process();
-            Compiler.StartInfo.UseShellExecute = false;
-            Compiler.StartInfo.FileName = Path.Combine(ExeFolder, "Compiler.exe");
-            Compiler.StartInfo.FileName = @"C:\Projects\Easly-Compiler\Compiler\bin\x64\Debug\Compiler.exe";
-            Compiler.StartInfo.Arguments = $"BaseNode \"{writer.SourceFileName}\" \"{ErrorFileName}\" \"{OutputFolder}\" NV {GuidText} {FeatureName}";
-            Compiler.StartInfo.CreateNoWindow = true;
-            Compiler.Start();
-
+            StartProcess(Path.Combine(ExeFolder, "Compiler.exe"), $"BaseNode \"{writer.SourceFileName}\" \"{ErrorFileName}\" \"{OutputFolder}\" NV {GuidText} {FeatureName}", false, out Process Compiler);
             Compiler.WaitForExit();
 
             string SpecialFileName = Path.Combine(OutputFolder, "SpecialMain.cs");
@@ -430,30 +423,18 @@
                 }
             }
 
-            Process Builder = new Process();
-            Builder.StartInfo.UseShellExecute = false;
-            Builder.StartInfo.FileName = @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\msbuild.exe";
-            Builder.StartInfo.Arguments = $"\"{OutputFolder}/CSharpProject.sln\"";
-            Builder.StartInfo.CreateNoWindow = true;
-            Builder.Start();
-
+            StartProcess(@"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\msbuild.exe", $"\"{OutputFolder}/CSharpProject.sln\"", false, out Process Builder);
             Builder.WaitForExit();
 
             try
             {
-                File.Copy($"{OutputFolder}/bin/Debug/CSharpProject.dll", @"C:\Projects\Easly-Compiler\Test\bin\x64\Debug\CSharpProject.dll", true);
+                File.Copy($"{OutputFolder}/bin/Debug/CSharpProject.dll", Path.Combine(ExeFolder, "CSharpProject.dll"), true);
             }
             catch
             {
             }
 
-            Process ConstantComputation = new Process();
-            ConstantComputation.StartInfo.UseShellExecute = false;
-            ConstantComputation.StartInfo.FileName = Path.Combine(ExeFolder, "ConstantComputation.exe");
-            ConstantComputation.StartInfo.FileName = @"C:\Projects\Easly-Compiler\Test\bin\x64\Debug\ConstantComputation.exe";
-            ConstantComputation.StartInfo.RedirectStandardOutput = true;
-            ConstantComputation.StartInfo.CreateNoWindow = true;
-            ConstantComputation.Start();
+            StartProcess(Path.Combine(ExeFolder, "ConstantComputation.exe"), null, true, out Process ConstantComputation);
 
             string Line = string.Empty;
             while (!ConstantComputation.StandardOutput.EndOfStream)
@@ -462,6 +443,27 @@
             }
 
             return Line;
+        }
+
+        private static void StartProcess(string fileName, string arguments, bool redirectStandardOutput, out Process process)
+        {
+            using (FileStream fs = new FileStream(@"C:\Projects\Easly-Language\info.txt", FileMode.Append, FileAccess.Write))
+            {
+                using (StreamWriter sw = new StreamWriter(fs))
+                {
+                    sw.WriteLine(fileName);
+                    sw.WriteLine(arguments);
+                    sw.WriteLine(redirectStandardOutput.ToString());
+                }
+            }
+
+            process = new Process();
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.FileName = fileName;
+            process.StartInfo.Arguments = arguments;
+            process.StartInfo.RedirectStandardOutput = redirectStandardOutput;
+            process.StartInfo.CreateNoWindow = true;
+            process.Start();
         }
         #endregion
 

@@ -97,6 +97,10 @@
     <PostBuildEvent>if not exist $(SolutionDir)\Test\bin\ mkdir $(SolutionDir)\Test\bin
 if not exist $(SolutionDir)\Test\bin\$(Platform)\ mkdir $(SolutionDir)\Test\bin\$(Platform)
 if not exist $(SolutionDir)\Test\bin\$(Platform)\$(Configuration)\ mkdir $(SolutionDir)\Test\bin\$(Platform)\$(Configuration)
-copy $(TargetPath) $(SolutionDir)\Test\bin\$(Platform)\$(Configuration)\$(TargetFileName)</PostBuildEvent>
+copy $(TargetPath) $(SolutionDir)\Test\bin\$(Platform)\$(Configuration)\$(TargetFileName)
+if not exist $(SolutionDir)\Easly-Compiler\bin\ mkdir $(SolutionDir)\Easly-Compiler\bin
+if not exist $(SolutionDir)\Easly-Compiler\bin\$(Platform)\ mkdir $(SolutionDir)\Easly-Compiler\bin\$(Platform)
+if not exist $(SolutionDir)\Easly-Compiler\bin\$(Platform)\$(Configuration)\ mkdir $(SolutionDir)\Easly-Compiler\bin\$(Platform)\$(Configuration)
+copy $(TargetPath) $(SolutionDir)\Easly-Compiler\bin\$(Platform)\$(Configuration)\$(TargetFileName)</PostBuildEvent>
   </PropertyGroup>
 </Project>
