@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace EaslyCompiler
+﻿namespace EaslyCompiler
 {
+    using System;
+
     /// <summary>
     /// An interface to write down source code from compiled Easly nodes.
     /// </summary>

@@ -199,7 +199,9 @@
         /// </summary>
         /// <param name="folder">The output root folder.</param>
         /// <param name="defaultNamespace">Namespace for the output code.</param>
-        void Write(string folder, string defaultNamespace);
+        /// <param name="sourceFileName">The source file name.</param>
+        /// <param name="singledClassFeature">The singled feature. can be null.</param>
+        void Write(string folder, string defaultNamespace, string sourceFileName, ICSharpFeature singledClassFeature);
 
         /// <summary>
         /// Gets the full name of a class.
@@ -710,13 +712,15 @@
         /// </summary>
         /// <param name="rootFolder">The output root folder.</param>
         /// <param name="defaultNamespace">Namespace for the output code.</param>
-        public void Write(string rootFolder, string defaultNamespace)
+        /// <param name="sourceFileName">The source file name.</param>
+        /// <param name="singledClassFeature">The singled feature. can be null.</param>
+        public void Write(string rootFolder, string defaultNamespace, string sourceFileName, ICSharpFeature singledClassFeature)
         {
             try
             {
                 string SourceName = Source.FromIdentifier.IsAssigned ? ((IIdentifier)Source.FromIdentifier.Item).ValidText.Item : null;
                 string ClassFileName = $"{ValidClassName}.cs";
-                LocateOrCreatePath(rootFolder, SourceName, ClassFileName, out string FilePath);
+                LocateOrCreatePath(rootFolder, SourceName, ClassFileName, singledClassFeature, out string FilePath);
 
                 string OutputFolder = Path.GetDirectoryName(FilePath);
                 if (!Directory.Exists(OutputFolder))
@@ -724,7 +728,7 @@
 
                 using (FileStream Stream = new FileStream(FilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
                 {
-                    using (CSharpWriter Writer = new CSharpWriter(Stream, defaultNamespace))
+                    using (CSharpWriter Writer = new CSharpWriter(Stream, defaultNamespace, sourceFileName, rootFolder))
                     {
                         Write(Writer);
                     }
@@ -737,10 +741,10 @@
             }
         }
 
-        private void LocateOrCreatePath(string rootFolder, string sourceName, string classFileName, out string filePath)
+        private void LocateOrCreatePath(string rootFolder, string sourceName, string classFileName, ICSharpFeature singledClassFeature, out string filePath)
         {
-            LocateOrCreateSolution(rootFolder, out string SolutionFullPath);
-            LocateOrCreateProject(SolutionFullPath, out string ProjectFullPath);
+            LocateOrCreateSolution(rootFolder, singledClassFeature, out string SolutionFullPath);
+            LocateOrCreateProject(SolutionFullPath, singledClassFeature, out string ProjectFullPath);
 
             List<string> LineList = new List<string>();
 
@@ -829,16 +833,16 @@
             }
         }
 
-        private static void LocateOrCreateSolution(string rootFolder, out string solutionFullPath)
+        private static void LocateOrCreateSolution(string rootFolder, ICSharpFeature singledClassFeature, out string solutionFullPath)
         {
             string[] Solutions = Directory.GetFiles(rootFolder, "*.sln");
             if (Solutions.Length > 0)
                 solutionFullPath = Solutions[0];
             else
-                CreateSolution(rootFolder, out solutionFullPath);
+                CreateSolution(rootFolder, singledClassFeature, out solutionFullPath);
         }
 
-        private static void LocateOrCreateProject(string solutionFullPath, out string projectFullPath)
+        private static void LocateOrCreateProject(string solutionFullPath, ICSharpFeature singledClassFeature, out string projectFullPath)
         {
             List<string> LineList = new List<string>();
 
@@ -893,7 +897,7 @@
             }
 
             Guid ProjectGuid;
-            CreateProject(Path.GetDirectoryName(solutionFullPath), out projectFullPath, out ProjectGuid);
+            CreateProject(Path.GetDirectoryName(solutionFullPath), singledClassFeature, out projectFullPath, out ProjectGuid);
 
             string ProjectName = Path.GetFileNameWithoutExtension(projectFullPath);
             string ProjectFile = Path.GetFileName(projectFullPath);
@@ -961,13 +965,13 @@
             }
         }
 
-        private static void CreateSolution(string rootFolder, out string solutionFullPath)
+        private static void CreateSolution(string rootFolder, ICSharpFeature singledClassFeature, out string solutionFullPath)
         {
             solutionFullPath = Path.Combine(rootFolder, "CSharpProject.sln");
 
             string ProjectFullPath;
             Guid ProjectGuid;
-            CreateProject(rootFolder, out ProjectFullPath, out ProjectGuid);
+            CreateProject(rootFolder, singledClassFeature, out ProjectFullPath, out ProjectGuid);
 
             string ProjectName = Path.GetFileNameWithoutExtension(ProjectFullPath);
             string ProjectFile = Path.GetFileName(ProjectFullPath);
@@ -1023,7 +1027,7 @@
             return false;
         }
 
-        private static void CreateProject(string rootFolder, out string projectFullPath, out Guid projectGuid)
+        private static void CreateProject(string rootFolder, ICSharpFeature singledClassFeature, out string projectFullPath, out Guid projectGuid)
         {
             projectFullPath = Path.Combine(rootFolder, "CSharpProject.csproj");
             projectGuid = Guid.NewGuid();
@@ -1105,6 +1109,10 @@
                     sw.WriteLine("    <Compile Include=\"Language\\Entity\\FeatureEntity\\ProcedureEntity.cs\" />");
                     sw.WriteLine("    <Compile Include=\"Language\\Entity\\FeatureEntity\\PropertyEntity.cs\" />");
                     sw.WriteLine("    <Compile Include=\"Properties\\AssemblyInfo.cs\" />");
+
+                    if (singledClassFeature != null)
+                        sw.WriteLine("    <Compile Include=\"SpecialMain.cs\" />");
+
                     sw.WriteLine("  </ItemGroup>");
                     sw.WriteLine("  <Import Project=\"$(MSBuildToolsPath)\\Microsoft.CSharp.targets\" />");
                     sw.WriteLine("  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. ");

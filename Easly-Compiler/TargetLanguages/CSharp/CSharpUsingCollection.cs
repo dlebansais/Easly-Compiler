@@ -13,6 +13,16 @@
         string DefaultNamespace { get; }
 
         /// <summary>
+        /// Gets the source file name.
+        /// </summary>
+        string SourceFileName { get; }
+
+        /// <summary>
+        /// Gets the output folder.
+        /// </summary>
+        string OutputFolder { get; }
+
+        /// <summary>
         /// Map of attached variable names.
         /// </summary>
         IDictionary<string, string> AttachmentMap { get; }

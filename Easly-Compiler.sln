@@ -9,6 +9,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compiler", "Compiler\Compiler.csproj", "{4C12A1EF-41AA-48E5-A8E7-399AF43246EB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConstantComputation", "ConstantComputation\ConstantComputation.csproj", "{AC0BE6E8-0993-4C1B-A0ED-A7B954FF2941}"
+	ProjectSection(ProjectDependencies) = postProject
+		{57CE1130-80A6-48A7-8957-E09027938A5B} = {57CE1130-80A6-48A7-8957-E09027938A5B}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpProject", "CSharpProject\CSharpProject.csproj", "{57CE1130-80A6-48A7-8957-E09027938A5B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -32,6 +39,16 @@ Global
 		{4C12A1EF-41AA-48E5-A8E7-399AF43246EB}.Release|x64.ActiveCfg = Release|x64
 		{4C12A1EF-41AA-48E5-A8E7-399AF43246EB}.Release|x64.Build.0 = Release|x64
 		{4C12A1EF-41AA-48E5-A8E7-399AF43246EB}.Travis|x64.ActiveCfg = Travis|x64
+		{AC0BE6E8-0993-4C1B-A0ED-A7B954FF2941}.Debug|x64.ActiveCfg = Debug|x64
+		{AC0BE6E8-0993-4C1B-A0ED-A7B954FF2941}.Debug|x64.Build.0 = Debug|x64
+		{AC0BE6E8-0993-4C1B-A0ED-A7B954FF2941}.Release|x64.ActiveCfg = Release|x64
+		{AC0BE6E8-0993-4C1B-A0ED-A7B954FF2941}.Release|x64.Build.0 = Release|x64
+		{AC0BE6E8-0993-4C1B-A0ED-A7B954FF2941}.Travis|x64.ActiveCfg = Travis|x64
+		{57CE1130-80A6-48A7-8957-E09027938A5B}.Debug|x64.ActiveCfg = Debug|x64
+		{57CE1130-80A6-48A7-8957-E09027938A5B}.Debug|x64.Build.0 = Debug|x64
+		{57CE1130-80A6-48A7-8957-E09027938A5B}.Release|x64.ActiveCfg = Release|x64
+		{57CE1130-80A6-48A7-8957-E09027938A5B}.Release|x64.Build.0 = Release|x64
+		{57CE1130-80A6-48A7-8957-E09027938A5B}.Travis|x64.ActiveCfg = Travis|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

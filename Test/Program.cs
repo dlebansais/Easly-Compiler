@@ -44,8 +44,9 @@
         {
             TargetCSharp t = new TargetCSharp(c, "Test");
             t.OutputRootFolder = "../../../Output";
-            t.SingledName = "Square";
-            t.SingledGuid = Guid.Parse("{3c6aa68f-d758-4776-8afb-8075f5337403}");
+            t.SourceFileName = c.FileName;
+            //t.SingledName = "Square";
+            //t.SingledGuid = Guid.Parse("{3c6aa68f-d758-4776-8afb-8075f5337403}");
 
             return t;
         }

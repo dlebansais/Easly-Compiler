@@ -2,6 +2,8 @@
 {
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
+    using System.Reflection;
     using CompilerNode;
     using Easly;
 
@@ -345,7 +347,7 @@
 
         private void ComputeFeature(ICSharpWriter writer)
         {
-            ComputedValue = ComputeQueryResult(writer, Feature, FeatureCall);
+            ComputedValue = ComputeQueryResult(writer, Feature as ICSharpFeatureWithName, FeatureCall);
         }
 
         private void ComputeDiscrete(ICSharpWriter writer)
@@ -359,10 +361,107 @@
             ComputedValue = AssignedDiscreteTable[Discrete.Source];
         }
 
-        public static string ComputeQueryResult(ICSharpWriter writer, ICSharpFeature feature, ICSharpFeatureCall featureCall)
+        /// <summary>
+        /// Computes the result of a call with constant arguments.
+        /// </summary>
+        /// <param name="writer">The stream on which to write.</param>
+        /// <param name="feature">The feature called.</param>
+        /// <param name="featureCall">Arguments of the call.</param>
+        public static string ComputeQueryResult(ICSharpWriter writer, ICSharpFeatureWithName feature, ICSharpFeatureCall featureCall)
         {
-            //TODO
-            return "TODO";
+            string FeatureArguments = string.Empty;
+            foreach (ICSharpArgument Argument in featureCall.ArgumentList)
+            {
+                ICSharpExpression SourceExpression = Argument.SourceExpression;
+                string SourceExpressionValue = ComputeNestedExpression(writer, SourceExpression);
+
+                if (FeatureArguments.Length > 0)
+                    FeatureArguments += ", ";
+
+                FeatureArguments += SourceExpressionValue;
+            }
+
+            string FeatureName = feature != null ? feature.Name : null;
+            string GuidText = feature.Owner.Source.ClassGuid.ToString();
+
+            Assembly CurrentAssembly = Assembly.GetExecutingAssembly();
+            string ExeFolder = Path.GetDirectoryName(CurrentAssembly.Location);
+            string ErrorFileName = Path.Combine(writer.OutputFolder, "Temp", "error.txt");
+            string OutputFolder = Path.Combine(writer.OutputFolder, "Temp");
+
+            if (Directory.Exists(OutputFolder))
+                try { Directory.Delete(OutputFolder, true); } catch { }
+
+            try
+            {
+                Directory.CreateDirectory(OutputFolder);
+            }
+            catch
+            {
+            }
+
+            Process Compiler = new Process();
+            Compiler.StartInfo.UseShellExecute = false;
+            Compiler.StartInfo.FileName = Path.Combine(ExeFolder, "Compiler.exe");
+            Compiler.StartInfo.FileName = @"C:\Projects\Easly-Compiler\Compiler\bin\x64\Debug\Compiler.exe";
+            Compiler.StartInfo.Arguments = $"BaseNode \"{writer.SourceFileName}\" \"{ErrorFileName}\" \"{OutputFolder}\" NV {GuidText} {FeatureName}";
+            Compiler.StartInfo.CreateNoWindow = true;
+            Compiler.Start();
+
+            Compiler.WaitForExit();
+
+            string SpecialFileName = Path.Combine(OutputFolder, "SpecialMain.cs");
+            using (FileStream fs = new FileStream(SpecialFileName, FileMode.Create, FileAccess.Write))
+            {
+                using (StreamWriter sw = new StreamWriter(fs))
+                {
+                    sw.WriteLine("namespace BaseNode");
+                    sw.WriteLine("{");
+                    sw.WriteLine("    public static class SpecialMain");
+                    sw.WriteLine("    {");
+                    sw.WriteLine("        public static string Main()");
+                    sw.WriteLine("        {");
+                    sw.WriteLine($"            var Source = new {CSharpNames.ToCSharpIdentifier(feature.Owner.ValidClassName)}();");
+                    sw.WriteLine($"            object Result = Source.{CSharpNames.ToCSharpIdentifier(FeatureName)}({FeatureArguments});");
+                    sw.WriteLine("            return Result.ToString();");
+                    sw.WriteLine("        }");
+                    sw.WriteLine("    }");
+                    sw.WriteLine("}");
+                }
+            }
+
+            Process Builder = new Process();
+            Builder.StartInfo.UseShellExecute = false;
+            Builder.StartInfo.FileName = @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\msbuild.exe";
+            Builder.StartInfo.Arguments = $"\"{OutputFolder}/CSharpProject.sln\"";
+            Builder.StartInfo.CreateNoWindow = true;
+            Builder.Start();
+
+            Builder.WaitForExit();
+
+            try
+            {
+                File.Copy($"{OutputFolder}/bin/Debug/CSharpProject.dll", @"C:\Projects\Easly-Compiler\Test\bin\x64\Debug\CSharpProject.dll", true);
+            }
+            catch
+            {
+            }
+
+            Process ConstantComputation = new Process();
+            ConstantComputation.StartInfo.UseShellExecute = false;
+            ConstantComputation.StartInfo.FileName = Path.Combine(ExeFolder, "ConstantComputation.exe");
+            ConstantComputation.StartInfo.FileName = @"C:\Projects\Easly-Compiler\Test\bin\x64\Debug\ConstantComputation.exe";
+            ConstantComputation.StartInfo.RedirectStandardOutput = true;
+            ConstantComputation.StartInfo.CreateNoWindow = true;
+            ConstantComputation.Start();
+
+            string Line = string.Empty;
+            while (!ConstantComputation.StandardOutput.EndOfStream)
+            {
+                Line = ConstantComputation.StandardOutput.ReadLine();
+            }
+
+            return Line;
         }
         #endregion
 

@@ -60,10 +60,14 @@
         /// </summary>
         /// <param name="stream">The stream to write to.</param>
         /// <param name="defaultNamespace">The default namespace.</param>
-        public CSharpWriter(Stream stream, string defaultNamespace)
+        /// <param name="sourceFileName">The source file name.</param>
+        /// <param name="outputFolder">The output folder.</param>
+        public CSharpWriter(Stream stream, string defaultNamespace, string sourceFileName, string outputFolder)
             : base(stream, Encoding.Unicode)
         {
             DefaultNamespace = defaultNamespace;
+            SourceFileName = sourceFileName;
+            OutputFolder = outputFolder;
             AutoFlush = false;
         }
         #endregion
@@ -73,6 +77,16 @@
         /// Gets the default namespace.
         /// </summary>
         public string DefaultNamespace { get; }
+
+        /// <summary>
+        /// Gets the source file name.
+        /// </summary>
+        public string SourceFileName { get; }
+
+        /// <summary>
+        /// Gets the output folder.
+        /// </summary>
+        public string OutputFolder { get; }
 
         /// <summary>
         /// Current indentation level.

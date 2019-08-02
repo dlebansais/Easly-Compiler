@@ -70,6 +70,7 @@
                 t.OutputRootFolder = OutputRootFolder;
                 t.SingledGuid = singledGuid;
                 t.SingledName = singledName;
+                t.SourceFileName = SourceFileName;
                 t.Translate();
 
                 ErrorList = t.ErrorList;

@@ -17,6 +17,11 @@
         /// Namespace for the output code.
         /// </summary>
         string Namespace { get; }
+
+        /// <summary>
+        /// The source file name.
+        /// </summary>
+        string SourceFileName { get; set; }
     }
 
     /// <summary>
@@ -42,6 +47,11 @@
         /// Namespace for the output code.
         /// </summary>
         public string Namespace { get; }
+
+        /// <summary>
+        /// The source file name.
+        /// </summary>
+        public string SourceFileName { get; set; }
         #endregion
 
         #region Client Interface
@@ -156,7 +166,7 @@
             }
             while (Continue);
 
-            ICSharpFeature SingledClass = null;
+            ICSharpFeature SingledClassFeature = null;
 
             if (SingledGuid != Guid.Empty || SingledGuid == Guid.Empty)
             {
@@ -168,17 +178,17 @@
                         foreach (ICSharpFeature Feature in Class.FeatureList)
                             if (Feature is ICSharpFeatureWithName AsWithName && AsWithName.Name == SingledName)
                             {
-                                SingledClass = Feature;
+                                SingledClassFeature = Feature;
                                 break;
                             }
                     }
 
-                    if (SingledClass != null)
+                    if (SingledClassFeature != null)
                         break;
                 }
             }
 
-            if (SingledClass == null)
+            if (SingledClassFeature == null)
             {
                 foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
                 {
@@ -193,7 +203,7 @@
                 }
             }
             else
-                SingledClass.SetWriteDown();
+                SingledClassFeature.SetWriteDown();
 
             if (!Directory.Exists(OutputRootFolder))
                 Directory.CreateDirectory(OutputRootFolder);
@@ -203,7 +213,7 @@
                 ICSharpClass Class = Entry.Value;
                 if (!CSharpClass.IsLanguageClass(Class.Source) && !IsClassFromLibrary(Class.Source))
                     if (Class.WriteDown)
-                        Class.Write(OutputRootFolder, Namespace);
+                        Class.Write(OutputRootFolder, Namespace, SourceFileName, SingledClassFeature);
             }
         }
 

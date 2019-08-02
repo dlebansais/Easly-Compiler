@@ -251,7 +251,7 @@
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
         /// <param name="expression">The expression to compute.</param>
-        protected virtual string ComputeNestedExpression(ICSharpWriter writer, ICSharpExpression expression)
+        protected static string ComputeNestedExpression(ICSharpWriter writer, ICSharpExpression expression)
         {
             string ValueString;
 

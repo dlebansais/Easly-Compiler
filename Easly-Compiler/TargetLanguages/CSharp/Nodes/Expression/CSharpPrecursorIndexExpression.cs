@@ -118,7 +118,7 @@
         public void Compute(ICSharpWriter writer)
         {
             //TODO use the precusor instead
-            ComputedValue = CSharpQueryExpression.ComputeQueryResult(writer, ParentFeature, FeatureCall);
+            ComputedValue = CSharpQueryExpression.ComputeQueryResult(writer, ParentFeature as ICSharpFeatureWithName, FeatureCall);
         }
         #endregion
 
