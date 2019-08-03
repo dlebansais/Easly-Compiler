@@ -250,7 +250,13 @@
                 ConstantExpression.SetWriteDown();
 
             if (Discrete != null)
+            {
+                int Index = Class.Source.DiscreteList.IndexOf(Discrete.Source);
+                Debug.Assert(Index >= 0);
+
                 Discrete.SetWriteDown();
+                Class.DiscreteList[Index].SetWriteDown();
+            }
         }
         #endregion
     }

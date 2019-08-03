@@ -86,6 +86,11 @@
         ISealableDictionary<ITypeName, ICompiledType> TypedefDelegateTable { get; }
 
         /// <summary>
+        /// List of initialized objects.
+        /// </summary>
+        List<ICSharpInitializedObjectExpression> InitializedObjectList { get; }
+
+        /// <summary>
         /// True if the class shares its name with another from a different 'From' source.
         /// </summary>
         bool IsSharedName { get; }
@@ -325,6 +330,11 @@
         public ISealableDictionary<ITypeName, ICompiledType> TypedefDelegateTable { get; } = new SealableDictionary<ITypeName, ICompiledType>();
 
         /// <summary>
+        /// List of initialized objects.
+        /// </summary>
+        public List<ICSharpInitializedObjectExpression> InitializedObjectList { get; } = new List<ICSharpInitializedObjectExpression>();
+
+        /// <summary>
         /// True if the class shares its name with another from a different 'From' source.
         /// </summary>
         public bool IsSharedName { get; private set; }
@@ -511,6 +521,12 @@
             {
                 ICSharpAssertion NewAssertion = CSharpAssertion.Create(context, Item);
                 InvariantList.Add(NewAssertion);
+            }
+
+            foreach (IInitializedObjectExpression InitializedObject in Source.InitializedObjectList)
+            {
+                ICSharpInitializedObjectExpression NewInitializedObject = CSharpInitializedObjectExpression.Create(context, InitializedObject);
+                InitializedObjectList.Add(NewInitializedObject);
             }
         }
 
@@ -1303,6 +1319,21 @@
             }
         }
 
+        private void WriteInitializedObjectsList(ICSharpWriter writer, bool writeAsConstant)
+        {
+            string ClassName = FullClassName2CSharpClassName(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);
+
+            for (int i = 0; i < InitializedObjectList.Count; i++)
+            {
+                ICSharpInitializedObjectExpression InitializedObject = InitializedObjectList[i];
+
+                ICSharpExpressionContext Context = new CSharpExpressionContext();
+                InitializedObject.WriteCSharpAsConstant(writer, Context);
+                string ReturnValue = Context.ReturnValue;
+                writer.WriteIndentedLine($"public static {ClassName} InitializedObject{i} = {ReturnValue};");
+            }
+        }
+
         private void WriteClass(ICSharpWriter writer)
         {
             writer.WriteIndentedLine($"namespace {writer.DefaultNamespace}");
@@ -1662,7 +1693,9 @@
             {
                 int WrittenFeatures = 0;
                 ISealableDictionary<string, ICSharpFeature> Region = RegionTable[BelongingRegion];
-                if (Region.Count > 0 || (BelongingRegion == InitRegion && ConstructorOverride != null))
+                bool HasRegionText = false;
+
+                if (Region.Count > 0 || (BelongingRegion == InitRegion && ConstructorOverride != null) || (BelongingRegion == ConstantRegion && (HasDiscreteConstants || InitializedObjectList.Count > 0)))
                 {
                     if (IsFirstRegion)
                         IsFirstRegion = false;
@@ -1673,6 +1706,7 @@
 
                     IsFirstFeature = true;
                     IsMultiline = false;
+                    HasRegionText = true;
 
                     if ((BelongingRegion == InitRegion && ConstructorOverride != null) && Region.Count == 0)
                     {
@@ -1756,6 +1790,9 @@
                 {
                     if (HasDiscreteConstants)
                         WriteDiscreteList(writer, true);
+
+                    if (InitializedObjectList.Count > 0)
+                        WriteInitializedObjectsList(writer, true);
                 }
                 else if (BelongingRegion == InitRegion)
                 {
@@ -1765,6 +1802,8 @@
                             writer.WriteEmptyLine();
                         else
                             writer.WriteIndentedLine("#region" + " " + BelongingRegion);
+
+                        HasRegionText = true;
 
                         writer.WriteIndentedLine("public" + " " + "static" + " " + ClassName + " " + "Singleton");
                         writer.WriteIndentedLine("{");
@@ -1801,6 +1840,8 @@
                         else
                             writer.WriteIndentedLine("#region" + " " + BelongingRegion);
 
+                        HasRegionText = true;
+
                         writer.WriteIndentedLine("static" + " " + ClassName + "(" + ")");
                         writer.WriteIndentedLine("{");
                         writer.IncreaseIndent();
@@ -1832,7 +1873,7 @@
                     }
                 }
 
-                if (WrittenFeatures > 0)
+                if (HasRegionText)
                     writer.WriteIndentedLine("#endregion");
             }
 

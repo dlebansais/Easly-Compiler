@@ -331,6 +331,11 @@ namespace CompilerNode
         /// True if the class contains at least one extern body.
         /// </summary>
         bool HasExternBody { get; }
+
+        /// <summary>
+        /// List of initialized objects of this class.
+        /// </summary>
+        ISealableList<IInitializedObjectExpression> InitializedObjectList { get; }
     }
 
     /// <summary>
@@ -682,6 +687,7 @@ namespace CompilerNode
                 ResolvedNodeWithDefaultList = new OnceReference<IList<IExpression>>();
                 ResolvedNodeWithNumberConstantList = new OnceReference<IList<IExpression>>();
                 InheritedBodyTagListTable = new SealableDictionary<IClassType, IList<IBody>>();
+                InitializedObjectList = new SealableList<IInitializedObjectExpression>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
@@ -1248,6 +1254,11 @@ namespace CompilerNode
                 return Result;
             }
         }
+
+        /// <summary>
+        /// List of initialized objects of this class.
+        /// </summary>
+        public ISealableList<IInitializedObjectExpression> InitializedObjectList { get; private set; } = new SealableList<IInitializedObjectExpression>();
         #endregion
 
         #region Debugging

@@ -80,6 +80,9 @@
             Debug.Assert(node.AssignedFeatureTable.Count == 0);
             node.AssignedFeatureTable.Merge(AssignedFeatureTable);
             node.AssignedFeatureTable.Seal();
+
+            IClass BaseClass = InitializedObjectType.BaseClass;
+            BaseClass.InitializedObjectList.Add(node);
         }
         #endregion
     }

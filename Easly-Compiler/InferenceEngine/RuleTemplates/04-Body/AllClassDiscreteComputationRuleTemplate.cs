@@ -67,6 +67,9 @@
                     AssignedDiscreteTable.Add(Discrete, Guid.NewGuid().ToString());
 
             AssignedDiscreteTable.Seal();
+
+            // Also seal the filled list.
+            node.InitializedObjectList.Seal();
         }
         #endregion
     }

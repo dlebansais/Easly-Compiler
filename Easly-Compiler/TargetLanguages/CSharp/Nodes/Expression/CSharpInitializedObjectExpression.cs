@@ -23,6 +23,13 @@
         /// The list of assignments.
         /// </summary>
         IList<ICSharpAssignmentArgument> AssignmentList { get; }
+
+        /// <summary>
+        /// Gets the source code corresponding to the expression.
+        /// </summary>
+        /// <param name="writer">The stream on which to write.</param>
+        /// <param name="expressionContext">The context.</param>
+        void WriteCSharpAsConstant(ICSharpWriter writer, ICSharpExpressionContext expressionContext);
     }
 
     /// <summary>
@@ -94,23 +101,40 @@
         public override void WriteCSharp(ICSharpWriter writer, ICSharpExpressionContext expressionContext, int skippedIndex)
         {
             Debug.Assert(WriteDown);
+            Debug.Assert(Class.Source.InitializedObjectList.Contains(Source));
+
+            string ClassNameText = CSharpNames.ToCSharpIdentifier(Class.ValidClassName);
+            int Index = Class.Source.InitializedObjectList.IndexOf(Source);
+
+            expressionContext.SetSingleReturnValue($"{ClassNameText}.InitializedObject{Index}");
+        }
+
+        /// <summary>
+        /// Gets the source code corresponding to the expression.
+        /// </summary>
+        /// <param name="writer">The stream on which to write.</param>
+        /// <param name="expressionContext">The context.</param>
+        public void WriteCSharpAsConstant(ICSharpWriter writer, ICSharpExpressionContext expressionContext)
+        {
+            Debug.Assert(WriteDown);
+            Debug.Assert(Class.Source.InitializedObjectList.Contains(Source));
 
             string ClassNameText = CSharpNames.ToCSharpIdentifier(Class.ValidClassName);
 
             string AssignmentText = string.Empty;
             foreach (ICSharpAssignmentArgument Assignment in AssignmentList)
             {
-                if (AssignmentText.Length > 0)
-                    AssignmentText += ", ";
-
                 ICSharpExpression SourceExpression = Assignment.SourceExpression;
                 string ExpressionText = SingleResultExpressionText(writer, SourceExpression);
 
-                //TODO: handle more than one parameter name
-                string AssignedField = Assignment.ParameterNameList[0];
-                string AssignedFieldText = CSharpNames.ToCSharpIdentifier(AssignedField);
+                foreach (string AssignedField in Assignment.ParameterNameList)
+                {
+                    if (AssignmentText.Length > 0)
+                        AssignmentText += ", ";
 
-                AssignmentText += $"{AssignedFieldText} = {ExpressionText}";
+                    string AssignedFieldText = CSharpNames.ToCSharpIdentifier(AssignedField);
+                    AssignmentText += $"{AssignedFieldText} = {ExpressionText}";
+                }
             }
 
             expressionContext.SetSingleReturnValue($"new {ClassNameText}() {{ {AssignmentText} }}");
@@ -130,7 +154,18 @@
         /// </summary>
         public override void SetWriteDown()
         {
+            if (WriteDown)
+                return;
+
             WriteDown = true;
+
+            foreach (ICSharpAssignmentArgument Argument in AssignmentList)
+                Argument.SetWriteDown();
+
+            int Index = Class.Source.InitializedObjectList.IndexOf(Source);
+            Debug.Assert(Index >= 0);
+
+            Class.InitializedObjectList[Index].SetWriteDown();
         }
         #endregion
     }
