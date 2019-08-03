@@ -67,6 +67,8 @@
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public override void CheckNumberType(ref bool isChanged)
         {
+            SourceExpression.CheckNumberType(ref isChanged);
+            UpdateNumberType(SourceExpression, ref isChanged);
         }
 
         /// <summary>

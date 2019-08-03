@@ -108,6 +108,12 @@
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public override void CheckNumberType(ref bool isChanged)
         {
+            ((ICSharpFeature)PrecursorFeature).CheckNumberType(ref isChanged);
+            if (SelectedOverloadType.ResultList.Count == 1)
+            {
+                ICSharpParameter Result = SelectedOverloadType.ResultList[0];
+                UpdateNumberType(Result.Feature.Type, ref isChanged);
+            }
         }
 
         /// <summary>

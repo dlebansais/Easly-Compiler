@@ -199,6 +199,22 @@
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public override void CheckNumberType(ref bool isChanged)
         {
+            if (NumberType == CSharpNumberTypes.NotApplicable || NumberType == CSharpNumberTypes.Unknown)
+            {
+                if (Discrete != null)
+                    NumberType = CSharpNumberTypes.Integer;
+
+                if (Feature != null)
+                {
+                    Feature.CheckNumberType(ref isChanged);
+
+                    if (SelectedOverloadType.ResultList.Count == 1)
+                    {
+                        ICSharpParameter Result = SelectedOverloadType.ResultList[0];
+                        UpdateNumberType(Result.Feature.Type, ref isChanged);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -447,6 +463,7 @@
 
         private static void StartProcess(string fileName, string arguments, bool redirectStandardOutput, out Process process)
         {
+            /*
             using (FileStream fs = new FileStream(@"C:\Projects\Easly-Language\info.txt", FileMode.Append, FileAccess.Write))
             {
                 using (StreamWriter sw = new StreamWriter(fs))
@@ -455,7 +472,7 @@
                     sw.WriteLine(arguments);
                     sw.WriteLine(redirectStandardOutput.ToString());
                 }
-            }
+            }*/
 
             process = new Process();
             process.StartInfo.UseShellExecute = false;

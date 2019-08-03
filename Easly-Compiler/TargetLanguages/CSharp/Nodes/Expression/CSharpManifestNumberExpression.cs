@@ -72,6 +72,14 @@
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public override void CheckNumberType(ref bool isChanged)
         {
+            if (NumberType == CSharpNumberTypes.NotApplicable || NumberType == CSharpNumberTypes.Unknown)
+            {
+                FormattedNumber n = Parser.Parse(Source.ValidText.Item);
+                if (n is FormattedInteger)
+                    NumberType = CSharpNumberTypes.Integer;
+                else
+                    NumberType = CSharpNumberTypes.Real;
+            }
         }
 
         /// <summary>

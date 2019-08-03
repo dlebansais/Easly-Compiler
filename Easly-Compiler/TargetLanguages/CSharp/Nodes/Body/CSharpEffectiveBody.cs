@@ -33,6 +33,12 @@
         /// <param name="skipFirstInstruction">Skip the first instruction.</param>
         /// <param name="initialisationStringList">List of initializations.</param>
         void WriteCSharp(ICSharpWriter writer, CSharpBodyFlags flags, string resultType, bool skipFirstInstruction, IList<string> initialisationStringList);
+
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        void CheckNumberType(ref bool isChanged);
     }
 
     /// <summary>
@@ -288,6 +294,16 @@
 
             writer.DecreaseIndent();
             writer.WriteIndentedLine("}");
+        }
+
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public void CheckNumberType(ref bool isChanged)
+        {
+            foreach (ICSharpScopeAttributeFeature EntityDeclaration in EntityDeclarationList)
+                ((ICSharpFeature)EntityDeclaration).CheckNumberType(ref isChanged);
         }
         #endregion
 

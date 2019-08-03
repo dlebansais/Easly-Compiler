@@ -29,6 +29,11 @@
         /// The feature call.
         /// </summary>
         ICSharpFeatureCall FeatureCall { get; }
+
+        /// <summary>
+        /// The selected overload type.
+        /// </summary>
+        ICSharpQueryOverloadType SelectedOverloadType { get; }
     }
 
     /// <summary>
@@ -74,6 +79,11 @@
             {
                 Debug.Assert(ResolvedRightResult.Count == 1);
             }
+
+            Debug.Assert(Source.SelectedOverload.IsAssigned);
+            IQueryOverload Overload = Source.SelectedOverload.Item;
+            IQueryOverloadType ResolvedAssociatedType = Overload.ResolvedAssociatedType.Item;
+            SelectedOverloadType = CSharpQueryOverloadType.Create(context, ResolvedAssociatedType, Operator.Owner);
         }
         #endregion
 
@@ -99,6 +109,11 @@
         public ICSharpFeatureCall FeatureCall { get; }
 
         /// <summary>
+        /// The selected overload type.
+        /// </summary>
+        public ICSharpQueryOverloadType SelectedOverloadType { get; }
+
+        /// <summary>
         /// True if calling a feature of the Number class.
         /// </summary>
         public bool IsCallingNumberFeature { get; }
@@ -111,6 +126,12 @@
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public override void CheckNumberType(ref bool isChanged)
         {
+            ((ICSharpFeature)Operator).CheckNumberType(ref isChanged);
+            if (SelectedOverloadType.ResultList.Count == 1)
+            {
+                ICSharpParameter Result = SelectedOverloadType.ResultList[0];
+                UpdateNumberType(Result.Feature.Type, ref isChanged);
+            }
         }
 
         /// <summary>

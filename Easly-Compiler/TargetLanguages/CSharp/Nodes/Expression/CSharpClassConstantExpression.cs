@@ -109,6 +109,22 @@
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public override void CheckNumberType(ref bool isChanged)
         {
+            ConstantExpression.CheckNumberType(ref isChanged);
+
+            if (Discrete != null)
+            {
+                if (NumberType == CSharpNumberTypes.NotApplicable || NumberType == CSharpNumberTypes.Unknown)
+                {
+                    NumberType = CSharpNumberTypes.Integer;
+                    isChanged = true;
+                }
+            }
+
+            if (Feature != null && ConstantExpression != null)
+            {
+                ConstantExpression.CheckNumberType(ref isChanged);
+                UpdateNumberType(ConstantExpression, ref isChanged);
+            }
         }
 
         /// <summary>

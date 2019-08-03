@@ -276,6 +276,37 @@
 
             return ValueString;
         }
+
+        /// <summary>
+        /// Updates the number type of the expression from a type.
+        /// </summary>
+        /// <param name="type">The type that may be a number.</param>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        protected void UpdateNumberType(ICSharpType type, ref bool isChanged)
+        {
+            if (type.IsNumberType && (NumberType == CSharpNumberTypes.NotApplicable || NumberType == CSharpNumberTypes.Unknown))
+            {
+                if (type.NumberType == CSharpNumberTypes.Integer || type.NumberType == CSharpNumberTypes.Real)
+                {
+                    NumberType = type.NumberType;
+                    isChanged = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates the number type of the expression from an expression.
+        /// </summary>
+        /// <param name="expression">The expression that may be a number.</param>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        protected void UpdateNumberType(ICSharpExpression expression, ref bool isChanged)
+        {
+            if ((expression.NumberType != CSharpNumberTypes.NotApplicable && expression.NumberType != CSharpNumberTypes.Unknown) && (NumberType == CSharpNumberTypes.NotApplicable || NumberType == CSharpNumberTypes.Unknown))
+            {
+                NumberType = expression.NumberType;
+                isChanged = true;
+            }
+        }
         #endregion
 
         #region Implementation of ICSharpOutputNode

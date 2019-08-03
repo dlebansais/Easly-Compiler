@@ -145,7 +145,8 @@
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public override void CheckNumberType(ref bool isChanged)
         {
-            //TODO
+            foreach (ICSharpQueryOverload Overload in OverloadList)
+                Overload.CheckNumberType(ref isChanged);
         }
 
         /// <summary>
