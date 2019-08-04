@@ -1330,7 +1330,7 @@
                 ICSharpExpressionContext Context = new CSharpExpressionContext();
                 InitializedObject.WriteCSharpAsConstant(writer, Context);
                 string ReturnValue = Context.ReturnValue;
-                writer.WriteIndentedLine($"public static {ClassName} InitializedObject{i} = {ReturnValue};");
+                writer.WriteIndentedLine($"public static readonly {ClassName} InitializedObject{i} = {ReturnValue};");
             }
         }
 
