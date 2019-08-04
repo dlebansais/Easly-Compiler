@@ -118,7 +118,7 @@
         private bool ComputeBooleanSideExpression(ICSharpWriter writer, ICSharpExpression expression)
         {
             string ValueString = ComputeNestedExpression(writer, expression);
-            Debug.Assert(ValueString == ToComputedValue(true) || ValueString == ToComputedValue(false));
+            Debug.Assert(ValueString == ToComputedValue(true) || ValueString == ToComputedValue(false) || ValueString == "TODO");
 
             return ValueString == ToComputedValue(true);
         }

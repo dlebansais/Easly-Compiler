@@ -88,7 +88,7 @@
         /// <summary>
         /// List of initialized objects.
         /// </summary>
-        List<ICSharpInitializedObjectExpression> InitializedObjectList { get; }
+        IList<ICSharpInitializedObjectExpression> InitializedObjectList { get; }
 
         /// <summary>
         /// True if the class shares its name with another from a different 'From' source.
@@ -332,7 +332,7 @@
         /// <summary>
         /// List of initialized objects.
         /// </summary>
-        public List<ICSharpInitializedObjectExpression> InitializedObjectList { get; } = new List<ICSharpInitializedObjectExpression>();
+        public IList<ICSharpInitializedObjectExpression> InitializedObjectList { get; } = new List<ICSharpInitializedObjectExpression>();
 
         /// <summary>
         /// True if the class shares its name with another from a different 'From' source.

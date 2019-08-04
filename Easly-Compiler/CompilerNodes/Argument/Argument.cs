@@ -316,6 +316,7 @@ namespace CompilerNode
         {
             OnceReference<ISealableList<IParameter>> SelectedOverload = new OnceReference<ISealableList<IParameter>>();
             selectedIndex = -1;
+            int MaximumAllowedArgumentCount = -1;
 
             for (int i = 0; i < parameterTableList.Count; i++)
             {
@@ -347,6 +348,9 @@ namespace CompilerNode
 
                 if (IsMatching)
                 {
+                    if (MaximumAllowedArgumentCount < OverloadParameterList.Count)
+                        MaximumAllowedArgumentCount = OverloadParameterList.Count;
+
                     for (; j < OverloadParameterList.Count && IsMatching; j++)
                     {
                         IParameter OverloadParameter = OverloadParameterList[j];
@@ -354,7 +358,7 @@ namespace CompilerNode
                     }
                 }
 
-                if (IsMatching && j == arguments.Count)
+                if (IsMatching && j >= arguments.Count)
                 {
                     Debug.Assert(!SelectedOverload.IsAssigned);
 
@@ -363,17 +367,19 @@ namespace CompilerNode
                 }
             }
 
+            if (MaximumAllowedArgumentCount >= 0 && MaximumAllowedArgumentCount < arguments.Count)
+            {
+                errorList.AddError(new ErrorTooManyArguments(source, arguments.Count, MaximumAllowedArgumentCount));
+                return false;
+            }
+
             if (!SelectedOverload.IsAssigned)
             {
                 errorList.AddError(new ErrorInvalidExpression(source));
                 return false;
             }
 
-            if (SelectedOverload.Item.Count < arguments.Count)
-            {
-                errorList.AddError(new ErrorTooManyArguments(source, arguments.Count, SelectedOverload.Item.Count));
-                return false;
-            }
+            Debug.Assert(SelectedOverload.Item.Count >= arguments.Count);
 
             return true;
         }

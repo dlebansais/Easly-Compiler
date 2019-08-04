@@ -279,8 +279,6 @@
 
                 CSharpArgument.CSharpArgumentList(writer, expressionContext, FeatureCall, ReturnValueIndex, false, out string ArgumentListText, out IList<string> OutgoingResultList);
 
-                Debug.Assert(OutgoingParameterCount > 1);
-
                 if (ReturnValueIndex >= 0)
                 {
                     string TemporaryResultName = writer.GetTemporaryName();

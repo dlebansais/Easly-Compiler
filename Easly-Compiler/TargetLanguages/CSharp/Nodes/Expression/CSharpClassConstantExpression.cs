@@ -61,10 +61,7 @@
             : base(context, source)
         {
             if (source.ResolvedFinalFeature.IsAssigned)
-            {
                 Feature = context.GetFeature(source.ResolvedFinalFeature.Item) as ICSharpConstantFeature;
-                ConstantExpression = Feature.ConstantExpression;
-            }
 
             if (source.ResolvedFinalDiscrete.IsAssigned)
                 Discrete = CSharpDiscrete.Create(context, source.ResolvedFinalDiscrete.Item);
@@ -89,7 +86,35 @@
         /// <summary>
         /// The constant value as an expression. Can be null.
         /// </summary>
-        public ICSharpExpression ConstantExpression { get; }
+        public ICSharpExpression ConstantExpression
+        {
+            get
+            {
+                ICSharpExpression Result;
+
+                if (Feature != null)
+                {
+                    Result = Feature.ConstantExpression;
+
+                    Debug.Assert(Result != null);
+                }
+                else
+                {
+                    Debug.Assert(Discrete != null);
+
+                    if (Discrete.Source.NumericValue.IsAssigned)
+                    {
+                        Result = Discrete.ExplicitValue;
+
+                        Debug.Assert(Result != null);
+                    }
+                    else
+                        Result = null;
+                }
+
+                return Result;
+            }
+        }
 
         /// <summary>
         /// The constant discrete. Can be null.
@@ -109,21 +134,22 @@
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public override void CheckNumberType(ref bool isChanged)
         {
-            ConstantExpression.CheckNumberType(ref isChanged);
-
-            if (Discrete != null)
+            if (Feature != null)
             {
+                Debug.Assert(ConstantExpression != null);
+
+                ConstantExpression.CheckNumberType(ref isChanged);
+                UpdateNumberType(ConstantExpression, ref isChanged);
+            }
+            else
+            {
+                Debug.Assert(Discrete != null);
+
                 if (NumberType == CSharpNumberTypes.NotApplicable || NumberType == CSharpNumberTypes.Unknown)
                 {
                     NumberType = CSharpNumberTypes.Integer;
                     isChanged = true;
                 }
-            }
-
-            if (Feature != null && ConstantExpression != null)
-            {
-                ConstantExpression.CheckNumberType(ref isChanged);
-                UpdateNumberType(ConstantExpression, ref isChanged);
             }
         }
 
@@ -191,13 +217,13 @@
         /// <param name="writer">The stream on which to write.</param>
         public void Compute(ICSharpWriter writer)
         {
-            if (Feature != null)
-                ComputeFeature(writer);
+            if (ConstantExpression != null)
+                ComputeConstant(writer);
             else
                 ComputeDiscrete(writer);
         }
 
-        private void ComputeFeature(ICSharpWriter writer)
+        private void ComputeConstant(ICSharpWriter writer)
         {
             string ValueString;
 
@@ -226,6 +252,7 @@
         private void ComputeDiscrete(ICSharpWriter writer)
         {
             Debug.Assert(Discrete != null);
+            Debug.Assert(ConstantExpression == null);
 
             ISealableDictionary<IDiscrete, string> AssignedDiscreteTable = Class.Source.AssignedDiscreteTable;
 
@@ -246,9 +273,6 @@
 
             WriteDown = true;
 
-            if (Feature != null)
-                ConstantExpression.SetWriteDown();
-
             if (Discrete != null)
             {
                 int Index = Class.Source.DiscreteList.IndexOf(Discrete.Source);
@@ -256,6 +280,12 @@
 
                 Discrete.SetWriteDown();
                 Class.DiscreteList[Index].SetWriteDown();
+            }
+            else
+            {
+                Debug.Assert(ConstantExpression != null);
+
+                ConstantExpression.SetWriteDown();
             }
         }
         #endregion

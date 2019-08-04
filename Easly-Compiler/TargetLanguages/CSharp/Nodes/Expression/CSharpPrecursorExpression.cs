@@ -109,7 +109,8 @@
         public override void CheckNumberType(ref bool isChanged)
         {
             ((ICSharpFeature)PrecursorFeature).CheckNumberType(ref isChanged);
-            if (SelectedOverloadType.ResultList.Count == 1)
+
+            if (SelectedOverloadType != null && SelectedOverloadType.ResultList.Count == 1)
             {
                 ICSharpParameter Result = SelectedOverloadType.ResultList[0];
                 UpdateNumberType(Result.Feature.Type, ref isChanged);

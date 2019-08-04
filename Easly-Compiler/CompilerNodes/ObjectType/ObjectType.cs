@@ -560,7 +560,7 @@
                 Debug.Assert(BaseParameter.ValidEntity.IsAssigned);
                 Debug.Assert(BaseParameter.ValidEntity.Item.ResolvedEffectiveType.IsAssigned);
 
-                Result &= TypeConformToBase(BaseParameter.ValidEntity.Item.ResolvedEffectiveType.Item, DerivedParameter.ValidEntity.Item.ResolvedEffectiveType.Item, errorList, sourceLocation, isConversionAllowed: false);
+                Result &= TypeConformToBase(DerivedParameter.ValidEntity.Item.ResolvedEffectiveType.Item, BaseParameter.ValidEntity.Item.ResolvedEffectiveType.Item, errorList, sourceLocation, isConversionAllowed: false);
             }
 
             for (int i = 0; i < baseType.ResultList.Count && i < derivedType.ResultList.Count; i++)

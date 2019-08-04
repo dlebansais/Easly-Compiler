@@ -204,6 +204,12 @@
                     ComputedValue = ToComputedValue(RightNumber.Negate());
                     IsHandled = true;
                     break;
+
+                case "To UUID":
+                    //TODO
+                    ComputedValue = RightNumber.ToString();
+                    IsHandled = true;
+                    break;
             }
 
             Debug.Assert(IsHandled);

@@ -330,7 +330,7 @@
     <Compile Include="Errors\Inference\02-Types\ErrorNameResultNotAllowed.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorTypeArgumentCount.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorTooManyTypeArguments.cs" />
-    <Compile Include="Errors\Inference\02-Types\ErrorMoreBasicParameter.cs" />
+    <Compile Include="Errors\Inference\02-Types\ErrorEqualParameters.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorNonConformingType.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorReferenceValueConstraintConformance.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorGenericClass.cs" />

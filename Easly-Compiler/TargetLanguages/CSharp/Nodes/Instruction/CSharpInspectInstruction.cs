@@ -153,6 +153,8 @@
 
             WriteDown = true;
 
+            SourceExpression.SetWriteDown();
+
             foreach (ICSharpWith With in WithList)
                 With.SetWriteDown();
 

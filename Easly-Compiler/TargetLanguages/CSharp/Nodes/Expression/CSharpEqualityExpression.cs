@@ -90,8 +90,45 @@
         {
             Debug.Assert(WriteDown);
 
-            string LeftText = SingleResultExpressionText(writer, LeftExpression);
-            string RightText = SingleResultExpressionText(writer, RightExpression);
+            string LeftText;
+
+            ICSharpExpressionContext LeftSourceExpressionContext = new CSharpExpressionContext();
+            LeftExpression.WriteCSharp(writer, LeftSourceExpressionContext, -1);
+
+            if (LeftSourceExpressionContext.ReturnValue != null)
+            {
+                string Result = LeftSourceExpressionContext.ReturnValue;
+
+                if (LeftExpression.IsComplex)
+                    Result = $"({Result})";
+
+                LeftText = Result;
+            }
+            else
+            {
+                //TODO
+                LeftText = "TODO";
+            }
+
+            string RightText;
+
+            ICSharpExpressionContext RightSourceExpressionContext = new CSharpExpressionContext();
+            RightExpression.WriteCSharp(writer, RightSourceExpressionContext, -1);
+
+            if (RightSourceExpressionContext.ReturnValue != null)
+            {
+                string Result = RightSourceExpressionContext.ReturnValue;
+
+                if (RightExpression.IsComplex)
+                    Result = $"({Result})";
+
+                RightText = Result;
+            }
+            else
+            {
+                //TODO
+                RightText = "TODO";
+            }
 
             string EqualitySign = null;
 

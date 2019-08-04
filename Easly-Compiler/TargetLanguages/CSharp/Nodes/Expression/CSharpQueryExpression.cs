@@ -448,6 +448,8 @@
             }
             catch
             {
+                //TODO Failed to compute
+                return "TODO";
             }
 
             StartProcess(Path.Combine(ExeFolder, "ConstantComputation.exe"), null, true, out Process ConstantComputation);
@@ -502,7 +504,7 @@
             }
 
             if (Discrete != null)
-                Feature.SetWriteDown();
+                Discrete.SetWriteDown();
         }
         #endregion
     }

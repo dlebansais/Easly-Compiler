@@ -52,7 +52,7 @@
             Debug.Assert(node.OverloadList.Count > 0);
 
             IErrorList CheckErrorList = new ErrorList();
-            if (!Feature.DisjoinedParameterCheck(node.OverloadList, node, CheckErrorList))
+            if (!Feature.DisjoinedParameterCheck(node.OverloadList, CheckErrorList))
             {
                 Debug.Assert(!CheckErrorList.IsEmpty);
                 AddSourceErrorList(CheckErrorList);

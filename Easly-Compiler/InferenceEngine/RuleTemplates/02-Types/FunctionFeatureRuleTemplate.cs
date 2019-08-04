@@ -78,7 +78,7 @@
                 OverloadTypeList.Add(Overload.ResolvedAssociatedType.Item);
             }
 
-            if (!Feature.DisjoinedParameterCheck(OverloadTypeList, node, CheckErrorList))
+            if (!Feature.DisjoinedParameterCheck(OverloadTypeList, CheckErrorList))
             {
                 Debug.Assert(!CheckErrorList.IsEmpty);
                 AddSourceErrorList(CheckErrorList);

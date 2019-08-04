@@ -102,19 +102,40 @@
         /// Checks that all overloads in a list have parameters that allow them to be distinguished in a caller.
         /// </summary>
         /// <param name="overloadList">The list of overloads.</param>
-        /// <param name="location">The location where to report errors.</param>
         /// <param name="errorList">The list of errors found.</param>
-        public static bool DisjoinedParameterCheck(IList<IQueryOverloadType> overloadList, ISource location, IErrorList errorList)
+        public static bool DisjoinedParameterCheck(IList<IQueryOverloadType> overloadList, IErrorList errorList)
         {
+            ISealableDictionary<int, IList<IQueryOverloadType>> UnmixedOverloadsTable = new SealableDictionary<int, IList<IQueryOverloadType>>();
+
+            foreach (IQueryOverloadType Overload in overloadList)
+            {
+                int LastParameterIndex;
+
+                for (LastParameterIndex = Overload.ParameterTable.Count; LastParameterIndex > 0; LastParameterIndex--)
+                {
+                    IParameter p = Overload.ParameterTable[LastParameterIndex - 1];
+                    IScopeAttributeFeature Attribute = p.ResolvedParameter;
+
+                    if (!Attribute.DefaultValue.IsAssigned)
+                        break;
+                }
+
+                if (!UnmixedOverloadsTable.ContainsKey(LastParameterIndex))
+                    UnmixedOverloadsTable.Add(LastParameterIndex, new List<IQueryOverloadType>());
+
+                IList<IQueryOverloadType> ThisOverloadMix = UnmixedOverloadsTable[LastParameterIndex];
+                ThisOverloadMix.Add(Overload);
+            }
+
             bool Success = true;
 
-            int MaxParameter = 0;
-            foreach (IQueryOverloadType Overload in overloadList)
-                if (MaxParameter < Overload.ParameterTable.Count)
-                    MaxParameter = Overload.ParameterTable.Count;
+            foreach (KeyValuePair<int, IList<IQueryOverloadType>> Entry in UnmixedOverloadsTable)
+            {
+                IList<IQueryOverloadType> ThisOverloadMix = Entry.Value;
 
-            for (int i = 0; i < MaxParameter; i++)
-                Success &= DisjoinedParameterCheck(overloadList, i, errorList);
+                for (int i = 0; i < Entry.Key; i++)
+                    Success &= DisjoinedParameterCheck(ThisOverloadMix, i, errorList);
+            }
 
             return Success;
         }
@@ -155,9 +176,9 @@
             ICompiledType BaseType = baseParameter.ResolvedParameter.ResolvedEffectiveType.Item;
             bool Success = true;
 
-            if (ObjectType.TypeConformToBase(DerivedType, BaseType, isConversionAllowed: false))
+            if (DerivedType == BaseType)
             {
-                errorList.AddError(new ErrorMoreBasicParameter(baseParameter.ResolvedParameter.Location));
+                errorList.AddError(new ErrorEqualParameters(baseParameter.ResolvedParameter.Location));
                 Success = false;
             }
 

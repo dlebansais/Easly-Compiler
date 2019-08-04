@@ -335,7 +335,7 @@ namespace CompilerNode
         /// <summary>
         /// List of initialized objects of this class.
         /// </summary>
-        ISealableList<IInitializedObjectExpression> InitializedObjectList { get; }
+        IList<IInitializedObjectExpression> InitializedObjectList { get; }
     }
 
     /// <summary>
@@ -377,6 +377,7 @@ namespace CompilerNode
             BaseClass.TypedefTable.Seal();
             BaseClass.ValidSourceName = string.Empty;
             BaseClass.ResolvedBodyTagList.Item = new List<IBody>();
+            BaseClass.AssignedDiscreteTable.Seal();
 
             return BaseClass;
         }
@@ -687,7 +688,7 @@ namespace CompilerNode
                 ResolvedNodeWithDefaultList = new OnceReference<IList<IExpression>>();
                 ResolvedNodeWithNumberConstantList = new OnceReference<IList<IExpression>>();
                 InheritedBodyTagListTable = new SealableDictionary<IClassType, IList<IBody>>();
-                InitializedObjectList = new SealableList<IInitializedObjectExpression>();
+                InitializedObjectList = new List<IInitializedObjectExpression>();
                 IsHandled = true;
             }
             else if (ruleTemplateList == RuleTemplateSet.Body)
@@ -1258,7 +1259,7 @@ namespace CompilerNode
         /// <summary>
         /// List of initialized objects of this class.
         /// </summary>
-        public ISealableList<IInitializedObjectExpression> InitializedObjectList { get; private set; } = new SealableList<IInitializedObjectExpression>();
+        public IList<IInitializedObjectExpression> InitializedObjectList { get; private set; } = new List<IInitializedObjectExpression>();
         #endregion
 
         #region Debugging

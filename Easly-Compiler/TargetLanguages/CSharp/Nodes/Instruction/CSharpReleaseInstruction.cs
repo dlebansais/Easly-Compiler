@@ -1,7 +1,7 @@
 ﻿namespace EaslyCompiler
 {
-    using CompilerNode;
     using System.Diagnostics;
+    using CompilerNode;
 
     /// <summary>
     /// A C# instruction.

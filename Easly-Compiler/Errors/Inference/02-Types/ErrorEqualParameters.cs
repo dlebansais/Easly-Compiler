@@ -3,21 +3,21 @@
     /// <summary>
     /// Two overloads can be confused.
     /// </summary>
-    public interface IErrorMoreBasicParameter : IError
+    public interface IErrorEqualParameters : IError
     {
     }
 
     /// <summary>
     /// Two overloads can be confused.
     /// </summary>
-    internal class ErrorMoreBasicParameter : Error, IErrorMoreBasicParameter
+    internal class ErrorEqualParameters : Error, IErrorEqualParameters
     {
         #region Init
         /// <summary>
-        /// Initializes a new instance of the <see cref="ErrorMoreBasicParameter"/> class.
+        /// Initializes a new instance of the <see cref="ErrorEqualParameters"/> class.
         /// </summary>
         /// <param name="source">The error location.</param>
-        public ErrorMoreBasicParameter(ISource source)
+        public ErrorEqualParameters(ISource source)
             : base(source)
         {
         }
@@ -27,7 +27,7 @@
         /// <summary>
         /// The error message.
         /// </summary>
-        public override string Message { get { return "Derived type used in a different overload."; } }
+        public override string Message { get { return "Identical type used in a different overload."; } }
         #endregion
     }
 }

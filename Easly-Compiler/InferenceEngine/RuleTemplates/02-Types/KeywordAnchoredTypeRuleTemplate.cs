@@ -53,17 +53,24 @@
             data = null;
 
             // The 'Current' case is handled in KeywordAnchoredTypeCurrentRuleTemplate.
-            Debug.Assert(node.Anchor != BaseNode.Keyword.Current);
-
-            IClass EmbeddingClass = node.EmbeddingClass;
-            IErrorList CheckErrorList = new ErrorList();
-            if (!KeywordExpression.IsKeywordAvailable(node.Anchor, node, CheckErrorList, out ITypeName ResultTypeName, out ICompiledType ResultType))
+            if (node.Anchor != BaseNode.Keyword.Current)
             {
-                AddSourceErrorList(CheckErrorList);
-                Success = false;
+                IClass EmbeddingClass = node.EmbeddingClass;
+                IErrorList CheckErrorList = new ErrorList();
+                if (!KeywordExpression.IsKeywordAvailable(node.Anchor, node, CheckErrorList, out ITypeName ResultTypeName, out ICompiledType ResultType))
+                {
+                    AddSourceErrorList(CheckErrorList);
+                    Success = false;
+                }
+                else
+                    data = new Tuple<ITypeName, ICompiledType>(ResultTypeName, ResultType);
             }
             else
-                data = new Tuple<ITypeName, ICompiledType>(ResultTypeName, ResultType);
+            {
+                // If we go through here, KeywordAnchoredTypeCurrentRuleTemplate musy have failed.
+                Debug.Assert(!ErrorList.IsEmpty);
+                Success = false;
+            }
 
             return Success;
         }
