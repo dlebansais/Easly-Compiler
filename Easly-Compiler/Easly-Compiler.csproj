@@ -74,10 +74,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompiledBody.cs" />
+    <Compile Include="CompiledNumberType.cs" />
     <Compile Include="CompilerNodes\Expression\ComparableExpression.cs" />
     <Compile Include="CompilerNodes\Expression\KeywordEntityExpression.cs" />
     <Compile Include="CompilerNodes\Feature\FeatureWithPrecursor.cs" />
     <Compile Include="CompiledTypeWithFeature.cs" />
+    <Compile Include="NumberKinds.cs" />
     <Compile Include="Errors\Inference\02-Types\ErrorInvalidConversionFeature.cs" />
     <Compile Include="Errors\Inference\03-Contract\ErrorCloningNotAllowed.cs" />
     <Compile Include="Errors\Inference\03-Contract\ErrorMissingOverSourceAndIndexer.cs" />

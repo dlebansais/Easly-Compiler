@@ -220,6 +220,7 @@
 
                             if (ResolveContract(root) && ResolveBody(root))
                             {
+                                CheckNumberType(root);
                             }
                         }
                     }
@@ -1125,6 +1126,22 @@
             }
 
             return true;
+        }
+        #endregion
+
+        #region Numbers
+        private void CheckNumberType(IRoot root)
+        {
+            for (;;)
+            {
+                bool IsChanged = false;
+
+                foreach (IClass Class in root.ClassList)
+                    Class.CheckNumberType(ref IsChanged);
+
+                if (!IsChanged)
+                    break;
+            }
         }
         #endregion
     }

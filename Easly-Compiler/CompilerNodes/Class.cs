@@ -336,6 +336,12 @@ namespace CompilerNode
         /// List of initialized objects of this class.
         /// </summary>
         IList<IInitializedObjectExpression> InitializedObjectList { get; }
+
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        void CheckNumberType(ref bool isChanged);
     }
 
     /// <summary>
@@ -1260,6 +1266,18 @@ namespace CompilerNode
         /// List of initialized objects of this class.
         /// </summary>
         public IList<IInitializedObjectExpression> InitializedObjectList { get; private set; } = new List<IInitializedObjectExpression>();
+        #endregion
+
+        #region Numbers
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public void CheckNumberType(ref bool isChanged)
+        {
+            foreach (IFeature Feature in FeatureList)
+                Feature.CheckNumberType(ref isChanged);
+        }
         #endregion
 
         #region Debugging

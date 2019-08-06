@@ -35,6 +35,12 @@ namespace CompilerNode
         /// List of exceptions the argument can throw.
         /// </summary>
         OnceReference<IResultException> ResolvedException { get; }
+
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        void CheckNumberType(ref bool isChanged);
     }
 
     /// <summary>

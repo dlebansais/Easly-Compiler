@@ -231,6 +231,23 @@ namespace CompilerNode
         public OnceReference<IResultType> ResolvedInitResult { get; private set; } = new OnceReference<IResultType>();
         #endregion
 
+        #region Numbers
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public void CheckNumberType(ref bool isChanged)
+        {
+            ((IExpression)Source).CheckNumberType(ref isChanged);
+
+            foreach (IAttachment Attachment in AttachmentList)
+                Attachment.CheckNumberType(ref isChanged);
+
+            if (ElseInstructions.IsAssigned)
+                ((IScope)ElseInstructions.Item).CheckNumberType(ref isChanged);
+        }
+        #endregion
+
         #region Debugging
         /// <summary>
         /// Gets a string representation of the instruction.

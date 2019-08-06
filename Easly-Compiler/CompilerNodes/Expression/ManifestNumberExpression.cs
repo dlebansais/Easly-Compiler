@@ -268,6 +268,28 @@
         }
         #endregion
 
+        #region Numbers
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public void CheckNumberType(ref bool isChanged)
+        {
+            IExpressionType Preferred = ResolvedResult.Item.Preferred;
+            ICompiledNumberType NumberType = Preferred.ValueType as ICompiledNumberType;
+
+            Debug.Assert(NumberType != null);
+
+            if (NumberType.NumberKind == NumberKinds.NotChecked)
+            {
+                FormattedNumber n = Parser.Parse(ValidText.Item);
+                bool IsInteger = n is FormattedInteger;
+
+                NumberType.UpdateNumberKind(IsInteger ? NumberKinds.Integer : NumberKinds.Real, ref isChanged);
+            }
+        }
+        #endregion
+
         #region Debugging
         /// <summary>
         /// Gets a string representation of the expression.

@@ -229,6 +229,33 @@ namespace CompilerNode
         public OnceReference<ICompiledType> ResolvedEntityType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
 
+        #region Numbers
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public void CheckNumberType(ref bool isChanged)
+        {
+            Debug.Assert(ResolvedEntityType.IsAssigned);
+
+            if (ResolvedEntityType.Item is ICompiledNumberType AsNumberTypeEntity)
+            {
+                if (AsNumberTypeEntity.NumberKind == NumberKinds.NotChecked)
+                {
+                    IExpression ConstantExpression = (IExpression)ConstantValue;
+                    ConstantExpression.CheckNumberType(ref isChanged);
+
+                    IExpressionType Preferred = ConstantExpression.ResolvedResult.Item.Preferred;
+                    ICompiledNumberType AsNumberTypeResult = Preferred.ValueType as ICompiledNumberType;
+
+                    Debug.Assert(AsNumberTypeResult != null);
+
+                    AsNumberTypeEntity.UpdateNumberKind(AsNumberTypeResult, ref isChanged);
+                }
+            }
+        }
+        #endregion
+
         #region Debugging
         /// <summary></summary>
         public override string ToString()

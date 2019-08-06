@@ -196,6 +196,17 @@ namespace CompilerNode
         }
         #endregion
 
+        #region Numbers
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public void CheckNumberType(ref bool isChanged)
+        {
+            ((IExpression)Source).CheckNumberType(ref isChanged);
+        }
+        #endregion
+
         #region Debugging
         /// <summary>
         /// Gets a string representation of the argument.

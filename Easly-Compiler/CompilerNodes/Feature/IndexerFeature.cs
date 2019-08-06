@@ -358,6 +358,21 @@ namespace CompilerNode
         public OnceReference<ICompiledType> ResolvedResultType { get { return ResolvedEntityType; } }
         #endregion
 
+        #region Numbers
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public void CheckNumberType(ref bool isChanged)
+        {
+            if (GetterBody.IsAssigned)
+                ((IBody)GetterBody.Item).CheckNumberType(ref isChanged);
+
+            if (SetterBody.IsAssigned)
+                ((IBody)SetterBody.Item).CheckNumberType(ref isChanged);
+        }
+        #endregion
+
         #region Debugging
         /// <summary></summary>
         public override string ToString()

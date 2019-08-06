@@ -490,6 +490,25 @@ namespace CompilerNode
         }
         #endregion
 
+        #region Numbers
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public void CheckNumberType(ref bool isChanged)
+        {
+            IExpressionType Preferred = ResolvedResult.Item.Preferred;
+            if (Preferred != null && Preferred.ValueType is ICompiledNumberType AsNumberType)
+            {
+                if (AsNumberType.NumberKind == NumberKinds.NotChecked)
+                {
+                    //TODO
+                    AsNumberType.UpdateNumberKind(NumberKinds.NotApplicable, ref isChanged);
+                }
+            }
+        }
+        #endregion
+
         #region Debugging
         /// <summary>
         /// Gets a string representation of the expression.

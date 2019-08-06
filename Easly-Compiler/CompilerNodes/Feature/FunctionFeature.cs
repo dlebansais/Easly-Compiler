@@ -253,6 +253,36 @@ namespace CompilerNode
         public OnceReference<IExpressionType> MostCommonResult { get; private set; } = new OnceReference<IExpressionType>();
         #endregion
 
+        #region Numbers
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public void CheckNumberType(ref bool isChanged)
+        {
+            foreach (IQueryOverload Overload in OverloadList)
+                Overload.CheckNumberType(ref isChanged);
+
+            if (MostCommonResult.IsAssigned && MostCommonResult.Item.ValueType is ICompiledNumberType AsMostCommonResultType)
+            {
+                IList<ICompiledNumberType> ResultTypeList = new List<ICompiledNumberType>();
+                foreach (IQueryOverload Overload in OverloadList)
+                {
+                    foreach (IParameter Result in Overload.ResultTable)
+                    {
+                        if (Result.Name == nameof(BaseNode.Keyword.Result) && Result.ResolvedParameter.ResolvedEffectiveType.Item is ICompiledNumberType AsNumberTypeResult)
+                        {
+                            ResultTypeList.Add(AsNumberTypeResult);
+                            break;
+                        }
+                    }
+                }
+
+                AsMostCommonResultType.UpdateNumberKind(ResultTypeList, ref isChanged);
+            }
+        }
+        #endregion
+
         #region Debugging
         /// <summary></summary>
         public override string ToString()

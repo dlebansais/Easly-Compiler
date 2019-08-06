@@ -308,6 +308,39 @@ namespace CompilerNode
         }
         #endregion
 
+        #region Numbers
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public void CheckNumberType(ref bool isChanged)
+        {
+            Debug.Assert(ResolvedResult.IsAssigned);
+
+            IExpressionType Preferred = ResolvedResult.Item.Preferred;
+            if (Preferred != null && Preferred.ValueType is ICompiledNumberType AsNumberType)
+            {
+                if (AsNumberType.NumberKind == NumberKinds.NotChecked)
+                {
+                    ((IExpression)RightExpression).CheckNumberType(ref isChanged);
+
+                    Debug.Assert(SelectedOverload.IsAssigned);
+
+                    IQueryOverload Overload = SelectedOverload.Item;
+
+                    foreach (IParameter Result in Overload.ResultTable)
+                    {
+                        if (Result.Name == nameof(BaseNode.Keyword.Result) && Result.ResolvedParameter.ResolvedEffectiveType.Item is ICompiledNumberType AsNumberTypeResult)
+                        {
+                            AsNumberType.UpdateNumberKind(AsNumberTypeResult, ref isChanged);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
+
         #region Debugging
         /// <summary>
         /// Gets a string representation of the expression.

@@ -8,7 +8,7 @@
     /// <summary>
     /// Compiler-only IFormalGenericType.
     /// </summary>
-    public interface IFormalGenericType : ICompiledTypeWithFeature
+    public interface IFormalGenericType : ICompiledTypeWithFeature, ICompiledNumberType
     {
         /// <summary>
         /// The generic from which this instance is issued.
@@ -47,6 +47,7 @@
             FormalGeneric = formalGeneric;
             ResolvedTypeName = resolvedTypeName;
             DiscreteTable.Seal();
+            NumberKind = NumberKinds.NotChecked;
         }
         #endregion
 
@@ -202,6 +203,130 @@
         public static bool TypesHaveIdenticalSignature(IFormalGenericType type1, IFormalGenericType type2)
         {
             return type1.FormalGeneric == type2.FormalGeneric;
+        }
+        #endregion
+
+        #region Numbers
+        /// <summary>
+        /// The number kind if the type is a number.
+        /// </summary>
+        public NumberKinds NumberKind { get; private set; }
+
+        /// <summary>
+        /// Gets the default number kind for this type.
+        /// </summary>
+        public NumberKinds GetDefaultNumberKind()
+        {
+            NumberKinds Result = NumberKinds.NotApplicable;
+
+            foreach (IConstraint Constraint in FormalGeneric.ConstraintList)
+            {
+                Debug.Assert(Constraint.ResolvedParentType.IsAssigned);
+
+                if (Constraint.ResolvedParentType.Item is IClassType AsClassType)
+                {
+                    IClass BaseClass = AsClassType.BaseClass;
+                    NumberKinds ClassKind;
+
+                    if (BaseClass.ClassGuid == LanguageClasses.Number.Guid)
+                        ClassKind = NumberKinds.Unknown;
+                    else if (BaseClass.ClassGuid == LanguageClasses.Integer.Guid)
+                        ClassKind = NumberKinds.Integer;
+                    else
+                        ClassKind = NumberKinds.NotApplicable;
+
+                    Result = DowngradedKind(NumberKind, ClassKind);
+                }
+            }
+
+            if (Result == NumberKinds.NotApplicable)
+            {
+                foreach (IConstraint Constraint in FormalGeneric.ConstraintList)
+                {
+                    Debug.Assert(Constraint.ResolvedParentType.IsAssigned);
+
+                    if (Constraint.ResolvedParentType.Item is ICompiledNumberType AsNumberType)
+                        Result = DowngradedKind(NumberKind, AsNumberType.NumberKind);
+                }
+            }
+
+            return Result;
+        }
+
+        private NumberKinds DowngradedKind(NumberKinds oldKind, NumberKinds newKind)
+        {
+            NumberKinds Result;
+
+            if (oldKind == NumberKinds.Integer && (newKind == NumberKinds.Real || newKind == NumberKinds.Unknown))
+                Result = newKind;
+            else if (oldKind == NumberKinds.Real && newKind == NumberKinds.Unknown)
+                Result = newKind;
+            else if (oldKind == NumberKinds.NotApplicable && newKind == NumberKinds.Unknown)
+                Result = newKind;
+            else
+                Result = oldKind;
+
+            return Result;
+        }
+
+        /// <summary>
+        /// Tentatively updates the number kind if <paramref name="numberKind"/> is more accurate.
+        /// </summary>
+        /// <param name="numberKind">The new kind.</param>
+        /// <param name="isChanged">True if the number kind was changed.</param>
+        public void UpdateNumberKind(NumberKinds numberKind, ref bool isChanged)
+        {
+            if (NumberKind == NumberKinds.NotApplicable && numberKind != NumberKinds.NotApplicable)
+            {
+                NumberKind = numberKind;
+                isChanged = true;
+            }
+            else if (NumberKind == NumberKinds.Unknown && numberKind == NumberKinds.Integer)
+            {
+                NumberKind = numberKind;
+                isChanged = true;
+            }
+        }
+
+        /// <summary>
+        /// Tentatively updates the number kind from another type if it is more accurate.
+        /// </summary>
+        /// <param name="type">The other type.</param>
+        /// <param name="isChanged">True if the number kind was changed.</param>
+        public void UpdateNumberKind(ICompiledNumberType type, ref bool isChanged)
+        {
+            UpdateNumberKind(type.NumberKind, ref isChanged);
+        }
+
+        /// <summary>
+        /// Tentatively updates the number kind from a list of other types, if they are all more accurate.
+        /// </summary>
+        /// <param name="typeList">The list of types.</param>
+        /// <param name="isChanged">True if the number kind was changed.</param>
+        public void UpdateNumberKind(IList<ICompiledNumberType> typeList, ref bool isChanged)
+        {
+            if (NumberKind != NumberKinds.NotApplicable || typeList.Count == 0)
+                return;
+
+            NumberKinds ComposedNumberKind = typeList[0].NumberKind;
+
+            for (int i = 1; i < typeList.Count; i++)
+            {
+                NumberKinds ItemNumberKind = typeList[i].NumberKind;
+
+                if (ItemNumberKind == NumberKinds.NotApplicable)
+                    ComposedNumberKind = NumberKinds.NotApplicable;
+                else if (ComposedNumberKind == NumberKinds.Integer && (ItemNumberKind == NumberKinds.Unknown || ItemNumberKind == NumberKinds.Real))
+                    ComposedNumberKind = ItemNumberKind;
+                else if (ComposedNumberKind == NumberKinds.Real && ItemNumberKind == NumberKinds.Unknown)
+                    ComposedNumberKind = ItemNumberKind;
+            }
+
+            if (ComposedNumberKind != NumberKinds.NotApplicable)
+            {
+                NumberKind = ComposedNumberKind;
+                isChanged = true;
+            }
         }
         #endregion
 

@@ -70,6 +70,12 @@
         /// The resolved body.
         /// </summary>
         OnceReference<ICompiledBody> ResolvedBody { get; }
+
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        void CheckNumberType(ref bool isChanged);
     }
 
     /// <summary>
@@ -321,6 +327,26 @@
         /// The resolved body.
         /// </summary>
         public OnceReference<ICompiledBody> ResolvedBody { get; private set; } = new OnceReference<ICompiledBody>();
+        #endregion
+
+        #region Numbers
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public void CheckNumberType(ref bool isChanged)
+        {
+            foreach (IEntityDeclaration EntityDeclaration in ParameterList)
+                EntityDeclaration.CheckNumberType(ref isChanged);
+
+            foreach (IEntityDeclaration EntityDeclaration in ResultList)
+                EntityDeclaration.CheckNumberType(ref isChanged);
+
+            if (Variant.IsAssigned)
+                ((IExpression)Variant).CheckNumberType(ref isChanged);
+
+            ((IBody)QueryBody).CheckNumberType(ref isChanged);
+        }
         #endregion
 
         #region Debugging

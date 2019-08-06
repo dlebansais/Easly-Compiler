@@ -40,6 +40,12 @@ namespace CompilerNode
         /// Gets a string representation of the entity declaration.
         /// </summary>
         string EntityDeclarationToString { get; }
+
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        void CheckNumberType(ref bool isChanged);
     }
 
     /// <summary>
@@ -196,6 +202,35 @@ namespace CompilerNode
         /// The entity as an atribute feature.
         /// </summary>
         public OnceReference<IScopeAttributeFeature> ValidEntity { get; private set; } = new OnceReference<IScopeAttributeFeature>();
+        #endregion
+
+        #region Numbers
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public void CheckNumberType(ref bool isChanged)
+        {
+            if (ValidEntity.Item.ResolvedEffectiveType.Item is ICompiledNumberType AsNumberTypeEntity)
+            {
+                if (AsNumberTypeEntity.NumberKind == NumberKinds.NotChecked)
+                {
+                    NumberKinds NumberKind = AsNumberTypeEntity.GetDefaultNumberKind();
+
+                    if (DefaultValue.IsAssigned)
+                    {
+                        IExpression SourceExpression = (IExpression)DefaultValue.Item;
+                        SourceExpression.CheckNumberType(ref isChanged);
+
+                        IExpressionType PreferredSource = SourceExpression.ResolvedResult.Item.Preferred;
+                        if (PreferredSource.ValueType is ICompiledNumberType AsNumberTypeSource)
+                            NumberKind = AsNumberTypeSource.NumberKind;
+                    }
+
+                    AsNumberTypeEntity.UpdateNumberKind(NumberKind, ref isChanged);
+                }
+            }
+        }
         #endregion
 
         #region Debugging

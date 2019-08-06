@@ -58,5 +58,11 @@
         /// Resolved list of instructions in the body.
         /// </summary>
         OnceReference<IList<IInstruction>> ResolvedInstructionList { get; }
+
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        void CheckNumberType(ref bool isChanged);
     }
 }

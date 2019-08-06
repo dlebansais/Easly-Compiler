@@ -259,6 +259,32 @@ namespace CompilerNode
         public ISealableDictionary<string, IScopeAttributeFeature> FullScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
         #endregion
 
+        #region Numbers
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public void CheckNumberType(ref bool isChanged)
+        {
+            foreach (IEntityDeclaration EntityDeclaration in EntityDeclarationList)
+                EntityDeclaration.CheckNumberType(ref isChanged);
+
+            foreach (IInstruction Instruction in InitInstructionList)
+                Instruction.CheckNumberType(ref isChanged);
+
+            ((IExpression)WhileCondition).CheckNumberType(ref isChanged);
+
+            foreach (IInstruction Instruction in LoopInstructionList)
+                Instruction.CheckNumberType(ref isChanged);
+
+            foreach (IInstruction Instruction in IterationInstructionList)
+                Instruction.CheckNumberType(ref isChanged);
+
+            if (Variant.IsAssigned)
+                ((IExpression)Variant.Item).CheckNumberType(ref isChanged);
+        }
+        #endregion
+
         #region Debugging
         /// <summary>
         /// Gets a string representation of the instruction.

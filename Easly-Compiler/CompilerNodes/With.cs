@@ -25,6 +25,12 @@ namespace CompilerNode
         /// List of exceptions the with clause can throw.
         /// </summary>
         OnceReference<IResultException> ResolvedException { get; }
+
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        void CheckNumberType(ref bool isChanged);
     }
 
     /// <summary>
@@ -211,6 +217,20 @@ namespace CompilerNode
         /// List of exceptions the with clause can throw.
         /// </summary>
         public OnceReference<IResultException> ResolvedException { get; private set; } = new OnceReference<IResultException>();
+        #endregion
+
+        #region Numbers
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public void CheckNumberType(ref bool isChanged)
+        {
+            foreach (IRange Range in RangeList)
+                Range.CheckNumberType(ref isChanged);
+
+            ((IScope)Instructions).CheckNumberType(ref isChanged);
+        }
         #endregion
     }
 }

@@ -8,7 +8,7 @@
     /// <summary>
     /// Compiler-only IClassType.
     /// </summary>
-    public interface IClassType : BaseNode.IShareableType, ICompiledTypeWithFeature
+    public interface IClassType : BaseNode.IShareableType, ICompiledTypeWithFeature, ICompiledNumberType
     {
         /// <summary>
         /// The source from which this type is issued.
@@ -122,6 +122,7 @@
             SourceType = sourceType;
             BaseClass = baseClass;
             TypeArgumentTable = typeArgumentTable;
+            NumberKind = GetDefaultNumberKind();
         }
 
         /// <summary>
@@ -185,6 +186,8 @@
                     BaseClass.ResolvedClassType.Item.InstancingRecordList.Add(NewRecord);
                 }
             }
+
+            NumberKind = GetDefaultNumberKind();
         }
         #endregion
 
@@ -563,6 +566,99 @@
         public void MarkAsUsedInCloneOf()
         {
             IsUsedInCloneOf = true;
+        }
+        #endregion
+
+        #region Numbers
+        /// <summary>
+        /// The number kind if the type is a number.
+        /// </summary>
+        public NumberKinds NumberKind { get; private set; }
+
+        /// <summary>
+        /// Gets the default number kind for this type.
+        /// </summary>
+        public NumberKinds GetDefaultNumberKind()
+        {
+            if (BaseClass.ClassGuid == LanguageClasses.Number.Guid)
+                return NumberKinds.Unknown;
+            else if (BaseClass.ClassGuid == LanguageClasses.Integer.Guid)
+                return NumberKinds.Integer;
+            else
+                return NumberKinds.NotApplicable;
+        }
+
+        /// <summary>
+        /// Tentatively updates the number kind if <paramref name="numberKind"/> is more accurate.
+        /// </summary>
+        /// <param name="numberKind">The new kind.</param>
+        /// <param name="isChanged">True if the number kind was changed.</param>
+        public void UpdateNumberKind(NumberKinds numberKind, ref bool isChanged)
+        {
+            Debug.Assert(numberKind != NumberKinds.NotChecked);
+
+            if (NumberKind == NumberKinds.NotChecked)
+            {
+                NumberKind = numberKind;
+                isChanged = true;
+            }
+            else
+            {
+                Debug.Assert(NumberKind != NumberKinds.NotApplicable || numberKind == NumberKinds.NotApplicable);
+
+                if (NumberKind == NumberKinds.Unknown && (numberKind == NumberKinds.Integer || numberKind == NumberKinds.Real))
+                {
+                    NumberKind = numberKind;
+                    isChanged = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tentatively updates the number kind from another type if it is more accurate.
+        /// </summary>
+        /// <param name="type">The other type.</param>
+        /// <param name="isChanged">True if the number kind was changed.</param>
+        public void UpdateNumberKind(ICompiledNumberType type, ref bool isChanged)
+        {
+            UpdateNumberKind(type.NumberKind, ref isChanged);
+        }
+
+        /// <summary>
+        /// Tentatively updates the number kind from a list of other types, if they are all more accurate.
+        /// </summary>
+        /// <param name="typeList">The list of types.</param>
+        /// <param name="isChanged">True if the number kind was changed.</param>
+        public void UpdateNumberKind(IList<ICompiledNumberType> typeList, ref bool isChanged)
+        {
+            if (NumberKind == NumberKinds.NotChecked)
+            {
+                NumberKind = NumberKinds.NotApplicable;
+                isChanged = true;
+            }
+
+            if (NumberKind != NumberKinds.NotApplicable || typeList.Count == 0)
+                return;
+
+            NumberKinds ComposedNumberKind = typeList[0].NumberKind;
+
+            for (int i = 1; i < typeList.Count; i++)
+            {
+                NumberKinds ItemNumberKind = typeList[i].NumberKind;
+
+                if (ItemNumberKind == NumberKinds.NotApplicable)
+                    ComposedNumberKind = NumberKinds.NotApplicable;
+                else if (ComposedNumberKind == NumberKinds.Integer && (ItemNumberKind == NumberKinds.Unknown || ItemNumberKind == NumberKinds.Real))
+                    ComposedNumberKind = ItemNumberKind;
+                else if (ComposedNumberKind == NumberKinds.Real && ItemNumberKind == NumberKinds.Unknown)
+                    ComposedNumberKind = ItemNumberKind;
+            }
+
+            if (ComposedNumberKind != NumberKinds.NotApplicable)
+            {
+                NumberKind = ComposedNumberKind;
+                isChanged = true;
+            }
         }
         #endregion
 

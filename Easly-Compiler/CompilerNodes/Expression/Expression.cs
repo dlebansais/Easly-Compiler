@@ -40,6 +40,12 @@ namespace CompilerNode
         /// The constant expression, if assigned.
         /// </summary>
         OnceReference<ILanguageConstant> ExpressionConstant { get; }
+
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        void CheckNumberType(ref bool isChanged);
     }
 
     /// <summary>

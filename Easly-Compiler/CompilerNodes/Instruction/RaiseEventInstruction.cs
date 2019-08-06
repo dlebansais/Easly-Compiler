@@ -195,6 +195,16 @@ namespace CompilerNode
         public OnceReference<ICompiledType> ResolvedEntityType { get; private set; } = new OnceReference<ICompiledType>();
         #endregion
 
+        #region Numbers
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public void CheckNumberType(ref bool isChanged)
+        {
+        }
+        #endregion
+
         #region Debugging
         /// <summary>
         /// Gets a string representation of the instruction.

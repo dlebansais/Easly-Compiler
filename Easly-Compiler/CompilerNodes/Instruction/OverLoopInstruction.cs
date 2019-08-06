@@ -235,13 +235,23 @@ namespace CompilerNode
         /// Scope of instructions in the loop.
         /// </summary>
         public ISealableDictionary<string, IScopeAttributeFeature> InnerLoopScope { get; private set; } = new SealableDictionary<string, IScopeAttributeFeature>();
-        #endregion
 
-        #region Compiler
         /// <summary>
         /// Result types of initialization.
         /// </summary>
         public OnceReference<IResultType> ResolvedInitResult { get; private set; } = new OnceReference<IResultType>();
+        #endregion
+
+        #region Numbers
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public void CheckNumberType(ref bool isChanged)
+        {
+            ((IExpression)OverList).CheckNumberType(ref isChanged);
+            ((IScope)LoopInstructions).CheckNumberType(ref isChanged);
+        }
         #endregion
 
         #region Debugging

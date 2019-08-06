@@ -203,6 +203,23 @@ namespace CompilerNode
         public OnceReference<IResultException> ResolvedException { get; private set; } = new OnceReference<IResultException>();
         #endregion
 
+        #region Numbers
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public void CheckNumberType(ref bool isChanged)
+        {
+            ((IExpression)ContinueCondition).CheckNumberType(ref isChanged);
+
+            foreach (IContinuation Continuation in ContinuationList)
+                Continuation.CheckNumberType(ref isChanged);
+
+            if (ElseInstructions.IsAssigned)
+                ((IScope)ElseInstructions.Item).CheckNumberType(ref isChanged);
+        }
+        #endregion
+
         #region Debugging
         /// <summary>
         /// Gets a string representation of the instruction.

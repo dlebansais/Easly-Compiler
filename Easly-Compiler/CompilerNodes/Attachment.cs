@@ -30,6 +30,12 @@ namespace CompilerNode
         /// List of resolved features for each attached entity.
         /// </summary>
         IList<IScopeAttributeFeature> ResolvedLocalEntitiesList { get; }
+
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        void CheckNumberType(ref bool isChanged);
     }
 
     /// <summary>
@@ -222,6 +228,17 @@ namespace CompilerNode
         /// List of resolved features for each attached entity.
         /// </summary>
         public IList<IScopeAttributeFeature> ResolvedLocalEntitiesList { get; private set; } = new List<IScopeAttributeFeature>();
+        #endregion
+
+        #region Numbers
+        /// <summary>
+        /// Check number types.
+        /// </summary>
+        /// <param name="isChanged">True upon return if a number type was changed.</param>
+        public void CheckNumberType(ref bool isChanged)
+        {
+            ((IScope)Instructions).CheckNumberType(ref isChanged);
+        }
         #endregion
     }
 }
