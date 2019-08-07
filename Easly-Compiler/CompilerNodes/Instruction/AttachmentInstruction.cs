@@ -246,6 +246,21 @@ namespace CompilerNode
             if (ElseInstructions.IsAssigned)
                 ((IScope)ElseInstructions.Item).CheckNumberType(ref isChanged);
         }
+
+        /// <summary>
+        /// Validates number types. If not valid, adds an error.
+        /// </summary>
+        /// <param name="errorList">The list of errors found.</param>
+        public void ValidateNumberType(IErrorList errorList)
+        {
+            ((IExpression)Source).ValidateNumberType(errorList);
+
+            foreach (IAttachment Attachment in AttachmentList)
+                Attachment.ValidateNumberType(errorList);
+
+            if (ElseInstructions.IsAssigned)
+                ((IScope)ElseInstructions.Item).ValidateNumberType(errorList);
+        }
         #endregion
 
         #region Debugging

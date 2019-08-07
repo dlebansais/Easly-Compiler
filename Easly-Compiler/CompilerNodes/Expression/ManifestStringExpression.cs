@@ -262,6 +262,14 @@ namespace CompilerNode
         public void CheckNumberType(ref bool isChanged)
         {
         }
+
+        /// <summary>
+        /// Validates number types. If not valid, adds an error.
+        /// </summary>
+        /// <param name="errorList">The list of errors found.</param>
+        public void ValidateNumberType(IErrorList errorList)
+        {
+        }
         #endregion
 
         #region Debugging

@@ -158,11 +158,13 @@
             {
                 Result = null;
 
-                if (BaseClassGuid == LanguageClasses.Number.Guid && IsNumberType)
+                if (BaseClassGuid == LanguageClasses.Number.Guid)
                 {
-                    if (NumberType == CSharpNumberTypes.Integer)
+                    Debug.Assert(Source.NumberKind != NumberKinds.NotChecked && Source.NumberKind != NumberKinds.NotApplicable);
+
+                    if (Source.NumberKind == NumberKinds.Integer)
                         Result = "int";
-                    else if (NumberType == CSharpNumberTypes.Real)
+                    else if (Source.NumberKind == NumberKinds.Real)
                         Result = "double";
                 }
 

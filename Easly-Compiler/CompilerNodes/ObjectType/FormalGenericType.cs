@@ -225,16 +225,7 @@
 
                 if (Constraint.ResolvedParentType.Item is IClassType AsClassType)
                 {
-                    IClass BaseClass = AsClassType.BaseClass;
-                    NumberKinds ClassKind;
-
-                    if (BaseClass.ClassGuid == LanguageClasses.Number.Guid)
-                        ClassKind = NumberKinds.Unknown;
-                    else if (BaseClass.ClassGuid == LanguageClasses.Integer.Guid)
-                        ClassKind = NumberKinds.Integer;
-                    else
-                        ClassKind = NumberKinds.NotApplicable;
-
+                    NumberKinds ClassKind = AsClassType.GetDefaultNumberKind();
                     Result = DowngradedKind(NumberKind, ClassKind);
                 }
             }

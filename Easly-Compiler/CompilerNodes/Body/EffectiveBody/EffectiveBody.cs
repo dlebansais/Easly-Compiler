@@ -302,6 +302,19 @@ namespace CompilerNode
             foreach (IInstruction Instruction in BodyInstructionList)
                 Instruction.CheckNumberType(ref isChanged);
         }
+
+        /// <summary>
+        /// Validates number types. If not valid, adds an error.
+        /// </summary>
+        /// <param name="errorList">The list of errors found.</param>
+        public void ValidateNumberType(IErrorList errorList)
+        {
+            foreach (IEntityDeclaration EntityDeclaration in EntityDeclarationList)
+                EntityDeclaration.ValidateNumberType(errorList);
+
+            foreach (IInstruction Instruction in BodyInstructionList)
+                Instruction.ValidateNumberType(errorList);
+        }
         #endregion
     }
 }

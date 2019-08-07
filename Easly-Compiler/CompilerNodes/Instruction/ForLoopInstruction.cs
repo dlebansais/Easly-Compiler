@@ -283,6 +283,30 @@ namespace CompilerNode
             if (Variant.IsAssigned)
                 ((IExpression)Variant.Item).CheckNumberType(ref isChanged);
         }
+
+        /// <summary>
+        /// Validates number types. If not valid, adds an error.
+        /// </summary>
+        /// <param name="errorList">The list of errors found.</param>
+        public void ValidateNumberType(IErrorList errorList)
+        {
+            foreach (IEntityDeclaration EntityDeclaration in EntityDeclarationList)
+                EntityDeclaration.ValidateNumberType(errorList);
+
+            foreach (IInstruction Instruction in InitInstructionList)
+                Instruction.ValidateNumberType(errorList);
+
+            ((IExpression)WhileCondition).ValidateNumberType(errorList);
+
+            foreach (IInstruction Instruction in LoopInstructionList)
+                Instruction.ValidateNumberType(errorList);
+
+            foreach (IInstruction Instruction in IterationInstructionList)
+                Instruction.ValidateNumberType(errorList);
+
+            if (Variant.IsAssigned)
+                ((IExpression)Variant.Item).ValidateNumberType(errorList);
+        }
         #endregion
 
         #region Debugging

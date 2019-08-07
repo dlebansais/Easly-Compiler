@@ -31,6 +31,12 @@ namespace CompilerNode
         /// </summary>
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         void CheckNumberType(ref bool isChanged);
+
+        /// <summary>
+        /// Validates number types. If not valid, adds an error.
+        /// </summary>
+        /// <param name="errorList">The list of errors found.</param>
+        void ValidateNumberType(IErrorList errorList);
     }
 
     /// <summary>
@@ -231,6 +237,18 @@ namespace CompilerNode
 
             foreach (IInstruction Instruction in CleanupList)
                 Instruction.CheckNumberType(ref isChanged);
+        }
+
+        /// <summary>
+        /// Validates number types. If not valid, adds an error.
+        /// </summary>
+        /// <param name="errorList">The list of errors found.</param>
+        public void ValidateNumberType(IErrorList errorList)
+        {
+            ((IScope)Instructions).ValidateNumberType(errorList);
+
+            foreach (IInstruction Instruction in CleanupList)
+                Instruction.ValidateNumberType(errorList);
         }
         #endregion
     }

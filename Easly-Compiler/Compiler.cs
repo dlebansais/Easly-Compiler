@@ -1142,6 +1142,9 @@
                 if (!IsChanged)
                     break;
             }
+
+            foreach (IClass Class in root.ClassList)
+                Class.ValidateNumberType(ErrorList);
         }
         #endregion
     }

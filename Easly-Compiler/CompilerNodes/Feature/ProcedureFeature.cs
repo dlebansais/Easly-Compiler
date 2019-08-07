@@ -246,6 +246,18 @@ namespace CompilerNode
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public void CheckNumberType(ref bool isChanged)
         {
+            foreach (ICommandOverload Overload in OverloadList)
+                Overload.CheckNumberType(ref isChanged);
+        }
+
+        /// <summary>
+        /// Validates number types. If not valid, adds an error.
+        /// </summary>
+        /// <param name="errorList">The list of errors found.</param>
+        public void ValidateNumberType(IErrorList errorList)
+        {
+            foreach (ICommandOverload Overload in OverloadList)
+                Overload.ValidateNumberType(errorList);
         }
         #endregion
 

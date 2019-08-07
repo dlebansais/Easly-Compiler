@@ -76,6 +76,12 @@
         /// </summary>
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         void CheckNumberType(ref bool isChanged);
+
+        /// <summary>
+        /// Validates number types. If not valid, adds an error.
+        /// </summary>
+        /// <param name="errorList">The list of errors found.</param>
+        void ValidateNumberType(IErrorList errorList);
     }
 
     /// <summary>
@@ -346,6 +352,24 @@
                 ((IExpression)Variant).CheckNumberType(ref isChanged);
 
             ((IBody)QueryBody).CheckNumberType(ref isChanged);
+        }
+
+        /// <summary>
+        /// Validates number types. If not valid, adds an error.
+        /// </summary>
+        /// <param name="errorList">The list of errors found.</param>
+        public void ValidateNumberType(IErrorList errorList)
+        {
+            foreach (IEntityDeclaration EntityDeclaration in ParameterList)
+                EntityDeclaration.ValidateNumberType(errorList);
+
+            foreach (IEntityDeclaration EntityDeclaration in ResultList)
+                EntityDeclaration.ValidateNumberType(errorList);
+
+            if (Variant.IsAssigned)
+                ((IExpression)Variant).ValidateNumberType(errorList);
+
+            ((IBody)QueryBody).ValidateNumberType(errorList);
         }
         #endregion
 

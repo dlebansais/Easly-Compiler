@@ -281,6 +281,16 @@ namespace CompilerNode
                 AsMostCommonResultType.UpdateNumberKind(ResultTypeList, ref isChanged);
             }
         }
+
+        /// <summary>
+        /// Validates number types. If not valid, adds an error.
+        /// </summary>
+        /// <param name="errorList">The list of errors found.</param>
+        public void ValidateNumberType(IErrorList errorList)
+        {
+            foreach (IQueryOverload Overload in OverloadList)
+                Overload.ValidateNumberType(errorList);
+        }
         #endregion
 
         #region Debugging

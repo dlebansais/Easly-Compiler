@@ -346,6 +346,56 @@ namespace CompilerNode
                 }
             }
         }
+
+        /// <summary>
+        /// Validates number types. If not valid, adds an error.
+        /// </summary>
+        /// <param name="errorList">The list of errors found.</param>
+        public void ValidateNumberType(IErrorList errorList)
+        {
+            ((IExpression)LeftExpression).ValidateNumberType(errorList);
+            ((IExpression)RightExpression).ValidateNumberType(errorList);
+            Debug.Assert(SelectedOverload.IsAssigned);
+
+            Debug.Assert(SelectedOverload.IsAssigned);
+            IQueryOverload Overload = SelectedOverload.Item;
+
+            Debug.Assert(Overload.EmbeddingClass != null);
+            Debug.Assert(SelectedFeature.IsAssigned);
+            Debug.Assert(SelectedFeature.Item.ValidFeatureName.IsAssigned);
+
+            if (Overload.EmbeddingClass.ClassGuid == LanguageClasses.Number.Guid)
+            {
+                string FeatureName = SelectedFeature.Item.ValidFeatureName.Item.Name;
+
+                switch (FeatureName)
+                {
+                    case "<<":
+                    case ">>":
+                    case "bitwise and":
+                    case "bitwise or":
+                    case "bitwise xor":
+                        NumberKinds LeftKind = GetExpressionNumberKind(LeftExpression);
+                        NumberKinds RightKind = GetExpressionNumberKind(RightExpression);
+
+                        if (LeftKind != NumberKinds.Integer)
+                            errorList.AddError(new ErrorInvalidOperatorOnNumber((IExpression)LeftExpression, FeatureName));
+                        else if (RightKind != NumberKinds.Integer)
+                            errorList.AddError(new ErrorInvalidOperatorOnNumber((IExpression)RightExpression, FeatureName));
+                        break;
+                }
+            }
+        }
+
+        private NumberKinds GetExpressionNumberKind(BaseNode.IExpression expression)
+        {
+            IExpressionType Preferred = ((IExpression)expression).ResolvedResult.Item.Preferred;
+
+            if (Preferred != null && Preferred.ValueType is ICompiledNumberType AsNumberType)
+                return AsNumberType.NumberKind;
+            else
+                return NumberKinds.NotApplicable;
+        }
         #endregion
 
         #region Debugging

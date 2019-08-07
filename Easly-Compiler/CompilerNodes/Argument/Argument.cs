@@ -41,6 +41,12 @@ namespace CompilerNode
         /// </summary>
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         void CheckNumberType(ref bool isChanged);
+
+        /// <summary>
+        /// Validates number types. If not valid, adds an error.
+        /// </summary>
+        /// <param name="errorList">The list of errors found.</param>
+        void ValidateNumberType(IErrorList errorList);
     }
 
     /// <summary>
@@ -320,7 +326,7 @@ namespace CompilerNode
 
         private static bool PositionalArgumentsConformToParameters(IList<ISealableList<IParameter>> parameterTableList, IReadOnlyList<IExpressionType> arguments, IErrorList errorList, ISource source, out int selectedIndex)
         {
-            OnceReference<ISealableList<IParameter>> SelectedOverload = new OnceReference<ISealableList<IParameter>>();
+            ISealableList<IParameter> SelectedOverload = null;
             selectedIndex = -1;
             int MaximumAllowedArgumentCount = -1;
 
@@ -334,20 +340,7 @@ namespace CompilerNode
                 {
                     ICompiledType ArgumentType = arguments[j].ValueType;
                     IParameter OverloadParameter = OverloadParameterList[j];
-                    Debug.Assert(OverloadParameter.ResolvedParameter.ResolvedEffectiveType.IsAssigned);
-
-                    ICompiledType ParameterType = null;
-                    switch (OverloadParameter.ResolvedParameter.ResolvedEffectiveType.Item)
-                    {
-                        case IFunctionType AsFunctionType:
-                        case IProcedureType AsProcedureType:
-                        case IClassType AsClassType:
-                        case IFormalGenericType AsFormalGenericType:
-                            ParameterType = OverloadParameter.ResolvedParameter.ResolvedEffectiveType.Item;
-                            break;
-                    }
-
-                    Debug.Assert(ParameterType != null);
+                    ICompiledType ParameterType = TypeOfPositionalParameter(OverloadParameter);
 
                     IsMatching &= ObjectType.TypeConformToBase(ArgumentType, ParameterType, isConversionAllowed: true);
                 }
@@ -366,10 +359,27 @@ namespace CompilerNode
 
                 if (IsMatching && j >= arguments.Count)
                 {
-                    Debug.Assert(!SelectedOverload.IsAssigned);
+                    bool IsBetter = false;
 
-                    SelectedOverload.Item = OverloadParameterList;
-                    selectedIndex = i;
+                    if (SelectedOverload != null)
+                    {
+                        for (j = 0; j < OverloadParameterList.Count && j < SelectedOverload.Count; j++)
+                        {
+                            IParameter OverloadParameter = OverloadParameterList[j];
+                            ICompiledType OverloadParameterType = TypeOfPositionalParameter(OverloadParameter);
+                            IParameter SelectedParameter = SelectedOverload[j];
+                            ICompiledType SelectedParameterType = TypeOfPositionalParameter(SelectedParameter);
+
+                            if (OverloadParameterType != SelectedParameterType)
+                                IsBetter |= ObjectType.TypeConformToBase(OverloadParameterType, SelectedParameterType, isConversionAllowed: false);
+                        }
+                    }
+
+                    if (SelectedOverload == null || IsBetter)
+                    {
+                        SelectedOverload = OverloadParameterList;
+                        selectedIndex = i;
+                    }
                 }
             }
 
@@ -379,20 +389,41 @@ namespace CompilerNode
                 return false;
             }
 
-            if (!SelectedOverload.IsAssigned)
+            if (SelectedOverload == null)
             {
                 errorList.AddError(new ErrorInvalidExpression(source));
                 return false;
             }
 
-            Debug.Assert(SelectedOverload.Item.Count >= arguments.Count);
+            Debug.Assert(SelectedOverload.Count >= arguments.Count);
 
             return true;
         }
 
+        private static ICompiledType TypeOfPositionalParameter(IParameter parameter)
+        {
+            Debug.Assert(parameter.ResolvedParameter.ResolvedEffectiveType.IsAssigned);
+
+            ICompiledType ParameterType = null;
+
+            switch (parameter.ResolvedParameter.ResolvedEffectiveType.Item)
+            {
+                case IFunctionType AsFunctionType:
+                case IProcedureType AsProcedureType:
+                case IClassType AsClassType:
+                case IFormalGenericType AsFormalGenericType:
+                    ParameterType = parameter.ResolvedParameter.ResolvedEffectiveType.Item;
+                    break;
+            }
+
+            Debug.Assert(ParameterType != null);
+
+            return ParameterType;
+        }
+
         private static bool AssignmentArgumentsConformToParameters(IList<ISealableList<IParameter>> parameterTableList, IReadOnlyList<IExpressionType> arguments, IErrorList errorList, ISource source, out int selectedIndex)
         {
-            OnceReference<ISealableList<IParameter>> SelectedOverload = new OnceReference<ISealableList<IParameter>>();
+            ISealableList<IParameter> SelectedOverload = null;
             selectedIndex = -1;
 
             for (int i = 0; i < parameterTableList.Count; i++)
@@ -432,14 +463,14 @@ namespace CompilerNode
 
                 if (IsMatching)
                 {
-                    Debug.Assert(!SelectedOverload.IsAssigned);
+                    Debug.Assert(SelectedOverload == null);
 
-                    SelectedOverload.Item = OverloadParameterList;
+                    SelectedOverload = OverloadParameterList;
                     selectedIndex = i;
                 }
             }
 
-            if (!SelectedOverload.IsAssigned)
+            if (SelectedOverload == null)
             {
                 errorList.AddError(new ErrorInvalidExpression(source));
                 return false;

@@ -25,6 +25,12 @@ namespace CompilerNode
         /// </summary>
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         void CheckNumberType(ref bool isChanged);
+
+        /// <summary>
+        /// Validates number types. If not valid, adds an error.
+        /// </summary>
+        /// <param name="errorList">The list of errors found.</param>
+        void ValidateNumberType(IErrorList errorList);
     }
 
     /// <summary>
@@ -158,6 +164,18 @@ namespace CompilerNode
 
             if (RightExpression.IsAssigned)
                 ((IExpression)RightExpression.Item).CheckNumberType(ref isChanged);
+        }
+
+        /// <summary>
+        /// Validates number types. If not valid, adds an error.
+        /// </summary>
+        /// <param name="errorList">The list of errors found.</param>
+        public void ValidateNumberType(IErrorList errorList)
+        {
+            ((IExpression)LeftExpression).ValidateNumberType(errorList);
+
+            if (RightExpression.IsAssigned)
+                ((IExpression)RightExpression.Item).ValidateNumberType(errorList);
         }
         #endregion
     }

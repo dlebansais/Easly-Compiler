@@ -80,7 +80,7 @@
             Debug.Assert(PreferredLeftResult != null);
 
             if (PreferredLeftResult.ValueType is IClassType AsClassType)
-                if (AsClassType.BaseClass.ClassGuid == LanguageClasses.Number.Guid)
+                if (AsClassType.BaseClass.ClassGuid == LanguageClasses.Number.Guid || AsClassType.BaseClass.ClassGuid == LanguageClasses.Integer.Guid)
                     IsCallingNumberFeature = true;
 
             if (IsCallingNumberFeature)

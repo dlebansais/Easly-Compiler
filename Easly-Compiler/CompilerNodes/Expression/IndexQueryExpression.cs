@@ -329,6 +329,16 @@ namespace CompilerNode
                 }
             }
         }
+
+        /// <summary>
+        /// Validates number types. If not valid, adds an error.
+        /// </summary>
+        /// <param name="errorList">The list of errors found.</param>
+        public void ValidateNumberType(IErrorList errorList)
+        {
+            IExpression Expression = (IExpression)IndexedExpression;
+            Expression.ValidateNumberType(errorList);
+        }
         #endregion
 
         #region Debugging

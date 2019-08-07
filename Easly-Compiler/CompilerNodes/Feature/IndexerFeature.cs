@@ -371,6 +371,19 @@ namespace CompilerNode
             if (SetterBody.IsAssigned)
                 ((IBody)SetterBody.Item).CheckNumberType(ref isChanged);
         }
+
+        /// <summary>
+        /// Validates number types. If not valid, adds an error.
+        /// </summary>
+        /// <param name="errorList">The list of errors found.</param>
+        public void ValidateNumberType(IErrorList errorList)
+        {
+            if (GetterBody.IsAssigned)
+                ((IBody)GetterBody.Item).ValidateNumberType(errorList);
+
+            if (SetterBody.IsAssigned)
+                ((IBody)SetterBody.Item).ValidateNumberType(errorList);
+        }
         #endregion
 
         #region Debugging

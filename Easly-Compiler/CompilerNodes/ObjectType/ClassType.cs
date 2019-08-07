@@ -582,8 +582,6 @@
         {
             if (BaseClass.ClassGuid == LanguageClasses.Number.Guid)
                 return NumberKinds.Unknown;
-            else if (BaseClass.ClassGuid == LanguageClasses.Integer.Guid)
-                return NumberKinds.Integer;
             else
                 return NumberKinds.NotApplicable;
         }
