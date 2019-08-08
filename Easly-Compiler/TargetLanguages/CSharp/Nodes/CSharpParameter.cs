@@ -17,12 +17,6 @@
         /// The parameter name.
         /// </summary>
         string Name { get; }
-
-        /// <summary>
-        /// Check number types.
-        /// </summary>
-        /// <param name="isChanged">True upon return if a number type was changed.</param>
-        void CheckNumberType(ref bool isChanged);
     }
 
     /// <summary>
@@ -65,17 +59,6 @@
         /// The parameter name.
         /// </summary>
         public string Name { get { return Feature.Name; } }
-        #endregion
-
-        #region Client Interface
-        /// <summary>
-        /// Check number types.
-        /// </summary>
-        /// <param name="isChanged">True upon return if a number type was changed.</param>
-        public void CheckNumberType(ref bool isChanged)
-        {
-            ((ICSharpFeature)Feature).CheckNumberType(ref isChanged);
-        }
         #endregion
     }
 }

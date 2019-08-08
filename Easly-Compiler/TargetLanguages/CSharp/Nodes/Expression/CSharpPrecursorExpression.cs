@@ -103,21 +103,6 @@
 
         #region Client Interface
         /// <summary>
-        /// Check number types.
-        /// </summary>
-        /// <param name="isChanged">True upon return if a number type was changed.</param>
-        public override void CheckNumberType(ref bool isChanged)
-        {
-            ((ICSharpFeature)PrecursorFeature).CheckNumberType(ref isChanged);
-
-            if (SelectedOverloadType != null && SelectedOverloadType.ResultList.Count == 1)
-            {
-                ICSharpParameter Result = SelectedOverloadType.ResultList[0];
-                UpdateNumberType(Result.Feature.Type, ref isChanged);
-            }
-        }
-
-        /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>

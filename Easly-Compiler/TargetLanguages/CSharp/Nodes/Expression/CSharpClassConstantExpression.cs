@@ -129,31 +129,6 @@
 
         #region Client Interface
         /// <summary>
-        /// Check number types.
-        /// </summary>
-        /// <param name="isChanged">True upon return if a number type was changed.</param>
-        public override void CheckNumberType(ref bool isChanged)
-        {
-            if (Feature != null)
-            {
-                Debug.Assert(ConstantExpression != null);
-
-                ConstantExpression.CheckNumberType(ref isChanged);
-                UpdateNumberType(ConstantExpression, ref isChanged);
-            }
-            else
-            {
-                Debug.Assert(Discrete != null);
-
-                if (NumberType == CSharpNumberTypes.NotApplicable || NumberType == CSharpNumberTypes.Unknown)
-                {
-                    NumberType = CSharpNumberTypes.Integer;
-                    isChanged = true;
-                }
-            }
-        }
-
-        /// <summary>
         /// Gets the source code corresponding to the expression.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>

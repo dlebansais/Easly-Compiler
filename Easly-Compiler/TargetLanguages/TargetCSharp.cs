@@ -154,18 +154,6 @@
                 Class.CreateDelegates();
             }
 
-            do
-            {
-                Continue = false;
-
-                foreach (KeyValuePair<IClass, ICSharpClass> Entry in ClassTable)
-                {
-                    ICSharpClass Class = Entry.Value;
-                    Class.CheckNumberType(ref Continue);
-                }
-            }
-            while (Continue);
-
             ICSharpFeature SingledClassFeature = null;
 
             if (SingledGuid != Guid.Empty || SingledGuid == Guid.Empty)

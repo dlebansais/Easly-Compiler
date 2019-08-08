@@ -29,12 +29,6 @@
         /// </summary>
         /// <param name="precursor">The precursor.</param>
         void SetPrecursor(ICSharpQueryOverload precursor);
-
-        /// <summary>
-        /// Check number types.
-        /// </summary>
-        /// <param name="isChanged">True upon return if a number type was changed.</param>
-        void CheckNumberType(ref bool isChanged);
     }
 
     /// <summary>
@@ -254,19 +248,6 @@
                 writer.WriteIndentedLine($"{ResultType} {nameString}({ArgumentEntityList});");
                 isMultiline = false;
             }
-        }
-
-        /// <summary>
-        /// Check number types.
-        /// </summary>
-        /// <param name="isChanged">True upon return if a number type was changed.</param>
-        public void CheckNumberType(ref bool isChanged)
-        {
-            foreach (ICSharpParameter Result in ResultList)
-                Result.CheckNumberType(ref isChanged);
-
-            if (Body is ICSharpEffectiveBody AsEffectiveBody)
-                AsEffectiveBody.CheckNumberType(ref isChanged);
         }
         #endregion
 

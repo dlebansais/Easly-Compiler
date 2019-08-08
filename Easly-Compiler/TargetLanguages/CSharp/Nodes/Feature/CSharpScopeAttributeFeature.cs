@@ -140,24 +140,6 @@
         }
 
         /// <summary>
-        /// Check number types.
-        /// </summary>
-        /// <param name="isChanged">True upon return if a number type was changed.</param>
-        public override void CheckNumberType(ref bool isChanged)
-        {
-            if (DefaultValue != null && (Type.NumberType == CSharpNumberTypes.NotApplicable || Type.NumberType == CSharpNumberTypes.Unknown))
-            {
-                DefaultValue.CheckNumberType(ref isChanged);
-
-                if (DefaultValue.NumberType != CSharpNumberTypes.NotApplicable && DefaultValue.NumberType != CSharpNumberTypes.Unknown)
-                {
-                    Type.NumberType = DefaultValue.NumberType;
-                    isChanged = true;
-                }
-            }
-        }
-
-        /// <summary>
         /// Gets the feature output format.
         /// </summary>
         /// <param name="selectedOverloadType">The selected overload type.</param>

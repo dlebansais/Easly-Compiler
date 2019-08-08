@@ -34,12 +34,6 @@
         CSharpNumberTypes NumberType { get; set; }
 
         /// <summary>
-        /// Check number types.
-        /// </summary>
-        /// <param name="isChanged">True upon return if a number type was changed.</param>
-        void CheckNumberType(ref bool isChanged);
-
-        /// <summary>
         /// Writes down the C# instruction.
         /// </summary>
         /// <param name="writer">The stream on which to write.</param>
@@ -211,12 +205,6 @@
         #endregion
 
         #region Client Interface
-        /// <summary>
-        /// Check number types.
-        /// </summary>
-        /// <param name="isChanged">True upon return if a number type was changed.</param>
-        public abstract void CheckNumberType(ref bool isChanged);
-
         /// <summary>
         /// Writes down the C# instruction.
         /// </summary>
