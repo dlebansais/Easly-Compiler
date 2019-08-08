@@ -498,11 +498,23 @@ namespace CompilerNode
 
         #region Numbers
         /// <summary>
+        /// Restarts a check of number types.
+        /// </summary>
+        public void RestartNumberType()
+        {
+            foreach (IArgument Argument in ArgumentList)
+                Argument.RestartNumberType();
+        }
+
+        /// <summary>
         /// Check number types.
         /// </summary>
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public void CheckNumberType(ref bool isChanged)
         {
+            foreach (IArgument Argument in ArgumentList)
+                Argument.CheckNumberType(ref isChanged);
+
             IExpressionType Preferred = ResolvedResult.Item.Preferred;
             if (Preferred != null && Preferred.ValueType is ICompiledNumberType AsNumberType)
             {
@@ -520,6 +532,8 @@ namespace CompilerNode
         /// <param name="errorList">The list of errors found.</param>
         public void ValidateNumberType(IErrorList errorList)
         {
+            foreach (IArgument Argument in ArgumentList)
+                Argument.ValidateNumberType(errorList);
         }
         #endregion
 

@@ -311,6 +311,18 @@ namespace CompilerNode
 
         #region Numbers
         /// <summary>
+        /// Restarts a check of number types.
+        /// </summary>
+        public void RestartNumberType()
+        {
+            IExpression Expression = (IExpression)IndexedExpression;
+            Expression.RestartNumberType();
+
+            foreach (IArgument Argument in ArgumentList)
+                Argument.RestartNumberType();
+        }
+
+        /// <summary>
         /// Check number types.
         /// </summary>
         /// <param name="isChanged">True upon return if a number type was changed.</param>
@@ -328,6 +340,9 @@ namespace CompilerNode
                     AsNumberType.UpdateNumberKind(NumberKinds.NotApplicable, ref isChanged);
                 }
             }
+
+            foreach (IArgument Argument in ArgumentList)
+                Argument.CheckNumberType(ref isChanged);
         }
 
         /// <summary>
@@ -338,6 +353,9 @@ namespace CompilerNode
         {
             IExpression Expression = (IExpression)IndexedExpression;
             Expression.ValidateNumberType(errorList);
+
+            foreach (IArgument Argument in ArgumentList)
+                Argument.ValidateNumberType(errorList);
         }
         #endregion
 

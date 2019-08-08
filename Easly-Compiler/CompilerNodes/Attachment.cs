@@ -32,6 +32,11 @@ namespace CompilerNode
         IList<IScopeAttributeFeature> ResolvedLocalEntitiesList { get; }
 
         /// <summary>
+        /// Restarts a check of number types.
+        /// </summary>
+        void RestartNumberType();
+
+        /// <summary>
         /// Check number types.
         /// </summary>
         /// <param name="isChanged">True upon return if a number type was changed.</param>
@@ -237,6 +242,14 @@ namespace CompilerNode
         #endregion
 
         #region Numbers
+        /// <summary>
+        /// Restarts a check of number types.
+        /// </summary>
+        public void RestartNumberType()
+        {
+            ((IScope)Instructions).RestartNumberType();
+        }
+
         /// <summary>
         /// Check number types.
         /// </summary>

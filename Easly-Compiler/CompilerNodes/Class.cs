@@ -338,6 +338,11 @@ namespace CompilerNode
         IList<IInitializedObjectExpression> InitializedObjectList { get; }
 
         /// <summary>
+        /// Restarts a check of number types.
+        /// </summary>
+        void RestartNumberType();
+
+        /// <summary>
         /// Check number types.
         /// </summary>
         /// <param name="isChanged">True upon return if a number type was changed.</param>
@@ -1275,6 +1280,15 @@ namespace CompilerNode
         #endregion
 
         #region Numbers
+        /// <summary>
+        /// Restarts a check of number types.
+        /// </summary>
+        public void RestartNumberType()
+        {
+            foreach (IFeature Feature in FeatureList)
+                Feature.RestartNumberType();
+        }
+
         /// <summary>
         /// Check number types.
         /// </summary>

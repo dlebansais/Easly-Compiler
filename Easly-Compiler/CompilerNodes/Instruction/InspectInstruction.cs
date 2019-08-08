@@ -205,6 +205,20 @@ namespace CompilerNode
 
         #region Numbers
         /// <summary>
+        /// Restarts a check of number types.
+        /// </summary>
+        public void RestartNumberType()
+        {
+            ((IExpression)Source).RestartNumberType();
+
+            foreach (IWith With in WithList)
+                With.RestartNumberType();
+
+            if (ElseInstructions.IsAssigned)
+                ((IScope)ElseInstructions.Item).RestartNumberType();
+        }
+
+        /// <summary>
         /// Check number types.
         /// </summary>
         /// <param name="isChanged">True upon return if a number type was changed.</param>

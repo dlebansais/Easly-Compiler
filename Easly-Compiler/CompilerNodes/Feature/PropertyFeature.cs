@@ -373,6 +373,18 @@ namespace CompilerNode
 
         #region Numbers
         /// <summary>
+        /// Restarts a check of number types.
+        /// </summary>
+        public void RestartNumberType()
+        {
+            if (GetterBody.IsAssigned)
+                ((IBody)GetterBody.Item).RestartNumberType();
+
+            if (SetterBody.IsAssigned)
+                ((IBody)SetterBody.Item).RestartNumberType();
+        }
+
+        /// <summary>
         /// Check number types.
         /// </summary>
         /// <param name="isChanged">True upon return if a number type was changed.</param>

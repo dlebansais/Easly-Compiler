@@ -261,6 +261,29 @@ namespace CompilerNode
 
         #region Numbers
         /// <summary>
+        /// Restarts a check of number types.
+        /// </summary>
+        public void RestartNumberType()
+        {
+            foreach (IEntityDeclaration EntityDeclaration in EntityDeclarationList)
+                EntityDeclaration.RestartNumberType();
+
+            foreach (IInstruction Instruction in InitInstructionList)
+                Instruction.RestartNumberType();
+
+            ((IExpression)WhileCondition).RestartNumberType();
+
+            foreach (IInstruction Instruction in LoopInstructionList)
+                Instruction.RestartNumberType();
+
+            foreach (IInstruction Instruction in IterationInstructionList)
+                Instruction.RestartNumberType();
+
+            if (Variant.IsAssigned)
+                ((IExpression)Variant.Item).RestartNumberType();
+        }
+
+        /// <summary>
         /// Check number types.
         /// </summary>
         /// <param name="isChanged">True upon return if a number type was changed.</param>

@@ -324,6 +324,21 @@ namespace CompilerNode
 
         #region Numbers
         /// <summary>
+        /// Restarts a check of number types.
+        /// </summary>
+        public void RestartNumberType()
+        {
+            if (ResolvedFinalFeature.IsAssigned)
+            {
+                IConstantFeature Feature = ResolvedFinalFeature.Item;
+                if (Feature.ResolvedEntityType.Item is ICompiledNumberType AsNumberTypeEntity)
+                {
+                    Feature.RestartNumberType();
+                }
+            }
+        }
+
+        /// <summary>
         /// Check number types.
         /// </summary>
         /// <param name="isChanged">True upon return if a number type was changed.</param>

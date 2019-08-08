@@ -42,6 +42,11 @@ namespace CompilerNode
         OnceReference<ILanguageConstant> ExpressionConstant { get; }
 
         /// <summary>
+        /// Restarts a check of number types.
+        /// </summary>
+        void RestartNumberType();
+
+        /// <summary>
         /// Check number types.
         /// </summary>
         /// <param name="isChanged">True upon return if a number type was changed.</param>

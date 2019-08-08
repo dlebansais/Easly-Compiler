@@ -72,6 +72,11 @@
         OnceReference<ICompiledBody> ResolvedBody { get; }
 
         /// <summary>
+        /// Restarts a check of number types.
+        /// </summary>
+        void RestartNumberType();
+
+        /// <summary>
         /// Check number types.
         /// </summary>
         /// <param name="isChanged">True upon return if a number type was changed.</param>
@@ -336,6 +341,23 @@
         #endregion
 
         #region Numbers
+        /// <summary>
+        /// Restarts a check of number types.
+        /// </summary>
+        public void RestartNumberType()
+        {
+            foreach (IEntityDeclaration EntityDeclaration in ParameterList)
+                EntityDeclaration.RestartNumberType();
+
+            foreach (IEntityDeclaration EntityDeclaration in ResultList)
+                EntityDeclaration.RestartNumberType();
+
+            if (Variant.IsAssigned)
+                ((IExpression)Variant).RestartNumberType();
+
+            ((IBody)QueryBody).RestartNumberType();
+        }
+
         /// <summary>
         /// Check number types.
         /// </summary>
