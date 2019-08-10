@@ -72,6 +72,11 @@
         OnceReference<ICompiledBody> ResolvedBody { get; }
 
         /// <summary>
+        /// The know arguments to the overload for each number parameter.
+        /// </summary>
+        IDictionary<IParameter, IList<NumberKinds>> NumberArgumentTable { get; }
+
+        /// <summary>
         /// Restarts a check of number types.
         /// </summary>
         void RestartNumberType();
@@ -338,6 +343,11 @@
         /// The resolved body.
         /// </summary>
         public OnceReference<ICompiledBody> ResolvedBody { get; private set; } = new OnceReference<ICompiledBody>();
+
+        /// <summary>
+        /// The know arguments to the overload for each number parameter.
+        /// </summary>
+        public IDictionary<IParameter, IList<NumberKinds>> NumberArgumentTable { get; } = new Dictionary<IParameter, IList<NumberKinds>>();
         #endregion
 
         #region Numbers
@@ -356,6 +366,39 @@
                 ((IExpression)Variant).RestartNumberType();
 
             ((IBody)QueryBody).RestartNumberType();
+
+            if (ParameterTable.Count > 0)
+            {
+                if (NumberArgumentTable.Count == 0)
+                {
+                    for (int i = 0; i < ParameterTable.Count; i++)
+                    {
+                        IParameter Parameter = ParameterTable[i];
+                        NumberArgumentTable.Add(Parameter, new List<NumberKinds>());
+                    }
+                }
+                else
+                {
+                    // Result of the previous pass.
+                    for (int i = 0; i < ParameterTable.Count; i++)
+                    {
+                        IParameter Parameter = ParameterTable[i];
+                        Debug.Assert(NumberArgumentTable.ContainsKey(Parameter));
+
+                        Debug.Assert(Parameter.ResolvedParameter.ResolvedEffectiveType.IsAssigned);
+
+                        if (Parameter.ResolvedParameter.ResolvedEffectiveType.Item is ICompiledNumberType AsNumberType)
+                        {
+                            NumberKinds BestGuess = GetParameterKind(Parameter);
+
+                            bool IsChanged = false;
+                            AsNumberType.UpdateNumberKind(BestGuess, ref IsChanged);
+                        }
+
+                        NumberArgumentTable[Parameter].Clear();
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -392,6 +435,34 @@
                 ((IExpression)Variant).ValidateNumberType(errorList);
 
             ((IBody)QueryBody).ValidateNumberType(errorList);
+        }
+
+        /// <summary>
+        /// Gets the best guess for the kind of a number parameter.
+        /// </summary>
+        public NumberKinds GetParameterKind(IParameter parameter)
+        {
+            NumberKinds BestGuess = NumberKinds.Integer;
+
+            foreach (NumberKinds Item in NumberArgumentTable[parameter])
+            {
+                switch (Item)
+                {
+                    case NumberKinds.NotApplicable:
+                        return NumberKinds.NotApplicable;
+
+                    case NumberKinds.Unknown:
+                        BestGuess = NumberKinds.Unknown;
+                        break;
+
+                    case NumberKinds.Real:
+                        if (BestGuess == NumberKinds.Integer)
+                            BestGuess = NumberKinds.Real;
+                        break;
+                }
+            }
+
+            return BestGuess;
         }
         #endregion
 

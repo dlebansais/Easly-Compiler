@@ -1134,6 +1134,9 @@
         {
             for (;;)
             {
+                foreach (IClass Class in root.ClassList)
+                    Class.RestartNumberType();
+
                 bool IsChanged = false;
 
                 foreach (IClass Class in root.ClassList)
