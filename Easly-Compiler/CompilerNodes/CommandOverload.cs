@@ -49,7 +49,7 @@ namespace CompilerNode
         /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        void RestartNumberType();
+        void RestartNumberType(ref bool isChanged);
 
         /// <summary>
         /// Check number types.
@@ -267,12 +267,12 @@ namespace CompilerNode
         /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
             foreach (IEntityDeclaration EntityDeclaration in ParameterList)
-                EntityDeclaration.RestartNumberType();
+                EntityDeclaration.RestartNumberType(ref isChanged);
 
-            ((IBody)CommandBody).RestartNumberType();
+            ((IBody)CommandBody).RestartNumberType(ref isChanged);
         }
 
         /// <summary>

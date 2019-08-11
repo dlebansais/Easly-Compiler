@@ -220,12 +220,24 @@ namespace CompilerNode
 
         #region Numbers
         /// <summary>
+        /// The number kind if the constant type is a number.
+        /// </summary>
+        public NumberKinds NumberKind
+        {
+            get
+            {
+                IExpression SourceExpression = (IExpression)Source;
+                return SourceExpression.NumberKind;
+            }
+        }
+
+        /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
             IExpression SourceExpression = (IExpression)Source;
-            SourceExpression.RestartNumberType();
+            SourceExpression.RestartNumberType(ref isChanged);
         }
 
         /// <summary>
@@ -234,21 +246,8 @@ namespace CompilerNode
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public void CheckNumberType(ref bool isChanged)
         {
-            IExpressionType Preferred = ResolvedResult.Item.Preferred;
-            if (Preferred != null && Preferred.ValueType is ICompiledNumberType AsNumberType)
-            {
-                if (AsNumberType.NumberKind == NumberKinds.NotChecked)
-                {
-                    IExpression SourceExpression = (IExpression)Source;
-                    SourceExpression.CheckNumberType(ref isChanged);
-
-                    IExpressionType PreferredSource = SourceExpression.ResolvedResult.Item.Preferred;
-                    if (PreferredSource.ValueType is ICompiledNumberType AsNumberTypeSource)
-                    {
-                        AsNumberType.UpdateNumberKind(AsNumberTypeSource, ref isChanged);
-                    }
-                }
-            }
+            IExpression SourceExpression = (IExpression)Source;
+            SourceExpression.CheckNumberType(ref isChanged);
         }
 
         /// <summary>

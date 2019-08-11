@@ -22,6 +22,11 @@ namespace CompilerNode
         OnceReference<IFeatureInstance> ResolvedPrecursor { get; }
 
         /// <summary>
+        /// The resolved indexer.
+        /// </summary>
+        OnceReference<IIndexerFeature> ResolvedIndexer { get; }
+
+        /// <summary>
         /// Details of the feature call.
         /// </summary>
         OnceReference<IFeatureCall> FeatureCall { get; }
@@ -131,6 +136,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
                 ResolvedException = new OnceReference<IResultException>();
+                ResolvedIndexer = new OnceReference<IIndexerFeature>();
                 FeatureCall = new OnceReference<IFeatureCall>();
                 IsHandled = true;
             }
@@ -166,6 +172,7 @@ namespace CompilerNode
             {
                 IsResolved = ResolvedException.IsAssigned;
 
+                Debug.Assert(ResolvedIndexer.IsAssigned || !IsResolved);
                 Debug.Assert(FeatureCall.IsAssigned || !IsResolved);
 
                 IsHandled = true;
@@ -210,6 +217,11 @@ namespace CompilerNode
         public OnceReference<IFeatureInstance> ResolvedPrecursor { get; private set; } = new OnceReference<IFeatureInstance>();
 
         /// <summary>
+        /// The resolved indexer.
+        /// </summary>
+        public OnceReference<IIndexerFeature> ResolvedIndexer { get; private set; } = new OnceReference<IIndexerFeature>();
+
+        /// <summary>
         /// Details of the feature call.
         /// </summary>
         public OnceReference<IFeatureCall> FeatureCall { get; private set; } = new OnceReference<IFeatureCall>();
@@ -243,20 +255,10 @@ namespace CompilerNode
         /// </summary>
         /// <param name="node">The agent expression to check.</param>
         /// <param name="errorList">The list of errors found.</param>
-        /// <param name="resolvedResult">The expression result types upon return.</param>
-        /// <param name="resolvedException">Exceptions the expression can throw upon return.</param>
-        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
-        /// <param name="expressionConstant">The expression constant upon return.</param>
-        /// <param name="selectedPrecursor">The selected precursor.</param>
-        /// <param name="featureCall">Details of the feature call.</param>
-        public static bool ResolveCompilerReferences(IPrecursorIndexExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFeatureInstance selectedPrecursor, out IFeatureCall featureCall)
+        /// <param name="resolvedExpression">The result of the search.</param>
+        public static bool ResolveCompilerReferences(IPrecursorIndexExpression node, IErrorList errorList, out ResolvedExpression resolvedExpression)
         {
-            resolvedResult = null;
-            resolvedException = null;
-            constantSourceList = new SealableList<IExpression>();
-            expressionConstant = NeutralLanguageConstant.NotConstant;
-            selectedPrecursor = null;
-            featureCall = null;
+            resolvedExpression = new ResolvedExpression();
 
             IOptionalReference<BaseNode.IObjectType> AncestorType = node.AncestorType;
             IList<IArgument> ArgumentList = node.ArgumentList;
@@ -270,10 +272,12 @@ namespace CompilerNode
             {
                 IFeatureInstance Instance = FeatureTable[FeatureName.IndexerFeatureName];
 
-                if (!Instance.FindPrecursor(node.AncestorType, errorList, node, out selectedPrecursor))
+                if (!Instance.FindPrecursor(node.AncestorType, errorList, node, out IFeatureInstance SelectedPrecursor))
                     return false;
 
-                if (!ResolveSelectedPrecursor(node, selectedPrecursor, errorList, out resolvedResult, out resolvedException, out constantSourceList, out expressionConstant, out featureCall))
+                resolvedExpression.SelectedPrecursor = SelectedPrecursor;
+
+                if (!ResolveSelectedPrecursor(node, SelectedPrecursor, errorList, ref resolvedExpression))
                     return false;
             }
             else
@@ -289,14 +293,8 @@ namespace CompilerNode
             return true;
         }
 
-        private static bool ResolveSelectedPrecursor(IPrecursorIndexExpression node, IFeatureInstance selectedPrecursor, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFeatureCall featureCall)
+        private static bool ResolveSelectedPrecursor(IPrecursorIndexExpression node, IFeatureInstance selectedPrecursor, IErrorList errorList, ref ResolvedExpression resolvedExpression)
         {
-            resolvedResult = null;
-            resolvedException = null;
-            constantSourceList = new SealableList<IExpression>();
-            expressionConstant = NeutralLanguageConstant.NotConstant;
-            featureCall = null;
-
             IList<IArgument> ArgumentList = node.ArgumentList;
 
             List<IExpressionType> MergedArgumentList = new List<IExpressionType>();
@@ -318,12 +316,13 @@ namespace CompilerNode
             if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, TypeArgumentStyle, errorList, node, out SelectedIndex))
                 return false;
 
-            resolvedResult = new ResultType(OperatorType.ResolvedEntityTypeName.Item, OperatorType.ResolvedEntityType.Item, string.Empty);
+            resolvedExpression.ResolvedResult = new ResultType(OperatorType.ResolvedEntityTypeName.Item, OperatorType.ResolvedEntityType.Item, string.Empty);
 
-            resolvedException = new ResultException(OperatorType.GetExceptionIdentifierList);
-            featureCall = new FeatureCall(ParameterTableList[SelectedIndex], ResultTableList[SelectedIndex], ArgumentList, MergedArgumentList, TypeArgumentStyle);
+            resolvedExpression.ResolvedException = new ResultException(OperatorType.GetExceptionIdentifierList);
+            resolvedExpression.FeatureCall = new FeatureCall(ParameterTableList[SelectedIndex], ResultTableList[SelectedIndex], ArgumentList, MergedArgumentList, TypeArgumentStyle);
+            resolvedExpression.ResolvedFinalFeature = OperatorFeature;
 
-            Argument.AddConstantArguments(ArgumentList, constantSourceList);
+            Argument.AddConstantArguments(ArgumentList, resolvedExpression.ConstantSourceList);
 
             return true;
         }
@@ -331,12 +330,17 @@ namespace CompilerNode
 
         #region Numbers
         /// <summary>
+        /// The number kind if the constant type is a number.
+        /// </summary>
+        public NumberKinds NumberKind { get { return ResolvedResult.Item.NumberKind; } }
+
+        /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
             foreach (IArgument Argument in ArgumentList)
-                Argument.RestartNumberType();
+                Argument.RestartNumberType(ref isChanged);
         }
 
         /// <summary>
@@ -348,15 +352,7 @@ namespace CompilerNode
             foreach (IArgument Argument in ArgumentList)
                 Argument.CheckNumberType(ref isChanged);
 
-            IExpressionType Preferred = ResolvedResult.Item.Preferred;
-            if (Preferred != null && Preferred.ValueType is ICompiledNumberType AsNumberType)
-            {
-                if (AsNumberType.NumberKind == NumberKinds.NotChecked)
-                {
-                    //TODO
-                    AsNumberType.UpdateNumberKind(NumberKinds.NotApplicable, ref isChanged);
-                }
-            }
+            Debug.Assert(ResolvedIndexer.IsAssigned);
         }
 
         /// <summary>

@@ -316,12 +316,17 @@ namespace CompilerNode
 
         #region Numbers
         /// <summary>
+        /// The number kind if the constant type is a number.
+        /// </summary>
+        public NumberKinds NumberKind { get { return ResolvedResult.Item.NumberKind; } }
+
+        /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
-            ((IExpression)LeftExpression).RestartNumberType();
-            ((IExpression)RightExpression).RestartNumberType();
+            ((IExpression)LeftExpression).RestartNumberType(ref isChanged);
+            ((IExpression)RightExpression).RestartNumberType(ref isChanged);
         }
 
         /// <summary>
@@ -332,27 +337,44 @@ namespace CompilerNode
         {
             Debug.Assert(ResolvedResult.IsAssigned);
 
-            IExpressionType Preferred = ResolvedResult.Item.Preferred;
-            if (Preferred != null && Preferred.ValueType is ICompiledNumberType AsNumberType)
+            ((IExpression)LeftExpression).CheckNumberType(ref isChanged);
+            ((IExpression)RightExpression).CheckNumberType(ref isChanged);
+
+            Debug.Assert(SelectedOverload.IsAssigned);
+            IQueryOverload Overload = SelectedOverload.Item;
+            Overload.CheckNumberType(ref isChanged);
+
+            ResolvedResult.Item.UpdateNumberKind(Overload.NumberKind, ref isChanged);
+
+            IDictionary<IParameter, IList<NumberKinds>> NumberArgumentTable = Overload.NumberArgumentTable;
+            Debug.Assert(NumberArgumentTable.Count > 0);
+            Debug.Assert(FeatureCall.Item.ArgumentList.Count <= NumberArgumentTable.Count);
+            Debug.Assert(FeatureCall.Item.ParameterList.Count == NumberArgumentTable.Count);
+
+            for (int i = 0; i < FeatureCall.Item.ArgumentList.Count; i++)
             {
-                if (AsNumberType.NumberKind == NumberKinds.NotChecked)
+                IArgument Argument = FeatureCall.Item.ArgumentList[i];
+                IParameter Parameter = Overload.ParameterTable[i];
+
+                Debug.Assert(NumberArgumentTable.ContainsKey(Parameter));
+                IList<NumberKinds> NumberKindList = NumberArgumentTable[Parameter];
+
+                IExpression SourceExpression = null;
+                switch (Argument)
                 {
-                    ((IExpression)LeftExpression).CheckNumberType(ref isChanged);
-                    ((IExpression)RightExpression).CheckNumberType(ref isChanged);
+                    case IPositionalArgument AsPositionalArgument:
+                        SourceExpression = (IExpression)AsPositionalArgument.Source;
+                        break;
 
-                    Debug.Assert(SelectedOverload.IsAssigned);
-
-                    IQueryOverload Overload = SelectedOverload.Item;
-
-                    foreach (IParameter Result in Overload.ResultTable)
-                    {
-                        if (Result.Name == nameof(BaseNode.Keyword.Result) && Result.ResolvedParameter.ResolvedEffectiveType.Item is ICompiledNumberType AsNumberTypeResult)
-                        {
-                            AsNumberType.UpdateNumberKind(AsNumberTypeResult, ref isChanged);
-                            break;
-                        }
-                    }
+                    case IAssignmentArgument AsAssignmentArgument:
+                        SourceExpression = (IExpression)AsAssignmentArgument.Source;
+                        break;
                 }
+
+                Debug.Assert(SourceExpression != null);
+                Debug.Assert(SourceExpression.ResolvedResult.IsAssigned);
+
+                NumberKindList.Add(SourceExpression.ResolvedResult.Item.NumberKind);
             }
         }
 
@@ -364,7 +386,6 @@ namespace CompilerNode
         {
             ((IExpression)LeftExpression).ValidateNumberType(errorList);
             ((IExpression)RightExpression).ValidateNumberType(errorList);
-            Debug.Assert(SelectedOverload.IsAssigned);
 
             Debug.Assert(SelectedOverload.IsAssigned);
             IQueryOverload Overload = SelectedOverload.Item;
@@ -384,8 +405,8 @@ namespace CompilerNode
                     case "bitwise and":
                     case "bitwise or":
                     case "bitwise xor":
-                        NumberKinds LeftKind = GetExpressionNumberKind(LeftExpression);
-                        NumberKinds RightKind = GetExpressionNumberKind(RightExpression);
+                        NumberKinds LeftKind = ((IExpression)LeftExpression).ResolvedResult.Item.NumberKind;
+                        NumberKinds RightKind = ((IExpression)RightExpression).ResolvedResult.Item.NumberKind;
 
                         if (LeftKind != NumberKinds.Integer)
                             errorList.AddError(new ErrorInvalidOperatorOnNumber((IExpression)LeftExpression, FeatureName));
@@ -394,16 +415,6 @@ namespace CompilerNode
                         break;
                 }
             }
-        }
-
-        private NumberKinds GetExpressionNumberKind(BaseNode.IExpression expression)
-        {
-            IExpressionType Preferred = ((IExpression)expression).ResolvedResult.Item.Preferred;
-
-            if (Preferred != null && Preferred.ValueType is ICompiledNumberType AsNumberType)
-                return AsNumberType.NumberKind;
-            else
-                return NumberKinds.NotApplicable;
         }
         #endregion
 

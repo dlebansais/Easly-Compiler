@@ -49,10 +49,10 @@
             data = null;
             bool Success = true;
 
-            Success &= PrecursorExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IResultException ResolvedException, out ISealableList<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out IFeatureInstance SelectedPrecursor, out IQueryOverloadType SelectedOverloadType, out IFeatureCall FeatureCall);
+            Success &= PrecursorExpression.ResolveCompilerReferences(node, ErrorList, out ResolvedExpression ResolvedExpression);
 
             if (Success)
-                data = new Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureInstance, IQueryOverloadType, IFeatureCall>(ResolvedResult, ResolvedException, ConstantSourceList, ExpressionConstant, SelectedPrecursor, SelectedOverloadType, FeatureCall);
+                data = ResolvedExpression;
 
             return Success;
         }
@@ -64,21 +64,15 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IPrecursorExpression node, object data)
         {
-            IResultType ResolvedResult = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureInstance, IQueryOverloadType, IFeatureCall>)data).Item1;
-            IResultException ResolvedException = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureInstance, IQueryOverloadType, IFeatureCall>)data).Item2;
-            ISealableList<IExpression> ConstantSourceList = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureInstance, IQueryOverloadType, IFeatureCall>)data).Item3;
-            ILanguageConstant ExpressionConstant = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureInstance, IQueryOverloadType, IFeatureCall>)data).Item4;
-            IFeatureInstance SelectedPrecursor = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureInstance, IQueryOverloadType, IFeatureCall>)data).Item5;
-            IQueryOverloadType SelectedOverloadType = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureInstance, IQueryOverloadType, IFeatureCall>)data).Item6;
-            IFeatureCall FeatureCall = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureInstance, IQueryOverloadType, IFeatureCall>)data).Item7;
+            ResolvedExpression ResolvedExpression = (ResolvedExpression)data;
 
-            node.ResolvedResult.Item = ResolvedResult;
-            node.ConstantSourceList.AddRange(ConstantSourceList);
+            node.ResolvedResult.Item = ResolvedExpression.ResolvedResult;
+            node.ConstantSourceList.AddRange(ResolvedExpression.ConstantSourceList);
             node.ConstantSourceList.Seal();
-            node.ResolvedPrecursor.Item = SelectedPrecursor;
+            node.ResolvedPrecursor.Item = ResolvedExpression.SelectedPrecursor;
 
             if (node.ConstantSourceList.Count == 0)
-                node.ExpressionConstant.Item = ExpressionConstant;
+                node.ExpressionConstant.Item = ResolvedExpression.ExpressionConstant;
         }
         #endregion
     }

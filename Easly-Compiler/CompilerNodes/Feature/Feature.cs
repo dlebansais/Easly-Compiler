@@ -23,7 +23,7 @@
         /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        void RestartNumberType();
+        void RestartNumberType(ref bool isChanged);
 
         /// <summary>
         /// Check number types.

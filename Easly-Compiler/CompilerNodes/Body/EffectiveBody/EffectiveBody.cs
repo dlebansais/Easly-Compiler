@@ -293,13 +293,13 @@ namespace CompilerNode
         /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
             foreach (IEntityDeclaration EntityDeclaration in EntityDeclarationList)
-                EntityDeclaration.RestartNumberType();
+                EntityDeclaration.RestartNumberType(ref isChanged);
 
             foreach (IInstruction Instruction in BodyInstructionList)
-                Instruction.RestartNumberType();
+                Instruction.RestartNumberType(ref isChanged);
         }
 
         /// <summary>

@@ -195,18 +195,10 @@ namespace CompilerNode
         /// </summary>
         /// <param name="node">The agent expression to check.</param>
         /// <param name="errorList">The list of errors found.</param>
-        /// <param name="resolvedResult">The expression result types upon return.</param>
-        /// <param name="resolvedException">Exceptions the expression can throw upon return.</param>
-        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
-        /// <param name="expressionConstant">The expression constant upon return.</param>
-        /// <param name="resolvedFinalFeature">The matching feature upon return.</param>
-        public static bool ResolveCompilerReferences(IOldExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature)
+        /// <param name="resolvedExpression">The result of the search.</param>
+        public static bool ResolveCompilerReferences(IOldExpression node, IErrorList errorList, out ResolvedExpression resolvedExpression)
         {
-            resolvedResult = null;
-            resolvedException = null;
-            constantSourceList = new SealableList<IExpression>();
-            expressionConstant = NeutralLanguageConstant.NotConstant;
-            resolvedFinalFeature = null;
+            resolvedExpression = new ResolvedExpression();
 
             IClass EmbeddingClass = node.EmbeddingClass;
             IQualifiedName Query = (IQualifiedName)node.Query;
@@ -239,9 +231,9 @@ namespace CompilerNode
 
             ObjectType.FillResultPath(EmbeddingClass, BaseType, LocalScope, ValidPath, 0, Query.ValidResultTypePath.Item);
 
-            resolvedResult = new ResultType(FinalTypeName, FinalType, string.Empty);
-            resolvedException = new ResultException();
-            resolvedFinalFeature = FinalFeature;
+            resolvedExpression.ResolvedFinalFeature = FinalFeature;
+            resolvedExpression.ResolvedResult = new ResultType(FinalTypeName, FinalType, string.Empty);
+            resolvedExpression.ResolvedException = new ResultException();
 
 #if COVERAGE
             Debug.Assert(!node.IsComplex);
@@ -253,9 +245,14 @@ namespace CompilerNode
 
         #region Numbers
         /// <summary>
+        /// The number kind if the constant type is a number.
+        /// </summary>
+        public NumberKinds NumberKind { get { return NumberKinds.NotApplicable; } }
+
+        /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
         }
 
@@ -265,6 +262,8 @@ namespace CompilerNode
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public void CheckNumberType(ref bool isChanged)
         {
+            if (ResolvedFinalFeature.Item is IFeatureWithNumberType AsFeatureWithNumberType)
+                ResolvedResult.Item.UpdateNumberKind(AsFeatureWithNumberType.NumberKind, ref isChanged);
         }
 
         /// <summary>

@@ -582,6 +582,8 @@
         {
             if (BaseClass.ClassGuid == LanguageClasses.Number.Guid)
                 return NumberKinds.Unknown;
+            else if (BaseClass.ClassGuid == LanguageClasses.Integer.Guid)
+                return NumberKinds.Integer;
             else
                 return NumberKinds.NotApplicable;
         }
@@ -604,10 +606,19 @@
             {
                 Debug.Assert(NumberKind != NumberKinds.NotApplicable || numberKind == NumberKinds.NotApplicable);
 
-                if (NumberKind == NumberKinds.Unknown && (numberKind == NumberKinds.Integer || numberKind == NumberKinds.Real))
+                if (NumberKind == NumberKinds.Unknown)
                 {
-                    NumberKind = numberKind;
-                    isChanged = true;
+                    if (numberKind == NumberKinds.Integer)
+                    {
+                        NumberKind = NumberKinds.Integer;
+                        isChanged = true;
+                    }
+
+                    if (numberKind == NumberKinds.Real)
+                    {
+                        NumberKind = NumberKinds.Real;
+                        isChanged = true;
+                    }
                 }
             }
         }
@@ -631,7 +642,7 @@
         {
             if (NumberKind == NumberKinds.NotChecked)
             {
-                NumberKind = NumberKinds.NotApplicable;
+                NumberKind = GetDefaultNumberKind();
                 isChanged = true;
             }
 
@@ -647,9 +658,14 @@
                 if (ItemNumberKind == NumberKinds.NotApplicable)
                     ComposedNumberKind = NumberKinds.NotApplicable;
                 else if (ComposedNumberKind == NumberKinds.Integer && (ItemNumberKind == NumberKinds.Unknown || ItemNumberKind == NumberKinds.Real))
-                    ComposedNumberKind = ItemNumberKind;
+                {
+                    if (ItemNumberKind == NumberKinds.Unknown)
+                        ComposedNumberKind = ItemNumberKind;
+                    else
+                        ComposedNumberKind = ItemNumberKind;
+                }
                 else if (ComposedNumberKind == NumberKinds.Real && ItemNumberKind == NumberKinds.Unknown)
-                    ComposedNumberKind = ItemNumberKind;
+                    ComposedNumberKind = NumberKinds.Unknown;
             }
 
             if (ComposedNumberKind != NumberKinds.NotApplicable)

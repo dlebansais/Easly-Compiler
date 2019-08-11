@@ -246,10 +246,10 @@ namespace CompilerNode
         /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
-            ((IExpression)OverList).RestartNumberType();
-            ((IScope)LoopInstructions).RestartNumberType();
+            ((IExpression)OverList).RestartNumberType(ref isChanged);
+            ((IScope)LoopInstructions).RestartNumberType(ref isChanged);
         }
 
         /// <summary>

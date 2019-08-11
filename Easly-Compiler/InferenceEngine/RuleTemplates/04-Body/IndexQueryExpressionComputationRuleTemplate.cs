@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using CompilerNode;
     using Easly;
 
@@ -48,10 +49,10 @@
             data = null;
             bool Success = true;
 
-            Success &= IndexQueryExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IResultException ResolvedException, out ISealableList<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out IFeatureCall FeatureCall);
+            Success &= IndexQueryExpression.ResolveCompilerReferences(node, ErrorList, out ResolvedExpression ResolvedExpression);
 
             if (Success)
-                data = new Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureCall>(ResolvedResult, ResolvedException, ConstantSourceList, ExpressionConstant, FeatureCall);
+                data = ResolvedExpression;
 
             return Success;
         }
@@ -63,14 +64,14 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IIndexQueryExpression node, object data)
         {
-            IResultType ResolvedResult = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureCall>)data).Item1;
-            IResultException ResolvedException = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureCall>)data).Item2;
-            ISealableList<IExpression> ConstantSourceList = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureCall>)data).Item3;
-            ILanguageConstant ExpressionConstant = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureCall>)data).Item4;
-            IFeatureCall FeatureCall = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureCall>)data).Item5;
+            ResolvedExpression ResolvedExpression = (ResolvedExpression)data;
 
-            node.ResolvedException.Item = ResolvedException;
-            node.FeatureCall.Item = FeatureCall;
+            node.ResolvedException.Item = ResolvedExpression.ResolvedException;
+
+            Debug.Assert(ResolvedExpression.ResolvedFinalFeature is IIndexerFeature);
+            node.ResolvedIndexer.Item = ResolvedExpression.ResolvedFinalFeature as IIndexerFeature;
+
+            node.FeatureCall.Item = ResolvedExpression.FeatureCall;
         }
         #endregion
     }

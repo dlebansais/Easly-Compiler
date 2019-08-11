@@ -1132,12 +1132,15 @@
         #region Numbers
         private void CheckNumberType(IRoot root)
         {
+            bool IsFirstPass = true;
+
             for (;;)
             {
-                foreach (IClass Class in root.ClassList)
-                    Class.RestartNumberType();
+                bool IsChanged = IsFirstPass;
+                IsFirstPass = false;
 
-                bool IsChanged = false;
+                foreach (IClass Class in root.ClassList)
+                    Class.RestartNumberType(ref IsChanged);
 
                 foreach (IClass Class in root.ClassList)
                     Class.CheckNumberType(ref IsChanged);

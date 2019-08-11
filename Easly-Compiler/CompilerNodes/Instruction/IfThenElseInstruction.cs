@@ -207,13 +207,13 @@ namespace CompilerNode
         /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
             foreach (IConditional Conditional in ConditionalList)
-                Conditional.RestartNumberType();
+                Conditional.RestartNumberType(ref isChanged);
 
             if (ElseInstructions.IsAssigned)
-                ((IScope)ElseInstructions.Item).RestartNumberType();
+                ((IScope)ElseInstructions.Item).RestartNumberType(ref isChanged);
         }
 
         /// <summary>

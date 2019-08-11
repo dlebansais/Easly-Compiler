@@ -402,9 +402,23 @@ namespace CompilerNode
 
         #region Numbers
         /// <summary>
+        /// The number kind if the constant type is a number.
+        /// </summary>
+        public NumberKinds NumberKind
+        {
+            get
+            {
+                if (Value == BaseNode.Keyword.Result)
+                    return ResolvedResult.Item.NumberKind;
+                else
+                    return NumberKinds.NotApplicable;
+            }
+        }
+
+        /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
         }
 
@@ -414,6 +428,30 @@ namespace CompilerNode
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public void CheckNumberType(ref bool isChanged)
         {
+            if (Value == BaseNode.Keyword.Result)
+            {
+                bool IsHandled = false;
+
+                if (EmbeddingOverload is IQueryOverload AsQueryOverload)
+                {
+                    IsHandled = true;
+                    ResolvedResult.Item.UpdateNumberKind(AsQueryOverload.NumberKind, ref isChanged);
+                }
+                else if (EmbeddingFeature is IPropertyFeature AsPropertyFeature)
+                {
+                    ResolvedResult.Item.UpdateNumberKind(AsPropertyFeature.NumberKind, ref isChanged);
+                    IsHandled = true;
+                }
+                else if (EmbeddingFeature is IIndexerFeature AsIndexerFeature)
+                {
+                    ResolvedResult.Item.UpdateNumberKind(AsIndexerFeature.NumberKind, ref isChanged);
+                    IsHandled = true;
+                }
+
+                Debug.Assert(IsHandled);
+            }
+            else
+                Debug.Assert(ResolvedResult.Item.NumberKind == NumberKinds.NotApplicable);
         }
 
         /// <summary>

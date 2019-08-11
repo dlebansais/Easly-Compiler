@@ -235,15 +235,15 @@ namespace CompilerNode
         /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
-            ((IExpression)Source).RestartNumberType();
+            ((IExpression)Source).RestartNumberType(ref isChanged);
 
             foreach (IAttachment Attachment in AttachmentList)
-                Attachment.RestartNumberType();
+                Attachment.RestartNumberType(ref isChanged);
 
             if (ElseInstructions.IsAssigned)
-                ((IScope)ElseInstructions.Item).RestartNumberType();
+                ((IScope)ElseInstructions.Item).RestartNumberType(ref isChanged);
         }
 
         /// <summary>

@@ -434,10 +434,17 @@
 
         #region Numbers
         /// <summary>
+        /// The number kind if the constant type is a number.
+        /// </summary>
+        public NumberKinds NumberKind { get { return NumberKinds.NotApplicable; } }
+
+        /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
+            foreach (IAssignmentArgument Assignment in AssignmentList)
+                Assignment.RestartNumberType(ref isChanged);
         }
 
         /// <summary>
@@ -446,6 +453,10 @@
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public void CheckNumberType(ref bool isChanged)
         {
+            foreach (IAssignmentArgument Assignment in AssignmentList)
+                Assignment.CheckNumberType(ref isChanged);
+
+            Debug.Assert(ResolvedResult.Item.NumberKind == NumberKinds.NotApplicable);
         }
 
         /// <summary>
@@ -454,6 +465,8 @@
         /// <param name="errorList">The list of errors found.</param>
         public void ValidateNumberType(IErrorList errorList)
         {
+            foreach (IAssignmentArgument Assignment in AssignmentList)
+                Assignment.ValidateNumberType(errorList);
         }
         #endregion
 

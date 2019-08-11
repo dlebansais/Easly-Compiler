@@ -42,9 +42,14 @@ namespace CompilerNode
         OnceReference<ILanguageConstant> ExpressionConstant { get; }
 
         /// <summary>
+        /// The number kind if the constant type is a number.
+        /// </summary>
+        NumberKinds NumberKind { get; }
+
+        /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        void RestartNumberType();
+        void RestartNumberType(ref bool isChanged);
 
         /// <summary>
         /// Check number types.

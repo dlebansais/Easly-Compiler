@@ -25,6 +25,11 @@
         IExpressionType At(int index);
 
         /// <summary>
+        /// The number kind if the expression type is a number.
+        /// </summary>
+        NumberKinds NumberKind { get; }
+
+        /// <summary>
         /// Get the type of the result if only one, or the one named 'result' if more than one.
         /// </summary>
         /// <param name="type">The result type upon return, if successful.</param>
@@ -34,6 +39,13 @@
         /// Gets the list of types.
         /// </summary>
         IReadOnlyList<IExpressionType> ToList();
+
+        /// <summary>
+        /// Tentatively updates the number kind of the result.
+        /// </summary>
+        /// <param name="numberKind">The new number kind.</param>
+        /// <param name="isChanged">True if the number kind was changed.</param>
+        void UpdateNumberKind(NumberKinds numberKind, ref bool isChanged);
     }
 
     /// <summary>
@@ -127,6 +139,21 @@
                 return null;
             }
         }
+
+        /// <summary>
+        /// The number kind if the expression type is a number.
+        /// </summary>
+        public NumberKinds NumberKind
+        {
+            get
+            {
+                IExpressionType PreferredResultType = Preferred;
+                if (PreferredResultType != null)
+                    return PreferredResultType.NumberKind;
+                else
+                    return NumberKinds.NotApplicable;
+            }
+        }
         #endregion
 
         #region Client Interface
@@ -167,6 +194,18 @@
         public IReadOnlyList<IExpressionType> ToList()
         {
             return this;
+        }
+
+        /// <summary>
+        /// Tentatively updates the number kind of the result.
+        /// </summary>
+        /// <param name="numberKind">The new number kind.</param>
+        /// <param name="isChanged">True if the number kind was changed.</param>
+        public void UpdateNumberKind(NumberKinds numberKind, ref bool isChanged)
+        {
+            IExpressionType PreferredResultType = Preferred;
+            if (PreferredResultType != null)
+                PreferredResultType.UpdateNumberKind(numberKind, ref isChanged);
         }
         #endregion
     }

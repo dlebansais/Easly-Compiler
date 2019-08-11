@@ -1,5 +1,6 @@
 ﻿namespace EaslyCompiler
 {
+    using System.Diagnostics;
     using CompilerNode;
 
     /// <summary>
@@ -38,6 +39,11 @@
         int Index { get; }
 
         /// <summary>
+        /// The number kind if the expression type is a number.
+        /// </summary>
+        NumberKinds NumberKind { get; }
+
+        /// <summary>
         /// Sets the origin expression of this type.
         /// </summary>
         /// <param name="source">The expression with this type.</param>
@@ -49,6 +55,13 @@
         /// </summary>
         /// <param name="name">The name to set.</param>
         void SetName(string name);
+
+        /// <summary>
+        /// Tentatively updates the number kind of the result.
+        /// </summary>
+        /// <param name="numberKind">The new number kind.</param>
+        /// <param name="isChanged">True if the number kind was changed.</param>
+        void UpdateNumberKind(NumberKinds numberKind, ref bool isChanged);
     }
 
     /// <summary>
@@ -68,6 +81,11 @@
             ValueTypeName = valueTypeName;
             ValueType = valueType;
             Name = name;
+
+            if (valueType is ICompiledNumberType AsNumberType)
+                NumberKind = AsNumberType.GetDefaultNumberKind();
+            else
+                NumberKind = NumberKinds.NotApplicable;
         }
         #endregion
 
@@ -101,6 +119,11 @@
         /// Index of this type in results of <see cref="Source"/>.
         /// </summary>
         public int Index { get; private set; }
+
+        /// <summary>
+        /// The number kind if the expression type is a number.
+        /// </summary>
+        public NumberKinds NumberKind { get; private set; }
         #endregion
 
         #region Client Interface
@@ -122,6 +145,42 @@
         public void SetName(string name)
         {
             Name = name;
+        }
+
+        /// <summary>
+        /// Tentatively updates the number kind of the result.
+        /// </summary>
+        /// <param name="numberKind">The new number kind.</param>
+        /// <param name="isChanged">True if the number kind was changed.</param>
+        public void UpdateNumberKind(NumberKinds numberKind, ref bool isChanged)
+        {
+            Debug.Assert(numberKind != NumberKinds.NotChecked);
+            Debug.Assert(ValueType is ICompiledNumberType);
+
+            if (NumberKind == NumberKinds.NotChecked)
+            {
+                NumberKind = numberKind;
+                isChanged = true;
+            }
+            else
+            {
+                Debug.Assert(NumberKind != NumberKinds.NotApplicable || numberKind == NumberKinds.NotApplicable);
+
+                if (NumberKind == NumberKinds.Unknown)
+                {
+                    if (numberKind == NumberKinds.Integer)
+                    {
+                        NumberKind = NumberKinds.Integer;
+                        isChanged = true;
+                    }
+
+                    if (numberKind == NumberKinds.Real)
+                    {
+                        NumberKind = NumberKinds.Real;
+                        isChanged = true;
+                    }
+                }
+            }
         }
         #endregion
     }

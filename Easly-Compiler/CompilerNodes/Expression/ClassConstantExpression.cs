@@ -324,17 +324,31 @@ namespace CompilerNode
 
         #region Numbers
         /// <summary>
+        /// The number kind if the constant type is a number.
+        /// </summary>
+        public NumberKinds NumberKind
+        {
+            get
+            {
+                if (ResolvedFinalFeature.IsAssigned)
+                    return ((IExpression)ResolvedFinalFeature.Item.ConstantValue).ResolvedResult.Item.NumberKind;
+                else
+                {
+                    Debug.Assert(ResolvedFinalDiscrete.IsAssigned);
+                    return NumberKinds.Integer;
+                }
+            }
+        }
+
+        /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
             if (ResolvedFinalFeature.IsAssigned)
             {
                 IConstantFeature Feature = ResolvedFinalFeature.Item;
-                if (Feature.ResolvedEntityType.Item is ICompiledNumberType AsNumberTypeEntity)
-                {
-                    Feature.RestartNumberType();
-                }
+                Feature.RestartNumberType(ref isChanged);
             }
         }
 
@@ -344,22 +358,12 @@ namespace CompilerNode
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public void CheckNumberType(ref bool isChanged)
         {
-            IExpressionType Preferred = ResolvedResult.Item.Preferred;
-            if (Preferred != null && Preferred.ValueType is ICompiledNumberType AsNumberType)
+            if (ResolvedFinalFeature.IsAssigned)
             {
-                if (AsNumberType.NumberKind == NumberKinds.NotChecked)
-                {
-                    IConstantFeature Feature = ResolvedFinalFeature.Item;
-                    if (Feature.ResolvedEntityType.Item is ICompiledNumberType AsNumberTypeEntity)
-                    {
-                        if (AsNumberTypeEntity.NumberKind == NumberKinds.NotChecked)
-                            Feature.CheckNumberType(ref isChanged);
+                IConstantFeature Feature = ResolvedFinalFeature.Item;
+                Feature.RestartNumberType(ref isChanged);
 
-                        Debug.Assert(AsNumberTypeEntity.NumberKind != NumberKinds.NotChecked);
-
-                        AsNumberType.UpdateNumberKind(AsNumberTypeEntity, ref isChanged);
-                    }
-                }
+                ResolvedResult.Item.UpdateNumberKind(Feature.NumberKind, ref isChanged);
             }
         }
 
@@ -372,10 +376,7 @@ namespace CompilerNode
             if (ResolvedFinalFeature.IsAssigned)
             {
                 IConstantFeature Feature = ResolvedFinalFeature.Item;
-                if (Feature.ResolvedEntityType.Item is ICompiledNumberType AsNumberTypeEntity)
-                {
-                    Feature.ValidateNumberType(errorList);
-                }
+                Feature.ValidateNumberType(errorList);
             }
         }
         #endregion

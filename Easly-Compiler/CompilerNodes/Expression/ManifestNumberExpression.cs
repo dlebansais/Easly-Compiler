@@ -270,9 +270,14 @@
 
         #region Numbers
         /// <summary>
+        /// The number kind if the constant type is a number.
+        /// </summary>
+        public NumberKinds NumberKind { get { return ResolvedResult.Item.NumberKind; } }
+
+        /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
         }
 
@@ -282,18 +287,13 @@
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public void CheckNumberType(ref bool isChanged)
         {
-            IExpressionType Preferred = ResolvedResult.Item.Preferred;
-            ICompiledNumberType NumberType = Preferred.ValueType as ICompiledNumberType;
+            FormattedNumber n = Parser.Parse(ValidText.Item);
+            bool IsInteger = n is FormattedInteger;
+            NumberKinds NumberKind = IsInteger ? NumberKinds.Integer : NumberKinds.Real;
 
-            Debug.Assert(NumberType != null);
+            Debug.Assert(ResolvedResult.IsAssigned);
 
-            if (NumberType.NumberKind == NumberKinds.NotChecked)
-            {
-                FormattedNumber n = Parser.Parse(ValidText.Item);
-                bool IsInteger = n is FormattedInteger;
-
-                NumberType.UpdateNumberKind(IsInteger ? NumberKinds.Integer : NumberKinds.Real, ref isChanged);
-            }
+            ResolvedResult.Item.UpdateNumberKind(NumberKind, ref isChanged);
         }
 
         /// <summary>

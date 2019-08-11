@@ -10,7 +10,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IIndexerFeature.
     /// </summary>
-    public interface IIndexerFeature : BaseNode.IIndexerFeature, IFeature, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithPrecursor, IGetterSetterScopeHolder, INodeWithResult, IFeatureWithEntity
+    public interface IIndexerFeature : BaseNode.IIndexerFeature, IFeature, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithPrecursor, IGetterSetterScopeHolder, INodeWithResult, IFeatureWithEntity, IFeatureWithNumberType
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.IndexerFeature.IndexParameterBlocks"/>.
@@ -360,15 +360,29 @@ namespace CompilerNode
 
         #region Numbers
         /// <summary>
+        /// The number kind if the constant type is a number.
+        /// </summary>
+        public NumberKinds NumberKind
+        {
+            get
+            {
+                if (ResolvedEntityType.Item is ICompiledNumberType AsNumberType)
+                    return AsNumberType.GetDefaultNumberKind();
+                else
+                    return NumberKinds.NotApplicable;
+            }
+        }
+
+        /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
             if (GetterBody.IsAssigned)
-                ((IBody)GetterBody.Item).RestartNumberType();
+                ((IBody)GetterBody.Item).RestartNumberType(ref isChanged);
 
             if (SetterBody.IsAssigned)
-                ((IBody)SetterBody.Item).RestartNumberType();
+                ((IBody)SetterBody.Item).RestartNumberType(ref isChanged);
         }
 
         /// <summary>

@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IScopeAttributeFeature.
     /// </summary>
-    public interface IScopeAttributeFeature : IFeatureWithName, ICompiledFeature, IFeatureWithEntity
+    public interface IScopeAttributeFeature : IFeatureWithName, ICompiledFeature, IFeatureWithEntity, IFeatureWithNumberType
     {
         /// <summary>
         /// The resolved feature name.
@@ -156,6 +156,11 @@ namespace CompilerNode
             Debug.Assert(!IsDeferredFeature);
             Debug.Assert(!HasExternBody);
             Debug.Assert(!HasPrecursorBody);
+
+            if (attributeType is ICompiledNumberType AsNumberType)
+                NumberKind = AsNumberType.GetDefaultNumberKind();
+            else
+                NumberKind = NumberKinds.NotApplicable;
         }
 
         /// <summary>
@@ -307,9 +312,14 @@ namespace CompilerNode
 
         #region Numbers
         /// <summary>
+        /// The number kind if the constant type is a number.
+        /// </summary>
+        public NumberKinds NumberKind { get; private set; }
+
+        /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
         }
 

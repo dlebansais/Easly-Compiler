@@ -207,15 +207,15 @@ namespace CompilerNode
         /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
-            ((IExpression)ContinueCondition).RestartNumberType();
+            ((IExpression)ContinueCondition).RestartNumberType(ref isChanged);
 
             foreach (IContinuation Continuation in ContinuationList)
-                Continuation.RestartNumberType();
+                Continuation.RestartNumberType(ref isChanged);
 
             if (ElseInstructions.IsAssigned)
-                ((IScope)ElseInstructions.Item).RestartNumberType();
+                ((IScope)ElseInstructions.Item).RestartNumberType(ref isChanged);
         }
 
         /// <summary>

@@ -249,7 +249,12 @@
             NumberKinds Result;
 
             if (oldKind == NumberKinds.Integer && (newKind == NumberKinds.Real || newKind == NumberKinds.Unknown))
-                Result = newKind;
+            {
+                if (newKind == NumberKinds.Real)
+                    Result = NumberKinds.Real;
+                else
+                    Result = newKind;
+            }
             else if (oldKind == NumberKinds.Real && newKind == NumberKinds.Unknown)
                 Result = newKind;
             else if (oldKind == NumberKinds.NotApplicable && newKind == NumberKinds.Unknown)
@@ -308,7 +313,12 @@
                 if (ItemNumberKind == NumberKinds.NotApplicable)
                     ComposedNumberKind = NumberKinds.NotApplicable;
                 else if (ComposedNumberKind == NumberKinds.Integer && (ItemNumberKind == NumberKinds.Unknown || ItemNumberKind == NumberKinds.Real))
-                    ComposedNumberKind = ItemNumberKind;
+                {
+                    if (ItemNumberKind == NumberKinds.Unknown)
+                        ComposedNumberKind = ItemNumberKind;
+                    else
+                        ComposedNumberKind = ItemNumberKind;
+                }
                 else if (ComposedNumberKind == NumberKinds.Real && ItemNumberKind == NumberKinds.Unknown)
                     ComposedNumberKind = ItemNumberKind;
             }

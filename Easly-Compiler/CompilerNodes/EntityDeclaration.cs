@@ -44,7 +44,7 @@ namespace CompilerNode
         /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        void RestartNumberType();
+        void RestartNumberType(ref bool isChanged);
 
         /// <summary>
         /// Check number types.
@@ -219,12 +219,12 @@ namespace CompilerNode
         /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
             if (DefaultValue.IsAssigned)
             {
                 IExpression SourceExpression = (IExpression)DefaultValue.Item;
-                SourceExpression.RestartNumberType();
+                SourceExpression.RestartNumberType(ref isChanged);
             }
         }
 

@@ -310,11 +310,16 @@ namespace CompilerNode
 
         #region Numbers
         /// <summary>
+        /// The number kind if the constant type is a number.
+        /// </summary>
+        public NumberKinds NumberKind { get { return ResolvedResult.Item.NumberKind; } }
+
+        /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
-            ((IExpression)RightExpression).RestartNumberType();
+            ((IExpression)RightExpression).RestartNumberType(ref isChanged);
         }
 
         /// <summary>
@@ -325,27 +330,13 @@ namespace CompilerNode
         {
             Debug.Assert(ResolvedResult.IsAssigned);
 
-            IExpressionType Preferred = ResolvedResult.Item.Preferred;
-            if (Preferred != null && Preferred.ValueType is ICompiledNumberType AsNumberType)
-            {
-                if (AsNumberType.NumberKind == NumberKinds.NotChecked)
-                {
-                    ((IExpression)RightExpression).CheckNumberType(ref isChanged);
+            ((IExpression)RightExpression).CheckNumberType(ref isChanged);
 
-                    Debug.Assert(SelectedOverload.IsAssigned);
+            Debug.Assert(SelectedOverload.IsAssigned);
+            IQueryOverload Overload = SelectedOverload.Item;
+            Overload.CheckNumberType(ref isChanged);
 
-                    IQueryOverload Overload = SelectedOverload.Item;
-
-                    foreach (IParameter Result in Overload.ResultTable)
-                    {
-                        if (Result.Name == nameof(BaseNode.Keyword.Result) && Result.ResolvedParameter.ResolvedEffectiveType.Item is ICompiledNumberType AsNumberTypeResult)
-                        {
-                            AsNumberType.UpdateNumberKind(AsNumberTypeResult, ref isChanged);
-                            break;
-                        }
-                    }
-                }
-            }
+            ResolvedResult.Item.UpdateNumberKind(Overload.NumberKind, ref isChanged);
         }
 
         /// <summary>

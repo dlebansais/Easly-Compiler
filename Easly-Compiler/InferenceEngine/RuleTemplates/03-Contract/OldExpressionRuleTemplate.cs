@@ -49,10 +49,10 @@
             data = null;
             bool Success = true;
 
-            Success &= OldExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IResultException ResolvedException, out ISealableList<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out ICompiledFeature ResolvedFinalFeature);
+            Success &= OldExpression.ResolveCompilerReferences(node, ErrorList, out ResolvedExpression ResolvedExpression);
 
             if (Success)
-                data = new Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, ICompiledFeature>(ResolvedResult, ResolvedException, ConstantSourceList, ExpressionConstant, ResolvedFinalFeature);
+                data = ResolvedExpression;
 
             return Success;
         }
@@ -64,16 +64,12 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IOldExpression node, object data)
         {
-            IResultType ResolvedResult = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, ICompiledFeature>)data).Item1;
-            IResultException ResolvedException = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, ICompiledFeature>)data).Item2;
-            ISealableList<IExpression> ConstantSourceList = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, ICompiledFeature>)data).Item3;
-            ILanguageConstant ExpressionConstant = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, ICompiledFeature>)data).Item4;
-            ICompiledFeature ResolvedFinalFeature = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, ICompiledFeature>)data).Item5;
+            ResolvedExpression ResolvedExpression = (ResolvedExpression)data;
 
-            node.ResolvedResult.Item = ResolvedResult;
-            node.ConstantSourceList.AddRange(ConstantSourceList);
+            node.ResolvedResult.Item = ResolvedExpression.ResolvedResult;
+            node.ConstantSourceList.AddRange(ResolvedExpression.ConstantSourceList);
             node.ConstantSourceList.Seal();
-            node.ExpressionConstant.Item = ExpressionConstant;
+            node.ExpressionConstant.Item = ResolvedExpression.ExpressionConstant;
         }
         #endregion
     }

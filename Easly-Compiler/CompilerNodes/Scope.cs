@@ -34,7 +34,7 @@ namespace CompilerNode
         /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        void RestartNumberType();
+        void RestartNumberType(ref bool isChanged);
 
         /// <summary>
         /// Check number types.
@@ -411,13 +411,13 @@ namespace CompilerNode
         /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
             foreach (IEntityDeclaration EntityDeclaration in EntityDeclarationList)
-                EntityDeclaration.RestartNumberType();
+                EntityDeclaration.RestartNumberType(ref isChanged);
 
             foreach (IInstruction Instruction in InstructionList)
-                Instruction.RestartNumberType();
+                Instruction.RestartNumberType(ref isChanged);
         }
 
         /// <summary>

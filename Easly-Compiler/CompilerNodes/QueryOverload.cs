@@ -77,9 +77,14 @@
         IDictionary<IParameter, IList<NumberKinds>> NumberArgumentTable { get; }
 
         /// <summary>
+        /// The number kind if the overload result type is a number.
+        /// </summary>
+        NumberKinds NumberKind { get; }
+
+        /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        void RestartNumberType();
+        void RestartNumberType(ref bool isChanged);
 
         /// <summary>
         /// Check number types.
@@ -352,20 +357,37 @@
 
         #region Numbers
         /// <summary>
+        /// The number kind if the constant type is a number.
+        /// </summary>
+        public NumberKinds NumberKind
+        {
+            get
+            {
+                foreach (IParameter Result in ResultTable)
+                {
+                    if (Result.Name == nameof(BaseNode.Keyword.Result) || ResultTable.Count == 1)
+                        return Result.ResolvedParameter.NumberKind;
+                }
+
+                return NumberKinds.NotApplicable;
+            }
+        }
+
+        /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
             foreach (IEntityDeclaration EntityDeclaration in ParameterList)
-                EntityDeclaration.RestartNumberType();
+                EntityDeclaration.RestartNumberType(ref isChanged);
 
             foreach (IEntityDeclaration EntityDeclaration in ResultList)
-                EntityDeclaration.RestartNumberType();
+                EntityDeclaration.RestartNumberType(ref isChanged);
 
             if (Variant.IsAssigned)
-                ((IExpression)Variant).RestartNumberType();
+                ((IExpression)Variant).RestartNumberType(ref isChanged);
 
-            ((IBody)QueryBody).RestartNumberType();
+            ((IBody)QueryBody).RestartNumberType(ref isChanged);
 
             if (ParameterTable.Count > 0)
             {
@@ -389,10 +411,9 @@
 
                         if (Parameter.ResolvedParameter.ResolvedEffectiveType.Item is ICompiledNumberType AsNumberType)
                         {
-                            NumberKinds BestGuess = GetParameterKind(Parameter);
-
-                            bool IsChanged = false;
-                            AsNumberType.UpdateNumberKind(BestGuess, ref IsChanged);
+                            NumberKinds BestGuess = AsNumberType.GetDefaultNumberKind();
+                            UpdateParameterKind(NumberArgumentTable[Parameter], ref BestGuess);
+                            AsNumberType.UpdateNumberKind(BestGuess, ref isChanged);
                         }
 
                         NumberArgumentTable[Parameter].Clear();
@@ -440,29 +461,26 @@
         /// <summary>
         /// Gets the best guess for the kind of a number parameter.
         /// </summary>
-        public NumberKinds GetParameterKind(IParameter parameter)
+        public void UpdateParameterKind(IList<NumberKinds> usageList, ref NumberKinds bestGuess)
         {
-            NumberKinds BestGuess = NumberKinds.Integer;
-
-            foreach (NumberKinds Item in NumberArgumentTable[parameter])
+            foreach (NumberKinds Item in usageList)
             {
                 switch (Item)
                 {
                     case NumberKinds.NotApplicable:
-                        return NumberKinds.NotApplicable;
+                        bestGuess = NumberKinds.NotApplicable;
+                        return;
 
                     case NumberKinds.Unknown:
-                        BestGuess = NumberKinds.Unknown;
+                        bestGuess = NumberKinds.Unknown;
                         break;
 
                     case NumberKinds.Real:
-                        if (BestGuess == NumberKinds.Integer)
-                            BestGuess = NumberKinds.Real;
+                        if (bestGuess == NumberKinds.Integer)
+                            bestGuess = NumberKinds.Real;
                         break;
                 }
             }
-
-            return BestGuess;
         }
         #endregion
 

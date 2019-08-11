@@ -48,10 +48,10 @@
             data = null;
             bool Success = true;
 
-            Success &= PrecursorIndexExpression.ResolveCompilerReferences(node, ErrorList, out IResultType ResolvedResult, out IResultException ResolvedException, out ISealableList<IExpression> ConstantSourceList, out ILanguageConstant ExpressionConstant, out IFeatureInstance SelectedPrecursor, out IFeatureCall FeatureCall);
+            Success &= PrecursorIndexExpression.ResolveCompilerReferences(node, ErrorList, out ResolvedExpression ResolvedExpression);
 
             if (Success)
-                data = new Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureInstance, IFeatureCall>(ResolvedResult, ResolvedException, ConstantSourceList, ExpressionConstant, SelectedPrecursor, FeatureCall);
+                data = ResolvedExpression;
 
             return Success;
         }
@@ -63,15 +63,14 @@
         /// <param name="data">Private data from CheckConsistency().</param>
         public override void Apply(IPrecursorIndexExpression node, object data)
         {
-            IResultType ResolvedResult = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureInstance, IFeatureCall>)data).Item1;
-            IResultException ResolvedException = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureInstance, IFeatureCall>)data).Item2;
-            ISealableList<IExpression> ConstantSourceList = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureInstance, IFeatureCall>)data).Item3;
-            ILanguageConstant ExpressionConstant = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureInstance, IFeatureCall>)data).Item4;
-            IFeatureInstance SelectedPrecursor = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureInstance, IFeatureCall>)data).Item5;
-            IFeatureCall FeatureCall = ((Tuple<IResultType, IResultException, ISealableList<IExpression>, ILanguageConstant, IFeatureInstance, IFeatureCall>)data).Item6;
+            ResolvedExpression ResolvedExpression = (ResolvedExpression)data;
 
-            node.ResolvedException.Item = ResolvedException;
-            node.FeatureCall.Item = FeatureCall;
+            node.ResolvedException.Item = ResolvedExpression.ResolvedException;
+
+            Debug.Assert(ResolvedExpression.ResolvedFinalFeature is IIndexerFeature);
+            node.ResolvedIndexer.Item = ResolvedExpression.ResolvedFinalFeature as IIndexerFeature;
+
+            node.FeatureCall.Item = ResolvedExpression.FeatureCall;
 
             IFeature EmbeddingFeature = node.EmbeddingFeature;
             IFeatureWithPrecursor ResolvedFeature = EmbeddingFeature.ResolvedFeature.Item as IFeatureWithPrecursor;

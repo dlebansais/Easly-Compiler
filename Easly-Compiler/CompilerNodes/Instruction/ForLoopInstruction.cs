@@ -263,24 +263,24 @@ namespace CompilerNode
         /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
             foreach (IEntityDeclaration EntityDeclaration in EntityDeclarationList)
-                EntityDeclaration.RestartNumberType();
+                EntityDeclaration.RestartNumberType(ref isChanged);
 
             foreach (IInstruction Instruction in InitInstructionList)
-                Instruction.RestartNumberType();
+                Instruction.RestartNumberType(ref isChanged);
 
-            ((IExpression)WhileCondition).RestartNumberType();
+            ((IExpression)WhileCondition).RestartNumberType(ref isChanged);
 
             foreach (IInstruction Instruction in LoopInstructionList)
-                Instruction.RestartNumberType();
+                Instruction.RestartNumberType(ref isChanged);
 
             foreach (IInstruction Instruction in IterationInstructionList)
-                Instruction.RestartNumberType();
+                Instruction.RestartNumberType(ref isChanged);
 
             if (Variant.IsAssigned)
-                ((IExpression)Variant.Item).RestartNumberType();
+                ((IExpression)Variant.Item).RestartNumberType(ref isChanged);
         }
 
         /// <summary>

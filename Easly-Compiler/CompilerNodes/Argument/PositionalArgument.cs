@@ -200,9 +200,9 @@ namespace CompilerNode
         /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
-            ((IExpression)Source).RestartNumberType();
+            ((IExpression)Source).RestartNumberType(ref isChanged);
         }
 
         /// <summary>

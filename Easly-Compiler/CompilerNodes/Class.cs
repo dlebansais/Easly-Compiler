@@ -340,7 +340,7 @@ namespace CompilerNode
         /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        void RestartNumberType();
+        void RestartNumberType(ref bool isChanged);
 
         /// <summary>
         /// Check number types.
@@ -1283,10 +1283,10 @@ namespace CompilerNode
         /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
             foreach (IFeature Feature in FeatureList)
-                Feature.RestartNumberType();
+                Feature.RestartNumberType(ref isChanged);
         }
 
         /// <summary>

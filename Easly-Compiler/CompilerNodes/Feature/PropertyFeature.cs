@@ -10,7 +10,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IPropertyFeature.
     /// </summary>
-    public interface IPropertyFeature : BaseNode.IPropertyFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithPrecursor, IGetterSetterScopeHolder, INodeWithResult, IFeatureWithEvents, IFeatureWithEntity
+    public interface IPropertyFeature : BaseNode.IPropertyFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithPrecursor, IGetterSetterScopeHolder, INodeWithResult, IFeatureWithEvents, IFeatureWithEntity, IFeatureWithNumberType
     {
         /// <summary>
         /// The name of the resolved property type.
@@ -373,15 +373,29 @@ namespace CompilerNode
 
         #region Numbers
         /// <summary>
+        /// The number kind if the constant type is a number.
+        /// </summary>
+        public NumberKinds NumberKind
+        {
+            get
+            {
+                if (ResolvedEntityType.Item is ICompiledNumberType AsNumberType)
+                    return AsNumberType.GetDefaultNumberKind();
+                else
+                    return NumberKinds.NotApplicable;
+            }
+        }
+
+        /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
             if (GetterBody.IsAssigned)
-                ((IBody)GetterBody.Item).RestartNumberType();
+                ((IBody)GetterBody.Item).RestartNumberType(ref isChanged);
 
             if (SetterBody.IsAssigned)
-                ((IBody)SetterBody.Item).RestartNumberType();
+                ((IBody)SetterBody.Item).RestartNumberType(ref isChanged);
         }
 
         /// <summary>

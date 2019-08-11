@@ -54,6 +54,11 @@
         public IQueryOverloadType SelectedOverloadType { get; set; }
 
         /// <summary>
+        /// The precursor feature.
+        /// </summary>
+        public IFeatureInstance SelectedPrecursor { get; set; }
+
+        /// <summary>
         /// Details of the feature call.
         /// </summary>
         public IFeatureCall FeatureCall { get; set; }

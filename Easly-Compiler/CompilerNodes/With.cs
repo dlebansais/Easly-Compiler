@@ -29,7 +29,7 @@ namespace CompilerNode
         /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        void RestartNumberType();
+        void RestartNumberType(ref bool isChanged);
 
         /// <summary>
         /// Check number types.
@@ -234,12 +234,12 @@ namespace CompilerNode
         /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
             foreach (IRange Range in RangeList)
-                Range.RestartNumberType();
+                Range.RestartNumberType(ref isChanged);
 
-            ((IScope)Instructions).RestartNumberType();
+            ((IScope)Instructions).RestartNumberType(ref isChanged);
         }
 
         /// <summary>

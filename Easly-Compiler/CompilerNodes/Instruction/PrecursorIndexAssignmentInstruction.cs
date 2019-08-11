@@ -223,12 +223,12 @@ namespace CompilerNode
         /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
             foreach (IArgument Argument in ArgumentList)
-                Argument.RestartNumberType();
+                Argument.RestartNumberType(ref isChanged);
 
-            ((IExpression)Source).RestartNumberType();
+            ((IExpression)Source).RestartNumberType(ref isChanged);
         }
 
         /// <summary>

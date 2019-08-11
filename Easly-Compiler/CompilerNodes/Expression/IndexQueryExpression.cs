@@ -17,6 +17,11 @@ namespace CompilerNode
         IList<IArgument> ArgumentList { get; }
 
         /// <summary>
+        /// The resolved indexer.
+        /// </summary>
+        OnceReference<IIndexerFeature> ResolvedIndexer { get; }
+
+        /// <summary>
         /// Details of the feature call.
         /// </summary>
         OnceReference<IFeatureCall> FeatureCall { get; }
@@ -125,6 +130,7 @@ namespace CompilerNode
             else if (ruleTemplateList == RuleTemplateSet.Body)
             {
                 ResolvedException = new OnceReference<IResultException>();
+                ResolvedIndexer = new OnceReference<IIndexerFeature>();
                 FeatureCall = new OnceReference<IFeatureCall>();
                 IsHandled = true;
             }
@@ -159,6 +165,7 @@ namespace CompilerNode
             {
                 IsResolved = ResolvedException.IsAssigned;
 
+                Debug.Assert(ResolvedIndexer.IsAssigned || !IsResolved);
                 Debug.Assert(FeatureCall.IsAssigned || !IsResolved);
 
                 IsHandled = true;
@@ -198,6 +205,11 @@ namespace CompilerNode
 
         #region Compiler
         /// <summary>
+        /// The resolved indexer.
+        /// </summary>
+        public OnceReference<IIndexerFeature> ResolvedIndexer { get; private set; } = new OnceReference<IIndexerFeature>();
+
+        /// <summary>
         /// Details of the feature call.
         /// </summary>
         public OnceReference<IFeatureCall> FeatureCall { get; private set; } = new OnceReference<IFeatureCall>();
@@ -232,18 +244,10 @@ namespace CompilerNode
         /// </summary>
         /// <param name="node">The agent expression to check.</param>
         /// <param name="errorList">The list of errors found.</param>
-        /// <param name="resolvedResult">The expression result types upon return.</param>
-        /// <param name="resolvedException">Exceptions the expression can throw upon return.</param>
-        /// <param name="constantSourceList">Sources of the constant expression upon return, if any.</param>
-        /// <param name="expressionConstant">The expression constant upon return.</param>
-        /// <param name="featureCall">Details of the feature call.</param>
-        public static bool ResolveCompilerReferences(IIndexQueryExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out IFeatureCall featureCall)
+        /// <param name="resolvedExpression">The result of the search.</param>
+        public static bool ResolveCompilerReferences(IIndexQueryExpression node, IErrorList errorList, out ResolvedExpression resolvedExpression)
         {
-            resolvedResult = null;
-            resolvedException = null;
-            constantSourceList = new SealableList<IExpression>();
-            expressionConstant = NeutralLanguageConstant.NotConstant;
-            featureCall = null;
+            resolvedExpression = new ResolvedExpression();
 
             IExpression IndexedExpression = (IExpression)node.IndexedExpression;
             IList<IArgument> ArgumentList = node.ArgumentList;
@@ -289,11 +293,12 @@ namespace CompilerNode
                 if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, TypeArgumentStyle, errorList, node, out SelectedIndex))
                     return false;
 
-                resolvedResult = new ResultType(AsIndexerType.ResolvedEntityTypeName.Item, AsIndexerType.ResolvedEntityType.Item, string.Empty);
-                resolvedException = new ResultException(AsIndexerType.GetExceptionIdentifierList);
-                featureCall = new FeatureCall(ParameterTableList[SelectedIndex], ResultTableList[SelectedIndex], ArgumentList, MergedArgumentList, TypeArgumentStyle);
+                resolvedExpression.ResolvedFinalFeature = Indexer;
+                resolvedExpression.ResolvedResult = new ResultType(AsIndexerType.ResolvedEntityTypeName.Item, AsIndexerType.ResolvedEntityType.Item, string.Empty);
+                resolvedExpression.ResolvedException = new ResultException(AsIndexerType.GetExceptionIdentifierList);
+                resolvedExpression.FeatureCall = new FeatureCall(ParameterTableList[SelectedIndex], ResultTableList[SelectedIndex], ArgumentList, MergedArgumentList, TypeArgumentStyle);
 
-                Argument.AddConstantArguments(ArgumentList, constantSourceList);
+                Argument.AddConstantArguments(ArgumentList, resolvedExpression.ConstantSourceList);
             }
             else
             {
@@ -311,15 +316,20 @@ namespace CompilerNode
 
         #region Numbers
         /// <summary>
+        /// The number kind if the constant type is a number.
+        /// </summary>
+        public NumberKinds NumberKind { get { return ResolvedIndexer.Item.NumberKind; } }
+
+        /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
             IExpression Expression = (IExpression)IndexedExpression;
-            Expression.RestartNumberType();
+            Expression.RestartNumberType(ref isChanged);
 
             foreach (IArgument Argument in ArgumentList)
-                Argument.RestartNumberType();
+                Argument.RestartNumberType(ref isChanged);
         }
 
         /// <summary>
@@ -328,21 +338,13 @@ namespace CompilerNode
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public void CheckNumberType(ref bool isChanged)
         {
-            IExpressionType Preferred = ResolvedResult.Item.Preferred;
-            if (Preferred != null && Preferred.ValueType is ICompiledNumberType AsNumberType)
-            {
-                if (AsNumberType.NumberKind == NumberKinds.NotChecked)
-                {
-                    IExpression Expression = (IExpression)IndexedExpression;
-                    Expression.CheckNumberType(ref isChanged);
-
-                    //TODO
-                    AsNumberType.UpdateNumberKind(NumberKinds.NotApplicable, ref isChanged);
-                }
-            }
+            IExpression Expression = (IExpression)IndexedExpression;
+            Expression.CheckNumberType(ref isChanged);
 
             foreach (IArgument Argument in ArgumentList)
                 Argument.CheckNumberType(ref isChanged);
+
+            Debug.Assert(ResolvedIndexer.IsAssigned);
         }
 
         /// <summary>

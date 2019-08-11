@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IConstantFeature.
     /// </summary>
-    public interface IConstantFeature : BaseNode.IConstantFeature, IFeature, IFeatureWithName, ICompiledFeature, IFeatureWithPrecursor, IFeatureWithEntity
+    public interface IConstantFeature : BaseNode.IConstantFeature, IFeature, IFeatureWithName, ICompiledFeature, IFeatureWithPrecursor, IFeatureWithEntity, IFeatureWithNumberType
     {
         /// <summary>
         /// The name of the resolved constant type.
@@ -231,12 +231,24 @@ namespace CompilerNode
 
         #region Numbers
         /// <summary>
+        /// The number kind if the constant type is a number.
+        /// </summary>
+        public NumberKinds NumberKind
+        {
+            get
+            {
+                IExpression ConstantExpression = (IExpression)ConstantValue;
+                return ConstantExpression.NumberKind;
+            }
+        }
+
+        /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
             IExpression ConstantExpression = (IExpression)ConstantValue;
-            ConstantExpression.RestartNumberType();
+            ConstantExpression.RestartNumberType(ref isChanged);
         }
 
         /// <summary>
@@ -245,23 +257,8 @@ namespace CompilerNode
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public void CheckNumberType(ref bool isChanged)
         {
-            Debug.Assert(ResolvedEntityType.IsAssigned);
-
-            if (ResolvedEntityType.Item is ICompiledNumberType AsNumberTypeEntity)
-            {
-                if (AsNumberTypeEntity.NumberKind == NumberKinds.NotChecked)
-                {
-                    IExpression ConstantExpression = (IExpression)ConstantValue;
-                    ConstantExpression.CheckNumberType(ref isChanged);
-
-                    IExpressionType Preferred = ConstantExpression.ResolvedResult.Item.Preferred;
-                    ICompiledNumberType AsNumberTypeResult = Preferred.ValueType as ICompiledNumberType;
-
-                    Debug.Assert(AsNumberTypeResult != null);
-
-                    AsNumberTypeEntity.UpdateNumberKind(AsNumberTypeResult, ref isChanged);
-                }
-            }
+            IExpression ConstantExpression = (IExpression)ConstantValue;
+            ConstantExpression.CheckNumberType(ref isChanged);
         }
 
         /// <summary>

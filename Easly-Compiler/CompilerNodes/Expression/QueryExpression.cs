@@ -372,6 +372,10 @@ namespace CompilerNode
                     if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, TypeArgumentStyle, errorList, node, out SelectedIndex))
                         return false;
 
+                    resolvedExpression.SelectedOverloadType = AsFunctionType.OverloadList[SelectedIndex];
+                    resolvedExpression.ResolvedResult = new ResultType(resolvedExpression.SelectedOverloadType.ResultTypeList);
+                    resolvedExpression.ResolvedException = new ResultException(resolvedExpression.SelectedOverloadType.ExceptionIdentifierList);
+
                     if (AsFunctionFeature != null)
                     {
                         Debug.Assert(AsFunctionFeature.OverloadList.Count == AsFunctionType.OverloadList.Count);
@@ -379,13 +383,16 @@ namespace CompilerNode
                         Debug.Assert(AsFunctionFeature.ResolvedAgentType.Item == AsFunctionType);
 
                         resolvedExpression.SelectedOverload = AsFunctionFeature.OverloadList[SelectedIndex];
+
+                        resolvedExpression.SelectedResultList = resolvedExpression.SelectedOverload.ResultTable;
+                        resolvedExpression.FeatureCall = new FeatureCall(resolvedExpression.SelectedOverload.ParameterTable, resolvedExpression.SelectedOverload.ResultTable, ArgumentList, MergedArgumentList, TypeArgumentStyle);
+                    }
+                    else
+                    {
+                        resolvedExpression.SelectedResultList = resolvedExpression.SelectedOverloadType.ResultTable;
+                        resolvedExpression.FeatureCall = new FeatureCall(resolvedExpression.SelectedOverloadType.ParameterTable, resolvedExpression.SelectedOverloadType.ResultTable, ArgumentList, MergedArgumentList, TypeArgumentStyle);
                     }
 
-                    resolvedExpression.SelectedOverloadType = AsFunctionType.OverloadList[SelectedIndex];
-                    resolvedExpression.ResolvedResult = new ResultType(resolvedExpression.SelectedOverloadType.ResultTypeList);
-                    resolvedExpression.ResolvedException = new ResultException(resolvedExpression.SelectedOverloadType.ExceptionIdentifierList);
-                    resolvedExpression.SelectedResultList = resolvedExpression.SelectedOverloadType.ResultTable;
-                    resolvedExpression.FeatureCall = new FeatureCall(resolvedExpression.SelectedOverloadType.ParameterTable, resolvedExpression.SelectedOverloadType.ResultTable, ArgumentList, MergedArgumentList, TypeArgumentStyle);
                     IsHandled = true;
                     break;
 
@@ -487,12 +494,17 @@ namespace CompilerNode
 
         #region Numbers
         /// <summary>
+        /// The number kind if the constant type is a number.
+        /// </summary>
+        public NumberKinds NumberKind { get { return ResolvedResult.Item.NumberKind; } }
+
+        /// <summary>
         /// Restarts a check of number types.
         /// </summary>
-        public void RestartNumberType()
+        public void RestartNumberType(ref bool isChanged)
         {
             foreach (IArgument Argument in ArgumentList)
-                Argument.RestartNumberType();
+                Argument.RestartNumberType(ref isChanged);
         }
 
         /// <summary>
@@ -506,6 +518,8 @@ namespace CompilerNode
 
             if (SelectedOverload.IsAssigned)
             {
+                ResolvedResult.Item.UpdateNumberKind(SelectedOverload.Item.NumberKind, ref isChanged);
+
                 IDictionary<IParameter, IList<NumberKinds>> NumberArgumentTable = SelectedOverload.Item.NumberArgumentTable;
 
                 for (int i = 0; i < FeatureCall.Item.ArgumentList.Count && i < FeatureCall.Item.ParameterList.Count; i++)
@@ -537,16 +551,6 @@ namespace CompilerNode
 
                         NumberKindList.Add(AsNumberArgumentType.NumberKind);
                     }
-                }
-            }
-
-            IExpressionType Preferred = ResolvedResult.Item.Preferred;
-            if (Preferred != null && Preferred.ValueType is ICompiledNumberType AsNumberType)
-            {
-                if (AsNumberType.NumberKind == NumberKinds.NotChecked)
-                {
-                    //TODO
-                    AsNumberType.UpdateNumberKind(NumberKinds.NotApplicable, ref isChanged);
                 }
             }
         }
