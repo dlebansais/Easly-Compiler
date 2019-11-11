@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
-    using FormattedNumber;
+    using EaslyNumber;
 
     /// <summary>
     /// A C# expression.
@@ -307,8 +307,8 @@
 
         private void ComputeNumberOperator(ICSharpWriter writer)
         {
-            CanonicalNumber LeftNumber = ComputeSide(writer, LeftExpression);
-            CanonicalNumber RightNumber = ComputeSide(writer, LeftExpression);
+            Number LeftNumber = ComputeSide(writer, LeftExpression);
+            Number RightNumber = ComputeSide(writer, LeftExpression);
 
             bool IsHandled = false;
 
@@ -366,19 +366,19 @@
                     IsHandled = true;
                     break;
                 case "+":
-                    ComputedValue = ToComputedValue(LeftNumber.Add(RightNumber));
+                    ComputedValue = ToComputedValue(LeftNumber + RightNumber);
                     IsHandled = true;
                     break;
                 case "-":
-                    ComputedValue = ToComputedValue(LeftNumber.Subtract(RightNumber));
+                    ComputedValue = ToComputedValue(LeftNumber - RightNumber);
                     IsHandled = true;
                     break;
                 case "*":
-                    ComputedValue = ToComputedValue(LeftNumber.Multiply(RightNumber));
+                    ComputedValue = ToComputedValue(LeftNumber * RightNumber);
                     IsHandled = true;
                     break;
                 case "/":
-                    ComputedValue = ToComputedValue(LeftNumber.Divide(RightNumber));
+                    ComputedValue = ToComputedValue(LeftNumber / RightNumber);
                     IsHandled = true;
                     break;
             }
@@ -386,7 +386,7 @@
             Debug.Assert(IsHandled);
         }
 
-        private CanonicalNumber ComputeSide(ICSharpWriter writer, ICSharpExpression expression)
+        private Number ComputeSide(ICSharpWriter writer, ICSharpExpression expression)
         {
             string ValueString;
 
@@ -409,9 +409,9 @@
                 ValueString = ComputableExpression.ComputedValue;
             }
 
-            FormattedNumber Result = Parser.Parse(ValueString);
+            FormattedNumber Result = new FormattedNumber(ValueString);
 
-            return Result.Canonical;
+            return Result.Value;
         }
 
         private string ToComputedValue(bool value)
@@ -419,7 +419,7 @@
             return value ? "true" : "false";
         }
 
-        private string ToComputedValue(CanonicalNumber value)
+        private string ToComputedValue(Number value)
         {
             return value.ToString();
         }

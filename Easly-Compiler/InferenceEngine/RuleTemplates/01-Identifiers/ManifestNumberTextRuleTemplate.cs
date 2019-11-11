@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
-    using FormattedNumber;
+    using EaslyNumber;
 
     /// <summary>
     /// A rule to process <see cref="IManifestNumberExpression"/>.
@@ -48,8 +48,8 @@
                 Success = false;
             else
             {
-                FormattedNumber fn = Parser.Parse(ValidText);
-                if (!string.IsNullOrEmpty(fn.InvalidText))
+                FormattedNumber fn = new FormattedNumber(ValidText);
+                if (!string.IsNullOrEmpty(fn.InvalidPart))
                     Success = false;
             }
 
@@ -70,7 +70,9 @@
         {
             string ValidText = data as string;
             Debug.Assert(StringValidation.IsValidIdentifier(ValidText));
-            Debug.Assert(string.IsNullOrEmpty(Parser.Parse(ValidText).InvalidText));
+
+            FormattedNumber fn = new FormattedNumber(ValidText);
+            Debug.Assert(string.IsNullOrEmpty(fn.InvalidPart));
 
             node.ValidText.Item = ValidText;
         }

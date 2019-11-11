@@ -1,6 +1,6 @@
 ﻿namespace EaslyCompiler
 {
-    using FormattedNumber;
+    using EaslyNumber;
 
     /// <summary>
     /// Discretes with the same value.
@@ -10,7 +10,7 @@
         /// <summary>
         /// The shared number.
         /// </summary>
-        CanonicalNumber Number { get; }
+        Number Number { get; }
     }
 
     /// <summary>
@@ -24,7 +24,7 @@
         /// </summary>
         /// <param name="source">The error location.</param>
         /// <param name="number">The shared number.</param>
-        public ErrorMultipleIdenticalDiscrete(ISource source, CanonicalNumber number)
+        public ErrorMultipleIdenticalDiscrete(ISource source, Number number)
             : base(source)
         {
             Number = number;
@@ -35,7 +35,7 @@
         /// <summary>
         /// The shared number.
         /// </summary>
-        public CanonicalNumber Number { get; }
+        public Number Number { get; }
 
         /// <summary>
         /// The error message.

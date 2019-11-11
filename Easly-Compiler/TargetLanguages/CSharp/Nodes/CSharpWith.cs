@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
-    using FormattedNumber;
+    using EaslyNumber;
 
     /// <summary>
     /// A C# case node.
@@ -100,7 +100,7 @@
                 switch (Constant)
                 {
                     case INumberLanguageConstant AsManifestConstant:
-                        CanonicalNumber AsNumber = AsManifestConstant.Value;
+                        Number AsNumber = AsManifestConstant.Value;
                         if (AsNumber.TryParseInt(out int IntValue))
                         {
                             writer.WriteIndentedLine($"case {IntValue}:");
@@ -137,7 +137,7 @@
                 if (IntMinimum < IntMaximum)
                 {
                     for (int i = IntMinimum + 1; i < IntMaximum; i++)
-                        ConstantList.Add(new NumberLanguageConstant(new CanonicalNumber(i)));
+                        ConstantList.Add(new NumberLanguageConstant(new Number(i)));
 
                     ConstantList.Add(range.Maximum);
                 }

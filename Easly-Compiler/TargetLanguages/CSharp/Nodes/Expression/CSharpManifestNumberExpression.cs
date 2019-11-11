@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
-    using FormattedNumber;
+    using EaslyNumber;
 
     /// <summary>
     /// A C# expression.
@@ -40,19 +40,10 @@
         protected CSharpManifestNumberExpression(ICSharpContext context, IManifestNumberExpression source)
             : base(context, source)
         {
-            FormattedNumber FormattedNumber = Parser.Parse(Source.ValidText.Item);
+            FormattedNumber FormattedNumber = new FormattedNumber(Source.ValidText.Item);
             Debug.Assert(FormattedNumber.IsValid);
 
-            switch (FormattedNumber)
-            {
-                case FormattedInteger AsInteger:
-                    NumberType = CSharpNumberTypes.Integer;
-                    break;
-
-                case FormattedReal AsReal:
-                    NumberType = CSharpNumberTypes.Real;
-                    break;
-            }
+            NumberType = FormattedNumber.Value.IsInteger ? CSharpNumberTypes.Integer : CSharpNumberTypes.Real;
 
             Debug.Assert(NumberType != CSharpNumberTypes.NotApplicable && NumberType != CSharpNumberTypes.Unknown);
         }

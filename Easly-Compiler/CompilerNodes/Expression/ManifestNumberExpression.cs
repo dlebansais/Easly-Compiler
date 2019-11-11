@@ -3,7 +3,7 @@
     using System.Diagnostics;
     using Easly;
     using EaslyCompiler;
-    using FormattedNumber;
+    using EaslyNumber;
 
     /// <summary>
     /// Compiler IManifestNumberExpression.
@@ -255,10 +255,10 @@
             resolvedResult = new ResultType(NumberTypeName, NumberType, string.Empty);
             resolvedException = new ResultException();
 
-            FormattedNumber FormattedNumber = Parser.Parse(NumberText);
-            Debug.Assert(string.IsNullOrEmpty(FormattedNumber.InvalidText));
+            FormattedNumber FormattedNumber = new FormattedNumber(NumberText);
+            Debug.Assert(string.IsNullOrEmpty(FormattedNumber.InvalidPart));
 
-            expressionConstant = new NumberLanguageConstant(FormattedNumber.Canonical);
+            expressionConstant = new NumberLanguageConstant(FormattedNumber.Value);
 
 #if COVERAGE
             Debug.Assert(!node.IsComplex);
@@ -287,8 +287,8 @@
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public void CheckNumberType(ref bool isChanged)
         {
-            FormattedNumber n = Parser.Parse(ValidText.Item);
-            bool IsInteger = n is FormattedInteger;
+            FormattedNumber n = new FormattedNumber(ValidText.Item);
+            bool IsInteger = n.Value.IsInteger;
             NumberKinds NumberKind = IsInteger ? NumberKinds.Integer : NumberKinds.Real;
 
             Debug.Assert(ResolvedResult.IsAssigned);

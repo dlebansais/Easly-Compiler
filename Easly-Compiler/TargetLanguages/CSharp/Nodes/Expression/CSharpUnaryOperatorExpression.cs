@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using CompilerNode;
-    using FormattedNumber;
+    using EaslyNumber;
 
     /// <summary>
     /// A C# expression.
@@ -180,14 +180,14 @@
 
         private void ComputeNumberOperator(ICSharpWriter writer)
         {
-            CanonicalNumber RightNumber = ComputeSide(writer, RightExpression);
+            Number RightNumber = ComputeSide(writer, RightExpression);
 
             bool IsHandled = false;
 
             switch (Operator.Name)
             {
                 case "-":
-                    ComputedValue = ToComputedValue(RightNumber.Negate());
+                    ComputedValue = ToComputedValue(-RightNumber);
                     IsHandled = true;
                     break;
 
@@ -201,7 +201,7 @@
             Debug.Assert(IsHandled);
         }
 
-        private CanonicalNumber ComputeSide(ICSharpWriter writer, ICSharpExpression expression)
+        private Number ComputeSide(ICSharpWriter writer, ICSharpExpression expression)
         {
             string ValueString;
 
@@ -224,12 +224,12 @@
                 ValueString = ComputableExpression.ComputedValue;
             }
 
-            FormattedNumber Result = Parser.Parse(ValueString);
+            FormattedNumber Result = new FormattedNumber(ValueString);
 
-            return Result.Canonical;
+            return Result.Value;
         }
 
-        private string ToComputedValue(CanonicalNumber value)
+        private string ToComputedValue(Number value)
         {
             return value.ToString();
         }

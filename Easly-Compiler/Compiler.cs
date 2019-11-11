@@ -10,7 +10,7 @@
     using BaseNodeHelper;
     using CompilerNode;
     using Easly;
-    using FormattedNumber;
+    using EaslyNumber;
     using PolySerializer;
 
     /// <summary>
@@ -339,7 +339,7 @@
         /// <summary></summary>
         protected virtual void GenerateCompilationUID()
         {
-            string NewGuidDigits = Guid.NewGuid().ToString("N") + IntegerBase.Hexadecimal.Suffix;
+            string NewGuidDigits = Guid.NewGuid().ToString("N") + ":" + Number.HexadecimalSuffixCharacter;
 
             BaseNode.IIdentifier Operator = NodeHelper.CreateSimpleIdentifier("To UUID");
             BaseNode.IManifestNumberExpression NumberExpression = NodeHelper.CreateSimpleManifestNumberExpression(NewGuidDigits);
@@ -445,7 +445,7 @@
                     case BaseNode.PreprocessorMacro.DiscreteClassIdentifier:
                         Debug.Assert(context.CurrentClass != null);
 
-                        string GlassGuidDigits = context.CurrentClass.ClassGuid.ToString("N") + IntegerBase.Hexadecimal.Suffix;
+                        string GlassGuidDigits = context.CurrentClass.ClassGuid.ToString("N") + ":" + Number.HexadecimalSuffixCharacter;
                         BaseNode.IIdentifier Operator = NodeHelper.CreateSimpleIdentifier("To UUID");
                         BaseNode.IManifestNumberExpression NumberExpression = NodeHelper.CreateSimpleManifestNumberExpression(GlassGuidDigits);
                         BaseNode.IUnaryOperatorExpression Expression = NodeHelper.CreateUnaryOperatorExpression(Operator, NumberExpression);
@@ -817,7 +817,7 @@
             foreach (byte b in Data)
                 Value += b.ToString("X2");
 
-            return new ManifestNumberExpression(Value + IntegerBase.Hexadecimal.Suffix);
+            return new ManifestNumberExpression(Value + ":" + Number.HexadecimalSuffixCharacter);
         }
         #endregion
 

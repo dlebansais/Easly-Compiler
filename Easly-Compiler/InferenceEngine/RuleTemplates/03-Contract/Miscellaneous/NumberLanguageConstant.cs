@@ -1,7 +1,7 @@
 ﻿namespace EaslyCompiler
 {
     using System.Diagnostics;
-    using FormattedNumber;
+    using EaslyNumber;
 
     /// <summary>
     /// Represents a number constant.
@@ -11,7 +11,7 @@
         /// <summary>
         /// The constant value, if known.
         /// </summary>
-        CanonicalNumber Value { get; }
+        Number Value { get; }
     }
 
     /// <summary>
@@ -30,7 +30,7 @@
         /// Initializes a new instance of the <see cref="NumberLanguageConstant"/> class.
         /// </summary>
         /// <param name="value">The constant value.</param>
-        public NumberLanguageConstant(CanonicalNumber value)
+        public NumberLanguageConstant(Number value)
         {
             Value = value;
         }
@@ -38,12 +38,12 @@
         /// <summary>
         /// True if the constant value is known.
         /// </summary>
-        public override bool IsValueKnown { get { return Value != null; } }
+        public override bool IsValueKnown { get { return !Value.IsNaN && !Value.IsInfinite; } }
 
         /// <summary>
         /// The constant value, if known.
         /// </summary>
-        public CanonicalNumber Value { get; }
+        public Number Value { get; }
 
         /// <summary>
         /// Checks if another constant can be compared with this instance.
@@ -69,7 +69,7 @@
         /// <param name="other">The other instance.</param>
         protected virtual bool IsConstantEqual(INumberLanguageConstant other)
         {
-            Debug.Assert(other != null && Value != null && other.Value != null);
+            Debug.Assert(other != null);
 
             return Value.IsEqual(other.Value);
         }
@@ -89,7 +89,7 @@
         /// <param name="other">The other instance.</param>
         protected virtual bool IsConstantGreater(INumberLanguageConstant other)
         {
-            Debug.Assert(other != null && Value != null && other.Value != null);
+            Debug.Assert(other != null);
 
             return Value > other.Value;
         }
