@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConstantComputation", "Cons
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpProject", "CSharpProject\CSharpProject.csproj", "{57CE1130-80A6-48A7-8957-E09027938A5B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test-Easly-Compiler", "Test-Easly-Compiler\Test-Easly-Compiler.csproj", "{16B27541-2CE6-4A41-AE77-D6DF7D73A260}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -49,6 +51,12 @@ Global
 		{57CE1130-80A6-48A7-8957-E09027938A5B}.Release|x64.ActiveCfg = Release|x64
 		{57CE1130-80A6-48A7-8957-E09027938A5B}.Release|x64.Build.0 = Release|x64
 		{57CE1130-80A6-48A7-8957-E09027938A5B}.Travis|x64.ActiveCfg = Travis|x64
+		{16B27541-2CE6-4A41-AE77-D6DF7D73A260}.Debug|x64.ActiveCfg = Debug|x64
+		{16B27541-2CE6-4A41-AE77-D6DF7D73A260}.Debug|x64.Build.0 = Debug|x64
+		{16B27541-2CE6-4A41-AE77-D6DF7D73A260}.Release|x64.ActiveCfg = Release|x64
+		{16B27541-2CE6-4A41-AE77-D6DF7D73A260}.Release|x64.Build.0 = Release|x64
+		{16B27541-2CE6-4A41-AE77-D6DF7D73A260}.Travis|x64.ActiveCfg = Travis|x64
+		{16B27541-2CE6-4A41-AE77-D6DF7D73A260}.Travis|x64.Build.0 = Travis|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
