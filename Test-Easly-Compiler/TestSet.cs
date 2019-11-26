@@ -42,6 +42,8 @@ namespace Test
 
             if (File.Exists("./Easly-Compiler/bin/x64/Travis/test.easly"))
                 RootPath = "./Easly-Compiler/bin/x64/Travis/";
+            else if (File.Exists("./Test-Easly-Compiler/test.easly"))
+                RootPath = "./Test-Easly-Compiler/";
             else
                 RootPath = "./";
 
@@ -113,6 +115,8 @@ namespace Test
         {
             if (TestOff)
                 return;
+
+            TestContext.Out.WriteLine($"RootPath: {RootPath}");
 
             Compiler Compiler = new Compiler();
 
