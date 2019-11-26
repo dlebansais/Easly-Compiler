@@ -40,8 +40,8 @@ namespace Coverage
 
             if (File.Exists("./Easly-Compiler/bin/x64/Travis/test.easly"))
                 RootPath = "./Easly-Compiler/bin/x64/Travis/";
-            else if (File.Exists("./Test/test.easly"))
-                RootPath = "./Test/";
+            else if (File.Exists("./Test-Easly-Compiler/test.easly"))
+                RootPath = "./Test-Easly-Compiler/";
             else
                 RootPath = "./";
 
