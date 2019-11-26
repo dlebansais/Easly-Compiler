@@ -46,19 +46,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Easly-Language">
-      <HintPath>..\Easly-Compiler\$(Platform)\$(Configuration)\Easly-Language.dll</HintPath>
+      <HintPath>..\Easly-Language\$(Platform)\$(Configuration)\Easly-Language.dll</HintPath>
     </Reference>
     <Reference Include="Easly-Language-Helper">
-      <HintPath>..\Easly-Compiler\$(Platform)\$(Configuration)\Easly-Language-Helper.dll</HintPath>
+      <HintPath>..\Easly-Language\$(Platform)\$(Configuration)\Easly-Language-Helper.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=3.12.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.12.0\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="PolySerializer">
-      <HintPath>..\Easly-Compiler\$(Platform)\$(Configuration)\PolySerializer.dll</HintPath>
+      <HintPath>..\PolySerializer\$(Platform)\$(Configuration)\PolySerializer.dll</HintPath>
     </Reference>
     <Reference Include="Easly-Number">
-      <HintPath>..\Easly-Compiler\$(Platform)\$(Configuration)\Easly-Number.dll</HintPath>
+      <HintPath>..\Easly-Number\$(Platform)\$(Configuration)\Easly-Number.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
