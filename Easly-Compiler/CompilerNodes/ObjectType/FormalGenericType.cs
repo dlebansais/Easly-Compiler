@@ -221,9 +221,10 @@
 
             foreach (IConstraint Constraint in FormalGeneric.ConstraintList)
             {
-                Debug.Assert(Constraint.ResolvedParentType.IsAssigned);
+                //TODO Check this
+                //Debug.Assert(Constraint.ResolvedParentType.IsAssigned);
 
-                if (Constraint.ResolvedParentType.Item is IClassType AsClassType)
+                if (Constraint.ResolvedParentType.IsAssigned && Constraint.ResolvedParentType.Item is IClassType AsClassType)
                 {
                     NumberKinds ClassKind = AsClassType.GetDefaultNumberKind();
                     Result = DowngradedKind(NumberKind, ClassKind);
@@ -234,9 +235,10 @@
             {
                 foreach (IConstraint Constraint in FormalGeneric.ConstraintList)
                 {
-                    Debug.Assert(Constraint.ResolvedParentType.IsAssigned);
+                    //TODO Check this
+                    //Debug.Assert(Constraint.ResolvedParentType.IsAssigned);
 
-                    if (Constraint.ResolvedParentType.Item is ICompiledNumberType AsNumberType)
+                    if (Constraint.ResolvedParentType.IsAssigned && Constraint.ResolvedParentType.Item is ICompiledNumberType AsNumberType)
                         Result = DowngradedKind(NumberKind, AsNumberType.NumberKind);
                 }
             }
