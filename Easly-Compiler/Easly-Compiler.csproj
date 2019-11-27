@@ -400,7 +400,7 @@
     <Compile Include="Errors\Inference\03-Contract\ErrorInvalidOperator.cs" />
     <Compile Include="Errors\Inference\03-Contract\ErrorNumberConstantExpected.cs" />
     <Compile Include="Errors\Inference\03-Contract\ErrorInvalidExpression.cs" />
-    <Compile Include="Errors\Inference\03-Contract\ErrorVariableAlreadyDefined.cs" />
+    <Compile Include="Errors\Inference\03-Contract\ErrorMultipleIdenticalDiscrete.cs" />
     <Compile Include="Errors\Replication\ErrorEmptyClassPath.cs" />
     <Compile Include="Errors\Replication\ErrorPatternAlreadyUsed.cs" />
     <Compile Include="Errors\ImportConsistency\ErrorIdentifierAlreadyListed.cs" />
