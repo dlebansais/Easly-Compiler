@@ -71,7 +71,7 @@
         {
             Debug.Assert(other != null);
 
-            return Value.IsEqual(other.Value);
+            return Value.Equals(other.Value);
         }
 
         /// <summary>

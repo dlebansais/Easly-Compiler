@@ -315,11 +315,11 @@
             switch (Operator.Name)
             {
                 case "≥":
-                    ComputedValue = ToComputedValue(LeftNumber > RightNumber || LeftNumber.IsEqual(RightNumber));
+                    ComputedValue = ToComputedValue(LeftNumber > RightNumber || LeftNumber.Equals(RightNumber));
                     IsHandled = true;
                     break;
                 case "≤":
-                    ComputedValue = ToComputedValue(LeftNumber < RightNumber || LeftNumber.IsEqual(RightNumber));
+                    ComputedValue = ToComputedValue(LeftNumber < RightNumber || LeftNumber.Equals(RightNumber));
                     IsHandled = true;
                     break;
                 case ">":
