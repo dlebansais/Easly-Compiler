@@ -125,7 +125,7 @@
                     Number Number1 = Entry1.Key;
                     Number Number2 = Entry2.Key;
 
-                    if (!ErroneousConstantList.Contains(Number1) && !ErroneousConstantList.Contains(Number2) && Number1.IsEqual(Number2))
+                    if (!ErroneousConstantList.Contains(Number1) && !ErroneousConstantList.Contains(Number2) && Number1.Equals(Number2))
                     {
                         IDiscrete Discrete1 = Entry1.Value;
                         IDiscrete Discrete2 = Entry1.Value;
