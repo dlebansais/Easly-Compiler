@@ -450,6 +450,23 @@ namespace CompilerNode
 
                 Debug.Assert(IsHandled);
             }
+            else if (Value == BaseNode.Keyword.Value)
+            {
+                bool IsHandled = false;
+
+                if (EmbeddingFeature is IPropertyFeature AsPropertyFeature)
+                {
+                    ResolvedResult.Item.UpdateNumberKind(AsPropertyFeature.NumberKind, ref isChanged);
+                    IsHandled = true;
+                }
+                else if (EmbeddingFeature is IIndexerFeature AsIndexerFeature)
+                {
+                    ResolvedResult.Item.UpdateNumberKind(AsIndexerFeature.NumberKind, ref isChanged);
+                    IsHandled = true;
+                }
+
+                Debug.Assert(IsHandled);
+            }
             else
                 Debug.Assert(ResolvedResult.Item.NumberKind == NumberKinds.NotApplicable);
         }

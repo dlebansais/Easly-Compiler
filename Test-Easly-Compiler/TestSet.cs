@@ -11,10 +11,10 @@ using EaslyCompiler;
 using NUnit.Framework;
 using PolySerializer;
 
-namespace Test
+namespace TestEaslyCompiler
 {
     [TestFixture]
-    public class TestSet
+    public class ATestSet
     {
         static bool TestOff = false;
 
@@ -22,78 +22,10 @@ namespace Test
         [OneTimeSetUp]
         public static void InitTestSession()
         {
-            CultureInfo enUS = CultureInfo.CreateSpecificCulture("en-US");
-            CultureInfo.DefaultThreadCurrentCulture = enUS;
-            CultureInfo.DefaultThreadCurrentUICulture = enUS;
-            Thread.CurrentThread.CurrentCulture = enUS;
-            Thread.CurrentThread.CurrentUICulture = enUS;
-
-            Assembly EaslyCompilerAssembly;
-
-            try
-            {
-                EaslyCompilerAssembly = Assembly.Load("Easly-Compiler");
-            }
-            catch
-            {
-                EaslyCompilerAssembly = null;
-            }
-            Assume.That(EaslyCompilerAssembly != null);
-
-            if (File.Exists("./Easly-Compiler/bin/x64/Travis/test.easly"))
-                RootPath = "./Easly-Compiler/bin/x64/Travis/";
-            else if (File.Exists("./Test-Easly-Compiler/test.easly"))
-                RootPath = "./Test-Easly-Compiler/";
-            else
-                RootPath = "./";
-
-            FileNameTable = new List<string>();
-            CoverageNode = null;
-            AddEaslyFiles(RootPath);
-        }
-
-        static void AddEaslyFiles(string path)
-        {
-            foreach (string FileName in Directory.GetFiles(path, "*.easly"))
-            {
-                FileNameTable.Add(FileName.Replace("\\", "/"));
-
-                if (FileName.EndsWith("coverage.easly"))
-                {
-                    using (FileStream fs = new FileStream(FileName, FileMode.Open, FileAccess.Read))
-                    {
-                        Serializer Serializer = new Serializer();
-                        INode RootNode = Serializer.Deserialize(fs) as INode;
-
-                        CoverageNode = RootNode;
-                    }
-                }
-            }
-
-            foreach (string Folder in Directory.GetDirectories(path))
-                AddEaslyFiles(Folder);
-        }
-
-        static IEnumerable<int> FileIndexRange()
-        {
-            for (int i = 0; i < 1; i++)
-                yield return i;
-        }
-
-        static int RandValue = 0;
-
-        static void SeedRand(int seed)
-        {
-            RandValue = seed;
-        }
-
-        static int RandNext(int maxValue)
-        {
-            RandValue = (int)(5478541UL + (ulong)RandValue * 872143693217UL);
-            if (RandValue < 0)
-                RandValue = -RandValue;
-
-            return RandValue % maxValue;
+            TestEnvironment.InitTestSession();
+            FileNameTable = TestEnvironment.FileNameTable;
+            CoverageNode = TestEnvironment.CoverageNode;
+            RootPath = TestEnvironment.RootPath;
         }
 
         static List<string> FileNameTable;
@@ -117,6 +49,7 @@ namespace Test
                 return;
 
             TestContext.Out.WriteLine($"RootPath: {RootPath}");
+            string s = Environment.CurrentDirectory;
 
             Compiler Compiler = new Compiler();
 
@@ -173,7 +106,7 @@ namespace Test
 
         #region Compile as object
         [Test]
-        [TestCaseSource(nameof(FileIndexRange))]
+        [TestCaseSource(nameof(TestEnvironment.FileIndexRange))]
         public static void TestCompileObject(int index)
         {
             if (TestOff)

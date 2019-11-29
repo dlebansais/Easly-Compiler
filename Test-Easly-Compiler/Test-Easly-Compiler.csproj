@@ -9,7 +9,7 @@
     <ProjectGuid>{16B27541-2CE6-4A41-AE77-D6DF7D73A260}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Test_Easly_Compiler</RootNamespace>
+    <RootNamespace>TestEaslyCompiler</RootNamespace>
     <AssemblyName>Test-Easly-Compiler</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="CoverageSet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestEnvironment.cs" />
     <Compile Include="TestSet.cs" />
   </ItemGroup>
   <ItemGroup>
