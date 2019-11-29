@@ -51,7 +51,6 @@
 
             Success &= AreAllConstantsValid(node);
             Success &= CheckNoCycle(node, out IDictionary<Number, IDiscrete> CombinedDiscreteNumericValueList);
-            Success &= CheckNoIdenticalConstants(node, CombinedDiscreteNumericValueList);
 
             return Success;
         }
@@ -107,45 +106,6 @@
                 {
                     AddSourceError(new ErrorInvalidExpression(NumericValue));
                     Success = false;
-                }
-            }
-
-            return Success;
-        }
-
-        private bool CheckNoIdenticalConstants(IClass node, IDictionary<Number, IDiscrete> combinedDiscreteNumericValueList)
-        {
-            bool Success = true;
-            IList<Number> ErroneousConstantList = new List<Number>();
-
-            foreach (KeyValuePair<Number, IDiscrete> Entry1 in combinedDiscreteNumericValueList)
-            {
-                foreach (KeyValuePair<Number, IDiscrete> Entry2 in combinedDiscreteNumericValueList)
-                {
-                    Number Number1 = Entry1.Key;
-                    Number Number2 = Entry2.Key;
-
-                    if (!ErroneousConstantList.Contains(Number1) && !ErroneousConstantList.Contains(Number2) && Number1.Equals(Number2))
-                    {
-                        IDiscrete Discrete1 = Entry1.Value;
-                        IDiscrete Discrete2 = Entry1.Value;
-
-                        int Index1 = node.DiscreteList.IndexOf(Discrete1);
-                        int Index2 = node.DiscreteList.IndexOf(Discrete2);
-
-                        ISource MostAccurateSource;
-                        if (Index1 < 0 && Index2 < 0)
-                            MostAccurateSource = node;
-                        else
-                            MostAccurateSource = (Index2 >= 0) ? Discrete2 : Discrete1;
-
-                        // Prevents having the same error twice.
-                        ErroneousConstantList.Add(Number1);
-                        ErroneousConstantList.Add(Number2);
-
-                        AddSourceError(new ErrorMultipleIdenticalDiscrete(MostAccurateSource, Number1));
-                        Success = false;
-                    }
                 }
             }
 
