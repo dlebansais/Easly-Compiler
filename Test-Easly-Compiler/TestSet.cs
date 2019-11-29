@@ -48,9 +48,6 @@ namespace TestEaslyCompiler
             if (TestOff)
                 return;
 
-            TestContext.Out.WriteLine($"RootPath: {RootPath}");
-            string s = Environment.CurrentDirectory;
-
             Compiler Compiler = new Compiler();
 
             Assert.That(Compiler != null, "Sanity Check #0");

@@ -58,6 +58,8 @@
             if (RootPath == null)
                 RootPath = "./";
 
+            TestContext.Progress.WriteLine($"RootPath: {RootPath}");
+
             FileNameTable = new List<string>();
             CoverageNode = null;
             AddEaslyFiles(RootPath);

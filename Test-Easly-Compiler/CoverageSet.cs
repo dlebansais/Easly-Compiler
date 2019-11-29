@@ -44,8 +44,6 @@ namespace TestEaslyCompiler
         [Category("Coverage")]
         public static void TestCompilationCalls()
         {
-            TestContext.Out.WriteLine($"RootPath: {RootPath}");
-
             Compiler Compiler = new Compiler();
 
             Assert.That(Compiler != null, "Sanity Check #0");
