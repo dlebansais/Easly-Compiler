@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
-using System.Reflection;
-using System.Threading;
-using BaseNode;
+﻿using BaseNode;
 using BaseNodeHelper;
 using EaslyCompiler;
 using NUnit.Framework;
 using PolySerializer;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace TestEaslyCompiler
 {
@@ -26,6 +22,12 @@ namespace TestEaslyCompiler
             FileNameTable = TestEnvironment.FileNameTable;
             CoverageNode = TestEnvironment.CoverageNode;
             RootPath = TestEnvironment.RootPath;
+        }
+
+        private static IEnumerable<int> FileIndexRange()
+        {
+            for (int i = 0; i < 1; i++)
+                yield return i;
         }
 
         static List<string> FileNameTable;
@@ -103,7 +105,7 @@ namespace TestEaslyCompiler
 
         #region Compile as object
         [Test]
-        [TestCaseSource(nameof(TestEnvironment.FileIndexRange))]
+        [TestCaseSource(nameof(FileIndexRange))]
         public static void TestCompileObject(int index)
         {
             if (TestOff)

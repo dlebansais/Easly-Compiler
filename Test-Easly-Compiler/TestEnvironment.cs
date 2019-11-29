@@ -87,12 +87,6 @@
                 AddEaslyFiles(Folder);
         }
 
-        public static IEnumerable<int> FileIndexRange()
-        {
-            for (int i = 0; i < 1; i++)
-                yield return i;
-        }
-
         private static void SeedRand(int seed)
         {
             RandValue = seed;
