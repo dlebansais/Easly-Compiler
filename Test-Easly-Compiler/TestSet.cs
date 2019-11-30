@@ -10,7 +10,7 @@ using System.IO;
 namespace TestEaslyCompiler
 {
     [TestFixture]
-    public class ATestSet
+    public class TestSet
     {
         static bool TestOff = false;
 
