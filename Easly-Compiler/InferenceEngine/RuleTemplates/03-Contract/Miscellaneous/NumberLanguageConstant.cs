@@ -24,6 +24,7 @@
         /// </summary>
         public NumberLanguageConstant()
         {
+            Value = Number.NaN;
         }
 
         /// <summary>

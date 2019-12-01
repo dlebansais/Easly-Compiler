@@ -4,6 +4,7 @@ using EaslyCompiler;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace TestEaslyCompiler
@@ -3159,11 +3160,9 @@ namespace TestEaslyCompiler
 
             Compiler.ActivateVerification = false;
 
-            //Debug.Assert(false);
             Compiler.Compile(TestFileName);
 
-            //TODO fix that
-            //Assert.That(!Compiler.ErrorList.IsEmpty && Compiler.ErrorList.At(0) is IErrorInvalidExpression, ErrorListToString(Compiler));
+            Assert.That(!Compiler.ErrorList.IsEmpty && Compiler.ErrorList.At(0) is IErrorInvalidExpression, ErrorListToString(Compiler));
         }
 
         [Test]
