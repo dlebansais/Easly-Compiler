@@ -7,7 +7,7 @@
 
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             CultureInfo enUS = CultureInfo.CreateSpecificCulture("en-US");
             CultureInfo.DefaultThreadCurrentCulture = enUS;

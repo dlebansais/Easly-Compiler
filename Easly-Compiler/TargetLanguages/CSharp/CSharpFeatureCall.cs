@@ -102,13 +102,6 @@
         public TypeArgumentStyles ArgumentStyle { get; }
         #endregion
 
-        #region Client Interface
-        public virtual string CallText()
-        {
-            return string.Empty;
-        }
-        #endregion
-
         #region Implementation of ICSharpOutputNode
         /// <summary>
         /// True if the node should be produced.

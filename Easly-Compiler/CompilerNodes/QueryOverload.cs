@@ -461,7 +461,7 @@
         /// <summary>
         /// Gets the best guess for the kind of a number parameter.
         /// </summary>
-        public void UpdateParameterKind(IList<NumberKinds> usageList, ref NumberKinds bestGuess)
+        public static void UpdateParameterKind(IList<NumberKinds> usageList, ref NumberKinds bestGuess)
         {
             foreach (NumberKinds Item in usageList)
             {

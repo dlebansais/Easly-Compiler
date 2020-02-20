@@ -1,5 +1,6 @@
 namespace CompilerNode
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -34,7 +35,7 @@ namespace CompilerNode
         public PositionalArgument(IExpression source)
         {
             Documentation = BaseNodeHelper.NodeHelper.CreateEmptyDocumentation();
-            Source = source;
+            Source = source ?? throw new ArgumentNullException(nameof(source));
 
             if (source.ResolvedResult.IsAssigned)
                 ResolvedResult.Item = source.ResolvedResult.Item;
@@ -188,6 +189,11 @@ namespace CompilerNode
         /// <param name="argument2">The second argument.</param>
         public static bool IsPositionalArgumentEqual(IPositionalArgument argument1, IPositionalArgument argument2)
         {
+            if (argument1 == null)
+                throw new ArgumentNullException(nameof(argument1));
+            if (argument2 == null)
+                throw new ArgumentNullException(nameof(argument2));
+
             bool Result = true;
 
             Result &= Expression.IsExpressionEqual((IExpression)argument1.Source, (IExpression)argument2.Source);

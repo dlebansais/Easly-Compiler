@@ -9,7 +9,7 @@
     /// <summary>
     /// Validation of source code strings
     /// </summary>
-    public class StringValidation
+    public static class StringValidation
     {
         static StringValidation()
         {

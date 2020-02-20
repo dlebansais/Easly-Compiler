@@ -21,7 +21,7 @@
         /// <summary>
         /// Sources of the constant expression, if any.
         /// </summary>
-        public ISealableList<IExpression> ConstantSourceList { get; set; } = new SealableList<IExpression>();
+        public ISealableList<IExpression> ConstantSourceList { get; } = new SealableList<IExpression>();
 
         /// <summary>
         /// The expression constant.

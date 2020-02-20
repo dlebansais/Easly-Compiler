@@ -34,7 +34,7 @@ namespace CompilerNode
     public class AttributeFeature : BaseNode.AttributeFeature, IAttributeFeature
     {
         #region Init
-        private static readonly BaseNode.EventType UninitializedEventType = (BaseNode.EventType)(-1);
+        private const BaseNode.EventType UninitializedEventType = (BaseNode.EventType)(-1);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AttributeFeature"/> class.

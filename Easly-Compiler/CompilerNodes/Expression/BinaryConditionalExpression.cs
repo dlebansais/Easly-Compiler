@@ -1,6 +1,7 @@
 ﻿namespace CompilerNode
 {
     using System.Diagnostics;
+    using System.Globalization;
     using Easly;
     using EaslyCompiler;
 
@@ -299,7 +300,7 @@
                 Expression = (IExpression)RightExpression;
                 string RightExpressionString = Expression.IsComplex ? $"({Expression.ExpressionToString})" : Expression.ExpressionToString;
 
-                return $"{LeftExpressionString} {Conditional.ToString().ToLower()} {RightExpressionString}";
+                return $"{LeftExpressionString} {Conditional.ToString().ToLowerInvariant()} {RightExpressionString}";
             }
         }
 

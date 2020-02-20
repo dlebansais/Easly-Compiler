@@ -155,7 +155,7 @@
                 Debug.Assert(Identifier.ValidText.IsAssigned);
                 string ValidText = Identifier.ValidText.Item;
 
-                if (ValidText.ToLower() == LanguageClasses.Any.Name.ToLower())
+                if (ValidText.ToUpperInvariant() == LanguageClasses.Any.Name.ToUpperInvariant())
                     ListedClassList.Add(LanguageClasses.Any.Name);
                 else if (node.ImportedClassTable.ContainsKey(ValidText))
                     ListedClassList.Add(ValidText);
@@ -198,7 +198,7 @@
                 IIdentifier Identifier = export.ClassIdentifierList[i];
                 string ValidIdentifier = Identifier.ValidText.Item;
 
-                if (ValidIdentifier.ToLower() != LanguageClasses.Any.Name.ToLower() && node.ImportedClassTable.ContainsKey(ValidIdentifier))
+                if (ValidIdentifier.ToUpperInvariant() != LanguageClasses.Any.Name.ToUpperInvariant() && node.ImportedClassTable.ContainsKey(ValidIdentifier))
                 {
                     IImportedClass Imported = node.ImportedClassTable[ValidIdentifier];
 

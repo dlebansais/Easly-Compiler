@@ -55,7 +55,7 @@
             ISealableDictionary<string, IImportedClass> ImportedClassTable = EmbeddingClass.ImportedClassTable;
             ISealableDictionary<string, ICompiledType> LocalGenericTable = EmbeddingClass.LocalGenericTable;
 
-            if (ValidText.ToLower() == LanguageClasses.Any.Name.ToLower())
+            if (ValidText.ToUpperInvariant() == LanguageClasses.Any.Name.ToUpperInvariant())
             {
                 AddSourceError(new ErrorReservedName(EntityName, ValidText));
                 Success = false;

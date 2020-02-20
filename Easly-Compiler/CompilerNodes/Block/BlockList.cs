@@ -3,22 +3,22 @@
     /// <summary>
     /// Compiler IBlockList.
     /// </summary>
-    /// <typeparam name="IN">Items interface type.</typeparam>
-    /// <typeparam name="N">Items type.</typeparam>
-    public interface IBlockList<IN, N> : BaseNode.IBlockList<IN, N>
-        where IN : class, BaseNode.INode
-        where N : BaseNode.Node, IN
+    /// <typeparam name="TINode">Items interface type.</typeparam>
+    /// <typeparam name="TNode">Items type.</typeparam>
+    public interface IBlockList<TINode, TNode> : BaseNode.IBlockList<TINode, TNode>
+        where TINode : class, BaseNode.INode
+        where TNode : BaseNode.Node, TINode
     {
     }
 
     /// <summary>
     /// Compiler IBlockList.
     /// </summary>
-    /// <typeparam name="IN">Items interface type.</typeparam>
-    /// <typeparam name="N">Items type.</typeparam>
-    public class BlockList<IN, N> : BaseNode.BlockList<IN, N>, IBlockList<IN, N>
-        where IN : class, BaseNode.INode
-        where N : BaseNode.Node, IN
+    /// <typeparam name="TINode">Items interface type.</typeparam>
+    /// <typeparam name="TNode">Items type.</typeparam>
+    public class BlockList<TINode, TNode> : BaseNode.BlockList<TINode, TNode>, IBlockList<TINode, TNode>
+        where TINode : class, BaseNode.INode
+        where TNode : BaseNode.Node, TINode
     {
     }
 }

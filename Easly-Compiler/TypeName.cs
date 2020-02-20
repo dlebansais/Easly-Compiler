@@ -17,13 +17,6 @@
     public class TypeName : ITypeName
     {
         #region Init
-        static TypeName()
-        {
-            Count = 0;
-        }
-
-        private static int Count;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeName"/> class.
         /// </summary>
@@ -35,6 +28,8 @@
 
             Count++;
         }
+
+        private static int Count = 0;
         #endregion
 
         #region Properties

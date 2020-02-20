@@ -98,11 +98,11 @@
 
             if (IsReady)
             {
-                if (ValidIdentifier.ToLower() == LanguageClasses.Any.Name.ToLower())
+                if (ValidIdentifier.ToUpperInvariant() == LanguageClasses.Any.Name.ToUpperInvariant())
                     GetBaseClassType(Class.ClassAny, out ValidTypeName, out ValidType);
-                else if (ValidIdentifier.ToLower() == LanguageClasses.AnyReference.Name.ToLower())
+                else if (ValidIdentifier.ToUpperInvariant() == LanguageClasses.AnyReference.Name.ToUpperInvariant())
                     GetBaseClassType(Class.ClassAnyReference, out ValidTypeName, out ValidType);
-                else if (ValidIdentifier.ToLower() == LanguageClasses.AnyValue.Name.ToLower())
+                else if (ValidIdentifier.ToUpperInvariant() == LanguageClasses.AnyValue.Name.ToUpperInvariant())
                     GetBaseClassType(Class.ClassAnyValue, out ValidTypeName, out ValidType);
                 else if (ImportedClassTable.ContainsKey(ValidIdentifier))
                 {

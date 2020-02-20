@@ -259,7 +259,7 @@
         /// <param name="typeArgumentList">The list of arguments.</param>
         /// <param name="isWithInterface">If true, include the interface type.</param>
         /// <param name="isWithImplementation">If true, include the implementation type.</param>
-        protected string TypeArguments2CSharpName(ICSharpUsingCollection usingCollection, IList<ICSharpType> typeArgumentList, bool isWithInterface, bool isWithImplementation)
+        protected static string TypeArguments2CSharpName(ICSharpUsingCollection usingCollection, IList<ICSharpType> typeArgumentList, bool isWithInterface, bool isWithImplementation)
         {
             Debug.Assert(isWithInterface || isWithImplementation);
 

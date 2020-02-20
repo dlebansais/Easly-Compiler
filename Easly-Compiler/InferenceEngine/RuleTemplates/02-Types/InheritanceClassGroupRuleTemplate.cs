@@ -60,15 +60,15 @@
 
                 ISealableDictionary<string, IImportedClass> ImportedClassTable = EmbeddingClass.ImportedClassTable;
 
-                if (ValidIdentifier.ToLower() == LanguageClasses.Any.Name.ToLower())
+                if (ValidIdentifier.ToUpperInvariant() == LanguageClasses.Any.Name.ToUpperInvariant())
                 {
                     BaseClass = Class.ClassAny;
                 }
-                else if (ValidIdentifier.ToLower() == LanguageClasses.AnyReference.Name.ToLower())
+                else if (ValidIdentifier.ToUpperInvariant() == LanguageClasses.AnyReference.Name.ToUpperInvariant())
                 {
                     BaseClass = Class.ClassAnyReference;
                 }
-                else if (ValidIdentifier.ToLower() == LanguageClasses.AnyValue.Name.ToLower())
+                else if (ValidIdentifier.ToUpperInvariant() == LanguageClasses.AnyValue.Name.ToUpperInvariant())
                 {
                     BaseClass = Class.ClassAnyValue;
                 }

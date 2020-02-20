@@ -1,6 +1,7 @@
 ﻿namespace CompilerNode
 {
     using System.Collections;
+    using System.Diagnostics;
     using Easly;
     using EaslyCompiler;
 

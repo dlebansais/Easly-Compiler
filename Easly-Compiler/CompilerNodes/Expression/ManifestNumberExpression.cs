@@ -1,6 +1,7 @@
 ﻿namespace CompilerNode
 {
     using System.Diagnostics;
+    using System.Globalization;
     using Easly;
     using EaslyCompiler;
     using EaslyNumber;
@@ -37,7 +38,7 @@
         public ManifestNumberExpression(int value)
         {
             Documentation = BaseNodeHelper.NodeHelper.CreateEmptyDocumentation();
-            Text = value.ToString();
+            Text = value.ToString(CultureInfo.InvariantCulture);
         }
 
         /// <summary>

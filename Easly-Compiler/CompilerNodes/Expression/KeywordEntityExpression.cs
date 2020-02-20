@@ -169,7 +169,8 @@ namespace CompilerNode
         /// <param name="other">The other expression.</param>
         protected bool IsExpressionEqual(IKeywordEntityExpression other)
         {
-            Debug.Assert(other != null);
+            if (other == null)
+                throw new ArgumentNullException(nameof(other));
 
             bool Result = true;
 
@@ -190,6 +191,11 @@ namespace CompilerNode
         /// <param name="resolvedFinalFeature">The feature if the end of the path is a feature.</param>
         public static bool ResolveCompilerReferences(IKeywordEntityExpression node, IErrorList errorList, out IResultType resolvedResult, out IResultException resolvedException, out ISealableList<IExpression> constantSourceList, out ILanguageConstant expressionConstant, out ICompiledFeature resolvedFinalFeature)
         {
+            if (node == null)
+                throw new ArgumentNullException(nameof(node));
+            if (errorList == null)
+                throw new ArgumentNullException(nameof(errorList));
+
             resolvedResult = null;
             resolvedException = null;
             constantSourceList = new SealableList<IExpression>();

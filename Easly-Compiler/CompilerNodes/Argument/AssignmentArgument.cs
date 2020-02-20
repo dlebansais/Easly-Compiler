@@ -1,5 +1,6 @@
 ﻿namespace CompilerNode
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -35,6 +36,9 @@
         /// <param name="nodeList">The node list.</param>
         public void FillReplicatedList(string propertyName, List<BaseNode.INode> nodeList)
         {
+            if (nodeList == null)
+                throw new ArgumentNullException(nameof(nodeList));
+
             IList TargetList = null;
 
             switch (propertyName)
@@ -186,6 +190,11 @@
         /// <param name="argument2">The second argument.</param>
         public static bool IsAssignmentArgumentEqual(IAssignmentArgument argument1, IAssignmentArgument argument2)
         {
+            if (argument1 == null)
+                throw new ArgumentNullException(nameof(argument1));
+            if (argument2 == null)
+                throw new ArgumentNullException(nameof(argument2));
+
             bool Result = true;
 
             Result &= argument1.ParameterList.Count != argument2.ParameterList.Count;

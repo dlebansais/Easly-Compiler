@@ -1,5 +1,6 @@
 namespace CompilerNode
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -66,6 +67,11 @@ namespace CompilerNode
         /// <param name="argumentList2">The second list.</param>
         public static bool IsArgumentListEqual(IList<IArgument> argumentList1, IList<IArgument> argumentList2)
         {
+            if (argumentList1 == null)
+                throw new ArgumentNullException(nameof(argumentList1));
+            if (argumentList2 == null)
+                throw new ArgumentNullException(nameof(argumentList2));
+
             bool Result = true;
 
             Result &= argumentList1.Count == argumentList2.Count;
@@ -122,6 +128,9 @@ namespace CompilerNode
         /// <param name="argumentList">The list of arguments.</param>
         public static string ArgumentListToString(IEnumerable argumentList)
         {
+            if (argumentList == null)
+                throw new ArgumentNullException(nameof(argumentList));
+
             string Result = string.Empty;
 
             foreach (IArgument Argument in argumentList)
@@ -143,6 +152,13 @@ namespace CompilerNode
         /// <param name="errorList">List of errors found.</param>
         public static bool Validate(IList<IArgument> argumentList, List<IExpressionType> mergedArgumentList, out TypeArgumentStyles argumentStyle, IErrorList errorList)
         {
+            if (argumentList == null)
+                throw new ArgumentNullException(nameof(argumentList));
+            if (mergedArgumentList == null)
+                throw new ArgumentNullException(nameof(mergedArgumentList));
+            if (errorList == null)
+                throw new ArgumentNullException(nameof(errorList));
+
             argumentStyle = TypeArgumentStyles.None;
 
             if (!GetArgumentPassingStyle(argumentList, out argumentStyle, errorList))
@@ -294,6 +310,13 @@ namespace CompilerNode
         /// <param name="selectedIndex">The selected index in the list of overloads upon return.</param>
         public static bool ArgumentsConformToParameters(IList<ISealableList<IParameter>> parameterTableList, IReadOnlyList<IExpressionType> arguments, TypeArgumentStyles argumentStyle, IErrorList errorList, ISource source, out int selectedIndex)
         {
+            if (parameterTableList == null)
+                throw new ArgumentNullException(nameof(parameterTableList));
+            if (arguments == null)
+                throw new ArgumentNullException(nameof(arguments));
+            if (errorList == null)
+                throw new ArgumentNullException(nameof(errorList));
+
             selectedIndex = -1;
             bool Result = false;
             bool IsHandled = false;

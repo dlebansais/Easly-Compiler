@@ -1,4 +1,6 @@
-﻿namespace EaslyCompiler
+﻿using System.Globalization;
+
+namespace EaslyCompiler
 {
     /// <summary>
     /// Invalid character in a string.
@@ -42,7 +44,7 @@
         {
             get
             {
-                return $"Invalid character with code U+{Character.ToString("X8")} found.";
+                return $"Invalid character with code U+{Character.ToString("X8", CultureInfo.InvariantCulture)} found.";
             }
         }
         #endregion

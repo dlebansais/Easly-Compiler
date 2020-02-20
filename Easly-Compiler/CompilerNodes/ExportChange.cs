@@ -3,6 +3,7 @@ namespace CompilerNode
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Globalization;
     using Easly;
     using EaslyCompiler;
 
@@ -206,7 +207,7 @@ namespace CompilerNode
                     Debug.Assert(!ListedClassTable.ContainsKey(ValidIdentifier));
                     ListedClassTable.Add(ValidIdentifier, importedClassTable[ValidIdentifier].Item);
                 }
-                else if (ValidIdentifier.ToLower() != LanguageClasses.Any.Name.ToLower())
+                else if (ValidIdentifier.ToUpperInvariant() != LanguageClasses.Any.Name.ToUpperInvariant())
                 {
                     errorList.AddError(new ErrorUnknownIdentifier(IdentifierItem, ValidIdentifier));
                     InvalidExportChange = true;

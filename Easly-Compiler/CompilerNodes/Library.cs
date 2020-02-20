@@ -233,7 +233,7 @@ namespace CompilerNode
                     continue;
                 }
 
-                if (ValidClassIdentifier.ToLower() == LanguageClasses.Any.Name.ToLower())
+                if (ValidClassIdentifier.ToUpperInvariant() == LanguageClasses.Any.Name.ToUpperInvariant())
                 {
                     // 'Any' is implicit and just ignored.
                 }

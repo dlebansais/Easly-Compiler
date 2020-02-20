@@ -1,5 +1,6 @@
 namespace CompilerNode
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -62,6 +63,9 @@ namespace CompilerNode
         /// <param name="nodeList">The node list.</param>
         public void FillReplicatedList(string propertyEntityDeclaration, List<BaseNode.INode> nodeList)
         {
+            if (nodeList == null)
+                throw new ArgumentNullException(nameof(nodeList));
+
             IList TargetList = null;
 
             switch (propertyEntityDeclaration)

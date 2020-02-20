@@ -8,6 +8,9 @@
     /// </summary>
     internal static class LanguageClasses
     {
+        public const string BooleanTrueString = "True";
+        public const string BooleanFalseString = "False";
+
         public static readonly NameGuidPair Any = new NameGuidPair() { Guid = new Guid("c6297be4-e121-400f-ad78-79df3ecf2858"), Name = "Any" };
         public static readonly NameGuidPair AnyDetachableReference = new NameGuidPair() { Guid = new Guid("a035583e-30d7-4434-be9a-8c4780029ead"), Name = "Any Detachable Reference" };
         public static readonly NameGuidPair AnyOnceReference = new NameGuidPair() { Guid = new Guid("894e9bd1-f516-42c4-a95f-a40e698eea97"), Name = "Any Once Reference" };
@@ -133,8 +136,5 @@
             { TypeEntity.Guid, TypeEntity.Name },
             { UniversallyUniqueIdentifier.Guid, UniversallyUniqueIdentifier.Name },
         };
-
-        public static readonly string BooleanTrueString = "True";
-        public static readonly string BooleanFalseString = "False";
     }
 }

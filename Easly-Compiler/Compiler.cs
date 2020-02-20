@@ -4,6 +4,7 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
     using System.Reflection;
     using System.Security.Cryptography;
@@ -332,14 +333,14 @@
         protected virtual void GenerateCompilationDateTime()
         {
             DateTime Now = DateTime.UtcNow;
-            string IsoString = Now.ToString("u");
+            string IsoString = Now.ToString("u", CultureInfo.InvariantCulture);
             CompilationDateTime = InitializedStringExpression(LanguageClasses.DateAndTime.Name, nameof(DateAndTime.ToUtcDateAndTime), IsoString);
         }
 
         /// <summary></summary>
         protected virtual void GenerateCompilationUID()
         {
-            string NewGuidDigits = Guid.NewGuid().ToString("N") + ":" + Number.HexadecimalSuffixCharacter;
+            string NewGuidDigits = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture) + ":" + Number.HexadecimalSuffixCharacter;
 
             BaseNode.IIdentifier Operator = NodeHelper.CreateSimpleIdentifier("To UUID");
             BaseNode.IManifestNumberExpression NumberExpression = NodeHelper.CreateSimpleManifestNumberExpression(NewGuidDigits);
@@ -445,7 +446,7 @@
                     case BaseNode.PreprocessorMacro.DiscreteClassIdentifier:
                         Debug.Assert(context.CurrentClass != null);
 
-                        string GlassGuidDigits = context.CurrentClass.ClassGuid.ToString("N") + ":" + Number.HexadecimalSuffixCharacter;
+                        string GlassGuidDigits = context.CurrentClass.ClassGuid.ToString("N", CultureInfo.InvariantCulture) + ":" + Number.HexadecimalSuffixCharacter;
                         BaseNode.IIdentifier Operator = NodeHelper.CreateSimpleIdentifier("To UUID");
                         BaseNode.IManifestNumberExpression NumberExpression = NodeHelper.CreateSimpleManifestNumberExpression(GlassGuidDigits);
                         BaseNode.IUnaryOperatorExpression Expression = NodeHelper.CreateUnaryOperatorExpression(Operator, NumberExpression);
@@ -815,7 +816,7 @@
 
             string Value = string.Empty;
             foreach (byte b in Data)
-                Value += b.ToString("X2");
+                Value += b.ToString("X2", CultureInfo.InvariantCulture);
 
             return new ManifestNumberExpression(Value + ":" + Number.HexadecimalSuffixCharacter);
         }
@@ -832,7 +833,7 @@
         }
 
         /// <summary></summary>
-        public bool InitializeSource(BaseNode.INode node, BaseNode.INode parentNode, string propertyName, IWalkCallbacks<object> callbacks, object context)
+        public static bool InitializeSource(BaseNode.INode node, BaseNode.INode parentNode, string propertyName, IWalkCallbacks<object> callbacks, object context)
         {
             bool Result = true;
 
