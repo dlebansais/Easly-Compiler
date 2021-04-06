@@ -16,6 +16,7 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConstantComputation", "ConstantComputation\ConstantComputation.csproj", "{AC0BE6E8-0993-4C1B-A0ED-A7B954FF2941}"
 	ProjectSection(ProjectDependencies) = postProject
 		{57CE1130-80A6-48A7-8957-E09027938A5B} = {57CE1130-80A6-48A7-8957-E09027938A5B}
+		{4C12A1EF-41AA-48E5-A8E7-399AF43246EB} = {4C12A1EF-41AA-48E5-A8E7-399AF43246EB}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSharpProject", "CSharpProject\CSharpProject.csproj", "{57CE1130-80A6-48A7-8957-E09027938A5B}"
