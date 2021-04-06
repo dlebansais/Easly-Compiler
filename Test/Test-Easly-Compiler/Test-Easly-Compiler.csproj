@@ -14,7 +14,7 @@
     <Product />
     <Description>Test</Description>
     <Copyright>Copyright © 2019 David Le Bansais</Copyright>
-    <AssemblyVersion>1.0.0.3414</AssemblyVersion>
+    <AssemblyVersion>1.0.0.3416</AssemblyVersion>
     <FileVersion>1.0.0.21</FileVersion>
     <RepositoryUrl>https://github.com/dlebansais/Easly-Compiler</RepositoryUrl>
     <NeutralLanguage>en-US</NeutralLanguage>
@@ -57,7 +57,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Easly-Compiler\Easly-Compiler.csproj" />
+    <ProjectReference Include="..\..\Easly-Compiler\Easly-Compiler.csproj" />
   </ItemGroup>
 
   <Target Name="_ResolveCopyLocalNuGetPackagePdbsAndXml" Condition="$(CopyLocalLockFileAssemblies) == true" AfterTargets="ResolveReferences">
