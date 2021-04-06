@@ -48,8 +48,8 @@
                 Success = false;
             else
             {
-                FormattedNumber fn = new FormattedNumber(ValidText);
-                if (!string.IsNullOrEmpty(fn.InvalidPart))
+                FormattedNumber fn = FormattedNumber.Parse(ValidText);
+                if (!string.IsNullOrEmpty(fn.InvalidText))
                     Success = false;
             }
 
@@ -71,8 +71,8 @@
             string ValidText = data as string;
             Debug.Assert(StringValidation.IsValidIdentifier(ValidText));
 
-            FormattedNumber fn = new FormattedNumber(ValidText);
-            Debug.Assert(string.IsNullOrEmpty(fn.InvalidPart));
+            FormattedNumber fn = FormattedNumber.Parse(ValidText);
+            Debug.Assert(string.IsNullOrEmpty(fn.InvalidText));
 
             node.ValidText.Item = ValidText;
         }

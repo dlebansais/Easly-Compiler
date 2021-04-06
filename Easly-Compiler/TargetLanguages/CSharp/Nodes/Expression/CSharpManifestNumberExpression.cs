@@ -40,7 +40,7 @@
         protected CSharpManifestNumberExpression(ICSharpContext context, IManifestNumberExpression source)
             : base(context, source)
         {
-            FormattedNumber FormattedNumber = new FormattedNumber(Source.ValidText.Item);
+            FormattedNumber FormattedNumber = FormattedNumber.Parse(Source.ValidText.Item);
             Debug.Assert(FormattedNumber.IsValid);
 
             NumberType = FormattedNumber.Value.IsInteger ? CSharpNumberTypes.Integer : CSharpNumberTypes.Real;

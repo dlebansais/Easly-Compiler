@@ -309,6 +309,7 @@
         {
             Number LeftNumber = ComputeSide(writer, LeftExpression);
             Number RightNumber = ComputeSide(writer, LeftExpression);
+            int IntValue;
 
             bool IsHandled = false;
 
@@ -342,11 +343,13 @@
                 */
 
                 case ">>":
-                    ComputedValue = ToComputedValue(LeftNumber.ShiftRight(RightNumber));
+                    RightNumber.TryParseInt(out IntValue);
+                    ComputedValue = ToComputedValue(LeftNumber >> IntValue);
                     IsHandled = true;
                     break;
                 case "<<":
-                    ComputedValue = ToComputedValue(LeftNumber.ShiftLeft(RightNumber));
+                    RightNumber.TryParseInt(out IntValue);
+                    ComputedValue = ToComputedValue(LeftNumber << IntValue);
                     IsHandled = true;
                     break;
                 case "modulo":
@@ -409,7 +412,7 @@
                 ValueString = ComputableExpression.ComputedValue;
             }
 
-            FormattedNumber Result = new FormattedNumber(ValueString);
+            FormattedNumber Result = FormattedNumber.Parse(ValueString);
 
             return Result.Value;
         }

@@ -256,8 +256,8 @@
             resolvedResult = new ResultType(NumberTypeName, NumberType, string.Empty);
             resolvedException = new ResultException();
 
-            FormattedNumber FormattedNumber = new FormattedNumber(NumberText);
-            Debug.Assert(string.IsNullOrEmpty(FormattedNumber.InvalidPart));
+            FormattedNumber FormattedNumber = FormattedNumber.Parse(NumberText);
+            Debug.Assert(string.IsNullOrEmpty(FormattedNumber.InvalidText));
 
             expressionConstant = new NumberLanguageConstant(FormattedNumber.Value);
 
@@ -288,7 +288,7 @@
         /// <param name="isChanged">True upon return if a number type was changed.</param>
         public void CheckNumberType(ref bool isChanged)
         {
-            FormattedNumber n = new FormattedNumber(ValidText.Item);
+            FormattedNumber n = FormattedNumber.Parse(ValidText.Item);
             bool IsInteger = n.Value.IsInteger;
             NumberKinds NumberKind = IsInteger ? NumberKinds.Integer : NumberKinds.Real;
 

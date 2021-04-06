@@ -224,7 +224,7 @@
                 ValueString = ComputableExpression.ComputedValue;
             }
 
-            FormattedNumber Result = new FormattedNumber(ValueString);
+            FormattedNumber Result = FormattedNumber.Parse(ValueString);
 
             return Result.Value;
         }

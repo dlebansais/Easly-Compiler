@@ -319,7 +319,7 @@
             GenerateConformanceToStandard();
             GenerateDebugging();
 
-            bool Success = NodeTreeWalk<ReplacePhase1MacroContext>.Walk(root, new WalkCallbacks<ReplacePhase1MacroContext>() { HandlerNode = ReplacePhase1Macro, IsRecursive = true }, new ReplacePhase1MacroContext());
+            bool Success = NodeTreeWalk.Walk<ReplacePhase1MacroContext>(root, new WalkCallbacks<ReplacePhase1MacroContext>() { HandlerNode = ReplacePhase1Macro, IsRecursive = true }, new ReplacePhase1MacroContext());
             Debug.Assert(Success);
         }
 
@@ -340,7 +340,7 @@
         /// <summary></summary>
         protected virtual void GenerateCompilationUID()
         {
-            string NewGuidDigits = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture) + ":" + Number.HexadecimalSuffixCharacter;
+            string NewGuidDigits = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture) + ":" + "H";
 
             BaseNode.IIdentifier Operator = NodeHelper.CreateSimpleIdentifier("To UUID");
             BaseNode.IManifestNumberExpression NumberExpression = NodeHelper.CreateSimpleManifestNumberExpression(NewGuidDigits);
@@ -446,7 +446,7 @@
                     case BaseNode.PreprocessorMacro.DiscreteClassIdentifier:
                         Debug.Assert(context.CurrentClass != null);
 
-                        string GlassGuidDigits = context.CurrentClass.ClassGuid.ToString("N", CultureInfo.InvariantCulture) + ":" + Number.HexadecimalSuffixCharacter;
+                        string GlassGuidDigits = context.CurrentClass.ClassGuid.ToString("N", CultureInfo.InvariantCulture) + ":" + "H";
                         BaseNode.IIdentifier Operator = NodeHelper.CreateSimpleIdentifier("To UUID");
                         BaseNode.IManifestNumberExpression NumberExpression = NodeHelper.CreateSimpleManifestNumberExpression(GlassGuidDigits);
                         BaseNode.IUnaryOperatorExpression Expression = NodeHelper.CreateUnaryOperatorExpression(Operator, NumberExpression);
@@ -488,7 +488,7 @@
 
             ReplicationContext Replication = new ReplicationContext();
             IWalkCallbacks<ReplicationContext> Callbacks = new WalkCallbacks<ReplicationContext>() { HandlerNode = OnNodeIgnoreReplicates, HandlerBlockList = OnBlockListReplicate, HandlerString = OnStringReplicateText };
-            NodeTreeWalk<ReplicationContext>.Walk(root, Callbacks, Replication);
+            NodeTreeWalk.Walk<ReplicationContext>(root, Callbacks, Replication);
 
             return ErrorList.IsEmpty;
         }
@@ -508,7 +508,7 @@
                 return ErrorList.IsEmpty;
             }
             else
-                return parentNode == null || NodeTreeWalk<ReplicationContext>.Walk(node, callbacks, context);
+                return parentNode == null || NodeTreeWalk.Walk<ReplicationContext>(node, callbacks, context);
         }
 
         private void ProcessGlobalReplicates(IRoot root, ReplicationContext context)
@@ -665,7 +665,7 @@
                 {
                     BaseNode.INode ClonedNode = NodeHelper.DeepCloneNode(Node, cloneCommentGuid: true);
 
-                    Continue &= NodeTreeWalk<ReplicationContext>.Walk(ClonedNode, callbacks, context);
+                    Continue &= NodeTreeWalk.Walk<ReplicationContext>(ClonedNode, callbacks, context);
                     if (Continue)
                     {
                         if (ClonedNode is IClass AsClass)
@@ -691,7 +691,7 @@
                 BaseNode.INode Node = NodeList[i] as BaseNode.INode;
                 Debug.Assert(Node != null);
 
-                Continue &= NodeTreeWalk<ReplicationContext>.Walk(Node, callbacks, context);
+                Continue &= NodeTreeWalk.Walk<ReplicationContext>(Node, callbacks, context);
                 if (Continue)
                 {
                     if (Node is IClass AsClass)
@@ -753,7 +753,7 @@
         {
             Debug.Assert(ErrorList.IsEmpty);
 
-            bool Success = NodeTreeWalk<ReplacePhase2MacroContext>.Walk(root, new WalkCallbacks<ReplacePhase2MacroContext>() { HandlerNode = ReplacePhase2Macro, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() }, new ReplacePhase2MacroContext());
+            bool Success = NodeTreeWalk.Walk<ReplacePhase2MacroContext>(root, new WalkCallbacks<ReplacePhase2MacroContext>() { HandlerNode = ReplacePhase2Macro, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() }, new ReplacePhase2MacroContext());
             Debug.Assert(Success);
         }
 
@@ -818,7 +818,7 @@
             foreach (byte b in Data)
                 Value += b.ToString("X2", CultureInfo.InvariantCulture);
 
-            return new ManifestNumberExpression(Value + ":" + Number.HexadecimalSuffixCharacter);
+            return new ManifestNumberExpression(Value + ":" + "H");
         }
         #endregion
 
@@ -828,7 +828,7 @@
         {
             Debug.Assert(ErrorList.IsEmpty);
 
-            bool Success = NodeTreeWalk<object>.Walk(root, new WalkCallbacks<object>() { HandlerNode = InitializeSource, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() }, null);
+            bool Success = NodeTreeWalk.Walk<object>(root, new WalkCallbacks<object>() { HandlerNode = InitializeSource, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() }, null);
             Debug.Assert(Success);
         }
 
@@ -1067,7 +1067,7 @@
             IList<IClass> ClassList = root.ClassList;
 
             foreach (IClass Class in ClassList)
-                NodeTreeWalk<BuildInferenceSourceList>.Walk(Class, Callbacks, Context);
+                NodeTreeWalk.Walk<BuildInferenceSourceList>(Class, Callbacks, Context);
 
             IList<ISource> SourceList = Context.SourceList;
             InferenceEngine Engine = new InferenceEngine(ruleTemplateList, SourceList, ClassList, true, InferenceRetries);
@@ -1109,7 +1109,7 @@
             IList<IClass> ClassList = root.ClassList;
 
             foreach (IClass Class in ClassList)
-                NodeTreeWalk<object>.Walk(Class, Callbacks, Context);
+                NodeTreeWalk.Walk<object>(Class, Callbacks, Context);
         }
 
         /// <summary></summary>

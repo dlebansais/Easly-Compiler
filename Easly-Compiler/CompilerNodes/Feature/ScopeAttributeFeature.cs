@@ -147,11 +147,11 @@ namespace CompilerNode
 
             if (initialDefaultValue != null)
             {
-                DefaultValue = BaseNodeHelper.OptionalReferenceHelper<IExpression>.CreateReference(initialDefaultValue);
+                DefaultValue = BaseNodeHelper.OptionalReferenceHelper.CreateReference<IExpression>(initialDefaultValue);
                 DefaultValue.Assign();
             }
             else
-                DefaultValue = BaseNodeHelper.OptionalReferenceHelper<IExpression>.CreateEmptyReference();
+                DefaultValue = BaseNodeHelper.OptionalReferenceHelper.CreateEmptyReference<IExpression>();
 
             Debug.Assert(!IsDeferredFeature);
             Debug.Assert(!HasExternBody);
