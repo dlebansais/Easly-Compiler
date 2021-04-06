@@ -46,8 +46,8 @@
     <Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)nuget-debug\lib\$(TargetFramework)\&quot; &gt; nul" Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(TargetFramework)'!='net5.0-windows'" />
     <Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)nuget\lib\net5.0\&quot; &gt; nul" Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(TargetFramework)'=='net5.0-windows'" />
     <Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)nuget\lib\$(TargetFramework)\&quot; &gt; nul" Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(TargetFramework)'!='net5.0-windows'" />
-    <Exec Command="if exist &quot;$(TargetDir)*.pdb&quot; copy &quot;$(TargetDir)*.pdb&quot; &quot;$(SolutionDir)nuget-debug\lib\net5.0\&quot; &gt; nul" Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(TargetFramework)'=='net5.0-windows'" />
-    <Exec Command="if exist &quot;$(TargetDir)*.pdb&quot; copy &quot;$(TargetDir)*.pdb&quot; &quot;$(SolutionDir)nuget-debug\lib\$(TargetFramework)\&quot; &gt; nul" Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(TargetFramework)'!='net5.0-windows'" />
+    <Exec Command="if exist &quot;$(TargetDir)$(ProjectName).pdb&quot; copy &quot;$(TargetDir)$(ProjectName).pdb&quot; &quot;$(SolutionDir)nuget-debug\lib\net5.0\&quot; &gt; nul" Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(TargetFramework)'=='net5.0-windows'" />
+    <Exec Command="if exist &quot;$(TargetDir)$(ProjectName).pdb&quot; copy &quot;$(TargetDir)$(ProjectName).pdb&quot; &quot;$(SolutionDir)nuget-debug\lib\$(TargetFramework)\&quot; &gt; nul" Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(TargetFramework)'!='net5.0-windows'" />
     <Exec Command="if not exist $(SolutionDir)\Test\bin\ mkdir $(SolutionDir)\Test\bin" />
     <Exec Command="if not exist $(SolutionDir)\Test\bin\$(Platform)\ mkdir $(SolutionDir)\Test\bin\$(Platform)" />
     <Exec Command="if not exist $(SolutionDir)\Test\bin\$(Platform)\$(Configuration)\ mkdir $(SolutionDir)\Test\bin\$(Platform)\$(Configuration)" />
