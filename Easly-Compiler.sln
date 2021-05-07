@@ -20,6 +20,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConstantComputation", "Cons
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSharpProject", "CSharpProject\CSharpProject.csproj", "{57CE1130-80A6-48A7-8957-E09027938A5B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3B665D01-2796-4584-8B04-32BC7F13200E} = {3B665D01-2796-4584-8B04-32BC7F13200E}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test-Easly-Compiler", "Test\Test-Easly-Compiler\Test-Easly-Compiler.csproj", "{16B27541-2CE6-4A41-AE77-D6DF7D73A260}"
 EndProject
