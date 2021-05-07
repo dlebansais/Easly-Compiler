@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
@@ -18,10 +18,12 @@
     <FileVersion>1.0.0.21</FileVersion>
     <RepositoryUrl>https://github.com/dlebansais/Easly-Compiler</RepositoryUrl>
     <NeutralLanguage>en-US</NeutralLanguage>
+    <RootNamespace>TestEaslyCompiler</RootNamespace>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="..\..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -34,7 +36,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="NUnit" Version="3.13.1">
+    <PackageReference Include="NUnit" Version="3.13.2">
       <NoWarn>NU1701</NoWarn>
     </PackageReference>
     <PackageReference Include="NUnit.ConsoleRunner" Version="3.12.0">

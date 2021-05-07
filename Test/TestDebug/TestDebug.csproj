@@ -10,10 +10,13 @@
     <Platforms>x64</Platforms>
     <AssemblyVersion>1.0.0.3416</AssemblyVersion>
     <FileVersion>1.0.0.209</FileVersion>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <RootNamespace>TestDebug</RootNamespace>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="..\..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 
   <ItemGroup>

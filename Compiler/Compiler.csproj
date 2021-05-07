@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
@@ -18,6 +18,8 @@
     <FileVersion>1.0.0.10</FileVersion>
     <RepositoryUrl>https://github.com/dlebansais/Easly-Compiler</RepositoryUrl>
     <NeutralLanguage>en-US</NeutralLanguage>
+    <RootNamespace>Compiler</RootNamespace>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

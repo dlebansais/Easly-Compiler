@@ -17,7 +17,13 @@
     <FileVersion>1.0.0.10</FileVersion>
     <RepositoryUrl>https://github.com/dlebansais/Easly-Compiler</RepositoryUrl>
     <NeutralLanguage>en-US</NeutralLanguage>
+    <RootNamespace>ConstantComputation</RootNamespace>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="5.0.3">
