@@ -2,7 +2,7 @@
 
 Process Easly source code to output code for the target language (C# supported only).
 
-[![Easly](https://www.easly.org/images/16.png)](https://www.easly.org) [![Build Status](https://travis-ci.com/dlebansais/Easly-Compiler.svg?branch=master)](https://travis-ci.com/dlebansais/Easly-Compiler) [![CodeFactor](https://www.codefactor.io/repository/github/dlebansais/easly-compiler/badge)](https://www.codefactor.io/repository/github/dlebansais/easly-compiler) [![codecov](https://codecov.io/gh/dlebansais/Easly-Compiler/branch/master/graph/badge.svg)](https://codecov.io/gh/dlebansais/Easly-Compiler)
+[![Easly](https://github.com/dlebansais/Easly-Draw/blob/master/Easly-Draw/Resources/icon.png?raw=true)] [![Build status](https://ci.appveyor.com/api/projects/status/o1ktot5wqwqaaiay?svg=true)](https://ci.appveyor.com/project/dlebansais/easly-compiler) [![CodeFactor](https://www.codefactor.io/repository/github/dlebansais/easly-compiler/badge)](https://www.codefactor.io/repository/github/dlebansais/easly-compiler) [![codecov](https://codecov.io/gh/dlebansais/Easly-Compiler/branch/master/graph/badge.svg)](https://codecov.io/gh/dlebansais/Easly-Compiler)
 
 Easly source code is defined in the [Easly-Language](https://github.com/dlebansais/Easly-Language/) assembly.
 
