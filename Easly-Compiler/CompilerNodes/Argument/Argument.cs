@@ -410,18 +410,7 @@ namespace CompilerNode
                 bool IsBetter = false;
 
                 if (selectedOverload != null)
-                {
-                    for (j = 0; j < OverloadParameterList.Count && j < selectedOverload.Count; j++)
-                    {
-                        IParameter OverloadParameter = OverloadParameterList[j];
-                        ICompiledType OverloadParameterType = TypeOfPositionalParameter(OverloadParameter);
-                        IParameter SelectedParameter = selectedOverload[j];
-                        ICompiledType SelectedParameterType = TypeOfPositionalParameter(SelectedParameter);
-
-                        if (OverloadParameterType != SelectedParameterType)
-                            IsBetter |= ObjectType.TypeConformToBase(OverloadParameterType, SelectedParameterType, isConversionAllowed: false);
-                    }
-                }
+                    IsBetter = SelectMatchingOverload(OverloadParameterList, selectedOverload);
 
                 if (selectedOverload == null || IsBetter)
                 {
@@ -429,6 +418,24 @@ namespace CompilerNode
                     selectedIndex = i;
                 }
             }
+        }
+
+        private static bool SelectMatchingOverload(ISealableList<IParameter> overloadParameterList, ISealableList<IParameter> selectedOverload)
+        {
+            bool IsBetter = false;
+
+            for (int j = 0; j < overloadParameterList.Count && j < selectedOverload.Count; j++)
+            {
+                IParameter OverloadParameter = overloadParameterList[j];
+                ICompiledType OverloadParameterType = TypeOfPositionalParameter(OverloadParameter);
+                IParameter SelectedParameter = selectedOverload[j];
+                ICompiledType SelectedParameterType = TypeOfPositionalParameter(SelectedParameter);
+
+                if (OverloadParameterType != SelectedParameterType)
+                    IsBetter |= ObjectType.TypeConformToBase(OverloadParameterType, SelectedParameterType, isConversionAllowed: false);
+            }
+
+            return IsBetter;
         }
 
         private static ICompiledType TypeOfPositionalParameter(IParameter parameter)
