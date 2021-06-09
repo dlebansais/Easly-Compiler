@@ -12,7 +12,6 @@
     [TestFixture]
     public class TestEnvironment
     {
-        #region Setup
         [OneTimeSetUp]
         public static void InitTestSession()
         {
@@ -94,7 +93,7 @@
 
         private static int RandNext(int maxValue)
         {
-            RandValue = (int)(5478541UL + (ulong)RandValue * 872143693217UL);
+            RandValue = (int)(5478541UL + ((ulong)RandValue * 872143693217UL));
             if (RandValue < 0)
                 RandValue = -RandValue;
 
@@ -105,6 +104,5 @@
         public static List<string> FileNameTable;
         public static INode CoverageNode;
         private static int RandValue = 0;
-        #endregion
     }
 }

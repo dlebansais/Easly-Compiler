@@ -350,7 +350,6 @@ namespace CompilerNode
             if (!Argument.Validate(ArgumentList, MergedArgumentList, out TypeArgumentStyles TypeArgumentStyle, errorList))
                 return false;
 
-            IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
             IIdentifier LastIdentifier = ValidPath[ValidPath.Count - 1];
             string ValidText = LastIdentifier.ValidText.Item;
             bool IsHandled = false;
@@ -359,39 +358,8 @@ namespace CompilerNode
             switch (finalType)
             {
                 case IFunctionType AsFunctionType:
-
-                    // IScopeAttributeFeature is the case of an agent.
-                    IFunctionFeature AsFunctionFeature = resolvedFinalFeature as IFunctionFeature;
-                    IScopeAttributeFeature AsScopeAttributeFeature = resolvedFinalFeature as IScopeAttributeFeature;
-                    Debug.Assert(AsFunctionFeature != null || AsScopeAttributeFeature != null);
-
-                    foreach (IQueryOverloadType Overload in AsFunctionType.OverloadList)
-                        ParameterTableList.Add(Overload.ParameterTable);
-
-                    int SelectedIndex;
-                    if (!Argument.ArgumentsConformToParameters(ParameterTableList, MergedArgumentList, TypeArgumentStyle, errorList, node, out SelectedIndex))
+                    if (!ResolveFeatureAsFunctionType(node, errorList, resolvedFinalFeature, MergedArgumentList, TypeArgumentStyle, AsFunctionType, ref resolvedExpression))
                         return false;
-
-                    resolvedExpression.SelectedOverloadType = AsFunctionType.OverloadList[SelectedIndex];
-                    resolvedExpression.ResolvedResult = new ResultType(resolvedExpression.SelectedOverloadType.ResultTypeList);
-                    resolvedExpression.ResolvedException = new ResultException(resolvedExpression.SelectedOverloadType.ExceptionIdentifierList);
-
-                    if (AsFunctionFeature != null)
-                    {
-                        Debug.Assert(AsFunctionFeature.OverloadList.Count == AsFunctionType.OverloadList.Count);
-                        Debug.Assert(AsFunctionFeature.ResolvedAgentType.IsAssigned);
-                        Debug.Assert(AsFunctionFeature.ResolvedAgentType.Item == AsFunctionType);
-
-                        resolvedExpression.SelectedOverload = AsFunctionFeature.OverloadList[SelectedIndex];
-
-                        resolvedExpression.SelectedResultList = resolvedExpression.SelectedOverload.ResultTable;
-                        resolvedExpression.FeatureCall = new FeatureCall(resolvedExpression.SelectedOverload.ParameterTable, resolvedExpression.SelectedOverload.ResultTable, ArgumentList, MergedArgumentList, TypeArgumentStyle);
-                    }
-                    else
-                    {
-                        resolvedExpression.SelectedResultList = resolvedExpression.SelectedOverloadType.ResultTable;
-                        resolvedExpression.FeatureCall = new FeatureCall(resolvedExpression.SelectedOverloadType.ParameterTable, resolvedExpression.SelectedOverloadType.ResultTable, ArgumentList, MergedArgumentList, TypeArgumentStyle);
-                    }
 
                     IsHandled = true;
                     break;
@@ -464,6 +432,46 @@ namespace CompilerNode
             }
 
             Debug.Assert(IsHandled);
+
+            return true;
+        }
+
+        private static bool ResolveFeatureAsFunctionType(IQueryExpression node, IErrorList errorList, ICompiledFeature resolvedFinalFeature, List<IExpressionType> mergedArgumentList, TypeArgumentStyles typeArgumentStyle, IFunctionType finalType, ref ResolvedExpression resolvedExpression)
+        {
+            // IScopeAttributeFeature is the case of an agent.
+            IList<IArgument> ArgumentList = node.ArgumentList;
+            IFunctionFeature AsFunctionFeature = resolvedFinalFeature as IFunctionFeature;
+            IScopeAttributeFeature AsScopeAttributeFeature = resolvedFinalFeature as IScopeAttributeFeature;
+            Debug.Assert(AsFunctionFeature != null || AsScopeAttributeFeature != null);
+
+            IList<ISealableList<IParameter>> ParameterTableList = new List<ISealableList<IParameter>>();
+            foreach (IQueryOverloadType Overload in finalType.OverloadList)
+                ParameterTableList.Add(Overload.ParameterTable);
+
+            int SelectedIndex;
+            if (!Argument.ArgumentsConformToParameters(ParameterTableList, mergedArgumentList, typeArgumentStyle, errorList, node, out SelectedIndex))
+                return false;
+
+            resolvedExpression.SelectedOverloadType = finalType.OverloadList[SelectedIndex];
+            resolvedExpression.ResolvedResult = new ResultType(resolvedExpression.SelectedOverloadType.ResultTypeList);
+            resolvedExpression.ResolvedException = new ResultException(resolvedExpression.SelectedOverloadType.ExceptionIdentifierList);
+
+            if (AsFunctionFeature != null)
+            {
+                Debug.Assert(AsFunctionFeature.OverloadList.Count == finalType.OverloadList.Count);
+                Debug.Assert(AsFunctionFeature.ResolvedAgentType.IsAssigned);
+                Debug.Assert(AsFunctionFeature.ResolvedAgentType.Item == finalType);
+
+                resolvedExpression.SelectedOverload = AsFunctionFeature.OverloadList[SelectedIndex];
+
+                resolvedExpression.SelectedResultList = resolvedExpression.SelectedOverload.ResultTable;
+                resolvedExpression.FeatureCall = new FeatureCall(resolvedExpression.SelectedOverload.ParameterTable, resolvedExpression.SelectedOverload.ResultTable, ArgumentList, mergedArgumentList, typeArgumentStyle);
+            }
+            else
+            {
+                resolvedExpression.SelectedResultList = resolvedExpression.SelectedOverloadType.ResultTable;
+                resolvedExpression.FeatureCall = new FeatureCall(resolvedExpression.SelectedOverloadType.ParameterTable, resolvedExpression.SelectedOverloadType.ResultTable, ArgumentList, mergedArgumentList, typeArgumentStyle);
+            }
 
             return true;
         }
