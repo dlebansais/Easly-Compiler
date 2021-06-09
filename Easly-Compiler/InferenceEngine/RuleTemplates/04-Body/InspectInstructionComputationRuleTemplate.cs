@@ -46,7 +46,6 @@
         public override bool CheckConsistency(IInspectInstruction node, IDictionary<ISourceTemplate, object> dataList, out object data)
         {
             data = null;
-            bool Success = true;
 
             IExpression Source = (IExpression)node.Source;
             IResultType ResolvedResult = Source.ResolvedResult.Item;
@@ -63,26 +62,61 @@
 
             if (ValueType is IClassType AsClassType)
             {
-                bool IsNumberAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName NumberTypeName, out ICompiledType NumberType);
-                Debug.Assert(IsNumberAvailable);
-
-                if (ValueType != NumberType)
-                {
-                    IClass BaseClass = AsClassType.BaseClass;
-                    if (BaseClass.IsEnumeration)
-                        EnforcedDiscreteTable = BaseClass.DiscreteTable;
-                    else
-                    {
-                        AddSourceError(new ErrorInvalidExpression(Source));
-                        return false;
-                    }
-                }
+                if (!CheckConsistencyClassType(node, AsClassType, ref EnforcedDiscreteTable))
+                    return false;
             }
             else
             {
                 AddSourceError(new ErrorInvalidExpression(Source));
                 return false;
             }
+
+            if (!CheckConsistencyRange(node, EnforcedDiscreteTable))
+                return false;
+
+            IResultException ResolvedException = new ResultException();
+
+            ResultException.Merge(ResolvedException, Source.ResolvedException.Item);
+
+            foreach (IWith Item in node.WithList)
+                ResultException.Merge(ResolvedException, Item.ResolvedException.Item);
+
+            if (node.ElseInstructions.IsAssigned)
+            {
+                IScope ElseInstructions = (IScope)node.ElseInstructions.Item;
+                ResultException.Merge(ResolvedException, ElseInstructions.ResolvedException.Item);
+            }
+
+            data = ResolvedException;
+
+            return true;
+        }
+
+        private bool CheckConsistencyClassType(IInspectInstruction node, IClassType valueType, ref ISealableDictionary<IFeatureName, IDiscrete> enforcedDiscreteTable)
+        {
+            IExpression Source = (IExpression)node.Source;
+
+            bool IsNumberAvailable = Expression.IsLanguageTypeAvailable(LanguageClasses.Number.Guid, node, out ITypeName NumberTypeName, out ICompiledType NumberType);
+            Debug.Assert(IsNumberAvailable);
+
+            if (valueType != NumberType)
+            {
+                IClass BaseClass = valueType.BaseClass;
+                if (BaseClass.IsEnumeration)
+                    enforcedDiscreteTable = BaseClass.DiscreteTable;
+                else
+                {
+                    AddSourceError(new ErrorInvalidExpression(Source));
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private bool CheckConsistencyRange(IInspectInstruction node, ISealableDictionary<IFeatureName, IDiscrete> enforcedDiscreteTable)
+        {
+            bool Success = true;
 
             IList<IConstantRange> CompleteRangeList = new List<IConstantRange>();
             foreach (IWith WithItem in node.WithList)
@@ -91,7 +125,7 @@
                     IConstantRange ResolvedRange = RangeItem.ResolvedRange.Item;
                     if (IsRangeCompatible(CompleteRangeList, ResolvedRange))
                     {
-                        if (EnforcedDiscreteTable != null && !IsRangeValidDiscrete(EnforcedDiscreteTable, ResolvedRange))
+                        if (enforcedDiscreteTable != null && !IsRangeValidDiscrete(enforcedDiscreteTable, ResolvedRange))
                         {
                             AddSourceError(new ErrorInvalidRange(RangeItem));
                             Success = false;
@@ -105,24 +139,6 @@
                         Success = false;
                     }
                 }
-
-            if (Success)
-            {
-                IResultException ResolvedException = new ResultException();
-
-                ResultException.Merge(ResolvedException, Source.ResolvedException.Item);
-
-                foreach (IWith Item in node.WithList)
-                    ResultException.Merge(ResolvedException, Item.ResolvedException.Item);
-
-                if (node.ElseInstructions.IsAssigned)
-                {
-                    IScope ElseInstructions = (IScope)node.ElseInstructions.Item;
-                    ResultException.Merge(ResolvedException, ElseInstructions.ResolvedException.Item);
-                }
-
-                data = ResolvedException;
-            }
 
             return Success;
         }

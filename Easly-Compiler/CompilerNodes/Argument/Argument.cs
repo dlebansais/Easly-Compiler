@@ -359,57 +359,7 @@ namespace CompilerNode
             int MaximumAllowedArgumentCount = -1;
 
             for (int i = 0; i < parameterTableList.Count; i++)
-            {
-                ISealableList<IParameter> OverloadParameterList = parameterTableList[i];
-
-                int j;
-                bool IsMatching = true;
-                for (j = 0; j < arguments.Count && j < OverloadParameterList.Count && IsMatching; j++)
-                {
-                    ICompiledType ArgumentType = arguments[j].ValueType;
-                    IParameter OverloadParameter = OverloadParameterList[j];
-                    ICompiledType ParameterType = TypeOfPositionalParameter(OverloadParameter);
-
-                    IsMatching &= ObjectType.TypeConformToBase(ArgumentType, ParameterType, isConversionAllowed: true);
-                }
-
-                if (IsMatching)
-                {
-                    if (MaximumAllowedArgumentCount < OverloadParameterList.Count)
-                        MaximumAllowedArgumentCount = OverloadParameterList.Count;
-
-                    for (; j < OverloadParameterList.Count && IsMatching; j++)
-                    {
-                        IParameter OverloadParameter = OverloadParameterList[j];
-                        IsMatching &= OverloadParameter.ResolvedParameter.DefaultValue.IsAssigned;
-                    }
-                }
-
-                if (IsMatching && j >= arguments.Count)
-                {
-                    bool IsBetter = false;
-
-                    if (SelectedOverload != null)
-                    {
-                        for (j = 0; j < OverloadParameterList.Count && j < SelectedOverload.Count; j++)
-                        {
-                            IParameter OverloadParameter = OverloadParameterList[j];
-                            ICompiledType OverloadParameterType = TypeOfPositionalParameter(OverloadParameter);
-                            IParameter SelectedParameter = SelectedOverload[j];
-                            ICompiledType SelectedParameterType = TypeOfPositionalParameter(SelectedParameter);
-
-                            if (OverloadParameterType != SelectedParameterType)
-                                IsBetter |= ObjectType.TypeConformToBase(OverloadParameterType, SelectedParameterType, isConversionAllowed: false);
-                        }
-                    }
-
-                    if (SelectedOverload == null || IsBetter)
-                    {
-                        SelectedOverload = OverloadParameterList;
-                        selectedIndex = i;
-                    }
-                }
-            }
+                PositionalArgumentMatching(parameterTableList, arguments, i, ref MaximumAllowedArgumentCount, ref SelectedOverload, ref selectedIndex);
 
             if (MaximumAllowedArgumentCount >= 0 && MaximumAllowedArgumentCount < arguments.Count)
             {
@@ -426,6 +376,59 @@ namespace CompilerNode
             Debug.Assert(SelectedOverload.Count >= arguments.Count);
 
             return true;
+        }
+
+        private static void PositionalArgumentMatching(IList<ISealableList<IParameter>> parameterTableList, IReadOnlyList<IExpressionType> arguments, int i, ref int maximumAllowedArgumentCount, ref ISealableList<IParameter> selectedOverload, ref int selectedIndex)
+        {
+            ISealableList<IParameter> OverloadParameterList = parameterTableList[i];
+
+            int j;
+            bool IsMatching = true;
+            for (j = 0; j < arguments.Count && j < OverloadParameterList.Count && IsMatching; j++)
+            {
+                ICompiledType ArgumentType = arguments[j].ValueType;
+                IParameter OverloadParameter = OverloadParameterList[j];
+                ICompiledType ParameterType = TypeOfPositionalParameter(OverloadParameter);
+
+                IsMatching &= ObjectType.TypeConformToBase(ArgumentType, ParameterType, isConversionAllowed: true);
+            }
+
+            if (IsMatching)
+            {
+                if (maximumAllowedArgumentCount < OverloadParameterList.Count)
+                    maximumAllowedArgumentCount = OverloadParameterList.Count;
+
+                for (; j < OverloadParameterList.Count && IsMatching; j++)
+                {
+                    IParameter OverloadParameter = OverloadParameterList[j];
+                    IsMatching &= OverloadParameter.ResolvedParameter.DefaultValue.IsAssigned;
+                }
+            }
+
+            if (IsMatching && j >= arguments.Count)
+            {
+                bool IsBetter = false;
+
+                if (selectedOverload != null)
+                {
+                    for (j = 0; j < OverloadParameterList.Count && j < selectedOverload.Count; j++)
+                    {
+                        IParameter OverloadParameter = OverloadParameterList[j];
+                        ICompiledType OverloadParameterType = TypeOfPositionalParameter(OverloadParameter);
+                        IParameter SelectedParameter = selectedOverload[j];
+                        ICompiledType SelectedParameterType = TypeOfPositionalParameter(SelectedParameter);
+
+                        if (OverloadParameterType != SelectedParameterType)
+                            IsBetter |= ObjectType.TypeConformToBase(OverloadParameterType, SelectedParameterType, isConversionAllowed: false);
+                    }
+                }
+
+                if (selectedOverload == null || IsBetter)
+                {
+                    selectedOverload = OverloadParameterList;
+                    selectedIndex = i;
+                }
+            }
         }
 
         private static ICompiledType TypeOfPositionalParameter(IParameter parameter)

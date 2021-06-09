@@ -324,7 +324,7 @@
         {
             bool IsFirstPass = true;
 
-            for (; ; )
+            while (true)
             {
                 bool IsChanged = IsFirstPass;
                 IsFirstPass = false;
