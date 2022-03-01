@@ -75,7 +75,7 @@
                     using (FileStream fs = new FileStream(FileName, FileMode.Open, FileAccess.Read))
                     {
                         Serializer Serializer = new Serializer();
-                        INode RootNode = Serializer.Deserialize(fs) as INode;
+                        Node RootNode = Serializer.Deserialize(fs) as Node;
 
                         CoverageNode = RootNode;
                     }
@@ -102,7 +102,7 @@
 
         public static string RootPath;
         public static List<string> FileNameTable;
-        public static INode CoverageNode;
+        public static Node CoverageNode;
         private static int RandValue = 0;
     }
 }

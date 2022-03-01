@@ -24,7 +24,7 @@
 
             //Debug.Assert(false);
             Compiler.Compile(TestFileName);
-            Assert.That(!Compiler.ErrorList.IsEmpty && Compiler.ErrorList.At(0) is IErrorEmptyClassPath && Compiler.ErrorList.At(0).Location.Node is IClass, ErrorListToString(Compiler));
+            Assert.That(!Compiler.ErrorList.IsEmpty && Compiler.ErrorList.At(0) is IErrorEmptyClassPath && Compiler.ErrorList.At(0).Location.Node is Class, ErrorListToString(Compiler));
         }
 
         [Test]

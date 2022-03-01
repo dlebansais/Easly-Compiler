@@ -8,8 +8,18 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IRaiseEventInstruction.
     /// </summary>
-    public interface IRaiseEventInstruction : BaseNode.IRaiseEventInstruction, IInstruction
+    public interface IRaiseEventInstruction : IInstruction
     {
+        /// <summary>
+        /// Gets or sets the event identifier.
+        /// </summary>
+        BaseNode.Identifier QueryIdentifier { get; }
+
+        /// <summary>
+        /// Gets or sets whether the event is single or forever.
+        /// </summary>
+        BaseNode.EventType Event { get; }
+
         /// <summary>
         /// The event feature.
         /// </summary>

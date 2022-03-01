@@ -9,8 +9,18 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IIfThenElseInstruction.
     /// </summary>
-    public interface IIfThenElseInstruction : BaseNode.IIfThenElseInstruction, IInstruction, INodeWithReplicatedBlocks
+    public interface IIfThenElseInstruction : IInstruction, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Gets or sets the list of conditionals.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Conditional> ConditionalBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets instructions to execute if all conditionals were false.
+        /// </summary>
+        IOptionalReference<BaseNode.Scope> ElseInstructions { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.IfThenElseInstruction.ConditionalBlocks"/>.
         /// </summary>
@@ -33,7 +43,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyConditional">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyConditional, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyConditional, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -47,7 +57,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

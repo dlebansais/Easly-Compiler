@@ -8,8 +8,13 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IManifestStringExpression.
     /// </summary>
-    public interface IManifestStringExpression : BaseNode.IManifestStringExpression, IExpression, IComparableExpression
+    public interface IManifestStringExpression : IExpression, IComparableExpression
     {
+        /// <summary>
+        /// Gets or sets the string.
+        /// </summary>
+        string Text { get; }
+
         /// <summary>
         /// The valid value of <see cref="BaseNode.IManifestStringExpression.Text"/>.
         /// </summary>
@@ -36,7 +41,7 @@ namespace CompilerNode
         /// <param name="text">Initial value.</param>
         public ManifestStringExpression(string text)
         {
-            Documentation = BaseNodeHelper.NodeHelper.CreateEmptyDocumentation();
+            Documentation = BaseNodeHelper.NodeHelper.CreateEmptyDocument();
             Text = text;
         }
         #endregion

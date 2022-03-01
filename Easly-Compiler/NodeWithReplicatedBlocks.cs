@@ -12,6 +12,6 @@
         /// </summary>
         /// <param name="propertyName">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        void FillReplicatedList(string propertyName, List<BaseNode.INode> nodeList);
+        void FillReplicatedList(string propertyName, List<BaseNode.Node> nodeList);
     }
 }

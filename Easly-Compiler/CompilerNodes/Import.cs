@@ -9,8 +9,28 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IImport.
     /// </summary>
-    public interface IImport : BaseNode.IImport, INode, INodeWithReplicatedBlocks, ISource
+    public interface IImport : INode, INodeWithReplicatedBlocks, ISource
     {
+        /// <summary>
+        /// Gets or sets the library identifier.
+        /// </summary>
+        BaseNode.Identifier LibraryIdentifier { get; }
+
+        /// <summary>
+        /// Gets or sets the set this library is from.
+        /// </summary>
+        IOptionalReference<BaseNode.Identifier> FromIdentifier { get; }
+
+        /// <summary>
+        /// Gets or sets the import type.
+        /// </summary>
+        BaseNode.ImportType Type { get; }
+
+        /// <summary>
+        /// Gets or sets the list of renamed features.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Rename> RenameBlocks { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.Import.RenameBlocks"/>.
         /// </summary>
@@ -50,7 +70,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyName">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyName, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyName, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -64,7 +84,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

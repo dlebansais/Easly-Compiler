@@ -11,7 +11,7 @@
         /// <summary>
         /// Replicate name (from BaseNode).
         /// </summary>
-        BaseNode.IName ReplicateName { get; }
+        BaseNode.Name ReplicateName { get; }
 
         /// <summary>
         /// Processed list of patterns.

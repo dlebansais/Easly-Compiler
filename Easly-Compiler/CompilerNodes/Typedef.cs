@@ -8,8 +8,18 @@ namespace CompilerNode
     /// <summary>
     /// Compiler ITypedef.
     /// </summary>
-    public interface ITypedef : BaseNode.ITypedef, INode, ISource
+    public interface ITypedef : INode, ISource
     {
+        /// <summary>
+        /// Gets or sets the typedef name.
+        /// </summary>
+        BaseNode.Name EntityName { get; }
+
+        /// <summary>
+        /// Gets or sets the typedef type.
+        /// </summary>
+        BaseNode.ObjectType DefinedType { get; }
+
         /// <summary>
         /// The valid typedef name.
         /// </summary>

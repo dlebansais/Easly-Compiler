@@ -48,7 +48,7 @@
         public ConditionallyAssignedReferenceSourceTemplate(string path, string propertyName, ITemplatePathStart<TSource> startingPoint = null)
             : base(path, startingPoint)
         {
-            ItemProperty = BaseNodeHelper.NodeTreeHelper.GetPropertyOf(typeof(TRef), propertyName);
+            ItemProperty = typeof(TRef).GetProperty(propertyName);
             Debug.Assert(ItemProperty != null);
             Debug.Assert(ItemProperty.PropertyType.GetInterface(typeof(IOnceReference).Name) != null);
         }

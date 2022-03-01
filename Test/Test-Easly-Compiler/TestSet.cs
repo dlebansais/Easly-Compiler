@@ -31,7 +31,7 @@ namespace TestEaslyCompiler
         }
 
         static List<string> FileNameTable;
-        static INode CoverageNode;
+        static Node CoverageNode;
         static string RootPath;
         static string NL = Environment.NewLine;
         #endregion
@@ -84,7 +84,7 @@ namespace TestEaslyCompiler
                 Assert.That(!Compiler.ErrorList.IsEmpty && Compiler.ErrorList.At(0) is IErrorInputFileInvalid, ErrorListToString(Compiler));
             }
 
-            IRoot NullRoot = null;
+            Root NullRoot = null;
             ex = Assert.Throws<ArgumentNullException>(() => Compiler.Compile(NullRoot));
             Assert.That(ex.Message == $"Value cannot be null.{NL}Parameter name: root", ex.Message);
 
@@ -94,9 +94,9 @@ namespace TestEaslyCompiler
                 Assert.That(Compiler.ErrorList.IsEmpty, ErrorListToString(Compiler));
             }
 
-            IRoot ClonedRoot = NodeHelper.DeepCloneNode(CoverageNode, cloneCommentGuid: true) as IRoot;
-            NodeTreeHelper.SetGuidProperty(ClonedRoot.ClassBlocks.NodeBlockList[0].NodeList[0], nameof(IClass.ClassGuid), Guid.Empty);
-            Assert.That(!NodeTreeDiagnostic.IsValid(ClonedRoot, assertValid: false));
+            Root ClonedRoot = NodeHelper.DeepCloneNode(CoverageNode, cloneCommentGuid: true) as Root;
+            NodeTreeHelper.SetGuidProperty(ClonedRoot.ClassBlocks.NodeBlockList[0].NodeList[0], nameof(Class.ClassGuid), Guid.Empty);
+            Assert.That(!NodeTreeDiagnostic.IsValid(ClonedRoot, throwOnInvalid: false));
 
             Compiler.Compile(ClonedRoot);
             Assert.That(!Compiler.ErrorList.IsEmpty && Compiler.ErrorList.At(0) is IErrorInputRootInvalid, ErrorListToString(Compiler));
@@ -112,7 +112,7 @@ namespace TestEaslyCompiler
                 return;
 
             string Name = null;
-            INode RootNode = null;
+            Node RootNode = null;
             int n = index;
             foreach (string FileName in FileNameTable)
             {
@@ -122,7 +122,7 @@ namespace TestEaslyCompiler
                     {
                         Name = FileName;
                         Serializer Serializer = new Serializer();
-                        RootNode = Serializer.Deserialize(fs) as INode;
+                        RootNode = Serializer.Deserialize(fs) as Node;
                     }
                     break;
                 }
@@ -136,11 +136,11 @@ namespace TestEaslyCompiler
             TestCompileObject(index, Name, RootNode);
         }
 
-        public static void TestCompileObject(int index, string name, INode rootNode)
+        public static void TestCompileObject(int index, string name, Node rootNode)
         {
             Compiler Compiler = new Compiler();
 
-            Compiler.Compile(CoverageNode as IRoot);
+            Compiler.Compile(CoverageNode as Root);
             Assert.That(Compiler.ErrorList.IsEmpty, ErrorListToString(Compiler));
         }
         #endregion

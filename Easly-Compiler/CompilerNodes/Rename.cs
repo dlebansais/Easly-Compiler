@@ -9,8 +9,18 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IRename.
     /// </summary>
-    public interface IRename : BaseNode.IRename, INode, ISource
+    public interface IRename : INode, ISource
     {
+        /// <summary>
+        /// Gets or sets the feature to rename.
+        /// </summary>
+        BaseNode.Identifier SourceIdentifier { get; }
+
+        /// <summary>
+        /// Gets or sets the new name.
+        /// </summary>
+        BaseNode.Identifier DestinationIdentifier { get; }
+
         /// <summary>
         /// The valid value of <see cref="BaseNode.IRename.SourceIdentifier"/>.
         /// </summary>

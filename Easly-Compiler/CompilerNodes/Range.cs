@@ -8,8 +8,18 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IRange
     /// </summary>
-    public interface IRange : BaseNode.IRange, INode, ISource
+    public interface IRange : INode, ISource
     {
+        /// <summary>
+        /// Gets or sets the single constant value, or the left side of the range in case of multiple values.
+        /// </summary>
+        BaseNode.Expression LeftExpression { get; }
+
+        /// <summary>
+        /// Gets or sets the right side of the range in case of multiple values.
+        /// </summary>
+        IOptionalReference<BaseNode.Expression> RightExpression { get; }
+
         /// <summary>
         /// The resolved range as a constant.
         /// </summary>

@@ -19,7 +19,7 @@ namespace CompilerNode
         /// <summary>
         /// The default value, if any.
         /// </summary>
-        IOptionalReference<IExpression> DefaultValue { get; }
+        IOptionalReference<BaseNode.Expression> DefaultValue { get; }
 
         /// <summary>
         /// Checks if this attribute conflicts with another from the same class group.
@@ -147,11 +147,13 @@ namespace CompilerNode
 
             if (initialDefaultValue != null)
             {
-                DefaultValue = BaseNodeHelper.OptionalReferenceHelper.CreateReference<IExpression>(initialDefaultValue);
+                DefaultValue = BaseNodeHelper.OptionalReferenceHelper.CreateReference<BaseNode.Expression>((BaseNode.Expression)initialDefaultValue);
                 DefaultValue.Assign();
             }
             else
-                DefaultValue = BaseNodeHelper.OptionalReferenceHelper.CreateEmptyReference<IExpression>();
+            {
+                DefaultValue = BaseNodeHelper.OptionalReferenceHelper.CreateReference<BaseNode.Expression>(BaseNodeHelper.NodeHelper.CreateDefaultExpression());
+            }
 
             Debug.Assert(!IsDeferredFeature);
             Debug.Assert(!HasExternBody);
@@ -307,7 +309,7 @@ namespace CompilerNode
         /// <summary>
         /// The default value, if any.
         /// </summary>
-        public IOptionalReference<IExpression> DefaultValue { get; }
+        public IOptionalReference<BaseNode.Expression> DefaultValue { get; }
         #endregion
 
         #region Numbers
@@ -344,7 +346,7 @@ namespace CompilerNode
         /// <summary>
         /// The generated attribute name.
         /// </summary>
-        public BaseNode.IName EntityName { get; }
+        public BaseNode.Name EntityName { get; }
         #endregion
     }
 }

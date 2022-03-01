@@ -9,8 +9,23 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IEntityDeclaration.
     /// </summary>
-    public interface IEntityDeclaration : BaseNode.IEntityDeclaration, INode, ISource
+    public interface IEntityDeclaration : INode, ISource
     {
+        /// <summary>
+        /// Gets or sets the entity name.
+        /// </summary>
+        BaseNode.Name EntityName { get; }
+
+        /// <summary>
+        /// Gets or sets the entity type.
+        /// </summary>
+        BaseNode.ObjectType EntityType { get; }
+
+        /// <summary>
+        /// Gets or sets the entity default value.
+        /// </summary>
+        IOptionalReference<BaseNode.Expression> DefaultValue { get; }
+
         /// <summary>
         /// The resolved type name of this declaration.
         /// </summary>

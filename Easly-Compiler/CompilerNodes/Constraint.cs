@@ -9,8 +9,18 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IConstraint.
     /// </summary>
-    public interface IConstraint : BaseNode.IConstraint, INode, INodeWithReplicatedBlocks, ISource
+    public interface IConstraint : INode, INodeWithReplicatedBlocks, ISource
     {
+        /// <summary>
+        /// Gets or sets the constraint type.
+        /// </summary>
+        BaseNode.ObjectType ParentType { get; }
+
+        /// <summary>
+        /// Gets or sets rename the statements to use for this constraint.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Rename> RenameBlocks { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.Constraint.RenameBlocks"/>.
         /// </summary>
@@ -63,7 +73,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyName">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyName, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyName, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -77,7 +87,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

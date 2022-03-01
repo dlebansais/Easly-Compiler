@@ -23,7 +23,7 @@
         }
 
         static List<string> FileNameTable;
-        static INode CoverageNode;
+        static Node CoverageNode;
         static string RootPath;
         static string NL = Environment.NewLine;
         #endregion

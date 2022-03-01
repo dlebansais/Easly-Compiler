@@ -5,7 +5,7 @@
     /// <summary>
     /// Compiler IDocument.
     /// </summary>
-    public interface IDocument : BaseNode.IDocument
+    public interface IDocument
     {
     }
 

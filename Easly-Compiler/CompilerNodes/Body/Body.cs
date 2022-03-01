@@ -7,7 +7,7 @@
     /// <summary>
     /// Compiler IBody.
     /// </summary>
-    public interface IBody : BaseNode.IBody, INode, INodeWithReplicatedBlocks, ISource
+    public interface IBody : INode, INodeWithReplicatedBlocks, ISource
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.Body.RequireBlocks"/>.

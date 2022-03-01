@@ -7,8 +7,12 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IPattern.
     /// </summary>
-    public interface IPattern : BaseNode.IPattern, INode, ISource
+    public interface IPattern : INode, ISource
     {
+        /// <summary>
+        /// Gets or sets the pattern text.
+        /// </summary>
+        string Text { get; }
     }
 
     /// <summary>

@@ -15,7 +15,7 @@
         #region Init
         static TemplateHelper()
         {
-            string BaseTypeName = typeof(BaseNode.INode).FullName;
+            string BaseTypeName = typeof(BaseNode.Node).FullName;
             BaseNamespace = BaseTypeName.Substring(0, BaseTypeName.IndexOf('.') + 1);
             string CompilerTypeName = typeof(CompilerNode.INode).FullName;
             CompilerNamespace = CompilerTypeName.Substring(0, CompilerTypeName.IndexOf('.') + 1);
@@ -50,7 +50,7 @@
                 type = GenericArguments[0];
             }
 
-            PropertyInfo Property = NodeTreeHelper.GetPropertyOf(type, PropertyName);
+            PropertyInfo Property = type.GetProperty(PropertyName);
             Debug.Assert(Property != null);
 
             propertyPath.Add(Property);
@@ -87,7 +87,7 @@
                             return default;
                         }
                         else
-                            IntermediateResult = AsOnceReference.Reference;
+                            IntermediateResult = AsOnceReference.Item;
 
                     IntermediateResult = propertyPath[i].GetValue(IntermediateResult);
                 }

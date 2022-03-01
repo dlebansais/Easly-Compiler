@@ -9,8 +9,23 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IGeneric.
     /// </summary>
-    public interface IGeneric : BaseNode.IGeneric, INode, INodeWithReplicatedBlocks, ISource
+    public interface IGeneric : INode, INodeWithReplicatedBlocks, ISource
     {
+        /// <summary>
+        /// Gets or sets the generic name.
+        /// </summary>
+        BaseNode.Name EntityName { get; }
+
+        /// <summary>
+        /// Gets or sets the generic default value.
+        /// </summary>
+        IOptionalReference<BaseNode.ObjectType> DefaultValue { get; }
+
+        /// <summary>
+        /// Gets or sets the constraints for this generic.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Constraint> ConstraintBlocks { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.Generic.ConstraintBlocks"/>.
         /// </summary>
@@ -58,7 +73,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyName">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyName, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyName, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -72,7 +87,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

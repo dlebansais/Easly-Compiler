@@ -343,7 +343,7 @@
 
         private void WriteCSharpImplementation(ICSharpWriter writer, CSharpFeatureTextTypes featureTextType, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
         {
-            writer.WriteDocumentation(Source);
+            writer.WriteDocumentation((BaseNode.PropertyFeature)Source);
 
             string ResultType = EntityType.Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
             string PropertyName = CSharpNames.ToCSharpIdentifier(Name);

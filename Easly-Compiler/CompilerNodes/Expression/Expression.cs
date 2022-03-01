@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IExpression.
     /// </summary>
-    public interface IExpression : BaseNode.IExpression, INode, ISource
+    public interface IExpression : INode, ISource
     {
         /// <summary>
         /// True if the expression is complex (and requires to be surrounded with parenthesis).

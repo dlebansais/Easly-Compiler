@@ -9,8 +9,18 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IGenericType.
     /// </summary>
-    public interface IGenericType : BaseNode.IGenericType, IObjectType, INodeWithReplicatedBlocks
+    public interface IGenericType : IObjectType, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Gets or sets the class identifier.
+        /// </summary>
+        BaseNode.Identifier ClassIdentifier { get; }
+
+        /// <summary>
+        /// Gets or sets the list of generic parameters.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.TypeArgument> TypeArgumentBlocks { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.GenericType.TypeArgumentBlocks"/>.
         /// </summary>
@@ -64,7 +74,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyTypeArgument">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyTypeArgument, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyTypeArgument, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -78,7 +88,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

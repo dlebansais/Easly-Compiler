@@ -8,7 +8,7 @@
     /// <summary>
     /// Compiler-only ITypedefType.
     /// </summary>
-    public interface ITypedefType : BaseNode.IObjectType
+    public interface ITypedefType : INode
     {
         /// <summary>
         /// Resolved type name of the source.

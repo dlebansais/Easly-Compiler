@@ -8,8 +8,13 @@ namespace CompilerNode
     /// <summary>
     /// Compiler ISimpleType.
     /// </summary>
-    public interface ISimpleType : BaseNode.ISimpleType, IObjectType
+    public interface ISimpleType : IObjectType
     {
+        /// <summary>
+        /// Gets or sets the class identifier.
+        /// </summary>
+        BaseNode.Identifier ClassIdentifier { get; }
+
         /// <summary>
         /// Type name of the source.
         /// </summary>
@@ -56,7 +61,7 @@ namespace CompilerNode
         /// <param name="classIdentifier">The class identifier</param>
         public SimpleType(IIdentifier classIdentifier)
         {
-            ClassIdentifier = classIdentifier;
+            ClassIdentifier = (BaseNode.Identifier)classIdentifier;
         }
         #endregion
 

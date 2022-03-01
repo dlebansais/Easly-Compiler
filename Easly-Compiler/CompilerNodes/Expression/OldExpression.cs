@@ -8,8 +8,13 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IOldExpression.
     /// </summary>
-    public interface IOldExpression : BaseNode.IOldExpression, IExpression, IComparableExpression
+    public interface IOldExpression : IExpression, IComparableExpression
     {
+        /// <summary>
+        /// Gets or sets the name path to the object.
+        /// </summary>
+        BaseNode.QualifiedName Query { get; }
+
         /// <summary>
         /// The resolved feature.
         /// </summary>

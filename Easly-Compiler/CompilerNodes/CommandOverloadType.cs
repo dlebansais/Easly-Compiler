@@ -9,8 +9,33 @@
     /// <summary>
     /// Compiler ICommandOverloadType.
     /// </summary>
-    public interface ICommandOverloadType : BaseNode.ICommandOverloadType, INode, INodeWithReplicatedBlocks, ISource
+    public interface ICommandOverloadType : INode, INodeWithReplicatedBlocks, ISource
     {
+        /// <summary>
+        /// Gets or sets the overload parameters.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.EntityDeclaration> ParameterBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets whether the overload accepts extra parameters.
+        /// </summary>
+        BaseNode.ParameterEndStatus ParameterEnd { get; }
+
+        /// <summary>
+        /// Gets or sets the requirements.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Assertion> RequireBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the guarantees.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Assertion> EnsureBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the exception handlers.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Identifier> ExceptionIdentifierBlocks { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.CommandOverloadType.ParameterBlocks"/>.
         /// </summary>
@@ -100,7 +125,7 @@
         /// </summary>
         /// <param name="propertyName">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyName, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyName, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -126,7 +151,7 @@
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

@@ -8,8 +8,17 @@
     /// <summary>
     /// Compiler IKeywordAssignmentInstruction.
     /// </summary>
-    public interface IKeywordAssignmentInstruction : BaseNode.IKeywordAssignmentInstruction, IInstruction
+    public interface IKeywordAssignmentInstruction : IInstruction
     {
+        /// <summary>
+        /// Gets or sets the keyword to assign.
+        /// </summary>
+        BaseNode.Keyword Destination { get; }
+
+        /// <summary>
+        /// Gets or sets the assigned value.
+        /// </summary>
+        BaseNode.Expression Source { get; }
     }
 
     /// <summary>

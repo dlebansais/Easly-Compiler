@@ -87,7 +87,7 @@
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="source">The source to use when reporting errors.</param>
         /// <param name="selectedPrecursor">The selected precursor upon return if successful.</param>
-        bool FindPrecursor(IOptionalReference<BaseNode.IObjectType> ancestorType, IErrorList errorList, ISource source, out IFeatureInstance selectedPrecursor);
+        bool FindPrecursor(IOptionalReference<BaseNode.ObjectType> ancestorType, IErrorList errorList, ISource source, out IFeatureInstance selectedPrecursor);
     }
 
     /// <summary>
@@ -234,7 +234,7 @@
         /// <param name="errorList">The list of errors found.</param>
         /// <param name="source">The source to use when reporting errors.</param>
         /// <param name="selectedPrecursor">The selected precursor upon return if successful.</param>
-        public bool FindPrecursor(IOptionalReference<BaseNode.IObjectType> ancestorType, IErrorList errorList, ISource source, out IFeatureInstance selectedPrecursor)
+        public bool FindPrecursor(IOptionalReference<BaseNode.ObjectType> ancestorType, IErrorList errorList, ISource source, out IFeatureInstance selectedPrecursor)
         {
             selectedPrecursor = null;
 

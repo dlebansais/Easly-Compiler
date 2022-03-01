@@ -8,8 +8,13 @@
     /// <summary>
     /// Compiler IName.
     /// </summary>
-    public interface IName : BaseNode.IName, INode, ISource
+    public interface IName : INode, ISource
     {
+        /// <summary>
+        /// Gets or sets the name.
+        /// </summary>
+        string Text { get; }
+
         /// <summary>
         /// The valid value of <see cref="BaseNode.IName.Text"/>.
         /// </summary>

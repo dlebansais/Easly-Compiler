@@ -8,7 +8,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IClassReplicate.
     /// </summary>
-    public interface IClassReplicate : BaseNode.IClassReplicate, INode, INodeWithReplicatedBlocks, ISource, ICompiledReplicate
+    public interface IClassReplicate : INode, INodeWithReplicatedBlocks, ISource, ICompiledReplicate
     {
     }
 
@@ -28,7 +28,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyEntityDeclaration">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyEntityDeclaration, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyEntityDeclaration, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -42,7 +42,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

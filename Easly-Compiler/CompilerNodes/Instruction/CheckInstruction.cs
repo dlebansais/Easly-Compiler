@@ -8,8 +8,12 @@ namespace CompilerNode
     /// <summary>
     /// Compiler ICheckInstruction.
     /// </summary>
-    public interface ICheckInstruction : BaseNode.ICheckInstruction, IInstruction
+    public interface ICheckInstruction : IInstruction
     {
+        /// <summary>
+        /// Gets or sets the value to check.
+        /// </summary>
+        BaseNode.Expression BooleanExpression { get; }
     }
 
     /// <summary>

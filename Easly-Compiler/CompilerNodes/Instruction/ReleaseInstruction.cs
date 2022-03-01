@@ -8,8 +8,12 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IReleaseInstruction.
     /// </summary>
-    public interface IReleaseInstruction : BaseNode.IReleaseInstruction, IInstruction
+    public interface IReleaseInstruction : IInstruction
     {
+        /// <summary>
+        /// Gets or sets the released reference.
+        /// </summary>
+        BaseNode.QualifiedName EntityName { get; }
     }
 
     /// <summary>

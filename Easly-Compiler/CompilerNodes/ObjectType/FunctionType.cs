@@ -9,8 +9,18 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IFunctionType.
     /// </summary>
-    public interface IFunctionType : BaseNode.IFunctionType, IObjectType, INodeWithReplicatedBlocks, ICompiledType
+    public interface IFunctionType : IObjectType, INodeWithReplicatedBlocks, ICompiledType
     {
+        /// <summary>
+        /// Gets or sets the base type.
+        /// </summary>
+        BaseNode.ObjectType BaseType { get; }
+
+        /// <summary>
+        /// Gets or sets the list of overload types.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.QueryOverloadType> OverloadBlocks { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.FunctionType.OverloadBlocks"/>.
         /// </summary>
@@ -60,7 +70,7 @@ namespace CompilerNode
         public FunctionType(ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, IList<IQueryOverloadType> overloadList)
             : this()
         {
-            BaseType = baseType;
+            BaseType = (BaseNode.ObjectType)baseType;
 
             ResolvedBaseTypeName.Item = baseTypeName;
             ResolvedBaseType.Item = resolvedBaseType;
@@ -79,7 +89,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyOverload">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyOverload, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyOverload, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -93,7 +103,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion
@@ -456,9 +466,9 @@ namespace CompilerNode
             return (name1 == nameof(BaseNode.Keyword.Result)) == (name2 == nameof(BaseNode.Keyword.Result));
         }
 
-        private static bool IsDefaultValueMatching(IOptionalReference<IExpression> value1, IOptionalReference<IExpression> value2)
+        private static bool IsDefaultValueMatching(IOptionalReference<BaseNode.Expression> value1, IOptionalReference<BaseNode.Expression> value2)
         {
-            return (!value1.IsAssigned && !value2.IsAssigned) || (value1.IsAssigned && value2.IsAssigned && Expression.IsExpressionEqual(value1.Item, value2.Item));
+            return (!value1.IsAssigned && !value2.IsAssigned) || (value1.IsAssigned && value2.IsAssigned && Expression.IsExpressionEqual((IExpression)value1.Item, (IExpression)value2.Item));
         }
 
         /// <summary>

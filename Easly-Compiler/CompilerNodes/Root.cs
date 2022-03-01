@@ -8,8 +8,23 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IRoot.
     /// </summary>
-    public interface IRoot : BaseNode.IRoot, INode, INodeWithReplicatedBlocks
+    public interface IRoot : INode, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Gets or sets the list of classes in the program.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Class> ClassBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the list of libraries.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Library> LibraryBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the global replicates.
+        /// </summary>
+        IList<BaseNode.GlobalReplicate> Replicates { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.Root.ClassBlocks"/>.
         /// </summary>
@@ -42,7 +57,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyName">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyName, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyName, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -60,7 +75,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

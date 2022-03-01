@@ -9,8 +9,18 @@
     /// <summary>
     /// Compiler IAssignmentInstruction.
     /// </summary>
-    public interface IAssignmentInstruction : BaseNode.IAssignmentInstruction, IInstruction, INodeWithReplicatedBlocks
+    public interface IAssignmentInstruction : IInstruction, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Gets or sets assigned variables.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.QualifiedName> DestinationBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the value to assign.
+        /// </summary>
+        BaseNode.Expression Source { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.AssignmentInstruction.DestinationBlocks"/>.
         /// </summary>
@@ -38,7 +48,7 @@
         /// </summary>
         /// <param name="propertyName">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyName, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyName, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -52,7 +62,7 @@
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

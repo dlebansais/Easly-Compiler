@@ -9,8 +9,28 @@ namespace CompilerNode
     /// <summary>
     /// Compiler ILibrary.
     /// </summary>
-    public interface ILibrary : BaseNode.ILibrary, INode, INodeWithReplicatedBlocks
+    public interface ILibrary : INode, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Gets or sets the library name.
+        /// </summary>
+        BaseNode.Name EntityName { get; }
+
+        /// <summary>
+        /// Gets or sets the set this library is from.
+        /// </summary>
+        IOptionalReference<BaseNode.Identifier> FromIdentifier { get; }
+
+        /// <summary>
+        /// Gets or sets the list of imports.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Import> ImportBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the list of classes in this library.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Identifier> ClassIdentifierBlocks { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.Library.ImportBlocks"/>.
         /// </summary>
@@ -95,7 +115,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyArgument">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyArgument, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyArgument, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -113,7 +133,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

@@ -8,8 +8,23 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IBinaryOperatorExpression.
     /// </summary>
-    public interface IBinaryOperatorExpression : BaseNode.IBinaryOperatorExpression, IExpression, IComparableExpression
+    public interface IBinaryOperatorExpression : IExpression, IComparableExpression
     {
+        /// <summary>
+        /// Gets or sets the left operand.
+        /// </summary>
+        BaseNode.Expression LeftExpression { get; }
+
+        /// <summary>
+        /// Gets or sets the operator.
+        /// </summary>
+        BaseNode.Identifier Operator { get; }
+
+        /// <summary>
+        /// Gets or sets the right operand.
+        /// </summary>
+        BaseNode.Expression RightExpression { get; }
+
         /// <summary>
         /// The resolved operator feature.
         /// </summary>

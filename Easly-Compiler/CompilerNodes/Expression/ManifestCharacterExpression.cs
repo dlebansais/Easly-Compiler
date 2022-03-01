@@ -8,8 +8,13 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IManifestCharacterExpression.
     /// </summary>
-    public interface IManifestCharacterExpression : BaseNode.IManifestCharacterExpression, IExpression, IComparableExpression
+    public interface IManifestCharacterExpression : IExpression, IComparableExpression
     {
+        /// <summary>
+        /// Gets or sets the character.
+        /// </summary>
+        string Text { get; }
+
         /// <summary>
         /// The valid value of <see cref="BaseNode.IManifestCharacterExpression.Text"/>.
         /// </summary>

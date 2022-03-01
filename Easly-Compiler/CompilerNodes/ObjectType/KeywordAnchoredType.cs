@@ -8,8 +8,13 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IKeywordAnchoredType.
     /// </summary>
-    public interface IKeywordAnchoredType : BaseNode.IKeywordAnchoredType, IObjectType
+    public interface IKeywordAnchoredType : IObjectType
     {
+        /// <summary>
+        /// Gets or sets the anchor.
+        /// </summary>
+        BaseNode.Keyword Anchor { get; }
+
         /// <summary>
         /// The resolved type name if the anchor is Current.
         /// </summary>

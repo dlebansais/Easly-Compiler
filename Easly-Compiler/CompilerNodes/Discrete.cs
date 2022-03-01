@@ -8,8 +8,18 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IDiscrete.
     /// </summary>
-    public interface IDiscrete : BaseNode.IDiscrete, INode, ISource
+    public interface IDiscrete : INode, ISource
     {
+        /// <summary>
+        /// Gets or sets the discrete's name.
+        /// </summary>
+        BaseNode.Name EntityName { get; }
+
+        /// <summary>
+        /// Gets or sets the discrete's value.
+        /// </summary>
+        IOptionalReference<BaseNode.Expression> NumericValue { get; }
+
         /// <summary>
         /// The valid discrete name.
         /// </summary>

@@ -151,7 +151,7 @@
 
         private void WriteCSharpImplementation(ICSharpWriter writer, CSharpExports exportStatus, bool isLocal, ref bool isFirstFeature, ref bool isMultiline)
         {
-            writer.WriteDocumentation(Source);
+            writer.WriteDocumentation((BaseNode.ConstantFeature)Source);
 
             string TypeString = Type.Type2CSharpString(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
             string AttributeString = CSharpNames.ToCSharpIdentifier(Name);

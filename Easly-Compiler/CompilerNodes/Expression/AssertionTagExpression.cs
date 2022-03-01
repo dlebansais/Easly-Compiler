@@ -8,8 +8,13 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IAssertionTagExpression.
     /// </summary>
-    public interface IAssertionTagExpression : BaseNode.IAssertionTagExpression, IExpression, IComparableExpression
+    public interface IAssertionTagExpression : IExpression, IComparableExpression
     {
+        /// <summary>
+        /// Gets or sets the assertion tag.
+        /// </summary>
+        BaseNode.Identifier TagIdentifier { get; }
+
         /// <summary>
         /// The resolved embedding assertion.
         /// </summary>

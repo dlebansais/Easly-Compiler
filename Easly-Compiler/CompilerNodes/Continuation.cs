@@ -9,8 +9,18 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IContinuation.
     /// </summary>
-    public interface IContinuation : BaseNode.IContinuation, INode, INodeWithReplicatedBlocks, ISource, IScopeHolder
+    public interface IContinuation : INode, INodeWithReplicatedBlocks, ISource, IScopeHolder
     {
+        /// <summary>
+        /// Gets or sets the instructions in this continuation.
+        /// </summary>
+        BaseNode.Scope Instructions { get; }
+
+        /// <summary>
+        /// Gets or sets the cleanup instructions.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Instruction> CleanupBlocks { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.Continuation.CleanupBlocks"/>.
         /// </summary>
@@ -60,7 +70,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyName">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyName, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyName, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -74,7 +84,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

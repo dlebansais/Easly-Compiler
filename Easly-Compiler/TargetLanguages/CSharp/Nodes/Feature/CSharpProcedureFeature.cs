@@ -167,7 +167,7 @@
             if (!WriteDown)
                 return;
 
-            writer.WriteDocumentation(Source);
+            writer.WriteDocumentation((BaseNode.ProcedureFeature)Source);
 
             string NameString = CSharpNames.ToCSharpIdentifier(Name);
 

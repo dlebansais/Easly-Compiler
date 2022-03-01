@@ -8,8 +8,18 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IClassConstantExpression.
     /// </summary>
-    public interface IClassConstantExpression : BaseNode.IClassConstantExpression, IExpression, IComparableExpression
+    public interface IClassConstantExpression : IExpression, IComparableExpression
     {
+        /// <summary>
+        /// Gets or sets the name of the class where to find the constant.
+        /// </summary>
+        BaseNode.Identifier ClassIdentifier { get; }
+
+        /// <summary>
+        /// Gets or sets the constant name.
+        /// </summary>
+        BaseNode.Identifier ConstantIdentifier { get; }
+
         /// <summary>
         /// The resolved feature.
         /// </summary>

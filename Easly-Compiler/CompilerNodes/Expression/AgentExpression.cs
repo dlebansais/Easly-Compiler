@@ -8,8 +8,18 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IAgentExpression.
     /// </summary>
-    public interface IAgentExpression : BaseNode.IAgentExpression, IExpression, IComparableExpression
+    public interface IAgentExpression : IExpression, IComparableExpression
     {
+        /// <summary>
+        /// Gets or sets the feature this agent represents.
+        /// </summary>
+        BaseNode.Identifier Delegated { get; }
+
+        /// <summary>
+        /// Gets or sets the type where to find the feature.
+        /// </summary>
+        IOptionalReference<BaseNode.ObjectType> BaseType { get; }
+
         /// <summary>
         /// The resolved type name of the feature providing the expression result.
         /// </summary>

@@ -9,8 +9,43 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IForLoopInstruction.
     /// </summary>
-    public interface IForLoopInstruction : BaseNode.IForLoopInstruction, IInstruction, INodeWithReplicatedBlocks
+    public interface IForLoopInstruction : IInstruction, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Gets or sets the loop variables.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.EntityDeclaration> EntityDeclarationBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets instructions to initialize the loop.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Instruction> InitInstructionBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the expression to continue.
+        /// </summary>
+        BaseNode.Expression WhileCondition { get; }
+
+        /// <summary>
+        /// Gets or sets instructions within the loop.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Instruction> LoopInstructionBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets instructions for the next iteration of the loop.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Instruction> IterationInstructionBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the loop invariants.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Assertion> InvariantBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the loop variant.
+        /// </summary>
+        IOptionalReference<BaseNode.Expression> Variant { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.ForLoopInstruction.EntityDeclarationBlocks"/>.
         /// </summary>
@@ -73,7 +108,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyEntityDeclaration">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyEntityDeclaration, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyEntityDeclaration, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -103,7 +138,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

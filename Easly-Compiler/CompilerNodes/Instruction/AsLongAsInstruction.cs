@@ -9,8 +9,23 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IAsLongAsInstruction.
     /// </summary>
-    public interface IAsLongAsInstruction : BaseNode.IAsLongAsInstruction, IInstruction, INodeWithReplicatedBlocks
+    public interface IAsLongAsInstruction : IInstruction, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Gets or sets the condition evaluated to continue.
+        /// </summary>
+        BaseNode.Expression ContinueCondition { get; }
+
+        /// <summary>
+        /// Gets or sets the list of continuations.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Continuation> ContinuationBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets instructions to execute when we don't continue.
+        /// </summary>
+        IOptionalReference<BaseNode.Scope> ElseInstructions { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.AsLongAsInstruction.ContinuationBlocks"/>.
         /// </summary>
@@ -33,7 +48,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyName">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyName, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyName, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -47,7 +62,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

@@ -9,8 +9,18 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IConstantFeature.
     /// </summary>
-    public interface IConstantFeature : BaseNode.IConstantFeature, IFeature, IFeatureWithName, ICompiledFeature, IFeatureWithPrecursor, IFeatureWithEntity, IFeatureWithNumberType
+    public interface IConstantFeature : IFeature, IFeatureWithName, ICompiledFeature, IFeatureWithPrecursor, IFeatureWithEntity, IFeatureWithNumberType
     {
+        /// <summary>
+        /// Gets or sets the constant type.
+        /// </summary>
+        BaseNode.ObjectType EntityType { get; }
+
+        /// <summary>
+        /// Gets or sets the value.
+        /// </summary>
+        BaseNode.Expression ConstantValue { get; }
+
         /// <summary>
         /// The name of the resolved constant type.
         /// </summary>

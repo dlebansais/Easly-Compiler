@@ -8,8 +8,13 @@ namespace CompilerNode
     /// <summary>
     /// Compiler INewExpression.
     /// </summary>
-    public interface INewExpression : BaseNode.INewExpression, IExpression, IComparableExpression
+    public interface INewExpression : IExpression, IComparableExpression
     {
+        /// <summary>
+        /// Gets or sets the name path to the new object.
+        /// </summary>
+        BaseNode.QualifiedName Object { get; }
+
         /// <summary>
         /// The resolved feature.
         /// </summary>

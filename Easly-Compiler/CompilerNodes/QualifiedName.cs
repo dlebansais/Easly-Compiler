@@ -9,8 +9,13 @@
     /// <summary>
     /// Compiler IQualifiedName.
     /// </summary>
-    public interface IQualifiedName : BaseNode.IQualifiedName, INode, ISource
+    public interface IQualifiedName : INode, ISource
     {
+        /// <summary>
+        /// Gets or sets the list of feature identifiers to follow to reach the destination feature.
+        /// </summary>
+        IList<BaseNode.Identifier> Path { get; }
+
         /// <summary>
         /// The valid value of <see cref="BaseNode.IQualifiedName.Path"/>.
         /// </summary>
@@ -46,11 +51,11 @@
         /// </summary>
         /// <param name="source">The pre-constructed source.</param>
         /// <param name="sourceType">The qualified name resolved type.</param>
-        public QualifiedName(BaseNode.IQualifiedName source, IExpressionType sourceType)
+        public QualifiedName(BaseNode.QualifiedName source, IExpressionType sourceType)
         {
             Debug.Assert(source.Path.Count == 1);
 
-            BaseNode.IIdentifier Identifier = source.Path[0];
+            BaseNode.Identifier Identifier = source.Path[0];
             IIdentifier NewIdentifier = new Identifier(Identifier.Text);
 
             ValidPath.Item = new List<IIdentifier>();

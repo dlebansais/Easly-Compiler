@@ -9,8 +9,13 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IEntityExpression.
     /// </summary>
-    public interface IEntityExpression : BaseNode.IEntityExpression, IExpression, IComparableExpression
+    public interface IEntityExpression : IExpression, IComparableExpression
     {
+        /// <summary>
+        /// Gets or sets the feature to get the entity from.
+        /// </summary>
+        BaseNode.QualifiedName Query { get; }
+
         /// <summary>
         /// The resolved feature.
         /// </summary>

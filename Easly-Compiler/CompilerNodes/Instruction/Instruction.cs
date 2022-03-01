@@ -7,7 +7,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IInstruction.
     /// </summary>
-    public interface IInstruction : BaseNode.IInstruction, INode, ISource, IScopeHolder
+    public interface IInstruction : INode, ISource, IScopeHolder
     {
         /// <summary>
         /// Types of results of the instruction.

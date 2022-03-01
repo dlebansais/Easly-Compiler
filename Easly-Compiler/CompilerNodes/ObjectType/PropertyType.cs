@@ -9,8 +9,43 @@
     /// <summary>
     /// Compiler IPropertyType.
     /// </summary>
-    public interface IPropertyType : BaseNode.IPropertyType, IObjectType, INodeWithReplicatedBlocks, ICompiledType
+    public interface IPropertyType : IObjectType, INodeWithReplicatedBlocks, ICompiledType
     {
+        /// <summary>
+        /// Gets or sets the base type.
+        /// </summary>
+        BaseNode.ObjectType BaseType { get; }
+
+        /// <summary>
+        /// Gets or sets the property type.
+        /// </summary>
+        BaseNode.ObjectType EntityType { get; }
+
+        /// <summary>
+        /// Gets or sets how this property can be used.
+        /// </summary>
+        BaseNode.UtilityType PropertyKind { get; }
+
+        /// <summary>
+        /// Gets or sets the getter guarantees.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Assertion> GetEnsureBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the getter exception handlers.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Identifier> GetExceptionIdentifierBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the setter requirements.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Assertion> SetRequireBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the setter exception handlers.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Identifier> SetExceptionIdentifierBlocks { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.PropertyType.GetEnsureBlocks"/>.
         /// </summary>
@@ -86,7 +121,7 @@
         public PropertyType(ITypeName baseTypeName, IObjectType baseType, ICompiledTypeWithFeature resolvedBaseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType propertyKind, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IIdentifier> setExceptionIdentifierList)
             : this()
         {
-            BaseType = baseType;
+            BaseType = (BaseNode.ObjectType)baseType;
             EntityType = null;
             PropertyKind = propertyKind;
 
@@ -127,7 +162,7 @@
         /// </summary>
         /// <param name="propertyTypeArgument">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyTypeArgument, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyTypeArgument, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -153,7 +188,7 @@
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

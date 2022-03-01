@@ -6,8 +6,12 @@
     /// <summary>
     /// Compiler IGlobalReplicate.
     /// </summary>
-    public interface IGlobalReplicate : BaseNode.IGlobalReplicate, INode, ICompiledReplicate
+    public interface IGlobalReplicate : INode, ICompiledReplicate
     {
+        /// <summary>
+        /// Gets or sets the patterns to use in the replication.
+        /// </summary>
+        IList<BaseNode.Pattern> Patterns { get; }
     }
 
     /// <summary>

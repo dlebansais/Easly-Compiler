@@ -9,8 +9,38 @@
     /// <summary>
     /// Compiler IQueryOverloadType.
     /// </summary>
-    public interface IQueryOverloadType : BaseNode.IQueryOverloadType, INode, INodeWithReplicatedBlocks, ISource
+    public interface IQueryOverloadType : INode, INodeWithReplicatedBlocks, ISource
     {
+        /// <summary>
+        /// Gets or sets the parameters.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.EntityDeclaration> ParameterBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets whether the query accepts extra parameters.
+        /// </summary>
+        BaseNode.ParameterEndStatus ParameterEnd { get; }
+
+        /// <summary>
+        /// Gets or sets the list of results.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.EntityDeclaration> ResultBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the list of requirements.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Assertion> RequireBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the list of guarantees.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Assertion> EnsureBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the list of exception handlers.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Identifier> ExceptionIdentifierBlocks { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.QueryOverloadType.ParameterBlocks"/>.
         /// </summary>
@@ -127,7 +157,7 @@
         /// </summary>
         /// <param name="propertyEntityDeclaration">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyEntityDeclaration, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyEntityDeclaration, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -157,7 +187,7 @@
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

@@ -8,8 +8,18 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IAssertion.
     /// </summary>
-    public interface IAssertion : BaseNode.IAssertion, INode, ISource, IScopeHolder
+    public interface IAssertion : INode, ISource, IScopeHolder
     {
+        /// <summary>
+        /// Gets or sets the assertion tag.
+        /// </summary>
+        IOptionalReference<BaseNode.Name> Tag { get; }
+
+        /// <summary>
+        /// Gets or sets the assertion expression.
+        /// </summary>
+        BaseNode.Expression BooleanExpression { get; }
+
         /// <summary>
         /// The resolved contract with the associated tag.
         /// </summary>

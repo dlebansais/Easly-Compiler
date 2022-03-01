@@ -161,7 +161,7 @@
                     IsEvent = true;
             }
 
-            writer.WriteDocumentation(Source);
+            writer.WriteDocumentation((BaseNode.AttributeFeature)Source);
 
             CSharpAssertion.WriteContract(writer, new List<ICSharpAssertion>(), EnsureList, CSharpContractLocations.Other, false, ref isFirstFeature, ref isMultiline);
 

@@ -49,7 +49,7 @@
         public OnceReferenceTableSourceTemplate(string path, string propertyName, ITemplatePathStart<TSource> startingPoint = null)
             : base(path, startingPoint)
         {
-            ItemProperty = BaseNodeHelper.NodeTreeHelper.GetPropertyOf(typeof(TValue), propertyName);
+            ItemProperty = typeof(TValue).GetProperty(propertyName);
             Debug.Assert(ItemProperty != null);
         }
 

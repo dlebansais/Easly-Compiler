@@ -8,7 +8,7 @@
     /// <summary>
     /// Compiler ITypeArgument.
     /// </summary>
-    public interface ITypeArgument : BaseNode.ITypeArgument, INode, ISource
+    public interface ITypeArgument : INode, ISource
     {
         /// <summary>
         /// Name of the resolved source type.

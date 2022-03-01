@@ -69,7 +69,7 @@
             node.ValidPath.Item = ValidPath;
         }
 
-        private bool IsPathAssigned(IList<string> stringPath, IList<BaseNode.IIdentifier> identifierPath)
+        private bool IsPathAssigned(IList<string> stringPath, IList<BaseNode.Identifier> identifierPath)
         {
             bool Result = true;
 

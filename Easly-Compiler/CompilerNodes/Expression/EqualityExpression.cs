@@ -8,8 +8,27 @@
     /// <summary>
     /// Compiler IEqualityExpression.
     /// </summary>
-    public interface IEqualityExpression : BaseNode.IEqualityExpression, IExpression, IComparableExpression
+    public interface IEqualityExpression : IExpression, IComparableExpression
     {
+        /// <summary>
+        /// Gets or sets the left operand.
+        /// </summary>
+        BaseNode.Expression LeftExpression { get; }
+
+        /// <summary>
+        /// Gets or sets the comparison type.
+        /// </summary>
+        BaseNode.ComparisonType Comparison { get; }
+
+        /// <summary>
+        /// Gets or sets the equality type.
+        /// </summary>
+        BaseNode.EqualityType Equality { get; }
+
+        /// <summary>
+        /// Gets or sets the right operand.
+        /// </summary>
+        BaseNode.Expression RightExpression { get; }
     }
 
     /// <summary>

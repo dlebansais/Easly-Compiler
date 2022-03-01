@@ -8,8 +8,13 @@
     /// <summary>
     /// Compiler IIdentifier.
     /// </summary>
-    public interface IIdentifier : BaseNode.IIdentifier, INode, ISource
+    public interface IIdentifier : INode, ISource
     {
+        /// <summary>
+        /// Gets or sets the identifier text.
+        /// </summary>
+        string Text { get; }
+
         /// <summary>
         /// The valid value of <see cref="BaseNode.IIdentifier.Text"/>.
         /// </summary>

@@ -80,7 +80,7 @@
             node.ValidEntity.Item = NewEntity;
 
             if (node.DefaultValue.IsAssigned)
-                EmbeddingClass.NodeWithDefaultList.Add(NewEntity.DefaultValue.Item);
+                EmbeddingClass.NodeWithDefaultList.Add((IExpression)NewEntity.DefaultValue.Item);
         }
         #endregion
     }

@@ -29,7 +29,7 @@
             GenerateConformanceToStandard();
             GenerateDebugging();
 
-            bool Success = NodeTreeWalk.Walk<ReplacePhase1MacroContext>(root, new WalkCallbacks<ReplacePhase1MacroContext>() { HandlerNode = ReplacePhase1Macro, IsRecursive = true }, new ReplacePhase1MacroContext());
+            bool Success = NodeTreeWalk.Walk<ReplacePhase1MacroContext>((BaseNode.Root)root, new WalkCallbacks<ReplacePhase1MacroContext>() { HandlerNode = ReplacePhase1Macro, IsRecursive = true }, new ReplacePhase1MacroContext());
             Debug.Assert(Success);
         }
 
@@ -52,10 +52,10 @@
         {
             string NewGuidDigits = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture) + ":" + "H";
 
-            BaseNode.IIdentifier Operator = NodeHelper.CreateSimpleIdentifier("To UUID");
-            BaseNode.IManifestNumberExpression NumberExpression = NodeHelper.CreateSimpleManifestNumberExpression(NewGuidDigits);
-            BaseNode.IUnaryOperatorExpression Expression = NodeHelper.CreateUnaryOperatorExpression(Operator, NumberExpression);
-            CompilationUID = ToCompilerNode<BaseNode.IUnaryOperatorExpression, IUnaryOperatorExpression>(Expression);
+            BaseNode.Identifier Operator = NodeHelper.CreateSimpleIdentifier("To UUID");
+            BaseNode.ManifestNumberExpression NumberExpression = NodeHelper.CreateSimpleManifestNumberExpression(NewGuidDigits);
+            BaseNode.UnaryOperatorExpression Expression = NodeHelper.CreateUnaryOperatorExpression(Operator, NumberExpression);
+            CompilationUID = ToCompilerNode<BaseNode.UnaryOperatorExpression, IUnaryOperatorExpression>(Expression);
         }
 
         /// <summary></summary>
@@ -67,34 +67,34 @@
         /// <summary></summary>
         protected virtual void GenerateConformanceToStandard()
         {
-            BaseNode.IKeywordExpression Expression = NodeHelper.CreateKeywordExpression(BaseNode.Keyword.True);
-            ConformanceToStandard = ToCompilerNode<BaseNode.IKeywordExpression, IKeywordExpression>(Expression);
+            BaseNode.KeywordExpression Expression = NodeHelper.CreateKeywordExpression(BaseNode.Keyword.True);
+            ConformanceToStandard = ToCompilerNode<BaseNode.KeywordExpression, IKeywordExpression>(Expression);
         }
 
         /// <summary></summary>
         protected virtual void GenerateDebugging()
         {
-            BaseNode.IKeywordExpression Expression = NodeHelper.CreateKeywordExpression(BaseNode.Keyword.False);
-            Debugging = ToCompilerNode<BaseNode.IKeywordExpression, IKeywordExpression>(Expression);
+            BaseNode.KeywordExpression Expression = NodeHelper.CreateKeywordExpression(BaseNode.Keyword.False);
+            Debugging = ToCompilerNode<BaseNode.KeywordExpression, IKeywordExpression>(Expression);
         }
 
         /// <summary></summary>
         protected virtual IInitializedObjectExpression InitializedStringExpression(string className, string identifierName, string initialValue)
         {
-            BaseNode.IManifestStringExpression ManifestValue = NodeHelper.CreateManifestStringExpression(initialValue);
+            BaseNode.ManifestStringExpression ManifestValue = NodeHelper.CreateManifestStringExpression(initialValue);
             return InitializedExpression(className, identifierName, ManifestValue);
         }
 
         /// <summary></summary>
-        protected virtual IInitializedObjectExpression InitializedExpression(string className, string identifierName, BaseNode.IExpression manifestValue)
+        protected virtual IInitializedObjectExpression InitializedExpression(string className, string identifierName, BaseNode.Expression manifestValue)
         {
-            BaseNode.IIdentifier ClassIdentifier = NodeHelper.CreateSimpleIdentifier(className);
-            BaseNode.IIdentifier FirstIdentifier = NodeHelper.CreateSimpleIdentifier(identifierName);
+            BaseNode.Identifier ClassIdentifier = NodeHelper.CreateSimpleIdentifier(className);
+            BaseNode.Identifier FirstIdentifier = NodeHelper.CreateSimpleIdentifier(identifierName);
 
-            BaseNode.IAssignmentArgument FirstArgument = NodeHelper.CreateAssignmentArgument(new List<BaseNode.IIdentifier>() { FirstIdentifier }, manifestValue);
-            BaseNode.IInitializedObjectExpression Expression = NodeHelper.CreateInitializedObjectExpression(ClassIdentifier, new List<BaseNode.IAssignmentArgument>() { FirstArgument });
+            BaseNode.AssignmentArgument FirstArgument = NodeHelper.CreateAssignmentArgument(new List<BaseNode.Identifier>() { FirstIdentifier }, manifestValue);
+            BaseNode.InitializedObjectExpression Expression = NodeHelper.CreateInitializedObjectExpression(ClassIdentifier, new List<BaseNode.AssignmentArgument>() { FirstArgument });
 
-            IInitializedObjectExpression Result = ToCompilerNode<BaseNode.IInitializedObjectExpression, IInitializedObjectExpression>(Expression);
+            IInitializedObjectExpression Result = ToCompilerNode<BaseNode.InitializedObjectExpression, IInitializedObjectExpression>(Expression);
             return Result;
         }
 
@@ -103,7 +103,7 @@
         /// <typeparam name="TCompiler">Compiler type.</typeparam>
         /// <param name="node">The BaseNode object to convert.</param>
         protected virtual TCompiler ToCompilerNode<TBase, TCompiler>(TBase node)
-            where TBase : BaseNode.INode
+            where TBase : BaseNode.Node
             where TCompiler : class, INode
         {
             using (MemoryStream ms = new MemoryStream())
@@ -119,7 +119,7 @@
         }
 
         /// <summary></summary>
-        public bool ReplacePhase1Macro(BaseNode.INode node, BaseNode.INode parentNode, string propertyName, IWalkCallbacks<ReplacePhase1MacroContext> callbacks, ReplacePhase1MacroContext context)
+        public bool ReplacePhase1Macro(BaseNode.Node node, BaseNode.Node parentNode, string propertyName, WalkCallbacks<ReplacePhase1MacroContext> callbacks, ReplacePhase1MacroContext context)
         {
             bool Result = true;
 
@@ -134,22 +134,22 @@
                 switch (AsPreprocessorExpression.Value)
                 {
                     case BaseNode.PreprocessorMacro.DateAndTime:
-                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, CompilationDateTime);
+                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, (BaseNode.InitializedObjectExpression)CompilationDateTime);
                         IsHandled = true;
                         break;
 
                     case BaseNode.PreprocessorMacro.CompilationDiscreteIdentifier:
-                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, CompilationUID);
+                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, (BaseNode.UnaryOperatorExpression)CompilationUID);
                         IsHandled = true;
                         break;
 
                     case BaseNode.PreprocessorMacro.CompilerVersion:
-                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, CompilerVersion);
+                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, (BaseNode.ManifestStringExpression)CompilerVersion);
                         IsHandled = true;
                         break;
 
                     case BaseNode.PreprocessorMacro.ConformanceToStandard:
-                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ConformanceToStandard);
+                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, (BaseNode.KeywordExpression)ConformanceToStandard);
                         IsHandled = true;
                         break;
 
@@ -157,17 +157,17 @@
                         Debug.Assert(context.CurrentClass != null);
 
                         string GlassGuidDigits = context.CurrentClass.ClassGuid.ToString("N", CultureInfo.InvariantCulture) + ":" + "H";
-                        BaseNode.IIdentifier Operator = NodeHelper.CreateSimpleIdentifier("To UUID");
-                        BaseNode.IManifestNumberExpression NumberExpression = NodeHelper.CreateSimpleManifestNumberExpression(GlassGuidDigits);
-                        BaseNode.IUnaryOperatorExpression Expression = NodeHelper.CreateUnaryOperatorExpression(Operator, NumberExpression);
-                        IExpression ReplacementNode = ToCompilerNode<BaseNode.IUnaryOperatorExpression, IUnaryOperatorExpression>(Expression);
+                        BaseNode.Identifier Operator = NodeHelper.CreateSimpleIdentifier("To UUID");
+                        BaseNode.ManifestNumberExpression NumberExpression = NodeHelper.CreateSimpleManifestNumberExpression(GlassGuidDigits);
+                        BaseNode.UnaryOperatorExpression Expression = NodeHelper.CreateUnaryOperatorExpression(Operator, NumberExpression);
+                        IExpression ReplacementNode = ToCompilerNode<BaseNode.UnaryOperatorExpression, IUnaryOperatorExpression>(Expression);
 
-                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ReplacementNode);
+                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, (BaseNode.Expression)ReplacementNode);
                         IsHandled = true;
                         break;
 
                     case BaseNode.PreprocessorMacro.Debugging:
-                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, Debugging);
+                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, (BaseNode.KeywordExpression)Debugging);
                         IsHandled = true;
                         break;
 
@@ -191,19 +191,19 @@
         {
             Debug.Assert(ErrorList.IsEmpty);
 
-            foreach (IBlock<BaseNode.IClass, BaseNode.Class> Block in root.ClassBlocks.NodeBlockList)
+            foreach (IBlock<BaseNode.Class> Block in root.ClassBlocks.NodeBlockList)
                 foreach (IClass Item in Block.NodeList)
                     if (string.IsNullOrEmpty(Item.ClassPath))
                         ErrorList.AddError(new ErrorEmptyClassPath(Item));
 
             ReplicationContext Replication = new ReplicationContext();
-            IWalkCallbacks<ReplicationContext> Callbacks = new WalkCallbacks<ReplicationContext>() { HandlerNode = OnNodeIgnoreReplicates, HandlerBlockList = OnBlockListReplicate, HandlerString = OnStringReplicateText };
-            NodeTreeWalk.Walk<ReplicationContext>(root, Callbacks, Replication);
+            WalkCallbacks<ReplicationContext> Callbacks = new WalkCallbacks<ReplicationContext>() { HandlerNode = OnNodeIgnoreReplicates, HandlerBlockList = OnBlockListReplicate, HandlerString = OnStringReplicateText };
+            NodeTreeWalk.Walk<ReplicationContext>((BaseNode.Root)root, Callbacks, Replication);
 
             return ErrorList.IsEmpty;
         }
 
-        private bool OnNodeIgnoreReplicates(BaseNode.INode node, BaseNode.INode parentNode, string propertyName, IWalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
+        private bool OnNodeIgnoreReplicates(BaseNode.Node node, BaseNode.Node parentNode, string propertyName, WalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
         {
             if (node is IGlobalReplicate)
                 return true;
@@ -242,17 +242,17 @@
                 context.GlobalReplicateTable.Add(Entry.Key, Entry.Value);
         }
 
-        private void ProcessClassReplicates(IClass parentClass, IWalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
+        private void ProcessClassReplicates(IClass parentClass, WalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
         {
             BaseNode.IBlockList ClassReplicateBlocks = (BaseNode.IBlockList)parentClass.ClassReplicateBlocks;
 
-            List<BaseNode.INode> ReplicatedNodeList = new List<BaseNode.INode>();
+            List<BaseNode.Node> ReplicatedNodeList = new List<BaseNode.Node>();
             if (ReplicateBlockList(ClassReplicateBlocks, ReplicatedNodeList, callbacks, context))
             {
                 parentClass.FillReplicatedList(nameof(IClass.ClassReplicateBlocks), ReplicatedNodeList);
 
                 List<ICompiledReplicate> ReplicateList = new List<ICompiledReplicate>();
-                foreach (BaseNode.INode Node in ReplicatedNodeList)
+                foreach (BaseNode.Node Node in ReplicatedNodeList)
                 {
                     IClassReplicate ReplicateItem = Node as IClassReplicate;
                     Debug.Assert(ReplicateItem != null);
@@ -304,7 +304,7 @@
             }
         }
 
-        private bool ReplicateBlockList(BaseNode.IBlockList blockList, List<BaseNode.INode> replicatedNodeList, IWalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
+        private bool ReplicateBlockList(BaseNode.IBlockList blockList, List<BaseNode.Node> replicatedNodeList, WalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
         {
             bool Result = true;
 
@@ -314,7 +314,7 @@
             return Result;
         }
 
-        private bool ReplicateBlock(BaseNode.IBlock block, List<BaseNode.INode> replicatedNodeList, IWalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
+        private bool ReplicateBlock(BaseNode.IBlock block, List<BaseNode.Node> replicatedNodeList, WalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
         {
             BaseNode.ReplicationStatus Status = block.Replication;
 
@@ -324,7 +324,7 @@
                 return ProcessNormalBlock(block, replicatedNodeList, callbacks, context);
         }
 
-        private bool ProcessReplicatedBlock(BaseNode.IBlock block, List<BaseNode.INode> replicatedNodeList, IWalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
+        private bool ProcessReplicatedBlock(BaseNode.IBlock block, List<BaseNode.Node> replicatedNodeList, WalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
         {
             IErrorStringValidity StringError;
             IPattern ReplicationPattern = (IPattern)block.ReplicationPattern;
@@ -360,7 +360,7 @@
             }
         }
 
-        private bool ProcessReplicationPatterns(BaseNode.IBlock block, List<BaseNode.INode> replicatedNodeList, string replicationPattern, string sourceIdentifier, IWalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
+        private bool ProcessReplicationPatterns(BaseNode.IBlock block, List<BaseNode.Node> replicatedNodeList, string replicationPattern, string sourceIdentifier, WalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
         {
             IList NodeList = block.NodeList as IList;
             List<string> PatternList = context.ReplicateTable[sourceIdentifier];
@@ -371,9 +371,9 @@
                 string PatternText = PatternList[i];
 
                 context.PatternTable.Add(replicationPattern, PatternText);
-                foreach (BaseNode.INode Node in NodeList)
+                foreach (BaseNode.Node Node in NodeList)
                 {
-                    BaseNode.INode ClonedNode = NodeHelper.DeepCloneNode(Node, cloneCommentGuid: true);
+                    BaseNode.Node ClonedNode = NodeHelper.DeepCloneNode(Node, cloneCommentGuid: true);
 
                     Continue &= NodeTreeWalk.Walk<ReplicationContext>(ClonedNode, callbacks, context);
                     if (Continue)
@@ -391,14 +391,14 @@
             return Continue;
         }
 
-        private bool ProcessNormalBlock(BaseNode.IBlock block, List<BaseNode.INode> replicatedNodeList, IWalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
+        private bool ProcessNormalBlock(BaseNode.IBlock block, List<BaseNode.Node> replicatedNodeList, WalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
         {
             IList NodeList = block.NodeList as IList;
 
             bool Continue = true;
             for (int i = 0; i < NodeList.Count && Continue; i++)
             {
-                BaseNode.INode Node = NodeList[i] as BaseNode.INode;
+                BaseNode.Node Node = NodeList[i] as BaseNode.Node;
                 Debug.Assert(Node != null);
 
                 Continue &= NodeTreeWalk.Walk<ReplicationContext>(Node, callbacks, context);
@@ -414,7 +414,7 @@
             return Continue;
         }
 
-        private bool OnStringReplicateText(BaseNode.INode node, string propertyName, ReplicationContext context)
+        private bool OnStringReplicateText(BaseNode.Node node, string propertyName, ReplicationContext context)
         {
             string Text = NodeTreeHelper.GetString(node, propertyName);
 
@@ -431,13 +431,13 @@
             return true;
         }
 
-        private bool OnBlockListReplicate(BaseNode.INode node, string propertyName, BaseNode.IBlockList blockList, IWalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
+        private bool OnBlockListReplicate(BaseNode.Node node, string propertyName, BaseNode.IBlockList blockList, WalkCallbacks<ReplicationContext> callbacks, ReplicationContext context)
         {
-            if (blockList is IBlockList<BaseNode.IClassReplicate, BaseNode.ClassReplicate>)
+            if (blockList is IBlockList<BaseNode.ClassReplicate>)
                 return true;
             else
             {
-                List<BaseNode.INode> ReplicatedNodeList = new List<BaseNode.INode>();
+                List<BaseNode.Node> ReplicatedNodeList = new List<BaseNode.Node>();
                 bool Continue = ReplicateBlockList(blockList, ReplicatedNodeList, callbacks, context);
                 if (Continue)
                 {
@@ -463,12 +463,12 @@
         {
             Debug.Assert(ErrorList.IsEmpty);
 
-            bool Success = NodeTreeWalk.Walk<ReplacePhase2MacroContext>(root, new WalkCallbacks<ReplacePhase2MacroContext>() { HandlerNode = ReplacePhase2Macro, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() }, new ReplacePhase2MacroContext());
+            bool Success = NodeTreeWalk.Walk<ReplacePhase2MacroContext>((BaseNode.Root)root, new WalkCallbacks<ReplacePhase2MacroContext>() { HandlerNode = ReplacePhase2Macro, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() }, new ReplacePhase2MacroContext());
             Debug.Assert(Success);
         }
 
         /// <summary></summary>
-        public bool ReplacePhase2Macro(BaseNode.INode node, BaseNode.INode parentNode, string propertyName, IWalkCallbacks<ReplacePhase2MacroContext> callbacks, ReplacePhase2MacroContext context)
+        public bool ReplacePhase2Macro(BaseNode.Node node, BaseNode.Node parentNode, string propertyName, WalkCallbacks<ReplacePhase2MacroContext> callbacks, ReplacePhase2MacroContext context)
         {
             bool Result = true;
 
@@ -490,14 +490,14 @@
                     case BaseNode.PreprocessorMacro.ClassPath:
                         Debug.Assert(context.CurrentClass != null);
                         ReplacementNode = new ManifestStringExpression(context.CurrentClass.FullClassPath);
-                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ReplacementNode);
+                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, (BaseNode.ManifestStringExpression)ReplacementNode);
                         IsHandled = true;
                         break;
 
                     case BaseNode.PreprocessorMacro.Counter:
                         Debug.Assert(context.CurrentClass != null);
                         ReplacementNode = new ManifestNumberExpression(context.CurrentClass.ClassCounter);
-                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ReplacementNode);
+                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, (BaseNode.ManifestNumberExpression)ReplacementNode);
 
                         context.CurrentClass.IncrementClassCounter();
                         IsHandled = true;
@@ -505,7 +505,7 @@
 
                     case BaseNode.PreprocessorMacro.RandomInteger:
                         ReplacementNode = CreateRandomInteger();
-                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, ReplacementNode);
+                        NodeTreeHelperChild.SetChildNode(parentNode, propertyName, (BaseNode.Expression)ReplacementNode);
                         IsHandled = true;
                         break;
                 }

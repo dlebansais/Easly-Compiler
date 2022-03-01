@@ -17,12 +17,12 @@
         {
             Debug.Assert(ErrorList.IsEmpty);
 
-            bool Success = NodeTreeWalk.Walk<object>(root, new WalkCallbacks<object>() { HandlerNode = InitializeSource, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() }, null);
+            bool Success = NodeTreeWalk.Walk<object>((BaseNode.Root)root, new WalkCallbacks<object>() { HandlerNode = InitializeSource, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() }, null);
             Debug.Assert(Success);
         }
 
         /// <summary></summary>
-        public static bool InitializeSource(BaseNode.INode node, BaseNode.INode parentNode, string propertyName, IWalkCallbacks<object> callbacks, object context)
+        public static bool InitializeSource(BaseNode.Node node, BaseNode.Node parentNode, string propertyName, WalkCallbacks<object> callbacks, object context)
         {
             bool Result = true;
 
@@ -252,11 +252,11 @@
         protected virtual bool Resolve(IRoot root, IRuleTemplateList ruleTemplateList, string passName)
         {
             BuildInferenceSourceList Context = new BuildInferenceSourceList(ruleTemplateList);
-            IWalkCallbacks<BuildInferenceSourceList> Callbacks = new WalkCallbacks<BuildInferenceSourceList>() { HandlerNode = ListAllSources, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() };
+            WalkCallbacks<BuildInferenceSourceList> Callbacks = new WalkCallbacks<BuildInferenceSourceList>() { HandlerNode = ListAllSources, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() };
             IList<IClass> ClassList = root.ClassList;
 
             foreach (IClass Class in ClassList)
-                NodeTreeWalk.Walk<BuildInferenceSourceList>(Class, Callbacks, Context);
+                NodeTreeWalk.Walk<BuildInferenceSourceList>((BaseNode.Class)Class, Callbacks, Context);
 
             IList<ISource> SourceList = Context.SourceList;
             InferenceEngine Engine = new InferenceEngine(ruleTemplateList, SourceList, ClassList, true, InferenceRetries);
@@ -268,7 +268,7 @@
         }
 
         /// <summary></summary>
-        protected virtual bool ListAllSources(BaseNode.INode node, BaseNode.INode parentNode, string propertyName, IWalkCallbacks<BuildInferenceSourceList> callbacks, BuildInferenceSourceList context)
+        protected virtual bool ListAllSources(BaseNode.Node node, BaseNode.Node parentNode, string propertyName, WalkCallbacks<BuildInferenceSourceList> callbacks, BuildInferenceSourceList context)
         {
             ISource Source = node as ISource;
             Debug.Assert(Source != null);
@@ -294,15 +294,15 @@
         protected virtual void SealScope(IRoot root)
         {
             object Context = null;
-            IWalkCallbacks<object> Callbacks = new WalkCallbacks<object>() { HandlerNode = SealAllScopes, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() };
+            WalkCallbacks<object> Callbacks = new WalkCallbacks<object>() { HandlerNode = SealAllScopes, IsRecursive = true, BlockSubstitution = CreateBlockSubstitution() };
             IList<IClass> ClassList = root.ClassList;
 
             foreach (IClass Class in ClassList)
-                NodeTreeWalk.Walk<object>(Class, Callbacks, Context);
+                NodeTreeWalk.Walk<object>((BaseNode.Class)Class, Callbacks, Context);
         }
 
         /// <summary></summary>
-        protected virtual bool SealAllScopes(BaseNode.INode node, BaseNode.INode parentNode, string propertyName, IWalkCallbacks<object> callbacks, object context)
+        protected virtual bool SealAllScopes(BaseNode.Node node, BaseNode.Node parentNode, string propertyName, WalkCallbacks<object> callbacks, object context)
         {
             ISource Source = node as ISource;
             Debug.Assert(Source != null);

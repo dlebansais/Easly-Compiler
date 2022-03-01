@@ -1536,7 +1536,7 @@
 
         private void WriteClassImplementation(ICSharpWriter writer)
         {
-            writer.WriteDocumentation(Source);
+            writer.WriteDocumentation((BaseNode.Class)Source);
 
             string InterfaceName = FullClassName2CSharpClassName(writer, CSharpTypeFormats.AsInterface, CSharpNamespaceFormats.None);
             string ClassName = FullClassName2CSharpClassName(writer, CSharpTypeFormats.Normal, CSharpNamespaceFormats.None);

@@ -10,8 +10,18 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IAttachment.
     /// </summary>
-    public interface IAttachment : BaseNode.IAttachment, INode, INodeWithReplicatedBlocks, ISource, IScopeHolder
+    public interface IAttachment : INode, INodeWithReplicatedBlocks, ISource, IScopeHolder
     {
+        /// <summary>
+        /// Gets or sets the blocks of attached types.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.ObjectType> AttachTypeBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets instructions to execute in case of successful attachment.
+        /// </summary>
+        BaseNode.Scope Instructions { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.Attachment.AttachTypeBlocks"/>.
         /// </summary>
@@ -66,7 +76,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyName">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyName, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyName, List<BaseNode.Node> nodeList)
         {
             if (nodeList == null)
                 throw new ArgumentNullException(nameof(nodeList));
@@ -83,7 +93,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

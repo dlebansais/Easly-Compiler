@@ -50,7 +50,7 @@
                 Assert.That(!Compiler.ErrorList.IsEmpty && Compiler.ErrorList.At(0) is IErrorInputFileInvalid, ErrorListToString(Compiler));
             }
 
-            IRoot NullRoot = null;
+            Root NullRoot = null;
             ex = Assert.Throws<ArgumentNullException>(() => Compiler.Compile(NullRoot));
             Assert.That(ex.Message == $"Value cannot be null.{NL}Parameter name: root", ex.Message);
 
@@ -60,9 +60,9 @@
                 Assert.That(Compiler.ErrorList.IsEmpty, ErrorListToString(Compiler));
             }
 
-            IRoot ClonedRoot = NodeHelper.DeepCloneNode(CoverageNode, cloneCommentGuid: true) as IRoot;
-            NodeTreeHelper.SetGuidProperty(ClonedRoot.ClassBlocks.NodeBlockList[0].NodeList[0], nameof(IClass.ClassGuid), Guid.Empty);
-            Assert.That(!NodeTreeDiagnostic.IsValid(ClonedRoot, assertValid: false));
+            Root ClonedRoot = NodeHelper.DeepCloneNode(CoverageNode, cloneCommentGuid: true) as Root;
+            NodeTreeHelper.SetGuidProperty(ClonedRoot.ClassBlocks.NodeBlockList[0].NodeList[0], nameof(Class.ClassGuid), Guid.Empty);
+            Assert.That(!NodeTreeDiagnostic.IsValid(ClonedRoot, throwOnInvalid: false));
 
             Compiler.Compile(ClonedRoot);
             Assert.That(!Compiler.ErrorList.IsEmpty && Compiler.ErrorList.At(0) is IErrorInputRootInvalid, ErrorListToString(Compiler));
@@ -70,13 +70,13 @@
             Compiler.ActivateVerification = false;
 
             Compiler.InferenceRetries = -1;
-            Compiler.Compile(CoverageNode as IRoot);
+            Compiler.Compile(CoverageNode as Root);
             Assert.That(!Compiler.ErrorList.IsEmpty && Compiler.ErrorList.At(0) is IErrorInternal, ErrorListToString(Compiler));
 
             Compiler.InferenceRetries = 20;
 
             //Debug.Assert(false);
-            Compiler.Compile(CoverageNode as IRoot);
+            Compiler.Compile(CoverageNode as Root);
             Assert.That(Compiler.ErrorList.IsEmpty, ErrorListToString(Compiler));
 
             Assert.That(Compiler.ActivateVerification == false);

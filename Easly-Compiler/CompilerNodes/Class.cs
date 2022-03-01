@@ -10,8 +10,98 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IClass.
     /// </summary>
-    public interface IClass : BaseNode.IClass, INode, INodeWithReplicatedBlocks, ISource, IScopeHolder
+    public interface IClass : INode, INodeWithReplicatedBlocks, ISource, IScopeHolder
     {
+        /// <summary>
+        /// Gets or sets the class name.
+        /// </summary>
+        BaseNode.Name EntityName { get; }
+
+        /// <summary>
+        /// Gets or sets the set this class is from.
+        /// </summary>
+        IOptionalReference<BaseNode.Identifier> FromIdentifier { get; }
+
+        /// <summary>
+        /// Gets or sets the class copy semantic.
+        /// </summary>
+        BaseNode.CopySemantic CopySpecification { get; }
+
+        /// <summary>
+        /// Gets or sets whether the class is cloneable.
+        /// </summary>
+        BaseNode.CloneableStatus Cloneable { get; }
+
+        /// <summary>
+        /// Gets or sets whether the class is comparable.
+        /// </summary>
+        BaseNode.ComparableStatus Comparable { get; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the class is abstract.
+        /// </summary>
+        bool IsAbstract { get; }
+
+        /// <summary>
+        /// Gets or sets the class imports.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Import> ImportBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the class generics.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Generic> GenericBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the class exports.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Export> ExportBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the class typedefs.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Typedef> TypedefBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the class inheritances.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Inheritance> InheritanceBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the class discrete values.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Discrete> DiscreteBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the class replicates.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.ClassReplicate> ClassReplicateBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the class features.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Feature> FeatureBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the class conversions.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Identifier> ConversionBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the class invariants.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Assertion> InvariantBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the class unique ID.
+        /// </summary>
+        Guid ClassGuid { get; }
+
+        /// <summary>
+        /// Gets or sets the class path.
+        /// </summary>
+        string ClassPath { get; }
+
         /// <summary>
         /// The class path with replication info.
         /// </summary>
@@ -484,7 +574,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyName">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyName, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyName, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -534,7 +624,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

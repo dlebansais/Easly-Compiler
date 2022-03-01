@@ -48,7 +48,7 @@
         public OnceReferenceCollectionSourceTemplate(string path, string propertyName, ITemplatePathStart<TSource> startingPoint = null)
             : base(path, startingPoint)
         {
-            ItemProperty = BaseNodeHelper.NodeTreeHelper.GetPropertyOf(typeof(TItem), propertyName);
+            ItemProperty = typeof(TItem).GetProperty(propertyName);
             Debug.Assert(ItemProperty != null);
             Debug.Assert(ItemProperty.PropertyType.GetInterface(typeof(IOnceReference).Name) != null);
         }

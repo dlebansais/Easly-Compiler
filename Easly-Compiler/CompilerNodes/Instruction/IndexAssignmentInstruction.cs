@@ -9,8 +9,23 @@
     /// <summary>
     /// Compiler IIndexAssignmentInstruction.
     /// </summary>
-    public interface IIndexAssignmentInstruction : BaseNode.IIndexAssignmentInstruction, IInstruction, INodeWithReplicatedBlocks
+    public interface IIndexAssignmentInstruction : IInstruction, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Gets or sets the assigned variable.
+        /// </summary>
+        BaseNode.QualifiedName Destination { get; }
+
+        /// <summary>
+        /// Gets or sets the call arguments.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Argument> ArgumentBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the index in the destination.
+        /// </summary>
+        BaseNode.Expression Source { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.IndexAssignmentInstruction.ArgumentBlocks"/>.
         /// </summary>
@@ -38,7 +53,7 @@
         /// </summary>
         /// <param name="propertyArgument">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyArgument, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyArgument, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -52,7 +67,7 @@
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

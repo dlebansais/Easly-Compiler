@@ -9,8 +9,23 @@ namespace CompilerNode
     /// <summary>
     /// Compiler ICommandOverload.
     /// </summary>
-    public interface ICommandOverload : BaseNode.ICommandOverload, INode, INodeWithReplicatedBlocks, IOverload, IScopeHolder
+    public interface ICommandOverload : INode, INodeWithReplicatedBlocks, IOverload, IScopeHolder
     {
+        /// <summary>
+        /// Gets or sets the command parameters.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.EntityDeclaration> ParameterBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets whether the command accepts extra parameters.
+        /// </summary>
+        BaseNode.ParameterEndStatus ParameterEnd { get; }
+
+        /// <summary>
+        /// Gets or sets the command body.
+        /// </summary>
+        BaseNode.Body CommandBody { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.CommandOverload.ParameterBlocks"/>.
         /// </summary>
@@ -80,7 +95,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyName">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyName, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyName, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -94,7 +109,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

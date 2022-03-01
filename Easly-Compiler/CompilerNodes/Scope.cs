@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IScope.
     /// </summary>
-    public interface IScope : BaseNode.IScope, INode, INodeWithReplicatedBlocks, ISource, IScopeHolder
+    public interface IScope : INode, INodeWithReplicatedBlocks, ISource, IScopeHolder
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.Scope.EntityDeclarationBlocks"/>.
@@ -70,7 +70,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyEntityDeclaration">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyEntityDeclaration, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyEntityDeclaration, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -88,7 +88,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

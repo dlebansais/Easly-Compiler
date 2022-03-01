@@ -9,8 +9,38 @@
     /// <summary>
     /// Compiler IQueryOverload.
     /// </summary>
-    public interface IQueryOverload : BaseNode.IQueryOverload, INode, INodeWithReplicatedBlocks, IOverload, IScopeHolder, INodeWithResult
+    public interface IQueryOverload : INode, INodeWithReplicatedBlocks, IOverload, IScopeHolder, INodeWithResult
     {
+        /// <summary>
+        /// Gets or sets the list of parameters.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.EntityDeclaration> ParameterBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets whether the query accepts extra parameters.
+        /// </summary>
+        BaseNode.ParameterEndStatus ParameterEnd { get; }
+
+        /// <summary>
+        /// Gets or sets the list of results.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.EntityDeclaration> ResultBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the list of other features this query modifies.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Identifier> ModifiedQueryBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the query variant.
+        /// </summary>
+        IOptionalReference<BaseNode.Expression> Variant { get; }
+
+        /// <summary>
+        /// Gets or sets the query body.
+        /// </summary>
+        BaseNode.Body QueryBody { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.QueryOverload.ParameterBlocks"/>.
         /// </summary>
@@ -125,7 +155,7 @@
         /// </summary>
         /// <param name="propertyEntityDeclaration">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyEntityDeclaration, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyEntityDeclaration, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -147,7 +177,7 @@
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

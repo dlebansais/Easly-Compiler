@@ -8,8 +8,17 @@
     /// <summary>
     /// Compiler IAssignmentTypeArgument.
     /// </summary>
-    public interface IAssignmentTypeArgument : BaseNode.IAssignmentTypeArgument, ITypeArgument
+    public interface IAssignmentTypeArgument : ITypeArgument
     {
+        /// <summary>
+        /// Gets or sets the assigned parameter name.
+        /// </summary>
+        BaseNode.Identifier ParameterIdentifier { get; }
+
+        /// <summary>
+        /// Gets or sets the source type.
+        /// </summary>
+        BaseNode.ObjectType Source { get; }
     }
 
     /// <summary>

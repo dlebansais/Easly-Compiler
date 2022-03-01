@@ -31,7 +31,7 @@
         /// Writes the documentation associated to a node.
         /// </summary>
         /// <param name="node">The documented node.</param>
-        void WriteDocumentation(BaseNode.INode node);
+        void WriteDocumentation(BaseNode.Node node);
 
         /// <summary>
         /// Increased the current indentation level by 1.
@@ -126,7 +126,7 @@
         /// Writes the documentation associated to a node.
         /// </summary>
         /// <param name="node">The documented node.</param>
-        public void WriteDocumentation(BaseNode.INode node)
+        public void WriteDocumentation(BaseNode.Node node)
         {
             string Comment = node.Documentation.Comment;
 

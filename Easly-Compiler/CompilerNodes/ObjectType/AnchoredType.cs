@@ -8,8 +8,17 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IAnchoredType.
     /// </summary>
-    public interface IAnchoredType : BaseNode.IAnchoredType, IObjectType
+    public interface IAnchoredType : IObjectType
     {
+        /// <summary>
+        /// Gets or sets the variable the type is anchored to.
+        /// </summary>
+        BaseNode.QualifiedName AnchoredName { get; }
+
+        /// <summary>
+        /// Gets or sets whether the anchor is at declaration or creation.
+        /// </summary>
+        BaseNode.AnchorKinds AnchorKind { get; }
     }
 
     /// <summary>

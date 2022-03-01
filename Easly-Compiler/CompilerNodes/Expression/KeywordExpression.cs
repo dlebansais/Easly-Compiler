@@ -9,8 +9,12 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IKeywordExpression.
     /// </summary>
-    public interface IKeywordExpression : BaseNode.IKeywordExpression, IExpression, IComparableExpression
+    public interface IKeywordExpression : IExpression, IComparableExpression
     {
+        /// <summary>
+        /// Gets or sets the keyword.
+        /// </summary>
+        BaseNode.Keyword Value { get; }
     }
 
     /// <summary>
@@ -332,7 +336,7 @@ namespace CompilerNode
             return Success;
         }
 
-        private static bool CheckGetterConsistency(ISource source, IOptionalReference<BaseNode.IBody> optionalGetter, IErrorList errorList)
+        private static bool CheckGetterConsistency(ISource source, IOptionalReference<BaseNode.Body> optionalGetter, IErrorList errorList)
         {
             if (source.EmbeddingBody is IBody AsBody)
             {

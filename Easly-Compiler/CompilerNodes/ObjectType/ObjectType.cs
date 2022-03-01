@@ -9,7 +9,7 @@
     /// <summary>
     /// Compiler IObjectType.
     /// </summary>
-    public interface IObjectType : BaseNode.IObjectType, INode, ISource
+    public interface IObjectType : INode, ISource
     {
         /// <summary>
         /// The resolved type name.

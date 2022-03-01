@@ -9,8 +9,23 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IInspectInstruction.
     /// </summary>
-    public interface IInspectInstruction : BaseNode.IInspectInstruction, IInstruction, INodeWithReplicatedBlocks
+    public interface IInspectInstruction : IInstruction, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Gets or sets the inspected expression.
+        /// </summary>
+        BaseNode.Expression Source { get; }
+
+        /// <summary>
+        /// Gets or sets the list of cases.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.With> WithBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets instructions to execute if none of the cases matched.
+        /// </summary>
+        IOptionalReference<BaseNode.Scope> ElseInstructions { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.InspectInstruction.WithBlocks"/>.
         /// </summary>
@@ -33,7 +48,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyWith">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyWith, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyWith, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -47,7 +62,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

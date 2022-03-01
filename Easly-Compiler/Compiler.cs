@@ -49,7 +49,7 @@
         /// Compiles the source code.
         /// </summary>
         /// <param name="root">The source code to compile.</param>
-        void Compile(BaseNode.IRoot root);
+        void Compile(BaseNode.Root root);
 
         /// <summary>
         /// Compiles the source code.
@@ -77,7 +77,7 @@
         /// <summary>
         /// The last compiled source code.
         /// </summary>
-        public BaseNode.IRoot Root { get; private set; }
+        public BaseNode.Root Root { get; private set; }
 
         /// <summary>
         /// The source code, merged with languages classes and compiled.
@@ -127,7 +127,7 @@
         /// Compiles the source code.
         /// </summary>
         /// <param name="root">The source code to compile.</param>
-        public virtual void Compile(BaseNode.IRoot root)
+        public virtual void Compile(BaseNode.Root root)
         {
             Root = root ?? throw new ArgumentNullException(nameof(root));
             ErrorList.ClearErrors();
@@ -195,7 +195,7 @@
 
             IRoot LanguageRoot = LoadLanguageRoot();
             Debug.Assert(LanguageRoot != null);
-            Debug.Assert(NodeTreeDiagnostic.IsValid(LanguageRoot));
+            Debug.Assert(NodeTreeDiagnostic.IsValid((BaseNode.Root)LanguageRoot));
 
             MergeLanguageRoot(root, LanguageRoot);
 
@@ -239,14 +239,14 @@
         protected virtual void MergeLanguageRoot(IRoot root, IRoot languageRoot)
         {
             Debug.Assert(languageRoot.LibraryBlocks.NodeBlockList.Count == 1);
-            BaseNode.IBlock<BaseNode.ILibrary, BaseNode.Library> BlockLibrary = languageRoot.LibraryBlocks.NodeBlockList[0];
+            BaseNode.IBlock<BaseNode.Library> BlockLibrary = languageRoot.LibraryBlocks.NodeBlockList[0];
 
             Debug.Assert(BlockLibrary.NodeList.Count == 1);
             root.LibraryBlocks.NodeBlockList.Add(BlockLibrary);
 
-            BaseNode.ILibrary LanguageLibrary = BlockLibrary.NodeList[0];
+            BaseNode.Library LanguageLibrary = BlockLibrary.NodeList[0];
             Debug.Assert(LanguageLibrary.ClassIdentifierBlocks.NodeBlockList.Count == 1);
-            BaseNode.IBlock<BaseNode.IIdentifier, BaseNode.Identifier> BlockIdentifier = LanguageLibrary.ClassIdentifierBlocks.NodeBlockList[0];
+            BaseNode.IBlock<BaseNode.Identifier> BlockIdentifier = LanguageLibrary.ClassIdentifierBlocks.NodeBlockList[0];
 
             Debug.Assert(BlockIdentifier.NodeList.Count == LanguageClasses.NameToGuid.Count);
             Debug.Assert(BlockIdentifier.NodeList.Count == LanguageClasses.GuidToName.Count);
@@ -258,7 +258,7 @@
             }
 
             Debug.Assert(languageRoot.ClassBlocks.NodeBlockList.Count == 1);
-            BaseNode.IBlock<BaseNode.IClass, BaseNode.Class> BlockClass = languageRoot.ClassBlocks.NodeBlockList[0];
+            BaseNode.IBlock<BaseNode.Class> BlockClass = languageRoot.ClassBlocks.NodeBlockList[0];
 
             Debug.Assert(BlockClass.NodeList.Count == LanguageClasses.NameToGuid.Count);
             Debug.Assert(BlockClass.NodeList.Count == LanguageClasses.GuidToName.Count);
@@ -275,15 +275,15 @@
             Debug.Assert(languageRoot.Replicates.Count == 0);
 
             // Remove hard-coded classes.
-            List<BaseNode.IIdentifier> IdentifierCopyList = new List<BaseNode.IIdentifier>(BlockIdentifier.NodeList);
+            List<BaseNode.Identifier> IdentifierCopyList = new List<BaseNode.Identifier>(BlockIdentifier.NodeList);
             foreach (IIdentifier Item in IdentifierCopyList)
                 if (Item.Text == "Any" || Item.Text == "Any Reference" || Item.Text == "Any Value")
-                    BlockIdentifier.NodeList.Remove(Item);
+                    BlockIdentifier.NodeList.Remove((BaseNode.Identifier)Item);
 
-            List<BaseNode.IClass> ClassCopyList = new List<BaseNode.IClass>(BlockClass.NodeList);
+            List<BaseNode.Class> ClassCopyList = new List<BaseNode.Class>(BlockClass.NodeList);
             foreach (IClass Item in ClassCopyList)
                 if (Item.EntityName.Text == "Any" || Item.EntityName.Text == "Any Reference" || Item.EntityName.Text == "Any Value")
-                    BlockClass.NodeList.Remove(Item);
+                    BlockClass.NodeList.Remove((BaseNode.Class)Item);
         }
 
         /// <summary></summary>
@@ -291,7 +291,7 @@
         {
             bool Success = true;
 
-            if (!NodeTreeDiagnostic.IsValid(root, assertValid: false))
+            if (!NodeTreeDiagnostic.IsValid((BaseNode.Root)root, throwOnInvalid: false))
             {
                 ErrorList.AddError(new ErrorInputRootInvalid());
                 Success = false;

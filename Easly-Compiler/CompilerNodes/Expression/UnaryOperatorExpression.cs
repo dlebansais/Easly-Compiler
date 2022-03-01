@@ -8,8 +8,18 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IUnaryOperatorExpression.
     /// </summary>
-    public interface IUnaryOperatorExpression : BaseNode.IUnaryOperatorExpression, IExpression, IComparableExpression
+    public interface IUnaryOperatorExpression : IExpression, IComparableExpression
     {
+        /// <summary>
+        /// Gets or sets the operator.
+        /// </summary>
+        BaseNode.Identifier Operator { get; }
+
+        /// <summary>
+        /// Gets or sets the operand.
+        /// </summary>
+        BaseNode.Expression RightExpression { get; }
+
         /// <summary>
         /// The resolved operator feature.
         /// </summary>

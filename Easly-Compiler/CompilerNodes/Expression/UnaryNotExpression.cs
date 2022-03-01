@@ -8,8 +8,13 @@
     /// <summary>
     /// Compiler IUnaryNotExpression.
     /// </summary>
-    public interface IUnaryNotExpression : BaseNode.IUnaryNotExpression, IExpression, IComparableExpression
+    public interface IUnaryNotExpression : IExpression, IComparableExpression
     {
+        /// <summary>
+        /// Gets or sets the operand.
+        /// </summary>
+        BaseNode.Expression RightExpression { get; }
+
         /// <summary>
         /// True if the condition is on events.
         /// </summary>

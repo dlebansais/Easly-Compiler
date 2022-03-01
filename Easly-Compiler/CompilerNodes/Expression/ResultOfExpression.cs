@@ -8,8 +8,12 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IResultOfExpression.
     /// </summary>
-    public interface IResultOfExpression : BaseNode.IResultOfExpression, IExpression, IComparableExpression
+    public interface IResultOfExpression : IExpression, IComparableExpression
     {
+        /// <summary>
+        /// Gets or sets the source expression.
+        /// </summary>
+        BaseNode.Expression Source { get; }
     }
 
     /// <summary>

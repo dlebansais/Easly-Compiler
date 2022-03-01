@@ -8,8 +8,17 @@ namespace CompilerNode
     /// <summary>
     /// Compiler ICloneOfExpression.
     /// </summary>
-    public interface ICloneOfExpression : BaseNode.ICloneOfExpression, IExpression, IComparableExpression
+    public interface ICloneOfExpression : IExpression, IComparableExpression
     {
+        /// <summary>
+        /// Gets or sets the clone type.
+        /// </summary>
+        BaseNode.CloneType Type { get; }
+
+        /// <summary>
+        /// Gets or sets the cloned source.
+        /// </summary>
+        BaseNode.Expression Source { get; }
     }
 
     /// <summary>

@@ -8,8 +8,12 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IDebugInstruction.
     /// </summary>
-    public interface IDebugInstruction : BaseNode.IDebugInstruction, IInstruction
+    public interface IDebugInstruction : IInstruction
     {
+        /// <summary>
+        /// Gets or sets instructions to execute conditionally.
+        /// </summary>
+        BaseNode.Scope Instructions { get; }
     }
 
     /// <summary>

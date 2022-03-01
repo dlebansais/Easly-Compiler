@@ -9,8 +9,23 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IThrowInstruction.
     /// </summary>
-    public interface IThrowInstruction : BaseNode.IThrowInstruction, IInstruction, INodeWithReplicatedBlocks
+    public interface IThrowInstruction : IInstruction, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Gets or sets the type of the exception.
+        /// </summary>
+        BaseNode.ObjectType ExceptionType { get; }
+
+        /// <summary>
+        /// Gets or sets the creation routine to use.
+        /// </summary>
+        BaseNode.Identifier CreationRoutine { get; }
+
+        /// <summary>
+        /// Gets or sets the call arguments.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Argument> ArgumentBlocks { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.ThrowInstruction.ArgumentBlocks"/>.
         /// </summary>
@@ -43,7 +58,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyArgument">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyArgument, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyArgument, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -57,7 +72,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

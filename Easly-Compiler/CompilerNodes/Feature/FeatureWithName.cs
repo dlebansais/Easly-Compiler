@@ -8,6 +8,6 @@
         /// <summary>
         /// The feature name.
         /// </summary>
-        BaseNode.IName EntityName { get; }
+        BaseNode.Name EntityName { get; }
     }
 }

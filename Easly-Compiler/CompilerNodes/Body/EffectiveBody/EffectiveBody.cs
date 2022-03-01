@@ -9,7 +9,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IEffectiveBody.
     /// </summary>
-    public interface IEffectiveBody : BaseNode.IEffectiveBody, IBody, ICompiledBody, IScopeHolder
+    public interface IEffectiveBody : IBody, ICompiledBody, IScopeHolder
     {
         /// <summary>
         /// Replicated list from <see cref="BaseNode.EffectiveBody.EntityDeclarationBlocks"/>.
@@ -68,7 +68,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyName">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyName, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyName, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -102,7 +102,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

@@ -9,8 +9,18 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IPrecursorIndexExpression.
     /// </summary>
-    public interface IPrecursorIndexExpression : BaseNode.IPrecursorIndexExpression, IExpression, INodeWithReplicatedBlocks
+    public interface IPrecursorIndexExpression : IExpression, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Gets or sets the type where to get the precursor from.
+        /// </summary>
+        IOptionalReference<BaseNode.ObjectType> AncestorType { get; }
+
+        /// <summary>
+        /// Gets or sets the query parameters.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Argument> ArgumentBlocks { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.PrecursorIndexExpression.ArgumentBlocks"/>.
         /// </summary>
@@ -48,7 +58,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyName">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyName, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyName, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -62,7 +72,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion
@@ -260,7 +270,7 @@ namespace CompilerNode
         {
             resolvedExpression = new ResolvedExpression();
 
-            IOptionalReference<BaseNode.IObjectType> AncestorType = node.AncestorType;
+            IOptionalReference<BaseNode.ObjectType> AncestorType = node.AncestorType;
             IList<IArgument> ArgumentList = node.ArgumentList;
             IClass EmbeddingClass = node.EmbeddingClass;
 

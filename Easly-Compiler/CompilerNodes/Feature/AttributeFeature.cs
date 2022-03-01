@@ -10,8 +10,18 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IAttributeFeature.
     /// </summary>
-    public interface IAttributeFeature : BaseNode.IAttributeFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithEvents, IFeatureWithEntity
+    public interface IAttributeFeature : IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithEvents, IFeatureWithEntity
     {
+        /// <summary>
+        /// Gets or sets the attribute type.
+        /// </summary>
+        BaseNode.ObjectType EntityType { get; }
+
+        /// <summary>
+        /// Gets or sets attribute guarantees.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Assertion> EnsureBlocks { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.AttributeFeature.EnsureBlocks"/>.
         /// </summary>
@@ -56,7 +66,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyName">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyName, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyName, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -70,7 +80,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

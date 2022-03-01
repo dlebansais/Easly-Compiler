@@ -7,7 +7,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IExceptionHandler.
     /// </summary>
-    public interface IExceptionHandler : BaseNode.IExceptionHandler, INode, ISource
+    public interface IExceptionHandler : INode, ISource
     {
     }
 

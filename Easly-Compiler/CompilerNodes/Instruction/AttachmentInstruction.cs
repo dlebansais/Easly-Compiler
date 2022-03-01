@@ -9,8 +9,28 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IAttachmentInstruction.
     /// </summary>
-    public interface IAttachmentInstruction : BaseNode.IAttachmentInstruction, IInstruction, INodeWithReplicatedBlocks
+    public interface IAttachmentInstruction : IInstruction, INodeWithReplicatedBlocks
     {
+        /// <summary>
+        /// Gets or sets the value to attach.
+        /// </summary>
+        BaseNode.Expression Source { get; }
+
+        /// <summary>
+        /// Gets or sets the list of variables created upon attachment.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Name> EntityNameBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the list of possible attachments.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Attachment> AttachmentBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets instructions to execute when not attaching.
+        /// </summary>
+        IOptionalReference<BaseNode.Scope> ElseInstructions { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.AttachmentInstruction.EntityNameBlocks"/>.
         /// </summary>
@@ -48,7 +68,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyName">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyName, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyName, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -66,7 +86,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

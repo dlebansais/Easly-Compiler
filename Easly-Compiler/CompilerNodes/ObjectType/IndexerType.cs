@@ -9,8 +9,63 @@
     /// <summary>
     /// Compiler IIndexerType.
     /// </summary>
-    public interface IIndexerType : BaseNode.IIndexerType, IObjectType, INodeWithReplicatedBlocks, ICompiledType
+    public interface IIndexerType : IObjectType, INodeWithReplicatedBlocks, ICompiledType
     {
+        /// <summary>
+        /// Gets or sets the base type.
+        /// </summary>
+        BaseNode.ObjectType BaseType { get; }
+
+        /// <summary>
+        /// Gets or sets the index type.
+        /// </summary>
+        BaseNode.ObjectType EntityType { get; }
+
+        /// <summary>
+        /// Gets or sets the list of parameters.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.EntityDeclaration> IndexParameterBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets whether the command accepts extra parameters.
+        /// </summary>
+        BaseNode.ParameterEndStatus ParameterEnd { get; }
+
+        /// <summary>
+        /// Gets or sets how this indexer can be used.
+        /// </summary>
+        BaseNode.UtilityType IndexerKind { get; }
+
+        /// <summary>
+        /// Gets or sets the getter requirements.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Assertion> GetRequireBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the getter guarantees.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Assertion> GetEnsureBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the getter exception handlers.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Identifier> GetExceptionIdentifierBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the setter requirements.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Assertion> SetRequireBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the setter guarantees.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Assertion> SetEnsureBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the setter exception handlers.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Identifier> SetExceptionIdentifierBlocks { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.IndexerType.IndexParameterBlocks"/>.
         /// </summary>
@@ -109,7 +164,7 @@
         public IndexerType(ITypeName baseTypeName, IClassType baseType, ITypeName entityTypeName, ICompiledType entityType, BaseNode.UtilityType indexerKind, IList<IEntityDeclaration> indexParameterList, BaseNode.ParameterEndStatus parameterEnd, IList<IAssertion> getRequireList, IList<IAssertion> getEnsureList, IList<IIdentifier> getExceptionIdentifierList, IList<IAssertion> setRequireList, IList<IAssertion> setEnsureList, IList<IIdentifier> setExceptionIdentifierList)
             : this()
         {
-            BaseType = baseType;
+            BaseType = (BaseNode.ObjectType)baseType;
             EntityType = null;
             ParameterEnd = parameterEnd;
             IndexerKind = indexerKind;
@@ -178,7 +233,7 @@
         /// </summary>
         /// <param name="propertyTypeArgument">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyTypeArgument, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyTypeArgument, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -216,7 +271,7 @@
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

@@ -10,7 +10,7 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IArgument.
     /// </summary>
-    public interface IArgument : BaseNode.IArgument, INode, ISource
+    public interface IArgument : INode, ISource
     {
         /// <summary>
         /// Gets a string representation of the argument.

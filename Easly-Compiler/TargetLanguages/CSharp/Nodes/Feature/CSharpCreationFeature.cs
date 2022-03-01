@@ -127,7 +127,7 @@
             if (!WriteDown)
                 return;
 
-            writer.WriteDocumentation(Source);
+            writer.WriteDocumentation((BaseNode.CreationFeature)Source);
 
             bool ClassHasSingleConstructor = isLocal && Owner.ClassConstructorType == CSharpConstructorTypes.OneConstructor;
 

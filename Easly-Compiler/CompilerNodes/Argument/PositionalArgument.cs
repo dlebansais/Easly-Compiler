@@ -10,8 +10,12 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IPositionalArgument.
     /// </summary>
-    public interface IPositionalArgument : BaseNode.IPositionalArgument, IArgument
+    public interface IPositionalArgument : IArgument
     {
+        /// <summary>
+        /// Gets the argument source.
+        /// </summary>
+        BaseNode.Expression Source { get; }
     }
 
     /// <summary>
@@ -34,8 +38,8 @@ namespace CompilerNode
         /// <param name="source">The source expression</param>
         public PositionalArgument(IExpression source)
         {
-            Documentation = BaseNodeHelper.NodeHelper.CreateEmptyDocumentation();
-            Source = source ?? throw new ArgumentNullException(nameof(source));
+            Documentation = BaseNodeHelper.NodeHelper.CreateEmptyDocument();
+            Source = source as BaseNode.Expression ?? throw new ArgumentNullException(nameof(source));
 
             if (source.ResolvedResult.IsAssigned)
                 ResolvedResult.Item = source.ResolvedResult.Item;

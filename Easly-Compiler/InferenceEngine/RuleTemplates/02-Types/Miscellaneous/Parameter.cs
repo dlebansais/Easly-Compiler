@@ -56,13 +56,17 @@
         /// <param name="name">The name to look for.</param>
         public static bool TableContainsName(ISealableList<IParameter> parameterTable, string name)
         {
-            return parameterTable.Exists((IParameter item) => item.Name == name);
+            foreach (IParameter Item in parameterTable)
+                if (Item.Name == name)
+                    return true;
+
+            return false;
         }
 
         /// <summary></summary>
         public override string ToString()
         {
-            string Value = ResolvedParameter.DefaultValue.IsAssigned ? $" = {ResolvedParameter.DefaultValue.Item.ExpressionToString}" : string.Empty;
+            string Value = ResolvedParameter.DefaultValue.IsAssigned ? $" = {((IExpression)ResolvedParameter.DefaultValue.Item).ExpressionToString}" : string.Empty;
             return $"Parameter '{Name}'{Value}";
         }
     }

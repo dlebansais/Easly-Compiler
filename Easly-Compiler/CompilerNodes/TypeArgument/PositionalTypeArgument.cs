@@ -8,8 +8,12 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IPositionalTypeArgument.
     /// </summary>
-    public interface IPositionalTypeArgument : BaseNode.IPositionalTypeArgument, ITypeArgument
+    public interface IPositionalTypeArgument : ITypeArgument
     {
+        /// <summary>
+        /// Gets or sets the argument type.
+        /// </summary>
+        BaseNode.ObjectType Source { get; }
     }
 
     /// <summary>

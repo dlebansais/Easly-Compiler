@@ -10,8 +10,33 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IPropertyFeature.
     /// </summary>
-    public interface IPropertyFeature : BaseNode.IPropertyFeature, IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithPrecursor, IGetterSetterScopeHolder, INodeWithResult, IFeatureWithEvents, IFeatureWithEntity, IFeatureWithNumberType
+    public interface IPropertyFeature : IFeature, IFeatureWithName, INodeWithReplicatedBlocks, ICompiledFeature, IFeatureWithPrecursor, IGetterSetterScopeHolder, INodeWithResult, IFeatureWithEvents, IFeatureWithEntity, IFeatureWithNumberType
     {
+        /// <summary>
+        /// Gets or sets the property type.
+        /// </summary>
+        BaseNode.ObjectType EntityType { get; }
+
+        /// <summary>
+        /// Gets or sets how this property can be used.
+        /// </summary>
+        BaseNode.UtilityType PropertyKind { get; }
+
+        /// <summary>
+        /// Gets or sets the list of other features this property modifies.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Identifier> ModifiedQueryBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the getter body.
+        /// </summary>
+        IOptionalReference<BaseNode.Body> GetterBody { get; }
+
+        /// <summary>
+        /// Gets or sets the setter body.
+        /// </summary>
+        IOptionalReference<BaseNode.Body> SetterBody { get; }
+
         /// <summary>
         /// The name of the resolved property type.
         /// </summary>
@@ -51,7 +76,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyName">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyName, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyName, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -65,7 +90,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

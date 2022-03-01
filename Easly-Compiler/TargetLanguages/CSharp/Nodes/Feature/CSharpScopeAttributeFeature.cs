@@ -128,7 +128,7 @@
             Type = CSharpType.Create(context, Source.ResolvedEffectiveType.Item);
 
             if (Source.DefaultValue.IsAssigned)
-                DefaultValue = CSharpExpression.Create(context, Source.DefaultValue.Item);
+                DefaultValue = CSharpExpression.Create(context, (IExpression)Source.DefaultValue.Item);
         }
 
         /// <summary>

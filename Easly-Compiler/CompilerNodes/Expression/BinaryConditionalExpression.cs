@@ -8,8 +8,22 @@
     /// <summary>
     /// Compiler IBinaryConditionalExpression.
     /// </summary>
-    public interface IBinaryConditionalExpression : BaseNode.IBinaryConditionalExpression, IExpression, IComparableExpression
+    public interface IBinaryConditionalExpression : IExpression, IComparableExpression
     {
+        /// <summary>
+        /// Gets or sets the left operand.
+        /// </summary>
+        BaseNode.Expression LeftExpression { get; }
+
+        /// <summary>
+        /// Gets or sets the conditional operator.
+        /// </summary>
+        BaseNode.ConditionalTypes Conditional { get; }
+
+        /// <summary>
+        /// Gets or sets the right operand.
+        /// </summary>
+        BaseNode.Expression RightExpression { get; }
     }
 
     /// <summary>

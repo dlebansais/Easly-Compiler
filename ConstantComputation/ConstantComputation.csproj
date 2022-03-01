@@ -13,7 +13,7 @@
     <Description>Constant Computation</Description>
     <Copyright>Copyright © 2019 David Le Bansais</Copyright>
     <Version>1.0.0</Version>
-    <AssemblyVersion>1.0.0.3416</AssemblyVersion>
+    <AssemblyVersion>1.0.0.3417</AssemblyVersion>
     <FileVersion>1.0.0.10</FileVersion>
     <RepositoryUrl>https://github.com/dlebansais/Easly-Compiler</RepositoryUrl>
     <NeutralLanguage>en-US</NeutralLanguage>
@@ -26,12 +26,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="5.0.3">
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="6.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Easly-Language-Debug" Version="1.0.5" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
-    <PackageReference Include="Easly-Language" Version="1.0.5" Condition="'$(Configuration)|$(Platform)'!='Debug|x64'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Easly-Language">
+      <HintPath>..\..\Easly-Language\Easly-Language-Helper\bin\x64\Debug\$(TargetFramework)\Easly-Language.dll</HintPath>
+    </Reference>
+    <Reference Include="Easly-Language-Helper">
+      <HintPath>..\..\Easly-Language\Easly-Language-Helper\bin\x64\Debug\$(TargetFramework)\Easly-Language-Helper.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

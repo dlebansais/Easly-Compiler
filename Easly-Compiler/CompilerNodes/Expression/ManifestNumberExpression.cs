@@ -9,8 +9,13 @@
     /// <summary>
     /// Compiler IManifestNumberExpression.
     /// </summary>
-    public interface IManifestNumberExpression : BaseNode.IManifestNumberExpression, IExpression, IComparableExpression
+    public interface IManifestNumberExpression : IExpression, IComparableExpression
     {
+        /// <summary>
+        /// Gets or sets the number text representation.
+        /// </summary>
+        string Text { get; }
+
         /// <summary>
         /// The valid value of <see cref="BaseNode.IManifestNumberExpression.Text"/>.
         /// </summary>
@@ -37,7 +42,7 @@
         /// <param name="value">Initial value.</param>
         public ManifestNumberExpression(int value)
         {
-            Documentation = BaseNodeHelper.NodeHelper.CreateEmptyDocumentation();
+            Documentation = BaseNodeHelper.NodeHelper.CreateEmptyDocument();
             Text = value.ToString(CultureInfo.InvariantCulture);
         }
 
@@ -47,7 +52,7 @@
         /// <param name="text">Initial value.</param>
         public ManifestNumberExpression(string text)
         {
-            Documentation = BaseNodeHelper.NodeHelper.CreateEmptyDocumentation();
+            Documentation = BaseNodeHelper.NodeHelper.CreateEmptyDocument();
             Text = text;
         }
         #endregion

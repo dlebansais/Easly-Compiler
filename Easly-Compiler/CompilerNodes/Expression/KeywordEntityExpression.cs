@@ -9,8 +9,12 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IKeywordEntityExpression.
     /// </summary>
-    public interface IKeywordEntityExpression : BaseNode.IKeywordEntityExpression, IExpression, IComparableExpression
+    public interface IKeywordEntityExpression : IExpression, IComparableExpression
     {
+        /// <summary>
+        /// Gets or sets the keyword.
+        /// </summary>
+        BaseNode.Keyword Value { get; }
     }
 
     /// <summary>

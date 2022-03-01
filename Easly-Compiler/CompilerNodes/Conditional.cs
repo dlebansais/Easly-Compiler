@@ -8,8 +8,18 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IConditional.
     /// </summary>
-    public interface IConditional : BaseNode.IConditional, INode, ISource, IScopeHolder
+    public interface IConditional : INode, ISource, IScopeHolder
     {
+        /// <summary>
+        /// Gets or sets the condition.
+        /// </summary>
+        BaseNode.Expression BooleanExpression { get; }
+
+        /// <summary>
+        /// Gets or sets instructions to execute if the condition is true.
+        /// </summary>
+        BaseNode.Scope Instructions { get; }
+
         /// <summary>
         /// Types of results of the conditional.
         /// </summary>

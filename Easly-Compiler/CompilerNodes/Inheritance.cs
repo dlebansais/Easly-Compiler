@@ -9,8 +9,58 @@ namespace CompilerNode
     /// <summary>
     /// Compiler IInheritance.
     /// </summary>
-    public interface IInheritance : BaseNode.IInheritance, INode, INodeWithReplicatedBlocks, ISource
+    public interface IInheritance : INode, INodeWithReplicatedBlocks, ISource
     {
+        /// <summary>
+        /// Gets or sets the parent type.
+        /// </summary>
+        BaseNode.ObjectType ParentType { get; }
+
+        /// <summary>
+        /// Gets or sets whether the inheritance is for conformance.
+        /// </summary>
+        BaseNode.ConformanceType Conformance { get; }
+
+        /// <summary>
+        /// Gets or sets the list of renames.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Rename> RenameBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the indexer should be overriden.
+        /// </summary>
+        bool ForgetIndexer { get; }
+
+        /// <summary>
+        /// Gets or sets the list of overriden features.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Identifier> ForgetBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the indexer should be kept.
+        /// </summary>
+        bool KeepIndexer { get; }
+
+        /// <summary>
+        /// Gets or sets the list of kept features.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Identifier> KeepBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the indexer should be discontinued.
+        /// </summary>
+        bool DiscontinueIndexer { get; }
+
+        /// <summary>
+        /// Gets or sets the list of discontinued features.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.Identifier> DiscontinueBlocks { get; }
+
+        /// <summary>
+        /// Gets or sets the list of changed export statements.
+        /// </summary>
+        BaseNode.IBlockList<BaseNode.ExportChange> ExportChangeBlocks { get; }
+
         /// <summary>
         /// Replicated list from <see cref="BaseNode.Inheritance.RenameBlocks"/>.
         /// </summary>
@@ -138,7 +188,7 @@ namespace CompilerNode
         /// </summary>
         /// <param name="propertyName">The property name of the block.</param>
         /// <param name="nodeList">The node list.</param>
-        public void FillReplicatedList(string propertyName, List<BaseNode.INode> nodeList)
+        public void FillReplicatedList(string propertyName, List<BaseNode.Node> nodeList)
         {
             IList TargetList = null;
 
@@ -168,7 +218,7 @@ namespace CompilerNode
             Debug.Assert(TargetList != null);
             Debug.Assert(TargetList.Count == 0);
 
-            foreach (BaseNode.INode Node in nodeList)
+            foreach (BaseNode.Node Node in nodeList)
                 TargetList.Add(Node);
         }
         #endregion

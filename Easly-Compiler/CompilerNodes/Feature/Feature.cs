@@ -8,8 +8,18 @@
     /// <summary>
     /// Compiler IFeature.
     /// </summary>
-    public interface IFeature : BaseNode.IFeature, INode, ISource
+    public interface IFeature : INode, ISource
     {
+        /// <summary>
+        /// Gets or sets the export to which this feature belongs.
+        /// </summary>
+        BaseNode.Identifier ExportIdentifier { get; }
+
+        /// <summary>
+        /// Gets or sets the export type.
+        /// </summary>
+        BaseNode.ExportStatus Export { get; }
+
         /// <summary>
         /// The resolved feature name.
         /// </summary>
